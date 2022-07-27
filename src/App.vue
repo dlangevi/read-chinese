@@ -1,15 +1,45 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app">
+    <div class="container">
+      <div class="text-center">
+        <h2 class="text-center mt-5">Your Library</h2>
+        <p>Click on a book to start making flashcards.</p>
+      </div>
+
+      <div class="row" v-if="books.length > 0">
+        <div class="col-md-3" v-for="(book, i) in books" :key="i">
+          <book-card :book="book" />
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue';
+import BookCard from './components/BookCard.vue';
+// import { getTimesRan } from './helpers/database';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld,
+    BookCard,
+  },
+  data() {
+    return {
+      books: [],
+    };
+  },
+  methods: {
+    getBooks() {
+      window.ipc.send('need-books');
+    },
+  },
+  mounted() {
+    window.ipc.on('give-books', (books) => {
+      console.log(books.map((book) => `${book.author}-${book.title}`));
+      this.books = books;
+    });
+    this.getBooks();
   },
 };
 </script>
