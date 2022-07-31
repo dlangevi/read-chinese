@@ -8,13 +8,11 @@ import path from 'path';
 import appMenuTemplate from './menu/app_menu_template';
 import editMenuTemplate from './menu/edit_menu_template';
 import devMenuTemplate from './menu/dev_menu_template';
-import knownWords from './helpers/knownWords';
+import { syncWords } from './helpers/knownWords';
 import { initLibraryIpc } from './helpers/calibre';
 import { updateTimesRan, getTimesRan } from './helpers/database';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
-
-knownWords.knownWords();
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -102,6 +100,7 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString());
     }
   }
+  await syncWords();
   setApplicationMenu();
   initIpc();
   createWindow();

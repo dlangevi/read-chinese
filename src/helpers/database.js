@@ -11,6 +11,7 @@ knex.migrate.latest(knexConfig).catch((err) => {
   console.log(err);
 });
 
+// TODO should this also be in sql?
 const bookStore = new Store({ name: 'books' });
 const metadataStore = new Store({ name: 'metadata' });
 
@@ -23,13 +24,25 @@ export function getTimesRan() {
   return metadataStore.get('ran', 0);
 }
 
-export function updateWord(ankiCard) {
-  knex('words')
-    .where('word', ankiCard.fields.Hanzi.value)
-    .update({
-      has_flash_card: true,
-      interval: ankiCard.interval,
-    }).catch((err) => { console.log(err); });
+export async function updateWord(ankiCard) {
+  const word = ankiCard.fields.Hanzi.value;
+  const exists = await knex('words').select().where('word', word);
+  if (exists.length === 0) {
+    console.log(`Adding new word: ${word}`);
+    knex('words')
+      .insert({
+        word,
+        interval: ankiCard.interval,
+        has_flash_card: true,
+      }).catch((err) => { console.log(err); });
+  } else {
+    knex('words')
+      .where('word', word)
+      .update({
+        has_flash_card: true,
+        interval: ankiCard.interval,
+      }).catch((err) => { console.log(err); });
+  }
 }
 
 export function saveWords(words) {
@@ -47,9 +60,17 @@ export function saveWords(words) {
 }
 
 export async function loadWords() {
-  const words = await knex('words')
-    .select({ id: 'id', word: 'word' })
+  const rows = await knex('words')
+    .select({ id: 'id', word: 'word', interval: 'interval' })
     .catch((error) => { console.log(error); });
+  const words = {};
+  rows.forEach((row) => {
+    words[row.word] = {
+      interval: row.interval,
+      // todo get added working
+      added: 0,
+    };
+  });
   return words;
 }
 

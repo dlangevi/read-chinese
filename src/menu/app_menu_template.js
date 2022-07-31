@@ -1,12 +1,9 @@
 import { app, dialog } from 'electron';
-import { createParser } from 'node-csv';
 import fs from 'fs';
 import { saveWords, loadWords } from '../helpers/database';
 import { importCalibreBooks } from '../helpers/calibre';
 import { generateSentences } from '../helpers/generateSentences';
-import { getSkritterWords, importAnkiKeywords } from '../helpers/ankiInterface';
-
-const csv = createParser();
+import { getLackingCards, importAnkiKeywords } from '../helpers/ankiInterface';
 
 export default {
   label: 'App',
@@ -56,40 +53,17 @@ export default {
       },
     },
     {
-      label: 'Test Sentence Gen',
-      click: () => {
-        const wordsFile = dialog.showOpenDialogSync({
-          properties: ['openFile'],
-          filters: [
-            { name: 'csv', extensions: ['csv'] },
-          ],
-        });
-        console.log(wordsFile);
-        const contents = fs.readFileSync(wordsFile[0], {
-          encoding: 'utf-8',
-          flags: 'r',
-        });
-        // TODO load csv words and generate known sentences
-        const words = csv.parse(contents);
-        const fixedWords = words
-          .filter((row) => (row.length === 4))
-          .map((row) => row[0]);
-
-        generateSentences(fixedWords);
-      },
-    },
-    {
       label: 'Sync Anki',
       click: async () => {
         importAnkiKeywords();
       },
     },
     {
-      label: 'Test Anki Gen',
+      label: 'Auto Generate Missing Sentences',
       click: async () => {
-        const ankiWords = await getSkritterWords();
+        const ankiWords = await getLackingCards('Reading');
         console.log(ankiWords);
-        generateSentences(ankiWords);
+        generateSentences(ankiWords, true);
       },
     },
     {

@@ -4,13 +4,18 @@ import { loadWords } from './database';
 
 // @todo save and load this from the database,
 // and handle per user word lists
-const known = loadWords();
-const knownCharacters = new Set();
-Object.keys(known).forEach((word) => {
-  Array.from(word).forEach((ch) => knownCharacters.add(ch));
-});
-console.log(`Known words: ${Object.keys(known).length}
+
+let known = {};
+let knownCharacters = new Set();
+export async function syncWords() {
+  known = await loadWords();
+  knownCharacters = new Set();
+  Object.keys(known).forEach((word) => {
+    Array.from(word).forEach((ch) => knownCharacters.add(ch));
+  });
+  console.log(`Known words: ${Object.keys(known).length}
 Known characters: ${knownCharacters.size} `);
+}
 
 /**
  * Format a date to the form 'YYYY-MM-DD'

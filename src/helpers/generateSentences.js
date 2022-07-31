@@ -1,6 +1,7 @@
 import { getBooks } from './database';
 import { loadJieba } from './segmentation';
 import known from './knownWords';
+import { addSentenceToCard } from './ankiInterface';
 
 function toText(sentence) {
   return sentence.map(([word]) => word).join('');
@@ -18,7 +19,7 @@ function sentenceKnown(sentence) {
   return unknown <= 0;
 }
 
-export function generateSentences(words) {
+export function generateSentences(words, modifyCards = false) {
   const sentences = {};
   const wordDict = {};
   words.forEach((word) => {
@@ -48,12 +49,15 @@ export function generateSentences(words) {
     });
   });
   let goodOnes = 0;
-  Object.values(wordDict).forEach((candidate) => {
+  Object.entries(wordDict).forEach(([word, candidate]) => {
     if (candidate !== '') {
       goodOnes += 1;
+      // For now do 10 at a time with lots of debugging
+      if (modifyCards && goodOnes < 50) {
+        addSentenceToCard(word, candidate);
+      }
     }
   });
-  console.log(wordDict);
   console.log(`Generated ${goodOnes}/${Object.keys(wordDict).length}`);
 }
 

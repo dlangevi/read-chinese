@@ -76,13 +76,34 @@ export async function createCard(/* card */) {
   return result;
 }
 
-export async function getSkritterWords() {
-  const skritter = await invoke('findCards', { query: 'deck:Skritter' });
+export async function addSentenceToCard(word, sentence) {
+  const notes = await invoke('findNotes', { query: `Hanzi:${word}` });
+  if (notes.result.length !== 1) {
+    console.log(`Too many or few notes match ${word}, ${notes.result}`);
+    return;
+  }
+  const noteID = notes.result[0];
+  console.log(`${word} has noteID ${noteID}, noteIDs ${notes.result}`);
+  const result = await invoke('updateNoteFields', {
+    note: {
+      id: noteID,
+      fields: {
+        ExampleSentence: sentence,
+      },
+    },
+  });
+  if (result.error) {
+    console.log(result);
+  }
+}
+
+export async function getLackingCards(deck) {
+  const skritter = await invoke('findCards', { query: `deck:${deck} ExampleSentence:` });
   const skritterInfo = await invoke('cardsInfo', {
     cards: skritter.result,
   });
   const allWords = skritterInfo.result
-    .map((card) => fixWord(card.fields.Simplified.value))
+    .map((card) => fixWord(card.fields.Hanzi.value))
     .filter((word) => isChinese(word));
   return allWords;
 }

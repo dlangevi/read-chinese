@@ -16,7 +16,14 @@ export function loadCTA(bookname) {
   return json;
 }
 
+const cache = {
+
+};
+
 export function loadJieba(txtPath) {
+  if (txtPath in cache) {
+    return cache[txtPath];
+  }
   const txt = fs.readFileSync(txtPath, 'UTF-8', 'r');
   // Misses names, but also makes less compound words
   // Haha, I see why they recommended the default. This still produces a
@@ -89,6 +96,7 @@ export function loadJieba(txtPath) {
     }
     return result;
   }, [[]]);
+  cache[txtPath] = finalResult;
   return finalResult;
 }
 
