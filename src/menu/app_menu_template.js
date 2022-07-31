@@ -63,7 +63,7 @@ export default {
       click: async () => {
         const ankiWords = await getLackingCards('Reading');
         console.log(ankiWords);
-        generateSentences(ankiWords, true);
+        generateSentences(ankiWords);
       },
     },
     {

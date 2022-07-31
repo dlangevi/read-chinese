@@ -8,20 +8,23 @@ function toText(sentence) {
 }
 
 function sentenceKnown(sentence) {
-  let unknown = 0;
+  const unknowns = new Set();
   sentence.forEach(([word, type]) => {
     if (type !== 3) return;
 
     if (!(known.isKnown(word))) {
-      unknown += 1;
+      unknowns.add(word);
     }
   });
-  return unknown <= 0;
+  return [...unknowns];
 }
 
 export function generateSentences(words, modifyCards = false) {
   const sentences = {};
   const wordDict = {};
+  const shouldLearn = {
+
+  };
   words.forEach((word) => {
     sentences[word] = [];
     wordDict[word] = '';
@@ -32,7 +35,8 @@ export function generateSentences(words, modifyCards = false) {
     console.log(`Loading ${bookInfo.txtFile}`);
     const segmented = loadJieba(bookInfo.txtFile);
     segmented.forEach((sentence) => {
-      if (sentenceKnown(sentence)) {
+      const unknowns = sentenceKnown(sentence);
+      if (unknowns.length === 0) {
         const text = toText(sentence);
         // For now longest wins
         sentence.forEach(([word, type]) => {
@@ -45,6 +49,12 @@ export function generateSentences(words, modifyCards = false) {
         });
 
         candidates.push(toText(sentence));
+      } else if (unknowns.length === 1) {
+        const learn = unknowns[0];
+        if (!(learn in shouldLearn)) {
+          shouldLearn[learn] = 0;
+        }
+        shouldLearn[learn] += 1;
       }
     });
   });
@@ -59,6 +69,15 @@ export function generateSentences(words, modifyCards = false) {
     }
   });
   console.log(`Generated ${goodOnes}/${Object.keys(wordDict).length}`);
+  const sorted = Object.entries(shouldLearn)
+    .filter(([_, timesSeen]) => (timesSeen > 100))
+    .sort(([_, timesA], [__, timesB]) => {
+      if (timesA > timesB) {
+        return 1;
+      }
+      return 0;
+    });
+  console.log(sorted);
 }
 
 export function otherFunction() {

@@ -6,6 +6,7 @@ yarn
 node
 anki
 anki-connect
+calibre: (optional but helpful)
 ```
 
 ## Project setup

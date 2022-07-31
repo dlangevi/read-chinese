@@ -98,7 +98,10 @@ export async function addSentenceToCard(word, sentence) {
 }
 
 export async function getLackingCards(deck) {
-  const skritter = await invoke('findCards', { query: `deck:${deck} ExampleSentence:` });
+  const skritter = await invoke('findCards', {
+    // query: `deck:${deck} ExampleSentence:`,
+    query: `deck:${deck}`,
+  });
   const skritterInfo = await invoke('cardsInfo', {
     cards: skritter.result,
   });
