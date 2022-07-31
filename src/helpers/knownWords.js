@@ -118,7 +118,6 @@ const knownWords = {
 
   knownWordsTable,
   knownWords: () => Object.keys(known).length,
-  loadWords,
   knownCharacters: numKnownCharacters,
   tableData,
 };

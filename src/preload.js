@@ -12,7 +12,6 @@ contextBridge.exposeInMainWorld('ipc', {
     // if (validChannels.includes(channel)) {
     //  ipcRenderer.send(channel, data);
     // }
-    console.log(channel, data);
     ipcRenderer.send(channel, data);
   },
   on: (channel, func) => {
@@ -22,7 +21,6 @@ contextBridge.exposeInMainWorld('ipc', {
     // }
     console.log(channel, func);
     ipcRenderer.on(channel, (event, ...args) => {
-      console.log(channel, ...args);
       func(...args);
     });
   },

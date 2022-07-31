@@ -1,8 +1,16 @@
 // All saved data will be ran through here, so we can swap electron-store to
 // something more performant later if we need
 import Store from 'electron-store';
+import Knex from 'knex';
+import knexConfigMap from '../../knexfile';
 
-const wordStore = new Store({ name: 'words' });
+const knexConfig = knexConfigMap[process.env.NODE_ENV];
+const knex = Knex(knexConfig);
+
+knex.migrate.latest(knexConfig).catch((err) => {
+  console.log(err);
+});
+
 const bookStore = new Store({ name: 'books' });
 const metadataStore = new Store({ name: 'metadata' });
 
@@ -15,17 +23,38 @@ export function getTimesRan() {
   return metadataStore.get('ran', 0);
 }
 
-export function saveWords(words) {
-  wordStore.set('wordlist', words);
+export function updateWord(ankiCard) {
+  knex('words')
+    .where('word', ankiCard.fields.Hanzi.value)
+    .update({
+      has_flash_card: true,
+      interval: ankiCard.interval,
+    }).catch((err) => { console.log(err); });
 }
 
-export function loadWords() {
-  return wordStore.get('wordlist', {});
+export function saveWords(words) {
+  Object.entries(words).forEach(([word, entry]) => {
+    console.log(`Inserting ${word}`);
+    knex('words')
+      .insert({
+        word,
+        interval: entry.interval,
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  });
+}
+
+export async function loadWords() {
+  const words = await knex('words')
+    .select({ id: 'id', word: 'word' })
+    .catch((error) => { console.log(error); });
+  return words;
 }
 
 export function addBook(author, title, cover, filepath) {
   // For now just point to the actual txt file location in calibre. Later we will make our own copy
-  console.log('Adding ', author, title, filepath);
   const books = bookStore.get('booklist', {});
   books[`${author}-${title}`] = {
     author,

@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import { updateWord } from './database';
 // Must have ankiconnect installed as a plugin in your anki installation
 async function invoke(action, params) {
   const response = await fetch('http://localhost:8765', {
@@ -86,6 +87,10 @@ export async function getSkritterWords() {
   return allWords;
 }
 
+async function updateCard(ankiCard) {
+  updateWord(ankiCard);
+}
+
 // @todo: make this configurable from the app to pick certian decks and fields
 export async function importAnkiKeywords() {
   const reading = await invoke('findCards', {
@@ -95,11 +100,7 @@ export async function importAnkiKeywords() {
     cards: reading.result,
   });
 
-  const intervalMap = {};
-  Object.assign(intervalMap, ...readingInfo.result
-    .map((card) => [fixWord(card.fields.Simplified.value), card.interval])
-    .filter(([word]) => isChinese(word))
-    .map(([word, interval]) => ({ [word]: interval })));
+  readingInfo.result.forEach((card) => updateCard(card));
 
   const skritter = await invoke('findCards', {
     query: 'deck:Skritter',
@@ -107,11 +108,5 @@ export async function importAnkiKeywords() {
   const skritterInfo = await invoke('cardsInfo', {
     cards: skritter.result,
   });
-
-  Object.assign(intervalMap, ...skritterInfo.result
-    .map((card) => [fixWord(card.fields.Simplified.value), card.interval])
-    .filter(([word]) => isChinese(word))
-    .map(([word, interval]) => ({ [word]: interval })));
-
-  return intervalMap;
+  skritterInfo.result.forEach((card) => updateCard(card));
 }

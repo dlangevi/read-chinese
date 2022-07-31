@@ -39,9 +39,7 @@ export async function importCalibreBooks() {
 export function initLibraryIpc() {
   console.log('setting up lib ipc');
   ipcMain.on('need-books', async (event) => {
-    console.log('got request for books');
     const books = getBooks();
-    console.log(books);
     books.forEach((book) => {
       const img = fs.readFileSync(book.cover).toString('base64');
       // Haha this gets around no reasign warning...

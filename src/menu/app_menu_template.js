@@ -1,10 +1,10 @@
 import { app, dialog } from 'electron';
 import { createParser } from 'node-csv';
 import fs from 'fs';
-import { saveWords } from '../helpers/database';
+import { saveWords, loadWords } from '../helpers/database';
 import { importCalibreBooks } from '../helpers/calibre';
 import { generateSentences } from '../helpers/generateSentences';
-import { getSkritterWords } from '../helpers/ankiInterface';
+import { getSkritterWords, importAnkiKeywords } from '../helpers/ankiInterface';
 
 const csv = createParser();
 
@@ -42,6 +42,14 @@ export default {
       },
     },
     {
+      label: 'Log Words',
+      click: async () => {
+        console.log('before');
+        const words = await loadWords();
+        console.log(`after ${words.length}`);
+      },
+    },
+    {
       label: 'Import Calibre',
       click: () => {
         importCalibreBooks();
@@ -68,6 +76,12 @@ export default {
           .map((row) => row[0]);
 
         generateSentences(fixedWords);
+      },
+    },
+    {
+      label: 'Sync Anki',
+      click: async () => {
+        importAnkiKeywords();
       },
     },
     {
