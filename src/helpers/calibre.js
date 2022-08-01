@@ -4,10 +4,11 @@
 // const db = new Database('/home/dlangevi/chinese/chinese books/metadatabk.db',
 // {verbose: console.log});
 //
-import { ipcMain } from 'electron';
 import { Calibre } from 'node-calibre';
 import fs from 'fs';
-import { bookExists, addBook, getBooks } from './database';
+import {
+  bookExists, addBook, getBooks, getBookByID,  // eslint-disable-line
+} from './database';
 
 // Create Calibre instance
 const calibre = new Calibre({ library: '/home/dlangevi/chinese/chinese books/' });
@@ -26,26 +27,34 @@ export async function importCalibreBooks() {
   const books = await getCalibreBooks();
   Object.values(books).forEach((book) => {
     // Overwrite everythin every time for now
-    if (bookExists(book.authors, book.title)) {
-      // For now just add the ones that already have txt files.
-      const txtBooks = book.formats.filter((path) => path.match(/.*.txt/));
-      if (txtBooks.length > 0) {
-        addBook(book.authors, book.title, book.cover, txtBooks[0]);
-      }
+    // if (bookExists(book.authors, book.title)) {
+    // For now just add the ones that already have txt files.
+    // TODO do some conversion of epubs etc
+    // (is epub-convert avaliable on all platforms?)
+    const txtBooks = book.formats.filter((path) => path.match(/.*.txt/));
+    if (txtBooks.length > 0) {
+      addBook(book.authors, book.title, book.cover, txtBooks[0]);
     }
+    // }
   });
 }
 
-export function initLibraryIpc() {
-  console.log('setting up lib ipc');
-  ipcMain.on('need-books', async (event) => {
+export function initLibraryIpc(ipcMain) {
+  ipcMain.handle('loadBooks', () => {
     const books = getBooks();
     books.forEach((book) => {
       const img = fs.readFileSync(book.cover).toString('base64');
-      // Haha this gets around no reasign warning...
-      const fake = book;
-      fake.imgData = img;
+      book.imgData = img;
     });
-    event.reply('give-books', books);
+    return books;
+  });
+
+  ipcMain.handle('loadBook', async (event, bookID) => {
+    const book = getBookByID(bookID);
+    const img = fs.readFileSync(book.cover).toString('base64');
+    console.log(book);
+    book.imgData = img;
+
+    return book;
   });
 }

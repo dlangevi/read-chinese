@@ -15,20 +15,11 @@ export default {
   },
   data() {
     return {
-      books: [],
     };
   },
   methods: {
-    getBooks() {
-      window.ipc.send('need-books');
-    },
   },
   mounted() {
-    window.ipc.on('give-books', (books) => {
-      console.log(books.map((book) => `${book.author}-${book.title}`));
-      this.books = books;
-    });
-    this.getBooks();
   },
 };
 </script>

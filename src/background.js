@@ -1,5 +1,5 @@
 import {
-  app, Menu, protocol, BrowserWindow, ipcMain, shell,
+  app, Menu, protocol, BrowserWindow, ipcMain,
 } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer';
@@ -78,14 +78,7 @@ app.on('activate', () => {
 
 // We can communicate with our window (the renderer process) via messages.
 const initIpc = () => {
-  initLibraryIpc();
-  ipcMain.on('need-app-path', (event) => {
-    event.reply('app-path', app.getAppPath());
-  });
-  ipcMain.on('open-external-link', (event, href) => {
-    console.log(href);
-    shell.openExternal(href);
-  });
+  initLibraryIpc(ipcMain);
 };
 
 // This method will be called when Electron has finished
@@ -102,7 +95,7 @@ app.on('ready', async () => {
   }
   await syncWords();
   setApplicationMenu();
-  initIpc();
+  initIpc(ipcMain);
   createWindow();
 });
 

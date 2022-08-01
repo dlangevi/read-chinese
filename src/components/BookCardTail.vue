@@ -1,7 +1,7 @@
 <template>
   <main>
     <div class="rounded border m-4
-      bg-white border-3 mb-4 border border-grey">
+      bg-white border-3 mb-4 border border-grey" @click="bookBigMode">
       <img
         class="w-full rounded rounded-t"
         :src="'data:image/png;base64,' + book.imgData"
@@ -25,7 +25,7 @@
               </button>
             </div>
             <small class="ms-auto text-grey"
-              >ID {{book.id}}</small
+              >ID {{book.bookID}}</small
             >
           </div>
         </div>
@@ -40,6 +40,11 @@ export default {
     book: {
       type: Object,
       required: true,
+    },
+  },
+  methods: {
+    bookBigMode() {
+      this.$router.push(`/book/${this.book.bookID}`);
     },
   },
 };

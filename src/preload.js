@@ -24,4 +24,6 @@ contextBridge.exposeInMainWorld('ipc', {
       func(...args);
     });
   },
+  loadBooks: () => ipcRenderer.invoke('loadBooks'),
+  loadBook: (title) => ipcRenderer.invoke('loadBook', title),
 });

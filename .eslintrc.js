@@ -17,6 +17,8 @@ module.exports = {
     'no-unused-vars': ['error', { argsIgnorePattern: '_' }],
     'no-param-reassign': 'off',
     'linebreak-style': 'off',
+    // TODO turn this back on once I actually want to release this to people
+    'vuejs-accessibility/click-events-have-key-events': 'off',
   },
   overrides: [
     {

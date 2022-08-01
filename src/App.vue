@@ -1,6 +1,8 @@
 <template>
   <div id="app" class="bg-white">
     <RouterButton to="/BookLibrary" text="Library" />
+    <RouterButton to="/FlashCards" text="Manage FlashCards" />
+    <RouterButton to="/WordLists" text="Manage Wordlist" />
     <RouterButton to="/About" text="About" />
     <router-view />
   </div>

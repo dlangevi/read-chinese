@@ -11,6 +11,10 @@ knex.migrate.latest(knexConfig).catch((err) => {
   console.log(err);
 });
 
+function bookKey(author, title) {
+  return `${author}-${title}`;
+}
+
 // TODO should this also be in sql?
 const bookStore = new Store({ name: 'books' });
 const metadataStore = new Store({ name: 'metadata' });
@@ -77,11 +81,12 @@ export async function loadWords() {
 export function addBook(author, title, cover, filepath) {
   // For now just point to the actual txt file location in calibre. Later we will make our own copy
   const books = bookStore.get('booklist', {});
-  books[`${author}-${title}`] = {
+  books[bookKey(author, title)] = {
     author,
     title,
     txtFile: filepath,
     cover,
+    bookID: bookKey(author, title),
   };
   bookStore.set('booklist', books);
 }
@@ -90,12 +95,16 @@ export function getBooks() {
   return Object.values(bookStore.get('booklist', {}));
 }
 
-export function getBookKey(bookKey) {
-  return bookStore.get('booklist')[bookKey];
+export function getBook(author, title) {
+  return bookStore.get('booklist')[bookKey(author, title)];
+}
+
+export function getBookByID(bookID) {
+  return bookStore.get('booklist')[bookID];
 }
 
 // For now we will use author and title to do book uniqueness
 export function bookExists(author, title) {
   const books = bookStore.get('booklist', {});
-  return (`${author}-${title}` in books);
+  return (bookKey(author, title) in books);
 }

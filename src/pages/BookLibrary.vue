@@ -25,16 +25,10 @@ export default {
     };
   },
   methods: {
-    getBooks() {
-      window.ipc.send('need-books');
-    },
   },
-  mounted() {
-    window.ipc.on('give-books', (books) => {
-      console.log(books.map((book) => `${book.author}-${book.title}`));
-      this.books = books;
-    });
-    this.getBooks();
+  async beforeRouteEnter(to, from, next) {
+    const books = await window.ipc.loadBooks();
+    next((vm) => { vm.books = books; });
   },
 };
 </script>
