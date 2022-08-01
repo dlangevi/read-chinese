@@ -1,18 +1,18 @@
 <template>
   <div id="app" class="bg-white">
-    <button>
-      <router-link to="/BookLibrary">Go to Library</router-link>
-    </button>
-    <router-link to="/about">Go to About</router-link>
+    <RouterButton to="/BookLibrary" text="Library" />
+    <RouterButton to="/About" text="About" />
     <router-view />
   </div>
 </template>
 
 <script>
+import RouterButton from './components/RouterButton.vue';
 
 export default {
   name: 'App',
   components: {
+    RouterButton,
   },
   data() {
     return {};
