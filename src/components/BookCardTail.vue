@@ -24,9 +24,9 @@
                 <i class="fas fa-plus"></i>
               </button>
             </div>
-            <small class="ms-auto text-grey"
-              >ID {{book.bookID}}</small
-            >
+            <small class="ms-auto text-grey">
+              ID {{book.bookID}}
+            </small>
           </div>
         </div>
       </div>

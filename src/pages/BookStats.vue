@@ -25,12 +25,10 @@ export default {
     };
   },
   methods: {
-    async getBook() {
-      this.book = await window.ipc.loadBook(this.bookID);
-    },
   },
-  mounted() {
-    this.getBook();
+  async beforeRouteEnter(to, from, next) {
+    const book = await window.ipc.loadBook(to.params.bookID);
+    next((vm) => { vm.book = book; });
   },
 };
 </script>
