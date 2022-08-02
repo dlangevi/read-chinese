@@ -49,10 +49,9 @@ export function initLibraryIpc(ipcMain) {
     return books;
   });
 
-  ipcMain.handle('loadBook', async (event, bookID) => {
+  ipcMain.handle('loadBook', (event, bookID) => {
     const book = getBookByID(bookID);
     const img = fs.readFileSync(book.cover).toString('base64');
-    console.log(book);
     book.imgData = img;
 
     return book;

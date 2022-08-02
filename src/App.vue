@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="bg-white">
+  <div id="app" class="bg-white max-h-screen overflow-hidden">
     <RouterButton to="/BookLibrary" text="Library" />
     <RouterButton to="/FlashCards" text="Manage FlashCards" />
     <RouterButton to="/WordLists" text="Manage Wordlist" />

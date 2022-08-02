@@ -19,19 +19,66 @@ function sentenceKnown(sentence) {
   return [...unknowns];
 }
 
-export function generateSentences(words, modifyCards = false) {
-  const sentences = {};
+function getT1Word(sentence) {
+  const unknowns = sentenceKnown(sentence);
+  if (unknowns.length === 1) {
+    return unknowns[0];
+  }
+  return false;
+}
+
+// Generates a list of words that are
+// holding you back from T1 sentences
+export function whatShouldILearn(books = []) {
+  if (books.length === 0) {
+    books = getBooks();
+  }
+  const shouldLearn = {};
+  books.forEach((bookInfo) => {
+    console.log(`Loading ${bookInfo.txtFile}`);
+    const segmented = loadJieba(bookInfo.txtFile);
+    segmented.forEach((sentence) => {
+      const word = getT1Word(sentence);
+      if (word) {
+        if (!(word in shouldLearn)) {
+          shouldLearn[word] = 0;
+        }
+        shouldLearn[word] += 1;
+      }
+    });
+  });
+  const sorted = Object.entries(shouldLearn)
+    .filter(([_, timesSeen]) => (timesSeen > 100))
+    .sort(([_, timesA], [__, timesB]) => {
+      if (timesA > timesB) {
+        return 1;
+      }
+      return 0;
+    })
+    .map(([word, timesSeen]) => ({
+      word, occurance: timesSeen,
+    }));
+  return sorted;
+}
+
+// Generates sentences for a given set of words
+// Returns a map of words to a sentence for each one
+export function generateSentences(
+  words = [],
+  books = [],
+  modifyCards = false,
+) {
   const wordDict = {};
   const shouldLearn = {
 
   };
   words.forEach((word) => {
-    sentences[word] = [];
     wordDict[word] = '';
   });
-  const allBooks = getBooks();
-  const candidates = [];
-  allBooks.forEach((bookInfo) => {
+  if (books.length === 0) {
+    books = getBooks();
+  }
+  books.forEach((bookInfo) => {
     console.log(`Loading ${bookInfo.txtFile}`);
     const segmented = loadJieba(bookInfo.txtFile);
     segmented.forEach((sentence) => {
@@ -47,8 +94,6 @@ export function generateSentences(words, modifyCards = false) {
             wordDict[word] = text;
           }
         });
-
-        candidates.push(toText(sentence));
       } else if (unknowns.length === 1) {
         const learn = unknowns[0];
         if (!(learn in shouldLearn)) {
@@ -80,6 +125,9 @@ export function generateSentences(words, modifyCards = false) {
   console.log(sorted);
 }
 
-export function otherFunction() {
-  console.log(';why');
+export function initWordGenIpc(ipcMain) {
+  ipcMain.handle('learningTarget', () => {
+    const words = whatShouldILearn();
+    return words;
+  });
 }

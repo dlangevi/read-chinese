@@ -10,6 +10,7 @@ import editMenuTemplate from './menu/edit_menu_template';
 import devMenuTemplate from './menu/dev_menu_template';
 import { syncWords } from './helpers/knownWords';
 import { initLibraryIpc } from './helpers/calibre';
+import { initWordGenIpc } from './helpers/generateSentences';
 import { updateTimesRan, getTimesRan } from './helpers/database';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -79,6 +80,7 @@ app.on('activate', () => {
 // We can communicate with our window (the renderer process) via messages.
 const initIpc = () => {
   initLibraryIpc(ipcMain);
+  initWordGenIpc(ipcMain);
 };
 
 // This method will be called when Electron has finished
@@ -95,7 +97,7 @@ app.on('ready', async () => {
   }
   await syncWords();
   setApplicationMenu();
-  initIpc(ipcMain);
+  initIpc();
   createWindow();
 });
 

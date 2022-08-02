@@ -27,7 +27,6 @@ export default {
   methods: {
     async getBook() {
       this.book = await window.ipc.loadBook(this.bookID);
-      console.log(this.book);
     },
   },
   mounted() {
