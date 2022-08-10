@@ -112,7 +112,6 @@ export async function generateSentences(
       goodOnes += 1;
       // For now do 10 at a time with lots of debugging
       if (modifyCards) {
-        // eslint-ignore
         await addSentenceToCard(word, candidate);
       }
     }
