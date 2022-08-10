@@ -16,9 +16,12 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-unused-vars': ['error', { argsIgnorePattern: '_' }],
     'no-param-reassign': 'off',
+    'no-await-in-loop': 'off',
     'linebreak-style': 'off',
-    // TODO turn this back on once I actually want to release this to people
+    // TODO turn these back on once I actually want to release this to people
     'vuejs-accessibility/click-events-have-key-events': 'off',
+    'vue/no-unused-vars': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'vue/no-unused-components': process.env.NODE_ENV === 'production' ? 'error' : 'off',
   },
   overrides: [
     {

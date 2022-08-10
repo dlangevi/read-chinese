@@ -63,6 +63,30 @@ export function saveWords(words) {
   });
 }
 
+export async function wordExists(word) {
+  const exists = await knex('words')
+    .select().where('word', word)
+    .catch((err) => {
+      console.error(err);
+    });
+  return exists.length !== 0;
+}
+
+// TODO more arguments
+export async function saveWord(word, interval = 0) {
+  const exists = await wordExists(word);
+  if (!exists) {
+    knex('words')
+      .insert({
+        word,
+        interval,
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+}
+
 export async function loadWords() {
   const rows = await knex('words')
     .select({ id: 'id', word: 'word', interval: 'interval' })

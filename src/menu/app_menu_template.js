@@ -1,6 +1,6 @@
 import { app, dialog } from 'electron';
 import fs from 'fs';
-import { saveWords, loadWords } from '../helpers/database';
+import { saveWord, saveWords, loadWords } from '../helpers/database';
 import { importCalibreBooks } from '../helpers/calibre';
 import { generateSentences } from '../helpers/generateSentences';
 import { getLackingCards, importAnkiKeywords } from '../helpers/ankiInterface';
@@ -39,6 +39,27 @@ export default {
       },
     },
     {
+      label: 'Import Words 2',
+      click: () => {
+        // TODO handle bad selections
+        const wordsFile = dialog.showOpenDialogSync({
+          properties: ['openFile'],
+          filters: [
+            { name: 'one per line', extensions: ['csv'] },
+          ],
+        });
+        console.log(wordsFile);
+        const contents = fs.readFileSync(wordsFile[0], {
+          encoding: 'utf-8',
+          flags: 'r',
+        });
+        const words = contents.split('\n');
+        words.forEach((word) => {
+          saveWord(word);
+        });
+      },
+    },
+    {
       label: 'Log Words',
       click: async () => {
         console.log('before');
@@ -61,9 +82,10 @@ export default {
     {
       label: 'Auto Generate Missing Sentences',
       click: async () => {
-        const ankiWords = await getLackingCards('Reading');
+        // const ankiWords = await getLackingCards('Reading');
+        const ankiWords = await getLackingCards('Skritter');
         console.log(ankiWords);
-        generateSentences(ankiWords);
+        generateSentences(ankiWords, [], true);
       },
     },
     {

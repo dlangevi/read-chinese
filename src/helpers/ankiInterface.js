@@ -83,7 +83,7 @@ export async function addSentenceToCard(word, sentence) {
     return;
   }
   const noteID = notes.result[0];
-  console.log(`${word} has noteID ${noteID}, noteIDs ${notes.result}`);
+  console.log(`Adding sentence to card for ${word} (noteID ${noteID})`);
   const result = await invoke('updateNoteFields', {
     note: {
       id: noteID,
@@ -99,8 +99,8 @@ export async function addSentenceToCard(word, sentence) {
 
 export async function getLackingCards(deck) {
   const skritter = await invoke('findCards', {
-    // query: `deck:${deck} ExampleSentence:`,
-    query: `deck:${deck}`,
+    query: `deck:${deck} ExampleSentence:`,
+    // query: `deck:${deck}`,
   });
   const skritterInfo = await invoke('cardsInfo', {
     cards: skritter.result,

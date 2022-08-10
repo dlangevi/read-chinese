@@ -63,7 +63,7 @@ export function whatShouldILearn(books = []) {
 
 // Generates sentences for a given set of words
 // Returns a map of words to a sentence for each one
-export function generateSentences(
+export async function generateSentences(
   words = [],
   books = [],
   modifyCards = false,
@@ -104,15 +104,19 @@ export function generateSentences(
     });
   });
   let goodOnes = 0;
-  Object.entries(wordDict).forEach(([word, candidate]) => {
+  const entries = Object.entries(wordDict);
+
+  for (let i = 0; i < entries.length; i += 1) {
+    const [word, candidate] = entries[i];
     if (candidate !== '') {
       goodOnes += 1;
       // For now do 10 at a time with lots of debugging
-      if (modifyCards && goodOnes < 50) {
-        addSentenceToCard(word, candidate);
+      if (modifyCards) {
+        // eslint-ignore
+        await addSentenceToCard(word, candidate);
       }
     }
-  });
+  }
   console.log(`Generated ${goodOnes}/${Object.keys(wordDict).length}`);
   const sorted = Object.entries(shouldLearn)
     .filter(([_, timesSeen]) => (timesSeen > 100))
