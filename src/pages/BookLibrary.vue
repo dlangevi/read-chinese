@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto px-4">
     <div class="text-center">
-      <h2 class="text-center mt-5">Your Library</h2>
+      <h2 class="text-center text-xl mt-5">Your Library</h2>
       <p>Click on a book to start making flashcards.</p>
     </div>
 
