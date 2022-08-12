@@ -100,7 +100,6 @@ export async function addSentenceToCard(word, sentence) {
 export async function getLackingCards(deck) {
   const skritter = await invoke('findCards', {
     query: `deck:${deck} ExampleSentence:`,
-    // query: `deck:${deck}`,
   });
   const skritterInfo = await invoke('cardsInfo', {
     cards: skritter.result,
@@ -109,6 +108,21 @@ export async function getLackingCards(deck) {
     .map((card) => fixWord(card.fields.Hanzi.value))
     .filter((word) => isChinese(word));
   return allWords;
+}
+
+// TODO filter by deck
+export async function getFlaggedCards() {
+  const flaggedIDs = await invoke('findCards', {
+    query: 'flag:1',
+  });
+  const flaggedCards = await invoke('cardsInfo', {
+    cards: flaggedIDs.result,
+  });
+  return flaggedCards.result
+    .map((card) => ({
+      word: fixWord(card.fields.Hanzi.value),
+      sentence: card.fields.ExampleSentence.value,
+    }));
 }
 
 async function updateCard(ankiCard) {

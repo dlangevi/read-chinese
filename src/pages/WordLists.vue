@@ -9,8 +9,7 @@
         class="ag-theme-alpine w-1/2 mx-auto
         h-full flex-grow-1 text-xl"
         :columnDefs="columnDefs"
-        :rowData="rowData"
-    >
+        :rowData="rowData" >
     </ag-grid-vue>
   </div>
 </template>

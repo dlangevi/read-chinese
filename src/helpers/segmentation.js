@@ -20,7 +20,7 @@ export function loadCTA(bookname) {
 const cache = {
 
 };
-console.log(process.env.NODE_ENV);
+
 if (process.env.NODE_ENV === 'production') {
   // The default dict doesn't load from the asar archive for some reason
   // If in production use the copies we have made in resources

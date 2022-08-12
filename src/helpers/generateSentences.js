@@ -1,7 +1,7 @@
 import { getBooks } from './database';
 import { loadJieba } from './segmentation';
 import known from './knownWords';
-import { addSentenceToCard } from './ankiInterface';
+import { addSentenceToCard, getFlaggedCards } from './ankiInterface';
 
 function toText(sentence) {
   return sentence.map(([word]) => word).join('');
@@ -132,5 +132,9 @@ export function initWordGenIpc(ipcMain) {
   ipcMain.handle('learningTarget', () => {
     const words = whatShouldILearn();
     return words;
+  });
+  ipcMain.handle('flaggedCards', async () => {
+    const flagged = await getFlaggedCards('Reading');
+    return flagged;
   });
 }
