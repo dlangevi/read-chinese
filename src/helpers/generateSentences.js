@@ -48,7 +48,7 @@ export function whatShouldILearn(books = []) {
     });
   });
   const sorted = Object.entries(shouldLearn)
-    .filter(([_, timesSeen]) => (timesSeen > 100))
+    .filter(([_, timesSeen]) => (timesSeen > 50))
     .sort(([_, timesA], [__, timesB]) => {
       if (timesA > timesB) {
         return 1;

@@ -1,15 +1,16 @@
 <template>
-  <div class="container mx-auto px-4">
-    <div class="text-center">
+  <div class="flex flex-col container mx-auto px-4 h-full">
+    <div class="text-center flex-shrink-0">
       <h1 class="text-center text-xl mt-5">Maybe you know these words?</h1>
-      <p>For now lets just mark learned words you already know</p>
+      <p>For now lets just mark learned words you already know 好不好?</p>
     </div>
-      <ag-grid-vue
-          class="ag-theme-alpine w-full h-screen"
-          :columnDefs="columnDefs"
-          :rowData="rowData"
-      >
-      </ag-grid-vue>
+    <ag-grid-vue
+        class="ag-theme-alpine w-1/2 mx-auto
+        h-full flex-grow-1 text-xl"
+        :columnDefs="columnDefs"
+        :rowData="rowData"
+    >
+    </ag-grid-vue>
   </div>
 </template>
 
@@ -33,9 +34,20 @@ export default {
   setup() {
     return {
       columnDefs: [
-        { headerName: 'word', field: 'word' },
-        { headerName: 'occurance', field: 'occurance' },
-        { headerName: 'markLearned', field: 'markButton', cellRenderer: MarkLearned },
+        {
+          headerName: 'word',
+          field: 'word',
+        },
+        {
+          headerName: 'occurance',
+          field: 'occurance',
+          sort: 'desc',
+        },
+        {
+          headerName: 'markLearned',
+          field: 'markButton',
+          cellRenderer: MarkLearned,
+        },
       ],
     };
   },
