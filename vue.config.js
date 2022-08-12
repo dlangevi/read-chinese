@@ -15,11 +15,24 @@ module.exports = {
       preload: 'src/preload.js',
       builderOptions: {
         // Add also your database location
+        // asar: false,
+        asar: true,
+        asarUnpack: [
+          'node_modules/nodejieba/dict/**',
+        ],
+        appId: 'read-chinese-more',
         extraFiles: [{
           from: 'migrations',
           to: 'resources/migrations',
           filter: '**/*',
-        }],
+        },
+        {
+          from: 'node_modules/nodejieba/dict/',
+          to: 'resources/dict/',
+          filter: '**/*',
+        },
+
+        ],
       },
       // This line: add knex and sqlite3
       externals: ['knex', 'sqlite3'],

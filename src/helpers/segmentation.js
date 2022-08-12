@@ -1,4 +1,5 @@
 import jieba from 'nodejieba';
+import path from 'path';
 // import rsjieba from '@node-rs/jieba';
 import fs from 'fs';
 // import books from './bookCatalogue.js';
@@ -19,6 +20,18 @@ export function loadCTA(bookname) {
 const cache = {
 
 };
+console.log(process.env.NODE_ENV);
+if (process.env.NODE_ENV === 'production') {
+  // The default dict doesn't load from the asar archive for some reason
+  // If in production use the copies we have made in resources
+  jieba.load({
+    dict: path.join(process.resourcesPath, './dict/jieba.dict.utf8'),
+    hmmDict: path.join(process.resourcesPath, './dict/hmm_model.utf8'),
+    userDict: path.join(process.resourcesPath, './dict/user.dict.utf8'),
+    idfDict: path.join(process.resourcesPath, './dict/idf.utf8'),
+    stopWordDict: path.join(process.resourcesPath, './dict/stop_words.utf8'),
+  });
+}
 
 export function loadJieba(txtPath) {
   if (txtPath in cache) {
@@ -29,6 +42,7 @@ export function loadJieba(txtPath) {
   // Haha, I see why they recommended the default. This still produces a
   // 'lower' accuracy than CTA, but it is not as bad as others
   // const json = rsjieba.cut(txt);
+  //
   const json = jieba.cut(txt);
 
   // Detects names better but makes stuff like 有庆死, 看凤霞

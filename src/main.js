@@ -1,9 +1,5 @@
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
-import BookLibrary from './pages/BookLibrary.vue';
-import BookStats from './pages/BookStats.vue';
-import About from './pages/About.vue';
-import WordLists from './pages/WordLists.vue';
 
 import App from './App.vue';
 
@@ -11,34 +7,29 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: '/',
-      name: 'About',
-      component: About,
-    },
-    {
       path: '/BookLibrary',
       name: 'BookLibrary',
-      component: BookLibrary,
+      component: () => import('./pages/BookLibrary.vue'),
     },
     {
       path: '/About',
       name: 'About',
-      component: About,
+      component: () => import('./pages/About.vue'),
     },
     {
       path: '/WordLists',
       name: 'WordLists',
-      component: WordLists,
+      component: () => import('./pages/WordLists.vue'),
     },
     {
       path: '/FlashCards',
       name: 'FlashCards',
-      component: WordLists,
+      component: () => import('./pages/FlashCards.vue'),
     },
     {
       path: '/book/:bookID',
       name: 'BookStats',
-      component: BookStats,
+      component: () => import('./pages/BookStats.vue'),
       props: true,
     },
   ],
