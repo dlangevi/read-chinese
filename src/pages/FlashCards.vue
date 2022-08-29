@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col container mx-auto px-4 h-full">
-    <p>Nothing here yet!</p>
+    <button @click='addWord()'>Click for word</button>
     <ag-grid-vue
         class="ag-theme-alpine w-5/6 mx-auto
         h-full flex-grow-1 text-xl"
@@ -16,19 +16,25 @@
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
+import { useCardQueue } from '@/stores/CardQueue';
+import AddToCardQueue from '@/components/AddToCardQueue.vue';
 
 export default {
   name: 'FlashCards',
   components: {
     AgGridVue,
+    AddToCardQueue,
   },
   data() {
     return {
       rowData: [],
+      activeWord: '',
     };
   },
   setup() {
+    const store = useCardQueue();
     return {
+      store,
       columnDefs: [
         {
           headerName: 'word',
@@ -40,13 +46,18 @@ export default {
           field: 'sentence',
           sort: 'desc',
         },
+        {
+          headerName: 'addToQueue',
+          field: 'Make FlashCard',
+          cellRenderer: AddToCardQueue,
+        },
       ],
     };
   },
   methods: {
-    callit() {
-      console.log(this);
-      this.gridApi.sizeColumnsToFit();
+    addWord() {
+      console.log('click3ed!');
+      this.store.addWord('hello');
     },
     onGridReady(params) {
       this.api = params.api;
@@ -58,8 +69,6 @@ export default {
   async mounted() {
     const flagged = await window.ipc.loadFlaggedCards();
     this.rowData = flagged;
-    console.log(this);
-    this.callit();
   },
 };
 </script>

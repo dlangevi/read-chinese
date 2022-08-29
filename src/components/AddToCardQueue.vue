@@ -1,5 +1,5 @@
 <template>
-  <img @click="markKnown(this.params.data)" class="
+  <img @click="addToQueue(this.params.data)" class="
     font-black
     bg-red-600
     hover:bg-green-600
@@ -12,16 +12,22 @@
 </template>
 
 <script>
+import { useCardQueue } from '@/stores/CardQueue';
+
 export default {
   data() {
     return {
     };
   },
+  setup() {
+    const store = useCardQueue();
+    return {
+      store,
+    };
+  },
   methods: {
-    markKnown: (rowData) => {
-      console.log(rowData);
-      // TODO ipc.addNewWord(...)
-      // remove this row from data somehow
+    addToQueue(rowData) {
+      this.store.addWord(rowData.word);
     },
 
   },

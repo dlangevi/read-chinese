@@ -18,6 +18,7 @@ module.exports = {
     'no-param-reassign': 'off',
     'no-await-in-loop': 'off',
     'linebreak-style': 'off',
+    'import/prefer-default-export': 'off',
     // TODO turn these back on once I actually want to release this to people
     'vuejs-accessibility/click-events-have-key-events': 'off',
     'vue/no-unused-vars': process.env.NODE_ENV === 'production' ? 'error' : 'off',
