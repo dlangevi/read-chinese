@@ -1,14 +1,11 @@
 <template>
-  <img @click="addToQueue(this.params.data)" class="
-    font-black
-    bg-red-600
-    hover:bg-green-600
-    absolute
-    top-1/2
-    rounded-xl
-    -translate-y-1/2
-    h-5
-    w-5" src="../assets/circle-check.svg" alt="checkmark"/>
+  <button type="button" class="inline-block px-4 py-1.5 bg-blue-600 text-white font-medium text-xs
+    leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700
+    focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition
+  duration-150 ease-in-out"
+    @click="addToQueue(this.params.data)">
+    Create new FlashCard
+  </button>
 </template>
 
 <script>
