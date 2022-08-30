@@ -33,11 +33,11 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-export function loadJieba(txtPath) {
+export async function loadJieba(txtPath) {
   if (txtPath in cache) {
     return cache[txtPath];
   }
-  const txt = fs.readFileSync(txtPath, 'UTF-8', 'r');
+  const txt = await fs.promises.readFile(txtPath, 'UTF-8', 'r');
   // Misses names, but also makes less compound words
   // Haha, I see why they recommended the default. This still produces a
   // 'lower' accuracy than CTA, but it is not as bad as others

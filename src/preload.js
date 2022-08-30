@@ -12,4 +12,5 @@ contextBridge.exposeInMainWorld('ipc', {
   loadBook: (title) => ipcRenderer.invoke('loadBook', title),
   learningTarget: () => ipcRenderer.invoke('learningTarget'),
   loadFlaggedCards: () => ipcRenderer.invoke('flaggedCards'),
+  getSentencesForWord: (word) => ipcRenderer.invoke('getSentencesForWord', word),
 });

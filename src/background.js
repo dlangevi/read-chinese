@@ -10,7 +10,7 @@ import editMenuTemplate from './menu/edit_menu_template';
 import devMenuTemplate from './menu/dev_menu_template';
 import { syncWords } from './helpers/knownWords';
 import { initLibraryIpc } from './helpers/calibre';
-import { initWordGenIpc } from './helpers/generateSentences';
+import { preloadWords, initWordGenIpc } from './helpers/generateSentences';
 import { updateTimesRan, getTimesRan } from './helpers/database';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -99,6 +99,7 @@ app.on('ready', async () => {
   setApplicationMenu();
   initIpc();
   createWindow();
+  preloadWords();
 });
 
 // Exit cleanly on request from parent process in development mode.

@@ -1,28 +1,52 @@
 <template>
   <div v-if="store.wordList.length != 0" class="modal">
-    <p>These are the words we are working on!</p>
-    <p>{{wordList}}</p>
-    <button @click="store.wordList = []">Clear</button>
+    <p>These are the words we are working on!
+    {{store.wordList.join(" ")}}</p>
+
+    <div v-if="step == 0">
+      <p>Select the sentence</p>
+      <div v-if="sentences.length > 0">
+        <p v-for="(sentence, i) in sentences" :key="i">
+        {{sentence}}
+        </p>
+      </div>
+    </div>
+    <div v-else-if="step == 1">
+      <p>Select the Picture</p>
+    </div>
+    <div v-else-if="step == 2">
+      <p>Select the Definition</p>
+    </div>
+
+    <button v-if="step>0" @click="step--">Previous</button>
+    <button v-if="step<2" @click="step++">Next</button>
+    <button v-if="step==2">Submit</button>
+    <button @click="store.wordList = []">Exit</button>
   </div>
 </template>
 
 <script>
-import { mapState } from 'pinia';
 import { useCardQueue } from '@/stores/CardQueue';
+import { ref } from 'vue';
 
 export default {
   name: 'CardCreator',
   setup() {
     const store = useCardQueue();
+    const sentences = ref([]);
+    store.$subscribe(async (mutation, state) => {
+      // Later we can prefetch new words sentences possibly
+      if (mutation.events.type === 'add' && mutation.events.key === '0') {
+        const word = state.wordList[0];
+        sentences.value = await window.ipc.getSentencesForWord(word);
+      }
+    });
     return {
-      store,
+      store, sentences,
     };
   },
-  computed: {
-    ...mapState(useCardQueue, ['wordList']),
-  },
   data() {
-    return { open: false };
+    return { step: 0 };
   },
 };
 
@@ -34,7 +58,7 @@ export default {
   z-index: 999;
   top: 20%;
   left: 50%;
-  width: 300px;
+  width: 560px;
   margin-left: -150px;
   background: pink;
 }

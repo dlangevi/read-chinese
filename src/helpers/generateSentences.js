@@ -3,8 +3,24 @@ import { loadJieba } from './segmentation';
 import known from './knownWords';
 import { addSentenceToCard, getFlaggedCards } from './ankiInterface';
 
+export async function preloadWords() {
+  const books = getBooks();
+  books.forEach((bookInfo) => {
+    console.log(`Loading ${bookInfo.txtFile}`);
+    loadJieba(bookInfo.txtFile);
+  });
+}
+
 function toText(sentence) {
   return sentence.map(([word]) => word).join('');
+}
+
+function isT1Candidate(sentence, t1word) {
+  return sentence.every(([word, type]) => {
+    if (type !== 3) return true;
+    if (word === t1word) return true;
+    return known.isKnown(word);
+  });
 }
 
 function sentenceKnown(sentence) {
@@ -29,14 +45,14 @@ function getT1Word(sentence) {
 
 // Generates a list of words that are
 // holding you back from T1 sentences
-export function whatShouldILearn(books = []) {
+export async function whatShouldILearn(books = []) {
   if (books.length === 0) {
     books = getBooks();
   }
   const shouldLearn = {};
-  books.forEach((bookInfo) => {
+  await Promise.all(books.map(async (bookInfo) => {
     console.log(`Loading ${bookInfo.txtFile}`);
-    const segmented = loadJieba(bookInfo.txtFile);
+    const segmented = await loadJieba(bookInfo.txtFile);
     segmented.forEach((sentence) => {
       const word = getT1Word(sentence);
       if (word) {
@@ -46,7 +62,7 @@ export function whatShouldILearn(books = []) {
         shouldLearn[word] += 1;
       }
     });
-  });
+  }));
   const sorted = Object.entries(shouldLearn)
     .filter(([_, timesSeen]) => (timesSeen > 50))
     .sort(([_, timesA], [__, timesB]) => {
@@ -59,6 +75,26 @@ export function whatShouldILearn(books = []) {
       word, occurance: timesSeen,
     }));
   return sorted;
+}
+
+async function getCandidateSentences(word, books = []) {
+  if (books.length === 0) {
+    books = getBooks();
+  }
+  const candidates = [];
+  await Promise.all(books.map(async (bookInfo) => {
+    console.log(`Loading ${bookInfo.txtFile}`);
+    const segmented = await loadJieba(bookInfo.txtFile);
+    segmented.forEach((sentence) => {
+      const text = toText(sentence);
+      if (text.includes(word)) {
+        if (isT1Candidate(sentence)) {
+          candidates.push(text);
+        }
+      }
+    });
+  }));
+  return candidates;
 }
 
 // Generates sentences for a given set of words
@@ -78,9 +114,9 @@ export async function generateSentences(
   if (books.length === 0) {
     books = getBooks();
   }
-  books.forEach((bookInfo) => {
+  await Promise.all(books.map(async (bookInfo) => {
     console.log(`Loading ${bookInfo.txtFile}`);
-    const segmented = loadJieba(bookInfo.txtFile);
+    const segmented = await loadJieba(bookInfo.txtFile);
     segmented.forEach((sentence) => {
       const unknowns = sentenceKnown(sentence);
       if (unknowns.length === 0) {
@@ -102,7 +138,7 @@ export async function generateSentences(
         shouldLearn[learn] += 1;
       }
     });
-  });
+  }));
   let goodOnes = 0;
   const entries = Object.entries(wordDict);
 
@@ -129,12 +165,16 @@ export async function generateSentences(
 }
 
 export function initWordGenIpc(ipcMain) {
-  ipcMain.handle('learningTarget', () => {
-    const words = whatShouldILearn();
+  ipcMain.handle('learningTarget', async () => {
+    const words = await whatShouldILearn();
     return words;
   });
   ipcMain.handle('flaggedCards', async () => {
     const flagged = await getFlaggedCards('Reading');
     return flagged;
+  });
+  ipcMain.handle('getSentencesForWord', async (event, word) => {
+    const sentences = await getCandidateSentences(word);
+    return sentences;
   });
 }
