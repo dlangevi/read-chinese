@@ -27,6 +27,7 @@
     "electron-devtools-installer": "^3.1.0",
     "electron-store": "^8.0.2",
     "knex": "^2.2.0",
+    "naive-ui": "^2.33.1",
     "node-calibre": "^2.1.1",
     "node-csv": "^0.1.2",
     "node-fetch": "2",
@@ -35,6 +36,7 @@
     "postcss": "^7",
     "sqlite3": "^5.0.10",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat",
+    "vfonts": "^0.0.3",
     "vue": "^3.2.13",
     "vue-cli-plugin-electron-builder": "~2.1.1",
     "vue-router": "4"

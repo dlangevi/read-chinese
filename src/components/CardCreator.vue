@@ -18,19 +18,21 @@
       <p>Select the Definition</p>
     </div>
 
-    <button v-if="step>0" @click="step--">Previous</button>
-    <button v-if="step<2" @click="step++">Next</button>
-    <button v-if="step==2">Submit</button>
-    <button @click="store.wordList = []">Exit</button>
+      <n-button type=primary v-if="step>0" @click="step--">Previous</n-button>
+      <n-button type=warning v-if="step<2" @click="step++">Next</n-button>
+      <n-button type=info v-if="step==2">Submit</n-button>
+    <n-button @click="store.wordList = []">Exit</n-button>
   </div>
 </template>
 
 <script>
+import { defineComponent, ref } from 'vue';
 import { useCardQueue } from '@/stores/CardQueue';
-import { ref } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'CardCreator',
+  components: [
+  ],
   setup() {
     const store = useCardQueue();
     const sentences = ref([]);
@@ -48,7 +50,7 @@ export default {
   data() {
     return { step: 0 };
   },
-};
+});
 
 </script>
 
