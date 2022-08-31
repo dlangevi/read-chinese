@@ -40,45 +40,31 @@
   </div>
 </template>
 
-<script>
-import { defineComponent, ref } from 'vue';
+<script setup>
+import { ref } from 'vue';
 import { useCardQueue } from '@/stores/CardQueue';
 import { useMessage } from 'naive-ui';
 
-export default defineComponent({
-  name: 'CardCreator',
-  components: [
-  ],
-  setup() {
-    const store = useCardQueue();
-    const sentences = ref([]);
-    const message = useMessage();
-    store.$subscribe(async (mutation, state) => {
-      // Later we can prefetch new words sentences possibly
-      if (mutation.events.type === 'add' && mutation.events.key === '0') {
-        const word = state.wordList[0];
-        sentences.value = await window.ipc.getSentencesForWord(word);
-      }
-    });
-    const sentence = ref(null);
-    const cities = ref(null);
-    const food = ref(null);
-    return {
-      store,
-      sentences,
-      sentence,
-      cities,
-      food,
-      submit() {
-        message.info(JSON.stringify([sentence, cities, food]));
-        console.log(JSON.stringify([sentence, cities, food]));
-      },
-    };
-  },
-  data() {
-    return { step: 0 };
-  },
+const store = useCardQueue();
+const sentences = ref([]);
+const sentence = ref(null);
+const cities = ref(null);
+const food = ref(null);
+const step = ref(0);
+
+const message = useMessage();
+store.$subscribe(async (mutation, state) => {
+  // Later we can prefetch new words sentences possibly
+  if (mutation.events.type === 'add' && mutation.events.key === '0') {
+    const word = state.wordList[0];
+    sentences.value = await window.ipc.getSentencesForWord(word);
+  }
 });
+
+function submit() {
+  message.info(JSON.stringify([sentence, cities, food]));
+  console.log(JSON.stringify([sentence, cities, food]));
+}
 
 </script>
 
