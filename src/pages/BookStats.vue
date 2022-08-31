@@ -8,27 +8,12 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import BookCard from '../components/BookCard.vue';
 
-export default {
-  name: 'BookStats',
-  components: {
-    BookCard,
-  },
-  props: {
-    bookID: String,
-  },
-  data() {
-    return {
-      book: [],
-    };
-  },
-  methods: {
-  },
-  async beforeRouteEnter(to, from, next) {
-    const book = await window.ipc.loadBook(to.params.bookID);
-    next((vm) => { vm.book = book; });
-  },
-};
+const props = defineProps({
+  bookID: String,
+});
+
+const book = await window.ipc.loadBook(props.bookID);
 </script>

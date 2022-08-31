@@ -4,7 +4,9 @@
       <TopNav class="w-screen h-16"/>
       <CardCreator/>
       <div class="w-screen h-[calc(100vh-4rem)] overflow-scroll">
-        <router-view />
+        <Suspense>
+          <router-view />
+        </Suspense>
       </div>
     </div>
   </n-message-provider>
