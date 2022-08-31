@@ -6,20 +6,3 @@
     </div>
   </div>
 </template>
-
-<script>
-
-export default {
-  name: 'AboutPage',
-  components: {
-  },
-  data() {
-    return {
-    };
-  },
-  methods: {
-  },
-  mounted() {
-  },
-};
-</script>

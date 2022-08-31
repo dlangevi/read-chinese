@@ -16,7 +16,7 @@ const router = createRouter({
     {
       path: '/About',
       name: 'About',
-      component: () => import('./pages/About.vue'),
+      component: () => import('./pages/AboutPage.vue'),
     },
     {
       path: '/WordLists',

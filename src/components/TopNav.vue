@@ -27,6 +27,6 @@ const navigation = [
   { name: 'BookLibrary', href: '/BookLibrary', current: true },
   { name: 'Manage FlashCards', href: '/FlashCards', current: true },
   { name: 'Manage Wordlist', href: '/WordLists', current: true },
-  { name: 'About', href: 'About', current: true },
+  { name: 'About', href: '/About', current: true },
 ];
 </script>
