@@ -1,11 +1,13 @@
 <template>
-  <div id="app" class="bg-white max-h-screen max-w-screen">
-    <TopNav class="w-screen h-16"/>
-    <CardCreator/>
-    <div class="w-screen h-[calc(100vh-4rem)] overflow-scroll">
-      <router-view />
+  <n-message-provider>
+    <div id="app" class="bg-white max-h-screen max-w-screen">
+      <TopNav class="w-screen h-16"/>
+      <CardCreator/>
+      <div class="w-screen h-[calc(100vh-4rem)] overflow-scroll">
+        <router-view />
+      </div>
     </div>
-  </div>
+  </n-message-provider>
 </template>
 
 <script>
