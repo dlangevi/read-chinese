@@ -1,10 +1,6 @@
 <template>
-  <div class="container mx-auto px-4">
-    <div class="text-center">
-      <h2 class="text-center mt-5">Your Library</h2>
-      <p>You clicked on {{ bookID }}.</p>
-      <book-card :book="book"/>
-    </div>
+  <div class="container mx-auto px-4 h-full">
+    <book-card :book="book" class="h-full w-1/3"/>
   </div>
 </template>
 
