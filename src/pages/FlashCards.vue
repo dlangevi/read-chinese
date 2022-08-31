@@ -11,65 +11,39 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
-import { useCardQueue } from '@/stores/CardQueue';
 import AddToCardQueue from '@/components/AddToCardQueue.vue';
 
-export default {
-  name: 'FlashCards',
-  components: {
-    AgGridVue,
-    AddToCardQueue,
+const columnDefs = [
+  {
+    headerName: 'word',
+    field: 'word',
+    suppressSizeToFit: true,
   },
-  data() {
-    return {
-      rowData: [],
-      activeWord: '',
-    };
+  {
+    headerName: 'sentence',
+    field: 'sentence',
+    sort: 'desc',
   },
-  setup() {
-    const store = useCardQueue();
-    return {
-      store,
-      columnDefs: [
-        {
-          headerName: 'word',
-          field: 'word',
-          suppressSizeToFit: true,
-        },
-        {
-          headerName: 'sentence',
-          field: 'sentence',
-          sort: 'desc',
-        },
-        {
-          headerName: 'addToQueue',
-          field: 'Make FlashCard',
-          cellRenderer: AddToCardQueue,
-        },
-      ],
-    };
+  {
+    headerName: 'addToQueue',
+    field: 'Make FlashCard',
+    cellRenderer: AddToCardQueue,
   },
-  methods: {
-    addWord() {
-      console.log('click3ed!');
-      this.store.addWord('hello');
-    },
-    onGridReady(params) {
-      this.api = params.api;
-      this.columnApi = params.columnApi;
-      this.api.sizeColumnsToFit();
-    },
+];
+let api = null;
+// let columnApi = null;
+function onGridReady(params) {
+  api = params.api;
+  // I know this will probably be used
+  // columnApi = params.columnApi;
+  api.sizeColumnsToFit();
+}
 
-  },
-  async mounted() {
-    const flagged = await window.ipc.loadFlaggedCards();
-    this.rowData = flagged;
-  },
-};
+const rowData = await window.ipc.loadFlaggedCards();
 </script>
 
 <style scoped>

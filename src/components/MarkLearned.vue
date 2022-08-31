@@ -11,19 +11,11 @@
     w-5" src="../assets/circle-check.svg" alt="checkmark"/>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-    };
-  },
-  methods: {
-    markKnown: (rowData) => {
-      console.log(rowData);
-      // TODO ipc.addNewWord(...)
-      // remove this row from data somehow
-    },
+<script setup>
+function markKnown(rowData) {
+  console.log(rowData);
+  // TODO ipc.addNewWord(...)
+  // remove this row from data somehow
+}
 
-  },
-};
 </script>

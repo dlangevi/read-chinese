@@ -11,24 +11,8 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import BookCard from '../components/BookCard.vue';
 
-export default {
-  name: 'BookLibrary',
-  components: {
-    BookCard,
-  },
-  data() {
-    return {
-      books: [],
-    };
-  },
-  methods: {
-  },
-  async beforeRouteEnter(to, from, next) {
-    const books = await window.ipc.loadBooks();
-    next((vm) => { vm.books = books; });
-  },
-};
+const books = await window.ipc.loadBooks();
 </script>

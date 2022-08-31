@@ -1,4 +1,3 @@
-<style src="../app.css"/>
 <template>
   <div class="flex flex-col container mx-auto px-4 h-full">
     <div class="text-center flex-shrink-0">
@@ -14,52 +13,32 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
 import MarkLearned from '../components/MarkLearned.vue';
 
-export default {
-  name: 'WordLists',
-  components: {
-    AgGridVue,
+const columnDefs = [
+  {
+    headerName: 'word',
+    field: 'word',
   },
-  data() {
-    return {
-      rowData: [
-      ],
-    };
+  {
+    headerName: 'occurance',
+    field: 'occurance',
+    sort: 'desc',
   },
-  setup() {
-    return {
-      columnDefs: [
-        {
-          headerName: 'word',
-          field: 'word',
-        },
-        {
-          headerName: 'occurance',
-          field: 'occurance',
-          sort: 'desc',
-        },
-        {
-          headerName: 'markLearned',
-          field: 'markButton',
-          cellRenderer: MarkLearned,
-        },
-      ],
-    };
+  {
+    headerName: 'markLearned',
+    field: 'markButton',
+    cellRenderer: MarkLearned,
   },
-  methods: {
-  },
+];
 
-  async mounted() {
-    const words = await window.ipc.learningTarget();
-    console.log(words);
-    this.rowData = words;
-  },
-};
+const words = await window.ipc.learningTarget();
+console.log(words);
+const rowData = words;
 </script>
 
 <style scoped>

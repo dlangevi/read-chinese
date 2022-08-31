@@ -19,23 +19,14 @@
     </div>
 </template>
 
-<script>
+<script setup>
 // TODO get the image working better
 
-export default {
-  name: 'TopNav',
-  components: {
-  },
-  data() {
-    return {
-      // TODO have the current somehow match the current page
-      navigation: [
-        { name: 'BookLibrary', href: '/BookLibrary', current: true },
-        { name: 'Manage FlashCards', href: '/FlashCards', current: true },
-        { name: 'Manage Wordlist', href: '/WordLists', current: true },
-        { name: 'About', href: 'About', current: true },
-      ],
-    };
-  },
-};
+// TODO have the current somehow match the current page
+const navigation = [
+  { name: 'BookLibrary', href: '/BookLibrary', current: true },
+  { name: 'Manage FlashCards', href: '/FlashCards', current: true },
+  { name: 'Manage Wordlist', href: '/WordLists', current: true },
+  { name: 'About', href: 'About', current: true },
+];
 </script>

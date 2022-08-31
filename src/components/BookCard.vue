@@ -33,19 +33,18 @@
     </div>
   </main>
 </template>
-<script>
-export default {
-  name: 'BookCard',
-  props: {
-    book: {
-      type: Object,
-      required: true,
-    },
+<script setup>
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const props = defineProps({
+  book: {
+    type: Object,
+    required: true,
   },
-  methods: {
-    bookBigMode() {
-      this.$router.push(`/book/${this.book.bookID}`);
-    },
-  },
-};
+});
+
+function bookBigMode() {
+  router.push(`/book/${props.book.bookID}`);
+}
 </script>
