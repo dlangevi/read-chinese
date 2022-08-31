@@ -5,32 +5,20 @@
       <CardCreator/>
       <div class="w-screen h-[calc(100vh-4rem)] overflow-scroll">
         <Suspense>
-          <router-view />
+          <router-view :key="route.fullPath"/>
         </Suspense>
       </div>
     </div>
   </n-message-provider>
 </template>
 
-<script>
+<script setup>
 import TopNav from '@/components/TopNav.vue';
 import CardCreator from '@/components/CardCreator.vue';
+import { useRoute } from 'vue-router';
 
-export default {
-  name: 'App',
-  components: {
-    TopNav,
-    CardCreator,
-  },
-  data() {
-    return {
-    };
-  },
-  methods: {
-  },
-  mounted() {
-  },
-};
+const route = useRoute();
+
 </script>
 
 <style src="./app.css"/>

@@ -20,13 +20,27 @@
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router';
+import { watch, ref } from 'vue';
+
+const route = useRoute();
 // TODO get the image working better
 
 // TODO have the current somehow match the current page
-const navigation = [
-  { name: 'BookLibrary', href: '/BookLibrary', current: true },
-  { name: 'Manage FlashCards', href: '/FlashCards', current: true },
-  { name: 'Manage Wordlist', href: '/WordLists', current: true },
-  { name: 'About', href: '/About', current: true },
-];
+const navigation = ref([
+  { name: 'BookLibrary', href: '/BookLibrary', current: false },
+  { name: 'Manage FlashCards', href: '/FlashCards', current: false },
+  { name: 'Manage Wordlist', href: '/WordLists', current: false },
+  { name: 'About', href: '/About', current: false },
+]);
+function updateNav(currentRoute) {
+  navigation.value.forEach((item) => {
+    item.current = item.href === currentRoute.fullPath;
+  });
+}
+
+watch(route, (_, newRoute) => {
+  updateNav(newRoute);
+});
+
 </script>
