@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import BookCard from '../components/BookCardTail.vue';
+import BookCard from '../components/BookCard.vue';
 
 export default {
   name: 'BookStats',
