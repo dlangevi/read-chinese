@@ -5,25 +5,13 @@
   </n-button>
 </template>
 
-<script>
+<script setup>
 import { useCardQueue } from '@/stores/CardQueue';
 
-export default {
-  data() {
-    return {
-    };
-  },
-  setup() {
-    const store = useCardQueue();
-    return {
-      store,
-    };
-  },
-  methods: {
-    addToQueue(rowData) {
-      this.store.addWord(rowData.word);
-    },
+const store = useCardQueue();
 
-  },
-};
+function addToQueue(rowData) {
+  store.addWord(rowData.word);
+}
+
 </script>
