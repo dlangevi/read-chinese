@@ -97,6 +97,18 @@ export async function addSentenceToCard(word, sentence) {
   }
 }
 
+async function getAnkiNote(word) {
+  const noteID = await invoke('findNotes', { query: `Hanzi:${word}` });
+  if (noteID.result.length !== 1) {
+    console.log(`Too many or few notes match ${word}, ${noteID.result}`);
+    return 'error';
+  }
+  const noteInfo = await invoke('notesInfo', {
+    notes: noteID.result,
+  });
+  return noteInfo.result[0];
+}
+
 async function getAnkiCard(word) {
   const cardID = await invoke('findCards', { query: `Hanzi:${word}` });
   if (cardID.result.length !== 1) {
@@ -141,6 +153,38 @@ async function updateCard(ankiCard) {
   updateWord(ankiCard);
 }
 
+async function updateAnkiCard(noteID, fields) {
+  const res = await invoke('updateNoteFields', {
+    note: {
+      id: noteID,
+      fields,
+    },
+  });
+  if (res.error === null) {
+    return 'success';
+  }
+  return res;
+}
+
+async function removeFlag(noteID) {
+  const noteInfo = await invoke('notesInfo', {
+    notes: [noteID],
+  });
+  const note = noteInfo.result[0];
+  // TODO handle this
+  if (note.cards.length !== 1) {
+    console.error('Note has multiple cards');
+  }
+  await invoke(
+    'setSpecificValueOfCard',
+    {
+      card: note.cards[0],
+      keys: ['flags'],
+      newValues: [0],
+    },
+  );
+}
+
 // @todo: make this configurable from the app to pick certian decks and fields
 export async function importAnkiKeywords() {
   const reading = await invoke('findCards', {
@@ -161,8 +205,10 @@ export async function importAnkiKeywords() {
   skritterInfo.result.forEach((card) => updateCard(card));
 }
 export function initAnkiIpc(ipcMain) {
-  ipcMain.handle('getAnkiCard', async (event, word) => {
-    const card = await getAnkiCard(word);
-    return card;
+  ipcMain.handle('getAnkiCard', async (event, word) => getAnkiCard(word));
+  ipcMain.handle('getAnkiNote', async (event, word) => getAnkiNote(word));
+  ipcMain.handle('updateAnkiCard', async (event, noteID, fields) => {
+    await removeFlag(noteID);
+    return updateAnkiCard(noteID, fields);
   });
 }

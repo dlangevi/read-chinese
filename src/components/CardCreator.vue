@@ -1,6 +1,6 @@
 <template>
     <n-modal
-      class="w-4/5"
+      class="w-4/5 max-h-[80vh]"
       v-model:show="showModal"
       :mask-closable="false"
       :closable="true"
@@ -15,15 +15,20 @@
         <p v-else-if="step==2">Select the Picture</p>
         <p v-else-if="step==3">Select the Definition</p>
       </template>
-      <n-layout has-sider sider-placement="right">
-        <n-layout-content content-style="padding: 24px;">
+      <n-layout has-sider sider-placement="right" style="height: 500px">
+        <n-layout-content content-style="padding: 24px;" :native-scrollbar="false">
           <div v-if="step == 1">
-            <n-checkbox-group v-if="sentences.length > 0" v-model:value="sentence">
-              <n-space vertical item-style="display: flex;">
-              <n-checkbox class="text-3xl" v-for="(sentence, i) in sentences" :key="i"
-                :value="sentence" :label="sentence"/>
+            <n-radio-group v-model:value="sentence" name="sentences">
+              <n-space>
+                <n-radio
+                  class="text-3xl"
+                  v-for="(sentence, i) in sentences"
+                  :key="i"
+                  :value="sentence"
+                  :label="sentence"
+                />
               </n-space>
-            </n-checkbox-group>
+            </n-radio-group>
           </div>
         </n-layout-content>
         <n-layout-sider v-if="card !== undefined"
@@ -55,8 +60,8 @@ import { ref, watch, reactive } from 'vue';
 import { useCardQueue } from '@/stores/CardQueue';
 import AnkiCardPreview from '@/components/AnkiCardPreview.vue';
 import {
-  useMessage, NCheckboxGroup, NCheckbox, NSpace, NButton, NModal,
-  NLayoutSider, NLayout, NLayoutContent,
+  useMessage, NSpace, NButton, NModal,
+  NLayoutSider, NLayout, NLayoutContent, NRadioGroup, NRadio,
 } from 'naive-ui';
 
 const store = useCardQueue();
@@ -71,12 +76,14 @@ const card = ref(undefined);
 const message = useMessage();
 store.$subscribe(async (mutation, state) => {
   // Later we can prefetch new words sentences possibly
-  if (mutation.events.type === 'add' && mutation.events.key === '0') {
+  // if (mutation.events.type === 'add' && mutation.events.key === '0') {
+  if (state.wordList.length > 0) {
     const word = state.wordList[0];
     sentences.value = await window.ipc.getSentencesForWord(word);
     // Todo card may not exist. In which case start a new one
-    const ankiCard = await window.ipc.getAnkiCard(word);
+    const ankiCard = await window.ipc.getAnkiNote(word);
     card.value = reactive(ankiCard);
+    sentence.value = card.value.fields.ExampleSentence.value;
   }
   step.value = 1;
   showModal.value = state.wordList.length !== 0;
@@ -86,8 +93,7 @@ store.$subscribe(async (mutation, state) => {
 watch(sentence, (newSentence) => {
   console.log(newSentence);
   if (newSentence.length > 0) {
-    const [s] = newSentence;
-    card.value.fields.ExampleSentence.value = s;
+    card.value.fields.ExampleSentence.value = newSentence;
     console.log('changed card');
   }
 });
@@ -105,8 +111,16 @@ function onClose() {
   return false;
 }
 
-function submit() {
-  message.info(JSON.stringify(card.value));
+async function submit() {
+  // Todo track changes to the card and submit those for update
+  onClose();
+  message.info('Card submited');
+  const res = await window.ipc.updateAnkiCard(card.value.noteId, {
+    ExampleSentence: sentence.value,
+    // Since this is a new sentence, make sure to strip the previous audio
+    SentenceAudio: '',
+  });
+  message.info(JSON.stringify(res));
 }
 
 </script>

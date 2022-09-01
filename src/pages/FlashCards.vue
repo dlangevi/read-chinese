@@ -31,7 +31,7 @@ const columnDefs = [
   {
     headerName: '',
     field: 'Make FlashCard',
-    width: '50px',
+    width: 50,
     cellRenderer: AddToCardQueue,
   },
 ];

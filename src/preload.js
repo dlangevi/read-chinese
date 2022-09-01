@@ -14,4 +14,6 @@ contextBridge.exposeInMainWorld('ipc', {
   loadFlaggedCards: () => ipcRenderer.invoke('flaggedCards'),
   getSentencesForWord: (word) => ipcRenderer.invoke('getSentencesForWord', word),
   getAnkiCard: (word) => ipcRenderer.invoke('getAnkiCard', word),
+  getAnkiNote: (word) => ipcRenderer.invoke('getAnkiNote', word),
+  updateAnkiCard: (noteID, fields) => ipcRenderer.invoke('updateAnkiCard', noteID, fields),
 });
