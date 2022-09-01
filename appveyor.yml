@@ -14,6 +14,12 @@ install:
   - ps: Install-Product node 14 x64
   - yarn
 
+artifacts:
+  - path: dist_electron 
+    name: test logs
+    type: zip
+
+
 build_script:
   - yarn electron:build 
 
