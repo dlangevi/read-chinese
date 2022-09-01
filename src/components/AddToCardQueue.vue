@@ -7,6 +7,7 @@
 
 <script setup>
 import { useCardQueue } from '@/stores/CardQueue';
+import { NButton } from 'naive-ui';
 
 const store = useCardQueue();
 

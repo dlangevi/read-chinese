@@ -175,6 +175,8 @@ export function initWordGenIpc(ipcMain) {
   });
   ipcMain.handle('getSentencesForWord', async (event, word) => {
     const sentences = await getCandidateSentences(word);
+    sentences.sort((a, b) => (b.length - a.length));
+    sentences.splice(20);
     return sentences;
   });
 }

@@ -16,6 +16,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
+import { NCard } from 'naive-ui';
 
 const router = useRouter();
 const props = defineProps({

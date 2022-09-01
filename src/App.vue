@@ -16,6 +16,7 @@
 import TopNav from '@/components/TopNav.vue';
 import CardCreator from '@/components/CardCreator.vue';
 import { useRoute } from 'vue-router';
+import { NMessageProvider } from 'naive-ui';
 
 const route = useRoute();
 

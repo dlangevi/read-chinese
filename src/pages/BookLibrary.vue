@@ -12,7 +12,8 @@
 </template>
 
 <script setup>
-import BookCard from '../components/BookCard.vue';
+import { NGrid, NGi } from 'naive-ui';
+import BookCard from '@/components/BookCard.vue';
 
 const books = await window.ipc.loadBooks();
 </script>

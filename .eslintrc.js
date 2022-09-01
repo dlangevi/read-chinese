@@ -21,8 +21,6 @@ module.exports = {
     'import/prefer-default-export': 'off',
     // TODO turn these back on once I actually want to release this to people
     'vuejs-accessibility/click-events-have-key-events': 'off',
-    'vue/no-unused-vars': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'vue/no-unused-components': process.env.NODE_ENV === 'production' ? 'error' : 'off',
   },
   overrides: [
     {

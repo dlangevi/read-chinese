@@ -9,5 +9,8 @@ export const useCardQueue = defineStore('CardQueue', {
     addWord(word) {
       this.wordList.push(word);
     },
+    clearWords() {
+      this.wordList.splice(0);
+    },
   },
 });

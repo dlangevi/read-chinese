@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import BookCard from '../components/BookCard.vue';
+import BookCard from '@/components/BookCard.vue';
 
 const props = defineProps({
   bookID: String,
