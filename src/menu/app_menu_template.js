@@ -70,7 +70,11 @@ export default {
     {
       label: 'Import Calibre',
       click: () => {
-        importCalibreBooks();
+        const calibreDir = dialog.showOpenDialogSync({
+          properties: ['openDirectory'],
+        });
+        console.log(calibreDir);
+        importCalibreBooks(calibreDir);
       },
     },
     {

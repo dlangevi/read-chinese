@@ -10,10 +10,9 @@ import {
   bookExists, addBook, getBooks, getBookByID,  // eslint-disable-line
 } from './database';
 
-// Create Calibre instance
-const calibre = new Calibre({ library: '/home/dlangevi/chinese/chinese books/' });
-
-async function getCalibreBooks() {
+async function getCalibreBooks(calibreDir) {
+  // Create Calibre instance
+  const calibre = new Calibre({ library: calibreDir });
   const result = await calibre.run('calibredb list', {
     // limit: 10,
     forMachine: null,
@@ -23,8 +22,8 @@ async function getCalibreBooks() {
   return books;
 }
 
-export async function importCalibreBooks() {
-  const books = await getCalibreBooks();
+export async function importCalibreBooks(calibreDir) {
+  const books = await getCalibreBooks(calibreDir);
   Object.values(books).forEach((book) => {
     // Overwrite everythin every time for now
     // if (bookExists(book.authors, book.title)) {
