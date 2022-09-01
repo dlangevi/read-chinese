@@ -1,7 +1,7 @@
 <template>
   <n-button type="primary"
     @click="addToQueue(this.params.data)">
-    Create new FlashCard
+    Replace Sentence
   </n-button>
 </template>
 
@@ -11,7 +11,7 @@ import { NButton } from 'naive-ui';
 
 const store = useCardQueue();
 
-function addToQueue(rowData) {
+async function addToQueue(rowData) {
   store.addWord(rowData.word);
 }
 

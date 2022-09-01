@@ -97,6 +97,18 @@ export async function addSentenceToCard(word, sentence) {
   }
 }
 
+async function getAnkiCard(word) {
+  const cardID = await invoke('findCards', { query: `Hanzi:${word}` });
+  if (cardID.result.length !== 1) {
+    console.log(`Too many or few notes match ${word}, ${cardID.result}`);
+    return 'error';
+  }
+  const cardInfo = await invoke('cardsInfo', {
+    cards: cardID.result,
+  });
+  return cardInfo.result[0];
+}
+
 export async function getLackingCards(deck) {
   const skritter = await invoke('findCards', {
     query: `deck:${deck} ExampleSentence:`,
@@ -147,4 +159,10 @@ export async function importAnkiKeywords() {
     cards: skritter.result,
   });
   skritterInfo.result.forEach((card) => updateCard(card));
+}
+export function initAnkiIpc(ipcMain) {
+  ipcMain.handle('getAnkiCard', async (event, word) => {
+    const card = await getAnkiCard(word);
+    return card;
+  });
 }

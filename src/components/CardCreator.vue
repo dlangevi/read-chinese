@@ -11,61 +11,62 @@
         <p class="text-xl">
           Creating card for {{currentWord}}
         </p>
-        <p v-if="step == 0">Select the sentence</p>
-        <p v-else-if="step==1">Select the Picture</p>
-        <p v-else-if="step==2">Select the Definition</p>
+        <p v-if="step == 1">Select the sentence</p>
+        <p v-else-if="step==2">Select the Picture</p>
+        <p v-else-if="step==3">Select the Definition</p>
       </template>
-      <div v-if="step == 0">
-        <n-checkbox-group v-if="sentences.length > 0" v-model:value="sentence">
-          <n-space vertical item-style="display: flex;">
-          <n-checkbox v-for="(sentence, i) in sentences" :key="i"
-            :value="sentence" :label="sentence"/>
-          </n-space>
-        </n-checkbox-group>
-      </div>
-      <div v-else-if="step == 1">
-        <n-checkbox-group v-model:value="cities">
-          <n-space vertical item-style="display: flex;">
-            <n-checkbox value="Beijing" label="Beijing" />
-            <n-checkbox value="Shanghai" label="Shanghai" />
-            <n-checkbox value="Guangzhou" label="Guangzhou" />
-            <n-checkbox value="Shenzen" label="Shenzhen" />
-          </n-space>
-        </n-checkbox-group>
-      </div>
-      <div v-else-if="step == 2">
-        <n-checkbox-group v-model:value="food">
-          <n-space vertical item-style="display: flex;">
-            <n-checkbox value="Potatos" label="Potatos" />
-            <n-checkbox value="Fish" label="Fish" />
-          </n-space>
-        </n-checkbox-group>
-      </div>
+      <n-layout has-sider sider-placement="right">
+        <n-layout-content content-style="padding: 24px;">
+          <div v-if="step == 1">
+            <n-checkbox-group v-if="sentences.length > 0" v-model:value="sentence">
+              <n-space vertical item-style="display: flex;">
+              <n-checkbox class="text-3xl" v-for="(sentence, i) in sentences" :key="i"
+                :value="sentence" :label="sentence"/>
+              </n-space>
+            </n-checkbox-group>
+          </div>
+        </n-layout-content>
+        <n-layout-sider v-if="card !== undefined"
+          collapse-mode="transform"
+          :collapsed-width="50"
+          :native-scrollbar="true"
+          :show-collapsed-content="false"
+          :width="500"
+          show-trigger="arrow-circle"
+          content-style="padding: 24px;"
+          bordered
+        >
+          <anki-card-preview :ankiCard="card"/>
+        </n-layout-sider>
+      </n-layout>
+
       <template #action>
         <n-space justify="end">
-          <n-button type=primary v-if="step>0" @click="onNegativeClick">Previous</n-button>
-          <n-button type=warning v-if="step<2" @click="onPositiveClick">Next</n-button>
-          <n-button type=info v-if="step==2" @click="submit()">Submit</n-button>
+          <n-button type=primary v-if="step>1" @click="onNegativeClick">Previous</n-button>
+          <n-button type=warning v-if="step<steps" @click="onPositiveClick">Next</n-button>
+          <n-button type=info v-if="step==steps" @click="submit()">Submit</n-button>
         </n-space>
       </template>
     </n-modal>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watch, reactive } from 'vue';
 import { useCardQueue } from '@/stores/CardQueue';
+import AnkiCardPreview from '@/components/AnkiCardPreview.vue';
 import {
   useMessage, NCheckboxGroup, NCheckbox, NSpace, NButton, NModal,
+  NLayoutSider, NLayout, NLayoutContent,
 } from 'naive-ui';
 
 const store = useCardQueue();
 const sentences = ref([]);
 const sentence = ref(null);
-const cities = ref(null);
-const food = ref(null);
-const step = ref(0);
+const step = ref(1);
+const steps = 1;
 const showModal = ref(false);
 const currentWord = ref(null);
+const card = ref(undefined);
 
 const message = useMessage();
 store.$subscribe(async (mutation, state) => {
@@ -73,10 +74,22 @@ store.$subscribe(async (mutation, state) => {
   if (mutation.events.type === 'add' && mutation.events.key === '0') {
     const word = state.wordList[0];
     sentences.value = await window.ipc.getSentencesForWord(word);
+    // Todo card may not exist. In which case start a new one
+    const ankiCard = await window.ipc.getAnkiCard(word);
+    card.value = reactive(ankiCard);
   }
-  step.value = 0;
+  step.value = 1;
   showModal.value = state.wordList.length !== 0;
   [currentWord.value] = state.wordList;
+});
+
+watch(sentence, (newSentence) => {
+  console.log(newSentence);
+  if (newSentence.length > 0) {
+    const [s] = newSentence;
+    card.value.fields.ExampleSentence.value = s;
+    console.log('changed card');
+  }
 });
 
 function onNegativeClick() {
@@ -93,21 +106,7 @@ function onClose() {
 }
 
 function submit() {
-  message.info(JSON.stringify([sentence, cities, food]));
-  console.log(JSON.stringify([sentence, cities, food]));
+  message.info(JSON.stringify(card.value));
 }
 
 </script>
-
-<style scoped>
-.modal {
-  position: fixed;
-  z-index: 999;
-  top: 20%;
-  left: 50%;
-  width: 560px;
-  margin-left: -150px;
-  background: pink;
-  max-height: 800px;
-}
-</style>

@@ -81,7 +81,7 @@ async function getCandidateSentences(word, books = []) {
   if (books.length === 0) {
     books = getBooks();
   }
-  const candidates = [];
+  const candidates = new Set();
   await Promise.all(books.map(async (bookInfo) => {
     console.log(`Loading ${bookInfo.txtFile}`);
     const segmented = await loadJieba(bookInfo.txtFile);
@@ -89,12 +89,12 @@ async function getCandidateSentences(word, books = []) {
       const text = toText(sentence);
       if (text.includes(word)) {
         if (isT1Candidate(sentence)) {
-          candidates.push(text);
+          candidates.add(text);
         }
       }
     });
   }));
-  return candidates;
+  return [...candidates];
 }
 
 // Generates sentences for a given set of words
@@ -176,7 +176,7 @@ export function initWordGenIpc(ipcMain) {
   ipcMain.handle('getSentencesForWord', async (event, word) => {
     const sentences = await getCandidateSentences(word);
     sentences.sort((a, b) => (b.length - a.length));
-    sentences.splice(20);
+    sentences.splice(10);
     return sentences;
   });
 }

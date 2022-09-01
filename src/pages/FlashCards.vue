@@ -29,8 +29,9 @@ const columnDefs = [
     sort: 'desc',
   },
   {
-    headerName: 'addToQueue',
+    headerName: '',
     field: 'Make FlashCard',
+    width: '50px',
     cellRenderer: AddToCardQueue,
   },
 ];

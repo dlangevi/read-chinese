@@ -10,6 +10,7 @@ import editMenuTemplate from './menu/edit_menu_template';
 import devMenuTemplate from './menu/dev_menu_template';
 import { syncWords } from './helpers/knownWords';
 import { initLibraryIpc } from './helpers/calibre';
+import { initAnkiIpc } from './helpers/ankiInterface';
 import { preloadWords, initWordGenIpc } from './helpers/generateSentences';
 import { updateTimesRan, getTimesRan } from './helpers/database';
 
@@ -81,6 +82,7 @@ app.on('activate', () => {
 const initIpc = () => {
   initLibraryIpc(ipcMain);
   initWordGenIpc(ipcMain);
+  initAnkiIpc(ipcMain);
 };
 
 // This method will be called when Electron has finished

@@ -6,7 +6,7 @@ export const useCardQueue = defineStore('CardQueue', {
     words: (state) => state.wordList,
   },
   actions: {
-    addWord(word) {
+    async addWord(word) {
       this.wordList.push(word);
     },
     clearWords() {
