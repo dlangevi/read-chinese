@@ -1,6 +1,6 @@
 import { app, dialog } from 'electron';
 import fs from 'fs';
-import { saveWord, saveWords, loadWords } from '../helpers/database';
+import { saveWord, saveLegacyWords, loadWords } from '../helpers/database';
 import { importCalibreBooks } from '../helpers/calibre';
 import { generateSentences } from '../helpers/generateSentences';
 import { getLackingCards, importAnkiKeywords } from '../helpers/ankiInterface';
@@ -20,7 +20,7 @@ export default {
       },
     },
     {
-      label: 'Import Words',
+      label: 'Import Legacy Words',
       click: () => {
         // TODO handle bad selections
         const wordsFile = dialog.showOpenDialogSync({
@@ -35,11 +35,11 @@ export default {
           flags: 'r',
         });
         const words = JSON.parse(contents);
-        saveWords(words);
+        saveLegacyWords(words);
       },
     },
     {
-      label: 'Import Words 2',
+      label: 'Import Words From CSV',
       click: () => {
         // TODO handle bad selections
         const wordsFile = dialog.showOpenDialogSync({

@@ -150,7 +150,11 @@ export async function getFlaggedCards() {
 }
 
 async function updateCard(ankiCard) {
-  updateWord(ankiCard);
+  updateWord(
+    ankiCard.fields.Hanzi.value,
+    ankiCard.interval,
+    true,
+  );
 }
 
 async function updateAnkiCard(noteID, fields) {

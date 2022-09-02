@@ -80,6 +80,7 @@ store.$subscribe(async (mutation, state) => {
   if (state.wordList.length > 0) {
     const word = state.wordList[0];
     sentences.value = await window.ipc.getSentencesForWord(word);
+    console.log(sentences.value);
     // Todo card may not exist. In which case start a new one
     const ankiCard = await window.ipc.getAnkiNote(word);
     card.value = reactive(ankiCard);
