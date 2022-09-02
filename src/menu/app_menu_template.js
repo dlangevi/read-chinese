@@ -1,6 +1,5 @@
 import { app, dialog } from 'electron';
 import fs from 'fs';
-import { loadWords } from '../helpers/database';
 import { addWord, saveLegacyWords } from '../helpers/knownWords';
 import { importCalibreBooks } from '../helpers/calibre';
 import { generateSentences } from '../helpers/generateSentences';
@@ -58,14 +57,6 @@ export default {
         words.forEach((word) => {
           addWord(word);
         });
-      },
-    },
-    {
-      label: 'Log Words',
-      click: async () => {
-        console.log('before');
-        const words = await loadWords();
-        console.log(`after ${words.length}`);
       },
     },
     {
