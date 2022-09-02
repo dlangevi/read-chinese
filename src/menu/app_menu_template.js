@@ -1,6 +1,7 @@
 import { app, dialog } from 'electron';
 import fs from 'fs';
-import { saveWord, saveLegacyWords, loadWords } from '../helpers/database';
+import { loadWords } from '../helpers/database';
+import { addWord, saveLegacyWords } from '../helpers/knownWords';
 import { importCalibreBooks } from '../helpers/calibre';
 import { generateSentences } from '../helpers/generateSentences';
 import { getLackingCards, importAnkiKeywords } from '../helpers/ankiInterface';
@@ -55,7 +56,7 @@ export default {
         });
         const words = contents.split('\n');
         words.forEach((word) => {
-          saveWord(word);
+          addWord(word);
         });
       },
     },

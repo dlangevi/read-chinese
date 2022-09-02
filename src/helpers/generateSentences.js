@@ -1,12 +1,11 @@
 import { getBooks } from './database';
 import { loadJieba } from './segmentation';
-import known from './knownWords';
+import { isKnown } from './knownWords';
 import { addSentenceToCard, getFlaggedCards } from './ankiInterface';
 
 export async function preloadWords() {
   const books = getBooks();
   books.forEach((bookInfo) => {
-    console.log(`Loading ${bookInfo.txtFile}`);
     loadJieba(bookInfo.txtFile);
   });
 }
@@ -19,7 +18,7 @@ function isT1Candidate(sentence, t1word) {
   return sentence.every(([word, type]) => {
     if (type !== 3) return true;
     if (word === t1word) return true;
-    return known.isKnown(word);
+    return isKnown(word);
   });
 }
 
@@ -28,7 +27,7 @@ function sentenceKnown(sentence) {
   sentence.forEach(([word, type]) => {
     if (type !== 3) return;
 
-    if (!(known.isKnown(word))) {
+    if (!(isKnown(word))) {
       unknowns.add(word);
     }
   });
@@ -51,7 +50,6 @@ export async function whatShouldILearn(books = []) {
   }
   const shouldLearn = {};
   await Promise.all(books.map(async (bookInfo) => {
-    console.log(`Loading ${bookInfo.txtFile}`);
     const segmented = await loadJieba(bookInfo.txtFile);
     segmented.forEach((sentence) => {
       const word = getT1Word(sentence);
@@ -83,7 +81,6 @@ async function getCandidateSentences(word, books = []) {
   }
   const candidates = new Set();
   await Promise.all(books.map(async (bookInfo) => {
-    console.log(`Loading ${bookInfo.txtFile}`);
     const segmented = await loadJieba(bookInfo.txtFile);
     segmented.forEach((sentence) => {
       const text = toText(sentence);
@@ -115,7 +112,6 @@ export async function generateSentences(
     books = getBooks();
   }
   await Promise.all(books.map(async (bookInfo) => {
-    console.log(`Loading ${bookInfo.txtFile}`);
     const segmented = await loadJieba(bookInfo.txtFile);
     segmented.forEach((sentence) => {
       const unknowns = sentenceKnown(sentence);

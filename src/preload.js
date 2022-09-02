@@ -5,15 +5,15 @@
 
 import { contextBridge, ipcRenderer } from 'electron';
 
-// Maybe later we will want to set this up but meh
-// const validChannels = ['READ_FILE', 'WRITE_FILE'];
+const call = ipcRenderer.invoke;
 contextBridge.exposeInMainWorld('ipc', {
-  loadBooks: () => ipcRenderer.invoke('loadBooks'),
-  loadBook: (title) => ipcRenderer.invoke('loadBook', title),
-  learningTarget: () => ipcRenderer.invoke('learningTarget'),
-  loadFlaggedCards: () => ipcRenderer.invoke('flaggedCards'),
-  getSentencesForWord: (word) => ipcRenderer.invoke('getSentencesForWord', word),
-  getAnkiCard: (word) => ipcRenderer.invoke('getAnkiCard', word),
-  getAnkiNote: (word) => ipcRenderer.invoke('getAnkiNote', word),
-  updateAnkiCard: (noteID, fields) => ipcRenderer.invoke('updateAnkiCard', noteID, fields),
+  loadBooks: () => call('loadBooks'),
+  loadBook: (title) => call('loadBook', title),
+  learningTarget: () => call('learningTarget'),
+  loadFlaggedCards: () => call('flaggedCards'),
+  getSentencesForWord: (word) => call('getSentencesForWord', word),
+  getAnkiCard: (word) => call('getAnkiCard', word),
+  getAnkiNote: (word) => call('getAnkiNote', word),
+  updateAnkiCard: (noteID, fields) => call('updateAnkiCard', noteID, fields),
+  addWord: (word) => call('addWord', word),
 });

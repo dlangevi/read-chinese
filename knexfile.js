@@ -16,7 +16,9 @@ module.exports = {
   development: {
     client: 'sqlite3',
     connection: {
-      filename: path.join(__dirname, 'db.sqlite3'),
+      // Use the same database for now
+      // filename: path.join(__dirname, 'db.sqlite3'),
+      filename: path.join(userData, 'db.sqlite3'),
     },
     migrations: {
       tableName: 'knex_migrations',

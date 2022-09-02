@@ -1,6 +1,6 @@
 // import wordStats from './wordStats.js';
 // import config from './config.js';
-import { loadWords } from './database';
+import { loadWords, updateWord } from './database';
 
 // @todo save and load this from the database,
 // and handle per user word lists
@@ -43,44 +43,9 @@ function currentDateString() {
   return toDateString(new Date());
 }
 
-/**
- * Convert a 'YYYY-MM-DD' string into milliseconds
- * @param {Date} dateString - input date
- * @return {number}
- */
-function toMilli(dateString) {
-  const [year, month, day] = dateString.split('-');
-  const date = new Date(year, month - 1, day);
-  return date.getTime();
-}
-
-/**
- * Data for the index.html word progress chart
- * @return {Object}
- */
-function tableData() {
-  const summed = {};
-  Object.values(known).forEach((data) => {
-    if (!(data.added in summed)) {
-      summed[data.added] = 0;
-    }
-    summed[data.added] += 1;
-  });
-
-  const sorted = Object.entries(summed).sort();
-  let acc = 0;
-  for (let i = 0; i < sorted.length; i += 1) {
-    acc += sorted[i][1];
-    sorted[i][1] = acc;
-  }
-
-  return {
-    lables: sorted.map(([x, _]) => x).map((dateString) => toMilli(dateString)),
-    data: sorted.map(([_, y]) => y),
-  };
-}
-
-function addWord(word, age) {
+// For now the db code will update the word set here on each addition.
+// In the future there should not be two seperate sets of words
+export function addWord(word, age = 0, hasFlashCard = false) {
   // If this is a new word, add it with the current date
   if (!(word in known)) {
     known[word] = {
@@ -93,37 +58,28 @@ function addWord(word, age) {
     known[word].interval = age;
     console.log(`Updating Word interval for ${word} to ${age}`);
   }
+  updateWord(word, age, hasFlashCard);
 }
 
-function knownWordsTable() {
-  return Object.entries(known).map(([key, value]) => ({
-    word: key,
-    interval: value.interval,
-    added: value.added,
-    // stars: wordStats.frequency(key),
-  }));
+export function saveLegacyWords(words) {
+  Object.entries(words).forEach(([word, entry]) => {
+    console.log(`Inserting ${word}`);
+    addWord(word, entry.interval);
+  });
 }
 
-function numKnownCharacters() {
-  return knownCharacters.size;
+export function isKnown(word, howKnown = 0) {
+  // if word is completly unknown return false
+  if (!(word in known)) {
+    return false;
+  }
+  // we know it at least somewhat known
+  return known[word].interval >= howKnown;
 }
 
-// exports various dictionaries
-const knownWords = {
-  addWord,
-  isKnown: (word, howKnown = 0) => {
-    // if word is completly unknown return false
-    if (!(word in known)) {
-      return false;
-    }
-    // we know it at least somewhat known
-    return known[word].interval >= howKnown;
-  },
-  isKnownChar: (ch) => knownCharacters.has(ch),
-
-  knownWordsTable,
-  knownWords: () => Object.keys(known).length,
-  knownCharacters: numKnownCharacters,
-  tableData,
-};
-export default knownWords;
+export function initWordsIpc(ipcMain) {
+  ipcMain.handle('addWord', (event, word) => {
+    // These will be from markedLearned so stick to prior convention for now
+    addWord(word, 10000);
+  });
+}

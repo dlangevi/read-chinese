@@ -1,5 +1,5 @@
 <template>
-  <img @click="markKnown(this.params.data)" class="
+  <img @click="markKnown" class="
     font-black
     bg-red-600
     hover:bg-green-600
@@ -12,10 +12,18 @@
 </template>
 
 <script setup>
-function markKnown(rowData) {
-  console.log(rowData);
-  // TODO ipc.addNewWord(...)
-  // remove this row from data somehow
+const props = defineProps({
+  params: {
+    type: Object,
+  },
+});
+
+function markKnown() {
+  const rowData = props.params.data;
+  window.ipc.addWord(rowData.word);
+  props.params.api.applyTransaction({
+    remove: [rowData],
+  });
 }
 
 </script>

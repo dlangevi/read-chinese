@@ -2,14 +2,17 @@
 // something more performant later if we need
 import Store from 'electron-store';
 import Knex from 'knex';
+// For now we do the sync whenever the db changes.
 import knexConfigMap from '../../knexfile';
 
 const knexConfig = knexConfigMap[process.env.NODE_ENV];
 const knex = Knex(knexConfig);
 
-knex.migrate.latest(knexConfig).catch((err) => {
-  console.log(err);
-});
+export async function initializeDatabase() {
+  await knex.migrate.latest(knexConfig).catch((err) => {
+    console.log(err);
+  });
+}
 
 function bookKey(author, title) {
   return `${author}-${title}`;
@@ -62,21 +65,6 @@ export async function wordExists(word) {
       console.error(err);
     });
   return exists.length !== 0;
-}
-
-// TODO more arguments
-export async function saveWord(word, interval = 0) {
-  const exists = await wordExists(word);
-  if (!exists) {
-    knex('words')
-      .insert({
-        word,
-        interval,
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
 }
 
 export async function loadWords() {

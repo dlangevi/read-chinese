@@ -19,7 +19,7 @@
         <n-layout-content content-style="padding: 24px;" :native-scrollbar="false">
           <div v-if="step == 1">
             <n-radio-group v-model:value="sentence" name="sentences">
-              <n-space>
+              <n-space vertical>
                 <n-radio
                   class="text-3xl"
                   v-for="(sentence, i) in sentences"

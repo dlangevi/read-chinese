@@ -17,7 +17,11 @@ const props = defineProps({
 
 const store = useCardQueue();
 async function addToQueue() {
-  store.addWord(props.params.data.word);
+  const rowData = props.params.data;
+  store.addWord(rowData.word);
+  props.params.api.applyTransaction({
+    remove: [rowData],
+  });
 }
 
 </script>

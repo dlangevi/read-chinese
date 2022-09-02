@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { updateWord } from './database';
+import { addWord } from './knownWords';
 // Must have ankiconnect installed as a plugin in your anki installation
 async function invoke(action, params) {
   const response = await fetch('http://localhost:8765', {
@@ -150,7 +150,7 @@ export async function getFlaggedCards() {
 }
 
 async function updateCard(ankiCard) {
-  updateWord(
+  addWord(
     ankiCard.fields.Hanzi.value,
     ankiCard.interval,
     true,

@@ -7,6 +7,7 @@
     <ag-grid-vue
         class="ag-theme-alpine w-1/2 mx-auto
         h-full flex-grow-1 text-xl"
+        :getRowId="getRowId"
         :columnDefs="columnDefs"
         :rowData="rowData" >
     </ag-grid-vue>
@@ -18,6 +19,8 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
 import MarkLearned from '../components/MarkLearned.vue';
+
+const getRowId = (params) => params.data.word;
 
 const columnDefs = [
   {

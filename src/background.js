@@ -8,11 +8,11 @@ import path from 'path';
 import appMenuTemplate from './menu/app_menu_template';
 import editMenuTemplate from './menu/edit_menu_template';
 import devMenuTemplate from './menu/dev_menu_template';
-import { syncWords } from './helpers/knownWords';
+import { syncWords, initWordsIpc } from './helpers/knownWords';
 import { initLibraryIpc } from './helpers/calibre';
 import { initAnkiIpc } from './helpers/ankiInterface';
 import { preloadWords, initWordGenIpc } from './helpers/generateSentences';
-import { updateTimesRan, getTimesRan } from './helpers/database';
+import { updateTimesRan, getTimesRan, initializeDatabase } from './helpers/database';
 
 // const isDevelopment = process.env.NODE_ENV !== 'production';
 const isDevelopment = true;
@@ -83,6 +83,7 @@ const initIpc = () => {
   initLibraryIpc(ipcMain);
   initWordGenIpc(ipcMain);
   initAnkiIpc(ipcMain);
+  initWordsIpc(ipcMain);
 };
 
 // This method will be called when Electron has finished
@@ -97,6 +98,7 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString());
     }
   }
+  await initializeDatabase();
   await syncWords();
   setApplicationMenu();
   initIpc();
