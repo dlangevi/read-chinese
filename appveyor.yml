@@ -15,12 +15,8 @@ install:
   - yarn
 
 artifacts:
-  - path: dist_electron 
-    name: test logs
-    type: zip
-
   - path: 'dist_electron\read-chinese Setup 0.1.0.exe'
-    name: Install Program
+    name: Windows Install Program
 
 build_script:
   - yarn electron:build 
