@@ -14,7 +14,8 @@ import { initAnkiIpc } from './helpers/ankiInterface';
 import { preloadWords, initWordGenIpc } from './helpers/generateSentences';
 import { updateTimesRan, getTimesRan } from './helpers/database';
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
+// const isDevelopment = process.env.NODE_ENV !== 'production';
+const isDevelopment = true;
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
