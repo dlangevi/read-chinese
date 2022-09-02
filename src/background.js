@@ -32,13 +32,12 @@ function setApplicationMenu() {
 
 async function createWindow() {
   // Create the browser window.
-  console.log(path.join(__dirname, 'preload.js'));
   updateTimesRan();
   console.log(`Ran ${getTimesRan()}`);
   console.log(`Data stored at ${app.getPath('userData')}`);
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1200,
+    height: 800,
     webPreferences: {
 
       // Required for Spectron testing

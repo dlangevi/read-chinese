@@ -1,6 +1,6 @@
 <template>
   <n-button type="primary"
-    @click="addToQueue(this.params.data)">
+    @click="addToQueue">
     Replace Sentence
   </n-button>
 </template>
@@ -9,10 +9,15 @@
 import { useCardQueue } from '@/stores/CardQueue';
 import { NButton } from 'naive-ui';
 
-const store = useCardQueue();
+const props = defineProps({
+  params: {
+    type: Object,
+  },
+});
 
-async function addToQueue(rowData) {
-  store.addWord(rowData.word);
+const store = useCardQueue();
+async function addToQueue() {
+  store.addWord(props.params.data.word);
 }
 
 </script>
