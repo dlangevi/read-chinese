@@ -1,9 +1,9 @@
 import { app, dialog } from 'electron';
 import fs from 'fs';
-import { addWord, saveLegacyWords } from '../helpers/knownWords';
-import { importCalibreBooks } from '../helpers/calibre';
-import { generateSentences } from '../helpers/generateSentences';
-import { getLackingCards, importAnkiKeywords } from '../helpers/ankiInterface';
+import { addWord, saveLegacyWords } from '../background/knownWords';
+import { importCalibreBooks } from '../background/calibre';
+import { generateSentences } from '../background/generateSentences';
+import { getLackingCards, importAnkiKeywords } from '../background/ankiInterface';
 
 export default {
   label: 'App',

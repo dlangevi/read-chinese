@@ -8,11 +8,11 @@ import path from 'path';
 import appMenuTemplate from './menu/app_menu_template';
 import editMenuTemplate from './menu/edit_menu_template';
 import devMenuTemplate from './menu/dev_menu_template';
-import { syncWords, initWordsIpc } from './helpers/knownWords';
-import { initLibraryIpc } from './helpers/calibre';
-import { initAnkiIpc } from './helpers/ankiInterface';
-import { preloadWords, initWordGenIpc } from './helpers/generateSentences';
-import { updateTimesRan, getTimesRan, initializeDatabase } from './helpers/database';
+import { syncWords, initWordsIpc } from './background/knownWords';
+import { initLibraryIpc } from './background/calibre';
+import { initAnkiIpc } from './background/ankiInterface';
+import { preloadWords, initWordGenIpc } from './background/generateSentences';
+import { updateTimesRan, getTimesRan, initializeDatabase } from './background/database';
 
 // const isDevelopment = process.env.NODE_ENV !== 'production';
 const isDevelopment = true;
