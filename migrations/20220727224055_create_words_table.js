@@ -11,7 +11,7 @@ exports.up = function up(knex) {
       table.boolean('has_flash_card');
       table.boolean('has_sentence');
       table.integer('interval');
-      table.timestamps();
+      table.timestamps(true, true);
     });
 };
 

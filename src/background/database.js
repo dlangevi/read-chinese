@@ -63,15 +63,11 @@ export async function wordExists(word) {
 
 export async function loadWords() {
   const rows = await knex('words')
-    .select({ id: 'id', word: 'word', interval: 'interval' })
+    .select({ id: 'id', word: 'word' })
     .catch((error) => { console.log(error); });
-  const words = {};
+  const words = new Set();
   rows.forEach((row) => {
-    words[row.word] = {
-      interval: row.interval,
-      // todo get added working
-      added: 0,
-    };
+    words.add(row.word);
   });
   return words;
 }
