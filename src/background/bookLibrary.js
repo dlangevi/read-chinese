@@ -6,7 +6,7 @@ import {
 } from './database';
 
 export function getBooks() {
-  return getBooks();
+  return dbGetBooks();
 }
 
 export function addBook(author, title, cover, filepath) {
