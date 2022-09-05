@@ -17,6 +17,9 @@ module.exports = {
     'no-unused-vars': ['error', { argsIgnorePattern: '_' }],
     'no-param-reassign': 'off',
     'no-await-in-loop': 'off',
+    'no-use-before-define': ['error', {
+      functions: false,
+    }],
     'linebreak-style': 'off',
     'import/prefer-default-export': 'off',
     // TODO turn these back on once I actually want to release this to people

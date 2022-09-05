@@ -31,6 +31,10 @@ export function isKnown(word) {
   return known.has(word);
 }
 
+export function isKnownChar(char) {
+  return knownCharacters.has(char);
+}
+
 export function initWordsIpc(ipcMain) {
   ipcMain.handle('addWord', (event, word) => {
     // These will be from markedLearned so stick to prior convention for now

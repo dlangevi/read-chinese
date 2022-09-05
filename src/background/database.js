@@ -95,6 +95,7 @@ export async function dbLoadWords() {
  *  txtFile: string, // path of where book txt file is stored
  *  cover: string, // path of where book cover image is stored
  *  bookID: string,
+ *  wordTable: { word => count } count of each word in the book
  * }
  *
  ********************************** */
