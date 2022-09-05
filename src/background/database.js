@@ -8,6 +8,7 @@ import knexConfigMap from '../../knexfile';
 const knexConfig = knexConfigMap[process.env.NODE_ENV];
 const knex = Knex(knexConfig);
 
+// This is called and waited before before anyother code can run
 export async function initializeDatabase() {
   await knex.migrate.latest(knexConfig).catch((err) => {
     console.log(err);
@@ -49,13 +50,6 @@ export async function updateWord(word, interval = 0, hasFlashCard = false) {
         interval,
       }).catch((err) => { console.log(err); });
   }
-}
-
-export function saveLegacyWords(words) {
-  Object.entries(words).forEach(([word, entry]) => {
-    console.log(`Inserting ${word}`);
-    updateWord(word, entry.interval);
-  });
 }
 
 export async function wordExists(word) {

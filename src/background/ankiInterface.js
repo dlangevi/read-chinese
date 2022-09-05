@@ -135,7 +135,7 @@ export async function getLackingCards(deck) {
 }
 
 // TODO filter by deck
-export async function getFlaggedCards() {
+async function getFlaggedCards() {
   const flaggedIDs = await invoke('findCards', {
     query: 'flag:1',
   });
@@ -214,5 +214,9 @@ export function initAnkiIpc(ipcMain) {
   ipcMain.handle('updateAnkiCard', async (event, noteID, fields) => {
     await removeFlag(noteID);
     return updateAnkiCard(noteID, fields);
+  });
+  ipcMain.handle('flaggedCards', async () => {
+    const flagged = await getFlaggedCards('Reading');
+    return flagged;
   });
 }

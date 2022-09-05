@@ -1,7 +1,6 @@
 import { getBooks } from './database';
 import { loadJieba } from './segmentation';
 import { isKnown } from './knownWords';
-import { addSentenceToCard, getFlaggedCards } from './ankiInterface';
 
 export async function preloadWords() {
   const books = getBooks();
@@ -99,7 +98,6 @@ async function getCandidateSentences(word, books = []) {
 export async function generateSentences(
   words = [],
   books = [],
-  modifyCards = false,
 ) {
   const wordDict = {};
   const shouldLearn = {
@@ -135,20 +133,7 @@ export async function generateSentences(
       }
     });
   }));
-  let goodOnes = 0;
-  const entries = Object.entries(wordDict);
 
-  for (let i = 0; i < entries.length; i += 1) {
-    const [word, candidate] = entries[i];
-    if (candidate !== '') {
-      goodOnes += 1;
-      // For now do 10 at a time with lots of debugging
-      if (modifyCards) {
-        await addSentenceToCard(word, candidate);
-      }
-    }
-  }
-  console.log(`Generated ${goodOnes}/${Object.keys(wordDict).length}`);
   const sorted = Object.entries(shouldLearn)
     .filter(([_, timesSeen]) => (timesSeen > 100))
     .sort(([_, timesA], [__, timesB]) => {
@@ -164,10 +149,6 @@ export function initWordGenIpc(ipcMain) {
   ipcMain.handle('learningTarget', async () => {
     const words = await whatShouldILearn();
     return words;
-  });
-  ipcMain.handle('flaggedCards', async () => {
-    const flagged = await getFlaggedCards('Reading');
-    return flagged;
   });
   ipcMain.handle('getSentencesForWord', async (event, word) => {
     const sentences = await getCandidateSentences(word);

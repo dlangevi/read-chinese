@@ -2,8 +2,7 @@ import { app, dialog } from 'electron';
 import fs from 'fs';
 import { addWord, saveLegacyWords } from '../background/knownWords';
 import { importCalibreBooks } from '../background/calibre';
-import { generateSentences } from '../background/generateSentences';
-import { getLackingCards, importAnkiKeywords } from '../background/ankiInterface';
+import { importAnkiKeywords } from '../background/ankiInterface';
 
 export default {
   label: 'App',
@@ -73,15 +72,6 @@ export default {
       label: 'Sync Anki',
       click: async () => {
         importAnkiKeywords();
-      },
-    },
-    {
-      label: 'Auto Generate Missing Sentences',
-      click: async () => {
-        // const ankiWords = await getLackingCards('Reading');
-        const ankiWords = await getLackingCards('Skritter');
-        console.log(ankiWords);
-        generateSentences(ankiWords, [], true);
       },
     },
     {

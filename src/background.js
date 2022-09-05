@@ -8,7 +8,7 @@ import path from 'path';
 import appMenuTemplate from './menu/app_menu_template';
 import editMenuTemplate from './menu/edit_menu_template';
 import devMenuTemplate from './menu/dev_menu_template';
-import { syncWords, initWordsIpc } from './background/knownWords';
+import { initWordsIpc } from './background/knownWords';
 import { initLibraryIpc } from './background/calibre';
 import { initAnkiIpc } from './background/ankiInterface';
 import { preloadWords, initWordGenIpc } from './background/generateSentences';
@@ -90,6 +90,8 @@ const initIpc = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
+  // TODO can this be moved further up?
+  await initializeDatabase();
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
@@ -98,8 +100,6 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString());
     }
   }
-  await initializeDatabase();
-  await syncWords();
   setApplicationMenu();
   initIpc();
   createWindow();
