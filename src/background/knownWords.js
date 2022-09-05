@@ -1,10 +1,10 @@
-import { loadWords, updateWord } from './database';
+import { dbLoadWords, dbUpdateWord } from './database';
 
 // Memory cache of the set of known words for performance
 let known = {};
 let knownCharacters = new Set();
 export async function syncWords() {
-  known = await loadWords();
+  known = await dbLoadWords();
   knownCharacters = new Set();
   known.forEach((word) => {
     Array.from(word).forEach((ch) => knownCharacters.add(ch));
@@ -17,7 +17,7 @@ Known characters: ${knownCharacters.size} `);
 // In the future there should not be two seperate sets of words
 export function addWord(word, age = 0, hasFlashCard = false) {
   known.add(word);
-  updateWord(word, age, hasFlashCard);
+  dbUpdateWord(word, age, hasFlashCard);
 }
 
 export function saveLegacyWords(words) {

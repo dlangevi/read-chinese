@@ -9,9 +9,10 @@ import appMenuTemplate from './menu/app_menu_template';
 import editMenuTemplate from './menu/edit_menu_template';
 import devMenuTemplate from './menu/dev_menu_template';
 import { syncWords, initWordsIpc } from './background/knownWords';
-import { initLibraryIpc } from './background/calibre';
+import { initLibraryIpc } from './background/bookLibrary';
 import { initAnkiIpc } from './background/ankiInterface';
-import { preloadWords, initWordGenIpc } from './background/generateSentences';
+import { initWordGenIpc } from './background/generateSentences';
+import { preloadWords } from './background/segmentation';
 import { updateTimesRan, getTimesRan, initializeDatabase } from './background/database';
 
 // const isDevelopment = process.env.NODE_ENV !== 'production';

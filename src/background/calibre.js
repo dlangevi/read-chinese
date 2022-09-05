@@ -5,10 +5,7 @@
 // {verbose: console.log});
 //
 import { Calibre } from 'node-calibre';
-import fs from 'fs';
-import {
-  bookExists, addBook, getBooks, getBookByID,  // eslint-disable-line
-} from './database';
+import { addBook } from './bookLibrary';
 
 async function getCalibreBooks(calibreDir) {
   // Create Calibre instance
@@ -35,24 +32,5 @@ export async function importCalibreBooks(calibreDir) {
       addBook(book.authors, book.title, book.cover, txtBooks[0]);
     }
     // }
-  });
-}
-
-export function initLibraryIpc(ipcMain) {
-  ipcMain.handle('loadBooks', () => {
-    const books = getBooks();
-    books.forEach((book) => {
-      const img = fs.readFileSync(book.cover).toString('base64');
-      book.imgData = img;
-    });
-    return books;
-  });
-
-  ipcMain.handle('loadBook', (event, bookID) => {
-    const book = getBookByID(bookID);
-    const img = fs.readFileSync(book.cover).toString('base64');
-    book.imgData = img;
-
-    return book;
   });
 }

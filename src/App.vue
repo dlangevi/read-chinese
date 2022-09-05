@@ -3,7 +3,7 @@
     <div id="app" class="bg-white max-h-screen max-w-screen">
       <TopNav class="w-screen h-16"/>
       <CardCreator/>
-      <div class="w-screen h-[calc(100vh-4rem)] overflow-scroll">
+      <div class="w-screen h-[calc(100vh-4rem)] overflow-auto">
         <Suspense>
           <router-view :key="route.fullPath"/>
         </Suspense>

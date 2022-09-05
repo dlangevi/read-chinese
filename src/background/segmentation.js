@@ -2,6 +2,7 @@ import jieba from 'nodejieba';
 import path from 'path';
 // import rsjieba from '@node-rs/jieba';
 import fs from 'fs';
+import getBooks from './database';
 // import books from './bookCatalogue.js';
 
 // Here we will handle the segmentation of text. There will be two supported
@@ -114,6 +115,12 @@ export async function loadJieba(txtPath) {
   return finalResult;
 }
 
+export async function preloadWords() {
+  const books = getBooks();
+  books.forEach((bookInfo) => {
+    loadJieba(bookInfo.txtFile);
+  });
+}
 /* const TYPE = {
   NONE: 0, // None - Indicative of an error
   INVALID: 1, // Invalid - Invalid utf8 text

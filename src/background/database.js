@@ -1,5 +1,8 @@
-// All saved data will be ran through here, so we can swap electron-store to
-// something more performant later if we need
+// Dont know if this is a silly idea, but want to isolate all the actual reads
+// and writes in a seperate file. So anything that is saved or read from
+// persistant storage will have to go through functions prefixed 'db' in this
+// file. If we want to swap out backends later on at least all the code to be
+// changed will be in the same place
 import Store from 'electron-store';
 import Knex from 'knex';
 // For now we do the sync whenever the db changes.
@@ -8,20 +11,23 @@ import knexConfigMap from '../../knexfile';
 const knexConfig = knexConfigMap[process.env.NODE_ENV];
 const knex = Knex(knexConfig);
 
-// This is called and waited before before anyother code can run
+// This is called and awaited before before anyother code can run
 export async function initializeDatabase() {
   await knex.migrate.latest(knexConfig).catch((err) => {
     console.log(err);
   });
 }
 
-function bookKey(author, title) {
-  return `${author}-${title}`;
-}
-
-// TODO should this also be in sql?
+// Books and metadata can be stored in electron-store for now since they should
+// be low footprint
 const bookStore = new Store({ name: 'books' });
 const metadataStore = new Store({ name: 'metadata' });
+
+/** *********************************
+ *
+ * Metadata
+ *
+ ********************************** */
 
 export function updateTimesRan() {
   const timesRan = metadataStore.get('ran', 0);
@@ -32,7 +38,21 @@ export function getTimesRan() {
   return metadataStore.get('ran', 0);
 }
 
-export async function updateWord(word, interval = 0, hasFlashCard = false) {
+/** *********************************
+ *
+ * Known Words + Flash Cards
+ *
+ * eachRow: {
+ *    word: string,
+ *    has_flash_card: boolean,
+ *    has_sentence: boolean,
+ *    interval: integer, // Anki flashcard interval
+ * }
+ *
+ ********************************** */
+
+// Adds if not exists
+export async function dbUpdateWord(word, interval = 0, hasFlashCard = false) {
   const exists = await knex('words').select().where('word', word);
   if (exists.length === 0) {
     console.log(`Adding new word: ${word}`);
@@ -52,16 +72,7 @@ export async function updateWord(word, interval = 0, hasFlashCard = false) {
   }
 }
 
-export async function wordExists(word) {
-  const exists = await knex('words')
-    .select().where('word', word)
-    .catch((err) => {
-      console.error(err);
-    });
-  return exists.length !== 0;
-}
-
-export async function loadWords() {
+export async function dbLoadWords() {
   const rows = await knex('words')
     .select({ id: 'id', word: 'word' })
     .catch((error) => { console.log(error); });
@@ -72,7 +83,25 @@ export async function loadWords() {
   return words;
 }
 
-export function addBook(author, title, cover, filepath) {
+/** *********************************
+ *
+ * Books
+ *
+ * currently indexed by combination of author and title
+ *
+ * bookKey: {
+ *  author: string,
+ *  title: string,
+ *  txtFile: string, // path of where book txt file is stored
+ *  cover: string, // path of where book cover image is stored
+ *  bookID: string,
+ * }
+ *
+ ********************************** */
+function bookKey(author, title) {
+  return `${author}-${title}`;
+}
+export function dbAddBook(author, title, cover, filepath) {
   // For now just point to the actual txt file location in calibre. Later we will make our own copy
   const books = bookStore.get('booklist', {});
   books[bookKey(author, title)] = {
@@ -85,20 +114,20 @@ export function addBook(author, title, cover, filepath) {
   bookStore.set('booklist', books);
 }
 
-export function getBooks() {
+export function dbGetBooks() {
   return Object.values(bookStore.get('booklist', {}));
 }
 
-export function getBook(author, title) {
+export function dbGetBook(author, title) {
   return bookStore.get('booklist')[bookKey(author, title)];
 }
 
-export function getBookByID(bookID) {
+export function dbGetBookByID(bookID) {
   return bookStore.get('booklist')[bookID];
 }
 
 // For now we will use author and title to do book uniqueness
-export function bookExists(author, title) {
+export function dbBookExists(author, title) {
   const books = bookStore.get('booklist', {});
   return (bookKey(author, title) in books);
 }

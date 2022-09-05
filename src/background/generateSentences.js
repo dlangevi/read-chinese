@@ -1,13 +1,6 @@
-import { getBooks } from './database';
+import { getBooks } from './bookLibrary';
 import { loadJieba } from './segmentation';
 import { isKnown } from './knownWords';
-
-export async function preloadWords() {
-  const books = getBooks();
-  books.forEach((bookInfo) => {
-    loadJieba(bookInfo.txtFile);
-  });
-}
 
 function toText(sentence) {
   return sentence.map(([word]) => word).join('');
