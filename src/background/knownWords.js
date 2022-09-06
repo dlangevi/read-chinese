@@ -1,4 +1,4 @@
-import { dbLoadWords, dbUpdateWord } from './database';
+import { dbLoadWords, dbUpdateWord, dbUpdateWords } from './database';
 
 // Memory cache of the set of known words for performance
 let known = {};
@@ -7,7 +7,7 @@ export async function syncWords() {
   known = await dbLoadWords();
   knownCharacters = new Set();
   known.forEach((word) => {
-    Array.from(word).forEach((ch) => knownCharacters.add(ch));
+    Array.from(word).forEach((ch) => { return knownCharacters.add(ch); });
   });
   console.log(`Known words: ${known.size}
 Known characters: ${knownCharacters.size} `);
@@ -20,11 +20,19 @@ export function addWord(word, age = 0, hasFlashCard = false) {
   dbUpdateWord(word, age, hasFlashCard);
 }
 
-export function saveLegacyWords(words) {
-  Object.entries(words).forEach(([word, entry]) => {
-    console.log(`Inserting ${word}`);
-    addWord(word, entry.interval);
+// wordRows expects [{word, interval, has_flash_card}]
+export function addWords(wordRows) {
+  wordRows.forEach((row) => {
+    known.add(row.word);
   });
+  dbUpdateWords(wordRows);
+}
+
+export function saveLegacyWords(words) {
+  const wordRows = Object.entries(words).map(
+    ([word, entry]) => { return { word, interval: entry.interval }; },
+  );
+  addWords(wordRows);
 }
 
 export function isKnown(word) {

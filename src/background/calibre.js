@@ -27,7 +27,7 @@ export async function importCalibreBooks(calibreDir) {
     // For now just add the ones that already have txt files.
     // TODO do some conversion of epubs etc
     // (is epub-convert avaliable on all platforms?)
-    const txtBooks = book.formats.filter((path) => path.match(/.*.txt/));
+    const txtBooks = book.formats.filter((path) => { return path.match(/.*.txt/); });
     if (txtBooks.length > 0) {
       addBook(book.authors, book.title, book.cover, txtBooks[0]);
     }

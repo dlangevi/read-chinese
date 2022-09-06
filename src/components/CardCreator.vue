@@ -16,7 +16,8 @@
         <p v-else-if="step==3">Select the Definition</p>
       </template>
       <n-layout has-sider sider-placement="right" style="height: 500px">
-        <n-layout-content content-style="padding: 24px;" :native-scrollbar="false">
+        <n-layout-content content-style="padding: 24px;"
+          :native-scrollbar="false">
           <div v-if="step == 1">
             <n-radio-group v-model:value="sentence" name="sentences">
               <n-space vertical>
@@ -47,9 +48,12 @@
 
       <template #action>
         <n-space justify="end">
-          <n-button type=primary v-if="step>1" @click="onNegativeClick">Previous</n-button>
-          <n-button type=warning v-if="step<steps" @click="onPositiveClick">Next</n-button>
-          <n-button type=info v-if="step==steps" @click="submit()">Submit</n-button>
+          <n-button type=primary v-if="step>1"
+            @click="onNegativeClick">Previous</n-button>
+          <n-button type=warning v-if="step<steps"
+            @click="onPositiveClick">Next</n-button>
+          <n-button type=info v-if="step==steps"
+            @click="submit()">Submit</n-button>
         </n-space>
       </template>
     </n-modal>

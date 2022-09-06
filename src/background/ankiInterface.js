@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { addWord } from './knownWords';
+import { addWords } from './knownWords';
 // Must have ankiconnect installed as a plugin in your anki installation
 async function invoke(action, params) {
   const response = await fetch('http://localhost:8765', {
@@ -129,8 +129,8 @@ export async function getLackingCards(deck) {
     cards: skritter.result,
   });
   const allWords = skritterInfo.result
-    .map((card) => fixWord(card.fields.Hanzi.value))
-    .filter((word) => isChinese(word));
+    .map((card) => { return fixWord(card.fields.Hanzi.value); })
+    .filter((word) => { return isChinese(word); });
   return allWords;
 }
 
@@ -143,18 +143,22 @@ async function getFlaggedCards() {
     cards: flaggedIDs.result,
   });
   return flaggedCards.result
-    .map((card) => ({
-      word: fixWord(card.fields.Hanzi.value),
-      sentence: card.fields.ExampleSentence.value,
-    }));
+    .map((card) => {
+      return {
+        word: fixWord(card.fields.Hanzi.value),
+        sentence: card.fields.ExampleSentence.value,
+      };
+    });
 }
 
-async function updateCard(ankiCard) {
-  addWord(
-    ankiCard.fields.Hanzi.value,
-    ankiCard.interval,
-    true,
-  );
+async function updateCards(ankiCards) {
+  addWords(ankiCards.map((ankiCard) => {
+    return {
+      word: ankiCard.fields.Hanzi.value,
+      interval: ankiCard.interval,
+      has_flash_card: true,
+    };
+  }));
 }
 
 async function updateAnkiCard(noteID, fields) {
@@ -198,7 +202,7 @@ export async function importAnkiKeywords() {
     cards: reading.result,
   });
 
-  readingInfo.result.forEach((card) => updateCard(card));
+  updateCards(readingInfo.result);
 
   const skritter = await invoke('findCards', {
     query: 'deck:Skritter',
@@ -206,11 +210,15 @@ export async function importAnkiKeywords() {
   const skritterInfo = await invoke('cardsInfo', {
     cards: skritter.result,
   });
-  skritterInfo.result.forEach((card) => updateCard(card));
+  updateCards(skritterInfo.result);
 }
 export function initAnkiIpc(ipcMain) {
-  ipcMain.handle('getAnkiCard', async (event, word) => getAnkiCard(word));
-  ipcMain.handle('getAnkiNote', async (event, word) => getAnkiNote(word));
+  ipcMain.handle('getAnkiCard', async (event, word) => {
+    return getAnkiCard(word);
+  });
+  ipcMain.handle('getAnkiNote', async (event, word) => {
+    return getAnkiNote(word);
+  });
   ipcMain.handle('updateAnkiCard', async (event, noteID, fields) => {
     await removeFlag(noteID);
     return updateAnkiCard(noteID, fields);

@@ -11,27 +11,27 @@ const router = createRouter({
     {
       path: '/BookLibrary',
       name: 'BookLibrary',
-      component: () => import('./pages/BookLibrary.vue'),
+      component: () => { return import('./pages/BookLibrary.vue'); },
     },
     {
       path: '/About',
       name: 'About',
-      component: () => import('./pages/AboutPage.vue'),
+      component: () => { return import('./pages/AboutPage.vue'); },
     },
     {
       path: '/WordLists',
       name: 'WordLists',
-      component: () => import('./pages/WordLists.vue'),
+      component: () => { return import('./pages/WordLists.vue'); },
     },
     {
       path: '/FlashCards',
       name: 'FlashCards',
-      component: () => import('./pages/FlashCards.vue'),
+      component: () => { return import('./pages/FlashCards.vue'); },
     },
     {
-      path: '/book/:bookID',
+      path: '/book/:bookId',
       name: 'BookStats',
-      component: () => import('./pages/BookStats.vue'),
+      component: () => { return import('./pages/BookStats.vue'); },
       props: true,
     },
   ],

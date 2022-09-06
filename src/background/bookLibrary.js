@@ -2,33 +2,34 @@ import fs from 'fs';
 import { isKnown } from './knownWords';
 import { loadJieba } from './segmentation';
 import {
-  dbGetBooks, dbGetBookByID, dbAddBook, dbBookExists,
+  dbGetBooks, dbGetBookById, dbAddBook, dbBookExists, dbSaveWordTable,
+  dbGetBook, dbLoadWordTable,
 } from './database';
 
-export function getBooks() {
+export async function getBooks() {
   return dbGetBooks();
 }
 
-export function addBook(author, title, cover, filepath) {
-  dbAddBook(author, title, cover, filepath);
+export async function addBook(author, title, cover, filepath) {
+  await dbAddBook(author, title, cover, filepath);
+  const book = await dbGetBook(author, title);
+  const wordTable = await computeWordTable(book);
+  return dbSaveWordTable(book, wordTable);
 }
-export function bookExists(author, title) {
-  dbBookExists(author, title);
+export async function bookExists(author, title) {
+  return dbBookExists(author, title);
 }
 
-async function loadBook(bookID) {
-  const book = dbGetBookByID(bookID);
-  if (!book.wordTable) {
-    book.wordTable = await computeWordTable(book);
-    // Save wordTable
-  }
+async function loadBook(bookId) {
+  const book = await dbGetBookById(bookId);
+  book.wordTable = await dbLoadWordTable(book);
   computeStats(book);
   return book;
 }
 
 async function computeWordTable(book) {
-  console.log(`computing wordtable for ${book.txtFile}`);
-  const segText = await loadJieba(book.txtFile);
+  console.log(`computing wordtable for ${book.filepath}`);
+  const segText = await loadJieba(book.filepath);
   const wordTable = {};
   segText.forEach((sentence) => {
     sentence.forEach(([word, type]) => {
@@ -57,8 +58,8 @@ function computeStats(book) {
 }
 
 export function initLibraryIpc(ipcMain) {
-  ipcMain.handle('loadBooks', () => {
-    const books = dbGetBooks();
+  ipcMain.handle('loadBooks', async () => {
+    const books = await dbGetBooks();
     books.forEach((book) => {
       const img = fs.readFileSync(book.cover).toString('base64');
       book.imgData = img;
@@ -66,8 +67,8 @@ export function initLibraryIpc(ipcMain) {
     return books;
   });
 
-  ipcMain.handle('loadBook', async (event, bookID) => {
-    const book = await loadBook(bookID);
+  ipcMain.handle('loadBook', async (event, bookId) => {
+    const book = await loadBook(bookId);
     const img = fs.readFileSync(book.cover).toString('base64');
     book.imgData = img;
 

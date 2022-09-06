@@ -20,7 +20,7 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
 import MarkLearned from '../components/MarkLearned.vue';
 
-const getRowId = (params) => params.data.word;
+const getRowId = (params) => { return params.data.word; };
 
 const columnDefs = [
   {

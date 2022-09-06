@@ -1,9 +1,10 @@
+import { performance } from 'perf_hooks';
 import { getBooks } from './bookLibrary';
 import { loadJieba } from './segmentation';
 import { isKnown } from './knownWords';
 
 function toText(sentence) {
-  return sentence.map(([word]) => word).join('');
+  return sentence.map(([word]) => { return word; }).join('');
 }
 
 function isT1Candidate(sentence, t1word) {
@@ -42,7 +43,7 @@ export async function whatShouldILearn(books = []) {
   }
   const shouldLearn = {};
   await Promise.all(books.map(async (bookInfo) => {
-    const segmented = await loadJieba(bookInfo.txtFile);
+    const segmented = await loadJieba(bookInfo.filepath);
     segmented.forEach((sentence) => {
       const word = getT1Word(sentence);
       if (word) {
@@ -54,16 +55,18 @@ export async function whatShouldILearn(books = []) {
     });
   }));
   const sorted = Object.entries(shouldLearn)
-    .filter(([_, timesSeen]) => (timesSeen > 50))
+    .filter(([_, timesSeen]) => { return (timesSeen > 50); })
     .sort(([_, timesA], [__, timesB]) => {
       if (timesA > timesB) {
         return 1;
       }
       return 0;
     })
-    .map(([word, timesSeen]) => ({
-      word, occurance: timesSeen,
-    }));
+    .map(([word, timesSeen]) => {
+      return {
+        word, occurance: timesSeen,
+      };
+    });
   return sorted;
 }
 
@@ -73,7 +76,7 @@ async function getCandidateSentences(word, books = []) {
   }
   const candidates = new Set();
   await Promise.all(books.map(async (bookInfo) => {
-    const segmented = await loadJieba(bookInfo.txtFile);
+    const segmented = await loadJieba(bookInfo.filepath);
     segmented.forEach((sentence) => {
       const text = toText(sentence);
       if (text.includes(word)) {
@@ -103,7 +106,7 @@ export async function generateSentences(
     books = getBooks();
   }
   await Promise.all(books.map(async (bookInfo) => {
-    const segmented = await loadJieba(bookInfo.txtFile);
+    const segmented = await loadJieba(bookInfo.filepath);
     segmented.forEach((sentence) => {
       const unknowns = sentenceKnown(sentence);
       if (unknowns.length === 0) {
@@ -128,7 +131,7 @@ export async function generateSentences(
   }));
 
   const sorted = Object.entries(shouldLearn)
-    .filter(([_, timesSeen]) => (timesSeen > 100))
+    .filter(([_, timesSeen]) => { return (timesSeen > 100); })
     .sort(([_, timesA], [__, timesB]) => {
       if (timesA > timesB) {
         return 1;
@@ -140,12 +143,15 @@ export async function generateSentences(
 
 export function initWordGenIpc(ipcMain) {
   ipcMain.handle('learningTarget', async () => {
+    const start = performance.now();
     const words = await whatShouldILearn();
+    const end = performance.now();
+    console.log(`Learning target took ${(end - start) / 1000}s`);
     return words;
   });
   ipcMain.handle('getSentencesForWord', async (event, word) => {
     const sentences = await getCandidateSentences(word);
-    sentences.sort((a, b) => (b.length - a.length));
+    sentences.sort((a, b) => { return (b.length - a.length); });
     sentences.splice(10);
     return sentences;
   });

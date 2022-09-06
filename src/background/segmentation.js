@@ -2,7 +2,7 @@ import jieba from 'nodejieba';
 import path from 'path';
 // import rsjieba from '@node-rs/jieba';
 import fs from 'fs';
-import getBooks from './database';
+import { dbGetBooks } from './database';
 // import books from './bookCatalogue.js';
 
 // Here we will handle the segmentation of text. There will be two supported
@@ -38,6 +38,7 @@ export async function loadJieba(txtPath) {
   if (txtPath in cache) {
     return cache[txtPath];
   }
+  // console.log(`Loading ${txtPath} for the first time`);
   const txt = await fs.promises.readFile(txtPath, 'UTF-8', 'r');
   // Misses names, but also makes less compound words
   // Haha, I see why they recommended the default. This still produces a
@@ -102,7 +103,8 @@ export async function loadJieba(txtPath) {
       if (end.length > 0) {
         end.push([word, type]);
       }
-    } else if ((word === '”' || word === '‘' || word === '』') && end.length === 0) {
+    } else if ((word === '”' || word === '‘' || word === '』')
+      && end.length === 0) {
       // Closing quotes go onto previous
       const previous = result[result.length - 2];
       previous.push([word, type]);
@@ -116,9 +118,9 @@ export async function loadJieba(txtPath) {
 }
 
 export async function preloadWords() {
-  const books = getBooks();
+  const books = await dbGetBooks();
   books.forEach((bookInfo) => {
-    loadJieba(bookInfo.txtFile);
+    loadJieba(bookInfo.filepath);
   });
 }
 /* const TYPE = {

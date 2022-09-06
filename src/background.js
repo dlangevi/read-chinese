@@ -13,7 +13,11 @@ import { initLibraryIpc } from './background/bookLibrary';
 import { initAnkiIpc } from './background/ankiInterface';
 import { initWordGenIpc } from './background/generateSentences';
 import { preloadWords } from './background/segmentation';
-import { updateTimesRan, getTimesRan, initializeDatabase } from './background/database';
+import {
+  updateTimesRan,
+  getTimesRan,
+  initializeDatabase,
+} from './background/database';
 
 // const isDevelopment = process.env.NODE_ENV !== 'production';
 const isDevelopment = true;
@@ -101,11 +105,16 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString());
     }
   }
-  await syncWords();
-  setApplicationMenu();
-  initIpc();
-  createWindow();
-  preloadWords();
+  try {
+    await syncWords();
+    setApplicationMenu();
+    initIpc();
+    await createWindow();
+    preloadWords();
+  } catch (e) {
+    console.error('Error in init', e.toString());
+    console.error('Error in init', e.stack());
+  }
 });
 
 // Exit cleanly on request from parent process in development mode.

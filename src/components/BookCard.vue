@@ -9,7 +9,7 @@
     </template>
     <p>{{ book.author }}</p>
     <small>
-      ID {{book.bookID}}
+      ID {{book.bookId}}
     </small>
   </n-card>
 </template>
@@ -27,6 +27,6 @@ const props = defineProps({
 });
 
 function bookBigMode() {
-  router.push(`/book/${props.book.bookID}`);
+  router.push(`/book/${props.book.bookId}`);
 }
 </script>

@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia';
 
 export const useCardQueue = defineStore('CardQueue', {
-  state: () => ({ wordList: [] }),
+  state: () => { return { wordList: [] }; },
   getters: {
-    words: (state) => state.wordList,
+    words: (state) => { return state.wordList; },
   },
   actions: {
     async addWord(word) {

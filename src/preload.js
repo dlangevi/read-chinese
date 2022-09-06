@@ -7,13 +7,15 @@ import { contextBridge, ipcRenderer } from 'electron';
 
 const call = ipcRenderer.invoke;
 contextBridge.exposeInMainWorld('ipc', {
-  loadBooks: () => call('loadBooks'),
-  loadBook: (title) => call('loadBook', title),
-  learningTarget: () => call('learningTarget'),
-  loadFlaggedCards: () => call('flaggedCards'),
-  getSentencesForWord: (word) => call('getSentencesForWord', word),
-  getAnkiCard: (word) => call('getAnkiCard', word),
-  getAnkiNote: (word) => call('getAnkiNote', word),
-  updateAnkiCard: (noteID, fields) => call('updateAnkiCard', noteID, fields),
-  addWord: (word) => call('addWord', word),
+  loadBooks: () => { return call('loadBooks'); },
+  loadBook: (title) => { return call('loadBook', title); },
+  learningTarget: () => { return call('learningTarget'); },
+  loadFlaggedCards: () => { return call('flaggedCards'); },
+  getSentencesForWord: (word) => { return call('getSentencesForWord', word); },
+  getAnkiCard: (word) => { return call('getAnkiCard', word); },
+  getAnkiNote: (word) => { return call('getAnkiNote', word); },
+  updateAnkiCard: (noteID, fields) => {
+    return call('updateAnkiCard', noteID, fields);
+  },
+  addWord: (word) => { return call('addWord', word); },
 });

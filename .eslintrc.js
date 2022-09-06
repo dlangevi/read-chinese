@@ -20,6 +20,12 @@ module.exports = {
     'no-use-before-define': ['error', {
       functions: false,
     }],
+    'max-len': ['error', {
+      code: 80,
+      ignoreRegExpLiterals: true,
+      ignoreUrls: true,
+    }],
+    'arrow-body-style': ['error', 'always'],
     'linebreak-style': 'off',
     'import/prefer-default-export': 'off',
     // TODO turn these back on once I actually want to release this to people

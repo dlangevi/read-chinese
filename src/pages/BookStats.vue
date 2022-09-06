@@ -10,9 +10,6 @@
     <n-layout>
       <n-layout-header class="p-4" bordered>
         <p>{{ book.author }}</p>
-        <small>
-          ID {{book.bookID}}
-        </small>
       </n-layout-header>
       <n-layout-content class="p-8">
         Stats: You know {{known}} percent
@@ -39,10 +36,10 @@ import {
 } from 'naive-ui';
 
 const props = defineProps({
-  bookID: String,
+  bookId: String,
 });
 
-const book = await window.ipc.loadBook(props.bookID);
+const book = await window.ipc.loadBook(props.bookId);
 
 const known = ((book.totalKnownWords / book.totalWords) * 100).toFixed(2);
 console.log(book);

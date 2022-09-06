@@ -4,13 +4,11 @@
  */
 exports.up = function up(knex) {
   return knex.schema
-    .createTable('words', (table) => {
+    .createTable('frequency', (table) => {
+      table.integer('book');
       table.string('word');
-      table.boolean('has_flash_card');
-      table.boolean('has_sentence');
-      table.integer('interval');
-      table.timestamps(true, true);
-      table.primary('word');
+      table.integer('count');
+      table.primary(['book', 'word']);
     });
 };
 
@@ -19,6 +17,5 @@ exports.up = function up(knex) {
  * @returns { Promise<void> }
  */
 exports.down = function down(knex) {
-  return knex.schema
-    .dropTable('words');
+  return knex.schema.dropTable('frequency');
 };

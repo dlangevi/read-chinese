@@ -20,7 +20,6 @@ export async function initializeDatabase() {
 
 // Books and metadata can be stored in electron-store for now since they should
 // be low footprint
-const bookStore = new Store({ name: 'books' });
 const metadataStore = new Store({ name: 'metadata' });
 
 /** *********************************
@@ -51,36 +50,52 @@ export function getTimesRan() {
  *
  ********************************** */
 
-// Adds if not exists
 export async function dbUpdateWord(word, interval = 0, hasFlashCard = false) {
-  const exists = await knex('words').select().where('word', word);
-  if (exists.length === 0) {
-    console.log(`Adding new word: ${word}`);
-    knex('words')
-      .insert({
-        word,
-        interval,
-        has_flash_card: hasFlashCard,
-      }).catch((err) => { console.log(err); });
-  } else {
-    knex('words')
-      .where('word', word)
-      .update({
-        has_flash_card: hasFlashCard,
-        interval,
-      }).catch((err) => { console.log(err); });
+  console.log(`Adding new word: ${word}`);
+  knex('words')
+    .insert({
+      word,
+      interval,
+      has_flash_card: hasFlashCard,
+    })
+    .onConflict('word')
+    .merge(['interval', 'has_flash_card', 'updated_at'])
+    .catch((err) => { console.log(err); });
+}
+
+// Insert words in chunks of chunkSize
+export async function dbUpdateWords(wordRows) {
+  try {
+    await knex.transaction(async (trx) => {
+      const chunkSize = 50;
+      for (let i = 0; i < wordRows.length; i += chunkSize) {
+        const chunk = wordRows.slice(i, i + chunkSize);
+        await knex('words')
+          .insert(chunk)
+          .onConflict('word')
+          .merge(['interval', 'has_flash_card', 'updated_at'])
+          .transacting(trx);
+      }
+    });
+  } catch (error) {
+    console.log(error);
   }
 }
 
 export async function dbLoadWords() {
   const rows = await knex('words')
-    .select({ id: 'id', word: 'word' })
+    .select({ word: 'word' })
     .catch((error) => { console.log(error); });
   const words = new Set();
   rows.forEach((row) => {
     words.add(row.word);
   });
   return words;
+}
+
+export async function dbWordExists(word) {
+  const exists = await knex('words').select().where('word', word);
+  return exists.length !== 0;
 }
 
 /** *********************************
@@ -92,43 +107,105 @@ export async function dbLoadWords() {
  * bookKey: {
  *  author: string,
  *  title: string,
- *  txtFile: string, // path of where book txt file is stored
+ *  filepath: string, // path of where book txt file is stored
  *  cover: string, // path of where book cover image is stored
- *  bookID: string,
- *  wordTable: { word => count } count of each word in the book
+ *  bookId: incrementing int,
  * }
  *
+ * for each book there are also entries in the frequency table of their
+ * word frequencies
+ *
  ********************************** */
-function bookKey(author, title) {
-  return `${author}-${title}`;
-}
-export function dbAddBook(author, title, cover, filepath) {
-  // For now just point to the actual txt file location in calibre. Later we will make our own copy
-  const books = bookStore.get('booklist', {});
-  books[bookKey(author, title)] = {
+export async function dbAddBook(author, title, cover, filepath) {
+  // For now just point to the actual txt file location in calibre.
+  // Later we will make our own copy
+  knex('books').insert({
     author,
     title,
-    txtFile: filepath,
     cover,
-    bookID: bookKey(author, title),
-  };
-  bookStore.set('booklist', books);
+    filepath,
+  }).onConflict(['title', 'author']).ignore()
+    .catch((err) => { return console.log(err); });
 }
 
-export function dbGetBooks() {
-  return Object.values(bookStore.get('booklist', {}));
+export async function dbSaveWordTable(book, wordTable) {
+  const wordRows = Object.entries(wordTable)
+    .map(([word, frequency]) => {
+      return { book: book.bookId, word, count: frequency };
+    });
+  // There should not be conflicts here.
+  knex.batchInsert('frequency', wordRows, 100).catch((err) => {
+    console.log(err);
+  });
 }
 
-export function dbGetBook(author, title) {
-  return bookStore.get('booklist')[bookKey(author, title)];
+export async function dbLoadWordTable(book) {
+  const wordRows = await knex('frequency')
+    .select({ word: 'word', count: 'count' })
+    .where('book', book.bookId);
+  const wordDict = {};
+  wordRows.forEach(({ word, count }) => {
+    wordDict[word] = count;
+  });
+  return wordDict;
 }
 
-export function dbGetBookByID(bookID) {
-  return bookStore.get('booklist')[bookID];
+// Seems a bit repetative ...
+export async function dbGetBooks() {
+  const books = await knex('books').select(
+    {
+      author: 'author',
+      title: 'title',
+      cover: 'cover',
+      filepath: 'filepath',
+      bookId: 'bookId',
+    },
+  );
+  return books;
+}
+
+export async function dbGetBook(author, title) {
+  const books = await knex('books').select(
+    {
+      author: 'author',
+      title: 'title',
+      cover: 'cover',
+      filepath: 'filepath',
+      bookId: 'bookId',
+    },
+  ).where({
+    author, title,
+  });
+  return books[0];
+}
+
+export async function dbGetBookById(bookId) {
+  const books = await knex('books').select(
+    {
+      author: 'author',
+      title: 'title',
+      cover: 'cover',
+      filepath: 'filepath',
+      bookId: 'bookId',
+    },
+  ).where({
+    bookId,
+  });
+  return books[0];
 }
 
 // For now we will use author and title to do book uniqueness
-export function dbBookExists(author, title) {
-  const books = bookStore.get('booklist', {});
-  return (bookKey(author, title) in books);
+export async function dbBookExists(author, title) {
+  const books = await knex('books').select(
+    {
+      author: 'author',
+      title: 'title',
+      cover: 'cover',
+      filepath: 'filepath',
+      bookId: 'bookId',
+    },
+  ).where({
+    author, title,
+  });
+  return books.length === 1;
 }
