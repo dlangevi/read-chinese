@@ -13,6 +13,10 @@ export async function syncWords() {
 Known characters: ${knownCharacters.size} `);
 }
 
+export function knownArray() {
+  return [...known];
+}
+
 // For now the db code will update the word set here on each addition.
 // In the future there should not be two seperate sets of words
 export function addWord(word, age = 0, hasFlashCard = false) {

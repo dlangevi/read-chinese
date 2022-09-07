@@ -12,8 +12,12 @@
 </template>
 
 <script setup>
+import { onBeforeMount, ref } from 'vue';
 import { NGrid, NGi } from 'naive-ui';
 import BookCard from '@/components/BookCard.vue';
 
-const books = await window.ipc.loadBooks();
+const books = ref([]);
+onBeforeMount(async () => {
+  books.value = await window.ipc.loadBooks();
+});
 </script>

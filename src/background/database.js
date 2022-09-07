@@ -9,7 +9,7 @@ import Knex from 'knex';
 import knexConfigMap from '../../knexfile';
 
 const knexConfig = knexConfigMap[process.env.NODE_ENV];
-const knex = Knex(knexConfig);
+export const knex = Knex(knexConfig);
 
 // This is called and awaited before before anyother code can run
 export async function initializeDatabase() {

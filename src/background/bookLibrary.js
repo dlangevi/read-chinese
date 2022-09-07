@@ -1,9 +1,10 @@
+import { performance } from 'perf_hooks';
 import fs from 'fs';
-import { isKnown } from './knownWords';
+import { isKnown, knownArray } from './knownWords';
 import { loadJieba } from './segmentation';
 import {
   dbGetBooks, dbGetBookById, dbAddBook, dbBookExists, dbSaveWordTable,
-  dbGetBook, dbLoadWordTable,
+  dbGetBook, dbLoadWordTable, knex,
 } from './database';
 
 export async function getBooks() {
@@ -57,6 +58,19 @@ function computeStats(book) {
   book.totalWords = totalWords;
 }
 
+// This is where I get tripped up on the seperation layer. This is a db
+// specific operation
+export async function topWords() {
+  const top = await knex('frequency')
+    .select('word')
+    .sum({ occurance: 'count' })
+    .whereNotIn('word', knownArray())
+    .groupBy('word')
+    .orderBy('occurance', 'desc')
+    .limit(200);
+  return top;
+}
+
 export function initLibraryIpc(ipcMain) {
   ipcMain.handle('loadBooks', async () => {
     const books = await dbGetBooks();
@@ -65,6 +79,13 @@ export function initLibraryIpc(ipcMain) {
       book.imgData = img;
     });
     return books;
+  });
+  ipcMain.handle('learningTarget', async () => {
+    const start = performance.now();
+    const words = await topWords();
+    const end = performance.now();
+    console.log(`Learning target took ${(end - start) / 1000}s`);
+    return words;
   });
 
   ipcMain.handle('loadBook', async (event, bookId) => {

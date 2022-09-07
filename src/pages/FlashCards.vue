@@ -16,6 +16,7 @@
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
+import { onBeforeMount, ref } from 'vue';
 import AddToCardQueue from '@/components/AddToCardQueue.vue';
 
 const getRowId = (params) => { return params.data.word; };
@@ -47,7 +48,10 @@ function onGridReady(params) {
   api.sizeColumnsToFit();
 }
 
-const rowData = await window.ipc.loadFlaggedCards();
+const rowData = ref([]);
+onBeforeMount(async () => {
+  rowData.value = await window.ipc.loadFlaggedCards();
+});
 </script>
 
 <style scoped>

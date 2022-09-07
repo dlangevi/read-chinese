@@ -17,6 +17,7 @@
 <script setup>
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { onBeforeMount, ref } from 'vue';
 import { AgGridVue } from 'ag-grid-vue3';
 import MarkLearned from '../components/MarkLearned.vue';
 
@@ -39,9 +40,10 @@ const columnDefs = [
   },
 ];
 
-const words = await window.ipc.learningTarget();
-console.log(words);
-const rowData = words;
+const rowData = ref([]);
+onBeforeMount(async () => {
+  rowData.value = await window.ipc.learningTarget();
+});
 </script>
 
 <style scoped>

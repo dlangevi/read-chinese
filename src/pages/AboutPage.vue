@@ -7,3 +7,7 @@
     </div>
   </div>
 </template>
+
+<script setup>
+console.log('hello');
+</script>

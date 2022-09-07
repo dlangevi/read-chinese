@@ -1,4 +1,3 @@
-import { performance } from 'perf_hooks';
 import { getBooks } from './bookLibrary';
 import { loadJieba } from './segmentation';
 import { isKnown } from './knownWords';
@@ -142,13 +141,6 @@ export async function generateSentences(
 }
 
 export function initWordGenIpc(ipcMain) {
-  ipcMain.handle('learningTarget', async () => {
-    const start = performance.now();
-    const words = await whatShouldILearn();
-    const end = performance.now();
-    console.log(`Learning target took ${(end - start) / 1000}s`);
-    return words;
-  });
   ipcMain.handle('getSentencesForWord', async (event, word) => {
     const sentences = await getCandidateSentences(word);
     sentences.sort((a, b) => { return (b.length - a.length); });
