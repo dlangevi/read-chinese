@@ -2,6 +2,7 @@ import { performance } from 'perf_hooks';
 import fs from 'fs';
 import { isKnown, knownArray } from './knownWords';
 import { loadJieba } from './segmentation';
+import { getDefinition } from './dictionaries';
 import {
   dbGetBooks, dbGetBookById, dbAddBook, dbBookExists, dbSaveWordTable,
   dbGetBook, dbLoadWordTable, knex,
@@ -68,7 +69,11 @@ export async function topWords() {
     .groupBy('word')
     .orderBy('occurance', 'desc')
     .limit(200);
-  return top;
+
+  return top.map((row) => {
+    row.definition = getDefinition(row.word);
+    return row;
+  });
 }
 
 export function initLibraryIpc(ipcMain) {

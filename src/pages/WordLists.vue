@@ -5,7 +5,7 @@
       <p>For now lets just mark learned words you already know 好不好?</p>
     </div>
     <ag-grid-vue
-        class="ag-theme-alpine w-1/2 mx-auto
+        class="ag-theme-alpine w-5/6 mx-auto
         h-full flex-grow-1 text-xl"
         :getRowId="getRowId"
         :columnDefs="columnDefs"
@@ -37,6 +37,11 @@ const columnDefs = [
     headerName: 'markLearned',
     field: 'markButton',
     cellRenderer: MarkLearned,
+  },
+  {
+    headerName: 'definition',
+    field: 'definition',
+    width: 600,
   },
 ];
 

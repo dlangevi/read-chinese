@@ -37,6 +37,15 @@ export function getTimesRan() {
   return metadataStore.get('ran', 0);
 }
 
+export function dbSaveDictPath(name, path) {
+  const dicts = metadataStore.get('dicts', {});
+  dicts[name] = path;
+  metadataStore.set('dicts', dicts);
+}
+
+export function dbLoadDictPaths() {
+  return metadataStore.get('dicts', {});
+}
 /** *********************************
  *
  * Known Words + Flash Cards

@@ -3,6 +3,7 @@ import fs from 'fs';
 import { addWord, saveLegacyWords } from '../background/knownWords';
 import { importCalibreBooks } from '../background/calibre';
 import { importAnkiKeywords } from '../background/ankiInterface';
+import { addDictionary } from '../background/dictionaries';
 
 export default {
   label: 'App',
@@ -16,6 +17,18 @@ export default {
             { name: 'Plain Text', extensions: ['txt'] },
           ],
         }));
+      },
+    },
+    {
+      label: 'Add Dictionary',
+      click: () => {
+        const dict = dialog.showOpenDialogSync({
+          properties: ['openFile'],
+          filters: [
+            { name: 'Yomichan Json Format', extensions: ['json'] },
+          ],
+        });
+        addDictionary(dict[0]);
       },
     },
     {
