@@ -38,7 +38,7 @@ function getT1Word(sentence) {
 // holding you back from T1 sentences
 export async function whatShouldILearn(books = []) {
   if (books.length === 0) {
-    books = getBooks();
+    books = await getBooks();
   }
   const shouldLearn = {};
   await Promise.all(books.map(async (bookInfo) => {
@@ -71,7 +71,7 @@ export async function whatShouldILearn(books = []) {
 
 async function getCandidateSentences(word, books = []) {
   if (books.length === 0) {
-    books = getBooks();
+    books = await getBooks();
   }
   const candidates = new Set();
   await Promise.all(books.map(async (bookInfo) => {
