@@ -11,7 +11,7 @@ import devMenuTemplate from './menu/dev_menu_template';
 import { syncWords, initWordsIpc } from './background/knownWords';
 import { initLibraryIpc } from './background/bookLibrary';
 import { initAnkiIpc } from './background/ankiInterface';
-import { loadDictionaries } from './background/dictionaries';
+import { loadDictionaries, initDictionaryIpc } from './background/dictionaries';
 import { initWordGenIpc } from './background/generateSentences';
 import { preloadWords } from './background/segmentation';
 import {
@@ -89,6 +89,7 @@ const initIpc = () => {
   initLibraryIpc(ipcMain);
   initWordGenIpc(ipcMain);
   initAnkiIpc(ipcMain);
+  initDictionaryIpc(ipcMain);
   initWordsIpc(ipcMain);
 };
 

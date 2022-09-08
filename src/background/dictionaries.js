@@ -35,3 +35,16 @@ export function getDefinition(word) {
   }
   return term[0].definition;
 }
+export function getDefinitions(word) {
+  const term = dicts.ccdict[word];
+  if (term === undefined) {
+    return undefined;
+  }
+  return term.map((def) => { return (def.definition); });
+}
+
+export function initDictionaryIpc(ipcMain) {
+  ipcMain.handle('getDefinitionsForWord', async (event, word) => {
+    return getDefinitions(word);
+  });
+}

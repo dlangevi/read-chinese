@@ -11,26 +11,16 @@
         <p class="text-xl">
           Creating card for {{currentWord}}
         </p>
-        <p v-if="step == 1">Select the sentence</p>
-        <p v-else-if="step==2">Select the Picture</p>
-        <p v-else-if="step==3">Select the Definition</p>
       </template>
       <n-layout has-sider sider-placement="right" style="height: 500px">
         <n-layout-content content-style="padding: 24px;"
           :native-scrollbar="false">
-          <div v-if="step == 1">
-            <n-radio-group v-model:value="sentence" name="sentences">
-              <n-space vertical>
-                <n-radio
-                  class="text-3xl"
-                  v-for="(sentence, i) in sentences"
-                  :key="i"
-                  :value="sentence"
-                  :label="sentence"
-                />
-              </n-space>
-            </n-radio-group>
-          </div>
+          <edit-sentence v-if="step==StepsEnum.SENTENCE"
+            :word="word" :sentence="sentence"
+            @updateSentence="updateSentence"/>
+          <edit-english-definition v-if="step==StepsEnum.ENGLISH"
+            :word="word" :definition="definition"
+            @updateDefinition="updateDefinition"/>
         </n-layout-content>
         <n-layout-sider v-if="card !== undefined"
           collapse-mode="transform"
@@ -42,17 +32,13 @@
           content-style="padding: 24px;"
           bordered
         >
-          <anki-card-preview :ankiCard="card"/>
+          <anki-card-preview :ankiCard="card" @changeStep="changeStep"/>
         </n-layout-sider>
       </n-layout>
 
       <template #action>
         <n-space justify="end">
-          <n-button type=primary v-if="step>1"
-            @click="onNegativeClick">Previous</n-button>
-          <n-button type=warning v-if="step<steps"
-            @click="onPositiveClick">Next</n-button>
-          <n-button type=info v-if="step==steps"
+          <n-button type=info
             @click="submit()">Submit</n-button>
         </n-space>
       </template>
@@ -60,33 +46,38 @@
 </template>
 
 <script setup>
-import { ref, watch, reactive } from 'vue';
+import { ref, reactive } from 'vue';
 import { useCardQueue } from '@/stores/CardQueue';
 import AnkiCardPreview from '@/components/AnkiCardPreview.vue';
 import {
   useMessage, NSpace, NButton, NModal,
-  NLayoutSider, NLayout, NLayoutContent, NRadioGroup, NRadio,
+  NLayoutSider, NLayout, NLayoutContent,
 } from 'naive-ui';
+import EditSentence from '@/components/CardCreatorSteps/EditSentence.vue';
+import EditEnglishDefinition from
+  '@/components/CardCreatorSteps/EditEnglishDefinition.vue';
+import StepsEnum from '@/components/CardCreatorSteps/StepsEnum';
 
 const store = useCardQueue();
-const sentences = ref([]);
 const sentence = ref(null);
-const step = ref(1);
-const steps = 1;
+const definition = ref(undefined);
 const showModal = ref(false);
 const currentWord = ref(null);
 const card = ref(undefined);
+const word = ref('');
+const step = ref(undefined);
 
+const changeStep = (estep) => { step.value = estep; };
 const message = useMessage();
 store.$subscribe(async (mutation, state) => {
   // Later we can prefetch new words sentences possibly
   // if (mutation.events.type === 'add' && mutation.events.key === '0') {
   if (state.wordList.length > 0) {
-    const word = state.wordList[0];
-    sentences.value = await window.ipc.getSentencesForWord(word);
-    console.log(sentences.value);
+    [word.value] = state.wordList;
+    // sentences.value = await window.ipc.getSentencesForWord(word);
+    // console.log(sentences.value);
     // Todo card may not exist. In which case start a new one
-    const ankiCard = await window.ipc.getAnkiNote(word);
+    const ankiCard = await window.ipc.getAnkiNote(word.value);
     card.value = reactive(ankiCard);
     sentence.value = card.value.fields.ExampleSentence.value;
   }
@@ -95,22 +86,20 @@ store.$subscribe(async (mutation, state) => {
   [currentWord.value] = state.wordList;
 });
 
-watch(sentence, (newSentence) => {
-  console.log(newSentence);
+const updateSentence = (newSentence) => {
+  sentence.value = newSentence;
   if (newSentence.length > 0) {
     card.value.fields.ExampleSentence.value = newSentence;
-    console.log('changed card');
   }
-});
+};
 
-function onNegativeClick() {
-  step.value -= 1;
-  return false;
-}
-function onPositiveClick() {
-  step.value += 1;
-  return false;
-}
+const updateDefinition = (newDefinition) => {
+  definition.value = newDefinition;
+  if (definition.value.length > 0) {
+    card.value.fields.EnglishDefinition.value = newDefinition;
+  }
+};
+
 function onClose() {
   store.clearWords();
   return false;
@@ -120,11 +109,17 @@ async function submit() {
   // Todo track changes to the card and submit those for update
   onClose();
   message.info('Card submited');
-  const res = await window.ipc.updateAnkiCard(card.value.noteId, {
-    ExampleSentence: sentence.value,
+  // TODO figure out the logic for determining changes better
+  const newData = {};
+  if (sentence.value) {
+    newData.ExampleSentence = sentence.value;
     // Since this is a new sentence, make sure to strip the previous audio
-    SentenceAudio: '',
-  });
+    newData.SentenceAudio = '';
+  }
+  if (definition.value) {
+    newData.EnglishDefinition = definition.value;
+  }
+  const res = await window.ipc.updateAnkiCard(card.value.noteId, newData);
   message.info(JSON.stringify(res));
 }
 

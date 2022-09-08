@@ -12,6 +12,9 @@ contextBridge.exposeInMainWorld('ipc', {
   learningTarget: () => { return call('learningTarget'); },
   loadFlaggedCards: () => { return call('flaggedCards'); },
   getSentencesForWord: (word) => { return call('getSentencesForWord', word); },
+  getDefinitionsForWord: (word) => {
+    return call('getDefinitionsForWord', word);
+  },
   getAnkiCard: (word) => { return call('getAnkiCard', word); },
   getAnkiNote: (word) => { return call('getAnkiNote', word); },
   updateAnkiCard: (noteID, fields) => {
