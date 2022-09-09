@@ -3,7 +3,6 @@ import { addWords } from './knownWords';
 // Must have ankiconnect installed as a plugin in your anki installation
 async function invoke(action, params) {
   const response = await fetch('http://localhost:8765', {
-  // const response = await fetch('http://120.0.0.1:8765', {
     method: 'Post',
     body: JSON.stringify({
       action,
@@ -41,7 +40,6 @@ function fixWord(origWord) {
 }
 
 export async function createCard(/* card */) {
-  // const result = await invoke('modelNames', {
   const result = await invoke('addNote', {
     note: {
       deckName: 'Testing',

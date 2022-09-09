@@ -1,26 +1,10 @@
 import jieba from 'nodejieba';
 import path from 'path';
-// import rsjieba from '@node-rs/jieba';
 import fs from 'fs';
+// direct from db to prevent cyclic dependency
 import { dbGetBooks } from './database';
-// import books from './bookCatalogue.js';
 
-// Here we will handle the segmentation of text. There will be two supported
-// methods for now.
-//
-// 1) Read in json dumped results from CTA
-// 2) Use node-rs/jieba to directly read the text
-export function loadCTA(bookname) {
-  // const ctaPath = books.getPath(bookname);
-  const ctaPath = `nowhere${bookname}`;
-  const ctaJson = fs.readFileSync(ctaPath, 'UTF-8', 'r');
-  const json = JSON.parse(ctaJson);
-  return json;
-}
-
-const cache = {
-
-};
+const cache = { };
 
 if (process.env.NODE_ENV === 'production') {
   // The default dict doesn't load from the asar archive for some reason

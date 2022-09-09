@@ -1,9 +1,3 @@
-// import Database from 'better-sqlite3';
-
-// Load a users calibre database
-// const db = new Database('/home/dlangevi/chinese/chinese books/metadatabk.db',
-// {verbose: console.log});
-//
 import { Calibre } from 'node-calibre';
 import { addBook } from './bookLibrary';
 
