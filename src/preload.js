@@ -1,15 +1,10 @@
-// import { ipcRenderer } from 'electron';
-
-// window.ipcRenderer = ipcRenderer;
-// window.dave = 32;
-
 import { contextBridge, ipcRenderer } from 'electron';
 
 const call = ipcRenderer.invoke;
 contextBridge.exposeInMainWorld('ipc', {
   loadBooks: () => { return call('loadBooks'); },
   loadBook: (title) => { return call('loadBook', title); },
-  learningTarget: () => { return call('learningTarget'); },
+  learningTarget: (books) => { return call('learningTarget', books); },
   loadFlaggedCards: () => { return call('flaggedCards'); },
   getSentencesForWord: (word) => { return call('getSentencesForWord', word); },
   getDefinitionsForWord: (word) => {

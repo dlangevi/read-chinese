@@ -13,6 +13,7 @@ module.exports = {
   pluginOptions: {
     electronBuilder: {
       preload: 'src/preload.js',
+      mainProcessWatch: ['src/background/**'],
       builderOptions: {
         // Add also your database location
         // asar: false,

@@ -4,51 +4,15 @@
       <h1 class="text-center text-xl mt-5">Maybe you know these words?</h1>
       <p>For now lets just mark learned words you already know 好不好?</p>
     </div>
-    <ag-grid-vue
-        class="ag-theme-alpine w-5/6 mx-auto
-        h-full flex-grow-1 text-xl"
-        :getRowId="getRowId"
-        :columnDefs="columnDefs"
-        :rowData="rowData" >
-    </ag-grid-vue>
+    <unknown-words
+      class="w-5/6 mx-auto h-full flex-grow-1"
+      showDefinitions
+      />
   </div>
 </template>
 
 <script setup>
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { onBeforeMount, ref } from 'vue';
-import { AgGridVue } from 'ag-grid-vue3';
-import MarkLearned from '../components/MarkLearned.vue';
-
-const getRowId = (params) => { return params.data.word; };
-
-const columnDefs = [
-  {
-    headerName: 'word',
-    field: 'word',
-  },
-  {
-    headerName: 'occurance',
-    field: 'occurance',
-    sort: 'desc',
-  },
-  {
-    headerName: 'markLearned',
-    field: 'markButton',
-    cellRenderer: MarkLearned,
-  },
-  {
-    headerName: 'definition',
-    field: 'definition',
-    width: 600,
-  },
-];
-
-const rowData = ref([]);
-onBeforeMount(async () => {
-  rowData.value = await window.ipc.learningTarget();
-});
+import UnknownWords from '@/components/UnknownWords.vue';
 </script>
 
 <style scoped>

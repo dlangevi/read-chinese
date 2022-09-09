@@ -14,6 +14,10 @@
       <n-layout-content class="p-8">
         Stats: You know {{known}} percent
         of this book
+        <unknown-words
+          class="h-96"
+          :bookFilter="[parseInt(props.bookId)]"
+          />
       </n-layout-content>
       <n-layout-footer class="p-4" bordered>
         <n-space justify="end">
@@ -30,6 +34,7 @@
 </template>
 
 <script setup>
+import UnknownWords from '@/components/UnknownWords.vue';
 import {
   NLayout, NLayoutSider, NLayoutHeader, NLayoutContent,
   NLayoutFooter, NButton, NSpace,

@@ -61,8 +61,8 @@ function computeStats(book) {
 
 // This is where I get tripped up on the seperation layer. This is a db
 // specific operation
-export async function topWords() {
-  const top = await knex('frequency')
+export async function topWords(bookIds) {
+  const top = knex('frequency')
     .select('word')
     .sum({ occurance: 'count' })
     .whereNotIn('word', knownArray())
@@ -70,7 +70,14 @@ export async function topWords() {
     .orderBy('occurance', 'desc')
     .limit(200);
 
-  return top.map((row) => {
+  if (bookIds !== undefined && bookIds.length > 0) {
+    console.log(bookIds);
+    top.whereIn('book', bookIds);
+  }
+
+  const results = await top;
+
+  return results.map((row) => {
     row.definition = getDefinition(row.word);
     return row;
   });
@@ -85,9 +92,9 @@ export function initLibraryIpc(ipcMain) {
     });
     return books;
   });
-  ipcMain.handle('learningTarget', async () => {
+  ipcMain.handle('learningTarget', async (event, bookIds) => {
     const start = performance.now();
-    const words = await topWords();
+    const words = await topWords(bookIds);
     const end = performance.now();
     console.log(`Learning target took ${(end - start) / 1000}s`);
     return words;

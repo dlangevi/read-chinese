@@ -20,8 +20,7 @@ import {
   initializeDatabase,
 } from './background/database';
 
-// const isDevelopment = process.env.NODE_ENV !== 'production';
-const isDevelopment = true;
+const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -30,9 +29,9 @@ protocol.registerSchemesAsPrivileged([
 
 function setApplicationMenu() {
   const menus = [appMenuTemplate, editMenuTemplate];
-  if (isDevelopment) {
-    menus.push(devMenuTemplate);
-  }
+  // if (isDevelopment) {
+  menus.push(devMenuTemplate);
+  // }
   Menu.setApplicationMenu(Menu.buildFromTemplate(menus));
 }
 
@@ -57,6 +56,9 @@ async function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
+  if (isDevelopment) {
+    win.webContents.openDevTools({ mode: 'detach' });
+  }
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
