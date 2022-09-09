@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer as i } from 'electron';
 
 // Any strings in the argument list below will be transformed into a ipc
 // function call.
@@ -8,9 +8,9 @@ import { contextBridge, ipcRenderer } from 'electron';
 // Definitly
 contextBridge.exposeInMainWorld(
   'ipc',
-  ((...funs) => funs.reduce((acc, name) => {
-    acc[name] = (...args) => ipcRenderer.invoke(name, ...args);
-    return acc;
+  ((...funs) => funs.reduce((f, n) => {
+    f[n] = (...a) => i.invoke(n, ...a);
+    return f;
   }, {}))(
     'loadBooks',
     'loadBook',
