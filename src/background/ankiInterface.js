@@ -129,8 +129,8 @@ export async function getLackingCards(deck) {
     cards: skritter.result,
   });
   const allWords = skritterInfo.result
-    .map((card) => { return fixWord(card.fields.Hanzi.value); })
-    .filter((word) => { return isChinese(word); });
+    .map((card) => fixWord(card.fields.Hanzi.value))
+    .filter((word) => isChinese(word));
   return allWords;
 }
 
@@ -143,22 +143,18 @@ async function getFlaggedCards() {
     cards: flaggedIDs.result,
   });
   return flaggedCards.result
-    .map((card) => {
-      return {
-        word: fixWord(card.fields.Hanzi.value),
-        sentence: card.fields.ExampleSentence.value,
-      };
-    });
+    .map((card) => ({
+      word: fixWord(card.fields.Hanzi.value),
+      sentence: card.fields.ExampleSentence.value,
+    }));
 }
 
 async function updateCards(ankiCards) {
-  addWords(ankiCards.map((ankiCard) => {
-    return {
-      word: ankiCard.fields.Hanzi.value,
-      interval: ankiCard.interval,
-      has_flash_card: true,
-    };
-  }));
+  addWords(ankiCards.map((ankiCard) => ({
+    word: ankiCard.fields.Hanzi.value,
+    interval: ankiCard.interval,
+    has_flash_card: true,
+  })));
 }
 
 async function updateAnkiCard(noteID, fields) {
@@ -213,17 +209,13 @@ export async function importAnkiKeywords() {
   updateCards(skritterInfo.result);
 }
 export function initAnkiIpc(ipcMain) {
-  ipcMain.handle('getAnkiCard', async (event, word) => {
-    return getAnkiCard(word);
-  });
-  ipcMain.handle('getAnkiNote', async (event, word) => {
-    return getAnkiNote(word);
-  });
+  ipcMain.handle('getAnkiCard', async (event, word) => getAnkiCard(word));
+  ipcMain.handle('getAnkiNote', async (event, word) => getAnkiNote(word));
   ipcMain.handle('updateAnkiCard', async (event, noteID, fields) => {
     await removeFlag(noteID);
     return updateAnkiCard(noteID, fields);
   });
-  ipcMain.handle('flaggedCards', async () => {
+  ipcMain.handle('loadFlaggedCards', async () => {
     const flagged = await getFlaggedCards('Reading');
     return flagged;
   });

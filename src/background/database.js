@@ -134,14 +134,16 @@ export async function dbAddBook(author, title, cover, filepath) {
     cover,
     filepath,
   }).onConflict(['title', 'author']).ignore()
-    .catch((err) => { return console.log(err); });
+    .catch((err) => console.log(err));
 }
 
 export async function dbSaveWordTable(book, wordTable) {
   const wordRows = Object.entries(wordTable)
-    .map(([word, frequency]) => {
-      return { book: book.bookId, word, count: frequency };
-    });
+    .map(([word, frequency]) => ({
+      book: book.bookId,
+      word,
+      count: frequency,
+    }));
   // There should not be conflicts here.
   knex.batchInsert('frequency', wordRows, 100).catch((err) => {
     console.log(err);

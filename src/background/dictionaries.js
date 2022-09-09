@@ -40,11 +40,12 @@ export function getDefinitions(word) {
   if (term === undefined) {
     return undefined;
   }
-  return term.map((def) => { return (def.definition); });
+  return term.map((def) => (def.definition));
 }
 
 export function initDictionaryIpc(ipcMain) {
-  ipcMain.handle('getDefinitionsForWord', async (event, word) => {
-    return getDefinitions(word);
-  });
+  ipcMain.handle(
+    'getDefinitionsForWord',
+    async (event, word) => getDefinitions(word),
+  );
 }

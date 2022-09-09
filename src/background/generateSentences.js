@@ -3,7 +3,7 @@ import { loadJieba } from './segmentation';
 import { isKnown } from './knownWords';
 
 function toText(sentence) {
-  return sentence.map(([word]) => { return word; }).join('');
+  return sentence.map(([word]) => word).join('');
 }
 
 function isT1Candidate(sentence, t1word) {
@@ -54,18 +54,16 @@ export async function whatShouldILearn(books = []) {
     });
   }));
   const sorted = Object.entries(shouldLearn)
-    .filter(([_, timesSeen]) => { return (timesSeen > 50); })
+    .filter(([_, timesSeen]) => (timesSeen > 50))
     .sort(([_, timesA], [__, timesB]) => {
       if (timesA > timesB) {
         return 1;
       }
       return 0;
     })
-    .map(([word, timesSeen]) => {
-      return {
-        word, occurance: timesSeen,
-      };
-    });
+    .map(([word, timesSeen]) => ({
+      word, occurance: timesSeen,
+    }));
   return sorted;
 }
 
@@ -130,7 +128,7 @@ export async function generateSentences(
   }));
 
   const sorted = Object.entries(shouldLearn)
-    .filter(([_, timesSeen]) => { return (timesSeen > 100); })
+    .filter(([_, timesSeen]) => (timesSeen > 100))
     .sort(([_, timesA], [__, timesB]) => {
       if (timesA > timesB) {
         return 1;
@@ -143,7 +141,7 @@ export async function generateSentences(
 export function initWordGenIpc(ipcMain) {
   ipcMain.handle('getSentencesForWord', async (event, word) => {
     const sentences = await getCandidateSentences(word);
-    sentences.sort((a, b) => { return (b.length - a.length); });
+    sentences.sort((a, b) => (b.length - a.length));
     sentences.splice(10);
     return sentences;
   });

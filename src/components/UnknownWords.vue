@@ -22,10 +22,10 @@ const props = defineProps({
   },
   bookFilter: {
     type: Array,
-    default: () => { return ([]); },
+    default: () => ([]),
   },
 });
-const getRowId = (params) => { return params.data.word; };
+const getRowId = (params) => params.data.word;
 
 const columnDefs = [
   {

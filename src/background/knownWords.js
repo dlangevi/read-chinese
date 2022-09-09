@@ -7,7 +7,7 @@ export async function syncWords() {
   known = await dbLoadWords();
   knownCharacters = new Set();
   known.forEach((word) => {
-    Array.from(word).forEach((ch) => { return knownCharacters.add(ch); });
+    Array.from(word).forEach((ch) => knownCharacters.add(ch));
   });
   console.log(`Known words: ${known.size}
 Known characters: ${knownCharacters.size} `);
@@ -34,7 +34,7 @@ export function addWords(wordRows) {
 
 export function saveLegacyWords(words) {
   const wordRows = Object.entries(words).map(
-    ([word, entry]) => { return { word, interval: entry.interval }; },
+    ([word, entry]) => ({ word, interval: entry.interval }),
   );
   addWords(wordRows);
 }

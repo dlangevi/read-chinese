@@ -18,8 +18,10 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
 import { onBeforeMount, ref } from 'vue';
 import AddToCardQueue from '@/components/AddToCardQueue.vue';
+import { useMessage } from 'naive-ui';
 
-const getRowId = (params) => { return params.data.word; };
+const message = useMessage();
+const getRowId = (params) => params.data.word;
 
 const columnDefs = [
   {
@@ -50,7 +52,14 @@ function onGridReady(params) {
 
 const rowData = ref([]);
 onBeforeMount(async () => {
-  rowData.value = await window.ipc.loadFlaggedCards();
+  // TODO is there some way we can have the message be sent from
+  // background, so we can just error at the source and not have
+  // to do error handleing in all of the different vue files?
+  try {
+    rowData.value = await window.ipc.loadFlaggedCards();
+  } catch (e) {
+    message.error('Please open Anki');
+  }
 });
 </script>
 
