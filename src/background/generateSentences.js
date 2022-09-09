@@ -67,7 +67,7 @@ export async function whatShouldILearn(books = []) {
   return sorted;
 }
 
-async function getCandidateSentences(word, books = []) {
+async function getSentencesForWord(word, books = []) {
   if (books.length === 0) {
     books = await getBooks();
   }
@@ -83,7 +83,10 @@ async function getCandidateSentences(word, books = []) {
       }
     });
   }));
-  return [...candidates];
+  const sentences = [...candidates];
+  sentences.sort((a, b) => (b.length - a.length));
+  sentences.splice(10);
+  return sentences;
 }
 
 // Generates sentences for a given set of words
@@ -138,11 +141,4 @@ export async function generateSentences(
   console.log(sorted);
 }
 
-export function initWordGenIpc(ipcMain) {
-  ipcMain.handle('getSentencesForWord', async (event, word) => {
-    const sentences = await getCandidateSentences(word);
-    sentences.sort((a, b) => (b.length - a.length));
-    sentences.splice(10);
-    return sentences;
-  });
-}
+export const generateSentencesIpc = [getSentencesForWord];

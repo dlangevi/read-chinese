@@ -35,7 +35,7 @@ export function getDefinition(word) {
   }
   return term[0].definition;
 }
-export function getDefinitions(word) {
+function getDefinitionsForWord(word) {
   const term = dicts.ccdict[word];
   if (term === undefined) {
     return undefined;
@@ -43,9 +43,6 @@ export function getDefinitions(word) {
   return term.map((def) => (def.definition));
 }
 
-export function initDictionaryIpc(ipcMain) {
-  ipcMain.handle(
-    'getDefinitionsForWord',
-    async (event, word) => getDefinitions(word),
-  );
-}
+export const dictionariesIpc = [
+  getDefinitionsForWord,
+];

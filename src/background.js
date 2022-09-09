@@ -8,11 +8,11 @@ import path from 'path';
 import appMenuTemplate from './menu/app_menu_template';
 import editMenuTemplate from './menu/edit_menu_template';
 import devMenuTemplate from './menu/dev_menu_template';
-import { syncWords, initWordsIpc } from './background/knownWords';
-import { initLibraryIpc } from './background/bookLibrary';
-import { initAnkiIpc } from './background/ankiInterface';
-import { loadDictionaries, initDictionaryIpc } from './background/dictionaries';
-import { initWordGenIpc } from './background/generateSentences';
+import { syncWords, knownWordsIpc } from './background/knownWords';
+import { bookLibraryIpc } from './background/bookLibrary';
+import { ankiInterfaceIpc } from './background/ankiInterface';
+import { loadDictionaries, dictionariesIpc } from './background/dictionaries';
+import { generateSentencesIpc } from './background/generateSentences';
 import { preloadWords } from './background/segmentation';
 import {
   updateTimesRan,
@@ -88,11 +88,15 @@ app.on('activate', () => {
 
 // We can communicate with our window (the renderer process) via messages.
 const initIpc = () => {
-  initLibraryIpc(ipcMain);
-  initWordGenIpc(ipcMain);
-  initAnkiIpc(ipcMain);
-  initDictionaryIpc(ipcMain);
-  initWordsIpc(ipcMain);
+  [
+    ...bookLibraryIpc,
+    ...knownWordsIpc,
+    ...generateSentencesIpc,
+    ...ankiInterfaceIpc,
+    ...dictionariesIpc,
+  ].forEach((fn) => {
+    ipcMain.handle(fn.name, (_, ...args) => fn(...args));
+  });
 };
 
 // This method will be called when Electron has finished

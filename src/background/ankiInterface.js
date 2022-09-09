@@ -133,7 +133,7 @@ export async function getLackingCards(deck) {
 }
 
 // TODO filter by deck
-async function getFlaggedCards() {
+async function loadFlaggedCards() {
   const flaggedIDs = await invoke('findCards', {
     query: 'flag:1',
   });
@@ -163,6 +163,8 @@ async function updateAnkiCard(noteID, fields) {
     },
   });
   if (res.error === null) {
+    // TODO we dont always want to do this
+    await removeFlag(noteID);
     return 'success';
   }
   return res;
@@ -206,15 +208,10 @@ export async function importAnkiKeywords() {
   });
   updateCards(skritterInfo.result);
 }
-export function initAnkiIpc(ipcMain) {
-  ipcMain.handle('getAnkiCard', async (event, word) => getAnkiCard(word));
-  ipcMain.handle('getAnkiNote', async (event, word) => getAnkiNote(word));
-  ipcMain.handle('updateAnkiCard', async (event, noteID, fields) => {
-    await removeFlag(noteID);
-    return updateAnkiCard(noteID, fields);
-  });
-  ipcMain.handle('loadFlaggedCards', async () => {
-    const flagged = await getFlaggedCards('Reading');
-    return flagged;
-  });
-}
+
+export const ankiInterfaceIpc = [
+  getAnkiCard,
+  getAnkiNote,
+  updateAnkiCard,
+  loadFlaggedCards,
+];

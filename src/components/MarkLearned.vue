@@ -20,7 +20,9 @@ const props = defineProps({
 
 function markKnown() {
   const rowData = props.params.data;
-  window.ipc.addWord(rowData.word);
+  // Keep with the convention of 10000 == user has claimed
+  // they super known this one
+  window.ipc.addWord(rowData.word, 10000);
   props.params.api.applyTransaction({
     remove: [rowData],
   });

@@ -26,6 +26,8 @@ async function loadBook(bookId) {
   const book = await dbGetBookById(bookId);
   book.wordTable = await dbLoadWordTable(book);
   computeStats(book);
+  const img = fs.readFileSync(book.cover).toString('base64');
+  book.imgData = img;
   return book;
 }
 
@@ -83,28 +85,22 @@ export async function topWords(bookIds) {
   });
 }
 
-export function initLibraryIpc(ipcMain) {
-  ipcMain.handle('loadBooks', async () => {
-    const books = await dbGetBooks();
-    books.forEach((book) => {
-      const img = fs.readFileSync(book.cover).toString('base64');
-      book.imgData = img;
-    });
-    return books;
-  });
-  ipcMain.handle('learningTarget', async (event, bookIds) => {
-    const start = performance.now();
-    const words = await topWords(bookIds);
-    const end = performance.now();
-    console.log(`Learning target took ${(end - start) / 1000}s`);
-    return words;
-  });
-
-  ipcMain.handle('loadBook', async (event, bookId) => {
-    const book = await loadBook(bookId);
+async function loadBooks() {
+  const books = await dbGetBooks();
+  books.forEach((book) => {
     const img = fs.readFileSync(book.cover).toString('base64');
     book.imgData = img;
-
-    return book;
   });
+  return books;
 }
+async function learningTarget(bookIds) {
+  const start = performance.now();
+  const words = await topWords(bookIds);
+  const end = performance.now();
+  console.log(`Learning target took ${(end - start) / 1000}s`);
+  return words;
+}
+
+export const bookLibraryIpc = [
+  loadBooks, learningTarget, loadBook,
+];
