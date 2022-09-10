@@ -1,5 +1,5 @@
 import {
-  app, Menu, protocol, BrowserWindow, ipcMain,
+  app, Menu, protocol, BrowserWindow,
 } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer';
@@ -8,12 +8,10 @@ import path from 'path';
 import appMenuTemplate from './menu/app_menu_template';
 import editMenuTemplate from './menu/edit_menu_template';
 import devMenuTemplate from './menu/dev_menu_template';
-import { syncWords, knownWordsIpc } from './background/knownWords';
-import { bookLibraryIpc } from './background/bookLibrary';
-import { ankiInterfaceIpc } from './background/ankiInterface';
-import { loadDictionaries, dictionariesIpc } from './background/dictionaries';
-import { generateSentencesIpc } from './background/generateSentences';
+import { syncWords } from './background/knownWords';
+import { loadDictionaries } from './background/dictionaries';
 import { preloadWords } from './background/segmentation';
+import { initIpcMain } from './ipcLoader';
 import {
   updateTimesRan,
   getTimesRan,
@@ -86,19 +84,6 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
-// We can communicate with our window (the renderer process) via messages.
-const initIpc = () => {
-  [
-    ...bookLibraryIpc,
-    ...knownWordsIpc,
-    ...generateSentencesIpc,
-    ...ankiInterfaceIpc,
-    ...dictionariesIpc,
-  ].forEach((fn) => {
-    ipcMain.handle(fn.name, (_, ...args) => fn(...args));
-  });
-};
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -116,7 +101,7 @@ app.on('ready', async () => {
   try {
     await syncWords();
     setApplicationMenu();
-    initIpc();
+    initIpcMain();
     await createWindow();
     preloadWords();
     loadDictionaries();
