@@ -14,7 +14,7 @@ module.exports = {
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-unused-vars': ['error', { argsIgnorePattern: '_' }],
+    'no-unused-vars': ['error', { argsIgnorePattern: '_', vars: 'local' }],
     'no-param-reassign': 'off',
     'no-await-in-loop': 'off',
     'no-use-before-define': ['error', {

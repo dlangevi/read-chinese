@@ -1,11 +1,11 @@
 import { performance } from 'perf_hooks';
 import fs from 'fs';
-import { isKnown, knownArray } from './knownWords';
+import { knownArray } from './knownWords';
 import { loadJieba } from './segmentation';
 import { getDefinition } from './dictionaries';
 import {
   dbGetBooks, dbGetBookById, dbAddBook, dbBookExists, dbSaveWordTable,
-  dbGetBook, dbLoadWordTable, knex,
+  dbGetBook, knex,
 } from './database';
 
 export async function getBooks() {
@@ -22,12 +22,16 @@ export async function bookExists(author, title) {
   return dbBookExists(author, title);
 }
 
+async function computeBookData(book) {
+  // compute at runtime stuff I dont want to save right now
+  await computeStats(book);
+  const imgData = await fs.promises.readFile(book.cover);
+  book.imgData = imgData.toString('base64');
+}
+
 async function loadBook(bookId) {
   const book = await dbGetBookById(bookId);
-  book.wordTable = await dbLoadWordTable(book);
-  computeStats(book);
-  const img = fs.readFileSync(book.cover).toString('base64');
-  book.imgData = img;
+  await computeBookData(book);
   return book;
 }
 
@@ -48,17 +52,9 @@ async function computeWordTable(book) {
   return wordTable;
 }
 
-function computeStats(book) {
-  let totalKnownWords = 0;
-  let totalWords = 0;
-  Object.entries(book.wordTable).forEach(([word, frequency]) => {
-    totalWords += frequency;
-    if (isKnown(word)) {
-      totalKnownWords += frequency;
-    }
-  });
-  book.totalKnownWords = totalKnownWords;
-  book.totalWords = totalWords;
+async function computeStats(book) {
+  book.totalKnownWords = await knownWords(book);
+  book.totalWords = await allWords(book);
 }
 
 // This is where I get tripped up on the seperation layer. This is a db
@@ -85,12 +81,29 @@ export async function topWords(bookIds) {
   });
 }
 
+async function knownWords(book) {
+  const top = await knex('frequency')
+    .sum({ occurance: 'count' })
+    .where('book', book.bookId)
+    .whereExists(function wordTable() {
+      this.select('word')
+        .from('words')
+        .whereRaw('words.word==frequency.word');
+    });
+  return top[0].occurance;
+}
+async function allWords(book) {
+  const top = await knex('frequency')
+    .sum({ occurance: 'count' })
+    .where('book', book.bookId);
+  return top[0].occurance;
+}
+
 async function loadBooks() {
   const books = await dbGetBooks();
-  books.forEach((book) => {
-    const img = fs.readFileSync(book.cover).toString('base64');
-    book.imgData = img;
-  });
+  console.time('loadBooks');
+  await Promise.all(books.map((book) => computeBookData(book)));
+  console.timeEnd('loadBooks');
   return books;
 }
 async function learningTarget(bookIds) {

@@ -1,5 +1,7 @@
 <template>
-  <n-card :title="book.title" class="p-4" @click="bookBigMode">
+  <n-card :title="book.title"
+    :class="(known > 90) ? 'bg-green-300 p-4' : 'p-4'"
+    @click="bookBigMode">
     <template #cover>
       <img
         class="rounded rounded-t h-full w-auto"
@@ -9,7 +11,7 @@
     </template>
     <p>{{ book.author }}</p>
     <small>
-      ID {{book.bookId}}
+      Known: {{known}}
     </small>
   </n-card>
 </template>
@@ -25,6 +27,9 @@ const props = defineProps({
     required: true,
   },
 });
+
+const known = (
+  (props.book.totalKnownWords / props.book.totalWords) * 100).toFixed(2);
 
 function bookBigMode() {
   router.push(`/book/${props.book.bookId}`);
