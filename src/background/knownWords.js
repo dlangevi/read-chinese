@@ -1,3 +1,5 @@
+import { dialog } from 'electron';
+import fs from 'fs';
 import { dbLoadWords, dbUpdateWord, dbUpdateWords } from './database';
 
 // Memory cache of the set of known words for performance
@@ -32,11 +34,52 @@ export function addWords(wordRows) {
   dbUpdateWords(wordRows);
 }
 
-export function saveLegacyWords(words) {
-  const wordRows = Object.entries(words).map(
-    ([word, entry]) => ({ word, interval: entry.interval }),
-  );
-  addWords(wordRows);
+export function importLegacyWords() {
+  const wordsFile = dialog.showOpenDialogSync({
+    properties: ['openFile'],
+    filters: [
+      { name: 'Json format', extensions: ['json'] },
+    ],
+  });
+  if (wordsFile === undefined) {
+    return;
+  }
+  const contents = fs.readFileSync(wordsFile[0], {
+    encoding: 'utf-8',
+    flags: 'r',
+  });
+  try {
+    // Dont worry about validating since this is only for my personal use
+    const words = JSON.parse(contents);
+    const wordRows = Object.entries(words).map(
+      ([word, entry]) => ({ word, interval: entry.interval }),
+    );
+    addWords(wordRows);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export function importCSVWords() {
+  // TODO handle bad selections
+  const wordsFile = dialog.showOpenDialogSync({
+    properties: ['openFile'],
+    filters: [
+      { name: 'one per line', extensions: ['csv'] },
+    ],
+  });
+  if (wordsFile === undefined) {
+    return;
+  }
+  const contents = fs.readFileSync(wordsFile[0], {
+    encoding: 'utf-8',
+    flags: 'r',
+  });
+  // For now its just one word per line no other data?
+  const words = contents.split('\n');
+  words.forEach((word) => {
+    addWord(word);
+  });
 }
 
 export function isKnown(word) {
@@ -47,4 +90,4 @@ export function isKnownChar(char) {
   return knownCharacters.has(char);
 }
 
-export const knownWordsIpc = [addWord];
+export const knownWordsIpc = [addWord, importLegacyWords, importCSVWords];

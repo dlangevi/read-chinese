@@ -214,4 +214,5 @@ export const ankiInterfaceIpc = [
   getAnkiNote,
   updateAnkiCard,
   loadFlaggedCards,
+  importAnkiKeywords,
 ];

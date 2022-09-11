@@ -1,7 +1,7 @@
 <template>
-  <n-card :title="book.title" class="p-4">
+  <n-card :title="book.title" class="p-4" @click="bookBigMode">
     <template #cover>
-      <img @click="bookBigMode"
+      <img
         class="rounded rounded-t h-full w-auto"
         :src="'data:image/png;base64,' + book.imgData"
         :alt="book.title"
