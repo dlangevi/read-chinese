@@ -114,6 +114,6 @@ async function learningTarget(bookIds) {
   return words;
 }
 
-export const bookLibraryIpc = [
+export const bookLibraryIpc = {
   loadBooks, learningTarget, loadBook,
-];
+};

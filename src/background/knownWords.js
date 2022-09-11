@@ -90,4 +90,4 @@ export function isKnownChar(char) {
   return knownCharacters.has(char);
 }
 
-export const knownWordsIpc = [addWord, importLegacyWords, importCSVWords];
+export const knownWordsIpc = { addWord, importLegacyWords, importCSVWords };

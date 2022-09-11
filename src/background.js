@@ -106,8 +106,7 @@ app.on('ready', async () => {
     preloadWords();
     loadDictionaries();
   } catch (e) {
-    console.error('Error in init', e.toString());
-    console.error('Error in init', e.stack());
+    console.error('Error in init', e.stack);
   }
 });
 

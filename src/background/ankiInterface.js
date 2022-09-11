@@ -209,10 +209,10 @@ export async function importAnkiKeywords() {
   updateCards(skritterInfo.result);
 }
 
-export const ankiInterfaceIpc = [
+export const ankiInterfaceIpc = {
   getAnkiCard,
   getAnkiNote,
   updateAnkiCard,
   loadFlaggedCards,
   importAnkiKeywords,
-];
+};

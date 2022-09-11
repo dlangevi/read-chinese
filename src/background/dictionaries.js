@@ -43,6 +43,6 @@ function getDefinitionsForWord(word) {
   return term.map((def) => (def.definition));
 }
 
-export const dictionariesIpc = [
+export const dictionariesIpc = {
   getDefinitionsForWord,
-];
+};

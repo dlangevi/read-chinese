@@ -141,4 +141,4 @@ export async function generateSentences(
   console.log(sorted);
 }
 
-export const generateSentencesIpc = [getSentencesForWord];
+export const generateSentencesIpc = { getSentencesForWord };
