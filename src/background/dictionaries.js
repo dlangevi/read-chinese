@@ -40,7 +40,11 @@ function getDefinitionsForWord(word) {
   if (term === undefined) {
     return undefined;
   }
-  return term.map((def) => (def.definition));
+  console.log(term);
+  return term.map((def) => ({
+    definition: def.definition,
+    pronunciation: def.pronunciation,
+  }));
 }
 
 export const dictionariesIpc = {

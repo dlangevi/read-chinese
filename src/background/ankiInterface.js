@@ -81,6 +81,7 @@ async function createAnkiNoteSkeleton(word) {
       sentence: '',
       englishDefn: '',
       chineseDefn: '',
+      pinyin: '',
     },
   };
 }
@@ -97,6 +98,7 @@ async function getAnkiNote(word) {
       sentence: rawNote.fields.ExampleSentence.value,
       englishDefn: rawNote.fields.EnglishDefinition.value,
       chineseDefn: rawNote.fields.ChineseDefinition.value,
+      pinyin: rawNote.fields.Pinyin.value,
     },
     rawNote,
   };
@@ -178,6 +180,7 @@ export async function createAnkiCard(fields) {
         ExampleSentence: fields.sentence,
         EnglishDefinition: fields.englishDefn,
         ChineseDefinition: fields.chineseDefn,
+        Pinyin: fields.pinyin,
       },
       options: {
         allowDuplicate: true,

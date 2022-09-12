@@ -6,7 +6,7 @@
         v-for="(definition, i) in definitions"
         :key="i"
         :value="definition"
-        :label="definition"
+        :label="definition.definition"
       />
     </n-space>
   </n-radio-group>
@@ -23,6 +23,7 @@ const definitions = ref([]);
 const definition = ref(null);
 
 watch(definition, () => {
+  console.log(definition);
   emit('updateDefinition', definition.value);
 });
 

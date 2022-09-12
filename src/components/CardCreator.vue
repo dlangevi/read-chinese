@@ -103,8 +103,9 @@ const updateSentence = (newSentence) => {
 };
 
 const updateDefinition = (newDefinition) => {
-  if (newDefinition.length > 0) {
-    card.value.fields.englishDefn = newDefinition;
+  if (newDefinition.definition.length > 0) {
+    card.value.fields.englishDefn = newDefinition.definition;
+    card.value.fields.pinyin = newDefinition.pronunciation;
   }
 };
 
@@ -119,7 +120,7 @@ async function submit() {
   // TODO figure out the logic for determining changes better
 
   if (action === ActionsEnum.CREATE) {
-    console.log('creating card');
+    console.log('creating card', card.value.fields);
     const res = await window.ipc.createAnkiCard({ ...card.value.fields });
     message.info(JSON.stringify(res));
   } else {
