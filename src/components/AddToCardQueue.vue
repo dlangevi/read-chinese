@@ -1,12 +1,12 @@
 <template>
   <n-button type="primary"
     @click="addToQueue">
-    Replace Sentence
+    {{params.text}}
   </n-button>
 </template>
 
 <script setup>
-import { useCardQueue } from '@/stores/CardQueue';
+import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import { NButton } from 'naive-ui';
 
 const props = defineProps({
@@ -18,9 +18,14 @@ const props = defineProps({
 const store = useCardQueue();
 async function addToQueue() {
   const rowData = props.params.data;
-  store.addWord(rowData.word);
-  props.params.api.applyTransaction({
-    remove: [rowData],
+  let action = ActionsEnum.MODIFY;
+  if (props.params.create) {
+    action = ActionsEnum.CREATE;
+  }
+  store.addWord(rowData.word, action, () => {
+    props.params.api.applyTransaction({
+      remove: [rowData],
+    });
   });
 }
 

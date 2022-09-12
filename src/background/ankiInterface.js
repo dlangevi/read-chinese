@@ -39,41 +39,6 @@ function fixWord(origWord) {
   return word;
 }
 
-export async function createCard(/* card */) {
-  const result = await invoke('addNote', {
-    note: {
-      deckName: 'Testing',
-      modelName: 'Reading Card',
-      fields: {
-        Simplified: 'test',
-        Meaning: 'test',
-        EnglishMeaning: 'test',
-        SentenceSimplified: 'test',
-      },
-      options: {
-        allowDuplicate: true,
-      },
-      audio: [{
-        url: 'https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=猫&kana=ねこ',
-        filename: 'yomichan_ねこ_猫.mp3',
-        skipHash: '7e2c2f954ef6051373ba916f000168dc',
-        fields: [
-          'Audio',
-        ],
-      }],
-      picture: [{
-        url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/A_black_cat_named_Tilly.jpg/220px-A_black_cat_named_Tilly.jpg',
-        filename: 'black_cat.jpg',
-        skipHash: '8d6e4646dfae812bf39651b59d7429ce',
-        fields: [
-          'SentenceImage',
-        ],
-      }],
-    },
-  });
-  return result;
-}
-
 export async function addSentenceToCard(word, sentence) {
   const notes = await invoke('findNotes', { query: `Hanzi:${word}` });
   if (notes.result.length !== 1) {
@@ -95,9 +60,9 @@ export async function addSentenceToCard(word, sentence) {
   }
 }
 
-async function getAnkiNote(word) {
+async function getAnkiNoteRaw(word) {
   const noteID = await invoke('findNotes', { query: `Hanzi:${word}` });
-  if (noteID.result.length !== 1) {
+  if (noteID.result.length > 1) {
     console.log(`Too many or few notes match ${word}, ${noteID.result}`);
     return 'error';
   }
@@ -105,6 +70,37 @@ async function getAnkiNote(word) {
     notes: noteID.result,
   });
   return noteInfo.result[0];
+}
+
+async function createAnkiNoteSkeleton(word) {
+  // TODO for now just do this simple thing to provide a skeleton
+  return {
+    noteId: undefined,
+    fields: {
+      word,
+      sentence: '',
+      englishDefn: '',
+      chineseDefn: '',
+    },
+  };
+}
+
+async function getAnkiNote(word) {
+  const rawNote = await getAnkiNoteRaw(word);
+
+  // TODO make this mapping user configureable
+  // to support multiple note types
+  const note = {
+    noteId: rawNote.noteId,
+    fields: {
+      word: rawNote.fields.Hanzi.value,
+      sentence: rawNote.fields.ExampleSentence.value,
+      englishDefn: rawNote.fields.EnglishDefinition.value,
+      chineseDefn: rawNote.fields.ChineseDefinition.value,
+    },
+    rawNote,
+  };
+  return note;
 }
 
 async function getAnkiCard(word) {
@@ -170,6 +166,46 @@ async function updateAnkiCard(noteID, fields) {
   return res;
 }
 
+export async function createAnkiCard(fields) {
+  // TODO make this based on used defined fields
+  console.log(fields);
+  const res = await invoke('addNote', {
+    note: {
+      deckName: 'Reading',
+      modelName: 'Reading Card',
+      fields: {
+        Hanzi: fields.word,
+        ExampleSentence: fields.sentence,
+        EnglishDefinition: fields.englishDefn,
+        ChineseDefinition: fields.chineseDefn,
+      },
+      options: {
+        allowDuplicate: true,
+      },
+      /* audio: [{
+        url: 'https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=猫&kana=ねこ',
+        filename: 'yomichan_ねこ_猫.mp3',
+        skipHash: '7e2c2f954ef6051373ba916f000168dc',
+        fields: [
+          'Audio',
+        ],
+      }],
+      picture: [{
+        url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/A_black_cat_named_Tilly.jpg/220px-A_black_cat_named_Tilly.jpg',
+        filename: 'black_cat.jpg',
+        skipHash: '8d6e4646dfae812bf39651b59d7429ce',
+        fields: [
+          'SentenceImage',
+        ],
+      }], */
+    },
+  });
+  if (res.error === null) {
+    return 'success';
+  }
+  return res;
+}
+
 async function removeFlag(noteID) {
   const noteInfo = await invoke('notesInfo', {
     notes: [noteID],
@@ -210,6 +246,8 @@ export async function importAnkiKeywords() {
 }
 
 export const ankiInterfaceIpc = {
+  createAnkiCard,
+  createAnkiNoteSkeleton,
   getAnkiCard,
   getAnkiNote,
   updateAnkiCard,

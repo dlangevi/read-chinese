@@ -14,6 +14,7 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { onBeforeMount, ref } from 'vue';
 import { AgGridVue } from 'ag-grid-vue3';
 import MarkLearned from '@/components/MarkLearned.vue';
+import AddToCardQueue from '@/components/AddToCardQueue.vue';
 
 const props = defineProps({
   showDefinitions: {
@@ -47,13 +48,26 @@ const columnDefs = [
 if (props.showDefinitions) {
   columnDefs.push(
     {
-
       headerName: 'definition',
       field: 'definition',
       width: 600,
     },
   );
 }
+
+columnDefs.push(
+  {
+    headerName: '',
+    field: 'Make FlashCard',
+    width: 200,
+    cellRenderer: AddToCardQueue,
+    cellRendererParams: {
+      text: 'Create FlashCard',
+      create: true,
+    },
+  },
+
+);
 
 const rowData = ref([]);
 onBeforeMount(async () => {

@@ -39,6 +39,9 @@ const columnDefs = [
     field: 'Make FlashCard',
     width: 50,
     cellRenderer: AddToCardQueue,
+    cellRendererParams: {
+      text: 'Replace Sentence',
+    },
   },
 ];
 let api = null;

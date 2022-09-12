@@ -6,11 +6,25 @@ export const useCardQueue = defineStore('CardQueue', {
     words: (state) => state.wordList,
   },
   actions: {
-    async addWord(word) {
-      this.wordList.push(word);
+    // Callback runs on word submition
+    // TODO? also have a callback for word failure?
+    async addWord(word, action, callback) {
+      this.wordList.push({
+        word,
+        action,
+        callback,
+      });
+    },
+    clearFront() {
+      this.wordList.shift();
     },
     clearWords() {
       this.wordList.splice(0);
     },
   },
+});
+
+export const ActionsEnum = Object.freeze({
+  CREATE: 'create',
+  MODIFY: 'modify',
 });

@@ -77,7 +77,7 @@ async function getSentencesForWord(word, books = []) {
     segmented.forEach((sentence) => {
       const text = toText(sentence);
       if (text.includes(word)) {
-        if (isT1Candidate(sentence)) {
+        if (isT1Candidate(sentence, word)) {
           candidates.add(text);
         }
       }

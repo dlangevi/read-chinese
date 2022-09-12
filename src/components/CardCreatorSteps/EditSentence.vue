@@ -34,6 +34,7 @@ const props = defineProps({
 });
 
 onBeforeMount(async () => {
+  console.log(props);
   sentences.value = await window.ipc.getSentencesForWord(props.word);
 });
 

@@ -1,21 +1,21 @@
 <template>
   <n-card>
-    <h2 class="text-xl font-bold">Hanzi: {{ankiCard.fields.Hanzi.value}}</h2>
+    <h2 class="text-xl font-bold">Hanzi: {{ankiCard.fields.word}}</h2>
     <p>
       <span class="text-l font-bold">Sentence:</span>
-      {{ankiCard.fields.ExampleSentence.value}}
+      {{ankiCard.fields.sentence}}
       <n-button type=info size=tiny class="inline"
         @click="$emit('changeStep', StepsEnum.SENTENCE)">Edit</n-button>
     </p>
     <h2 class="text-l font-bold">Definition:</h2>
     <p>
-      <span v-html="ankiCard.fields.EnglishDefinition.value"/>
+      <span v-html="ankiCard.fields.englishDefn"/>
       <n-button type=info size=tiny
         @click="$emit('changeStep', StepsEnum.ENGLISH)">Edit</n-button>
     </p>
     <h2 class="text-l font-bold">ChineseDefinition:</h2>
     <p>
-      <span v-html="ankiCard.fields.ChineseDefinition.value"/>
+      <span v-html="ankiCard.fields.chinesDefn"/>
       <n-button type=info size=tiny
         @click="$emit('changeStep', StepsEnum.CHINESE)">Edit</n-button>
     </p>
