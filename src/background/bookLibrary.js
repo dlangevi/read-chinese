@@ -1,6 +1,6 @@
 import { performance } from 'perf_hooks';
 import fs from 'fs';
-import { knownArray } from './knownWords';
+import { knownArray, isKnown, isKnownChar } from './knownWords';
 import { loadJieba } from './segmentation';
 import { getDefinition } from './dictionaries';
 import {
@@ -29,9 +29,40 @@ async function computeBookData(book) {
   book.imgData = imgData.toString('base64');
 }
 
+async function computeExtraData(book) {
+  const top = await knex('frequency')
+    .select('word')
+    .sum({ occurance: 'count' })
+    .where('book', book.bookId)
+    .groupBy('word');
+
+  let probablyKnownWords = 0;
+  let knownCharacters = 0;
+  let totalCharacters = 0;
+  top.forEach(({ word, occurance }) => {
+    totalCharacters += word.length * occurance;
+    let allKnown = true;
+    Array.from(word).forEach((char) => {
+      if (isKnownChar(char)) {
+        knownCharacters += occurance;
+      } else {
+        allKnown = false;
+      }
+    });
+    if (isKnown(word) || allKnown) {
+      probablyKnownWords += occurance;
+    }
+  });
+
+  book.probablyKnownWords = probablyKnownWords;
+  book.knownCharacters = knownCharacters;
+  book.totalCharacters = totalCharacters;
+}
+
 async function loadBook(bookId) {
   const book = await dbGetBookById(bookId);
   await computeBookData(book);
+  await computeExtraData(book);
   return book;
 }
 
