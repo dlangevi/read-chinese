@@ -20,7 +20,7 @@
         <p>For now lets just mark learned words you already know 好不好?</p>
       </div>
       <unknown-words
-        class="w-5/6 mx-auto h-full flex-grow-1"
+        class="w-5/6 mx-auto h-full flex-grow"
         showDefinitions
         />
     </div>

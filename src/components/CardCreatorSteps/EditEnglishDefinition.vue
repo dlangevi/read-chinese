@@ -1,4 +1,5 @@
 <template>
+  <div class="text-3xl m-4">Pick a definition</div>
   <n-radio-group v-model:value="definition" name="definitions">
     <n-space vertical>
       <n-radio
@@ -6,7 +7,9 @@
         v-for="(definition, i) in definitions"
         :key="i"
         :value="definition"
-        :label="definition.definition"
+        :label="
+        '[' + definition.pronunciation + '] ' +
+        definition.definition"
       />
     </n-space>
   </n-radio-group>

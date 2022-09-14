@@ -8,7 +8,11 @@ export const useCardQueue = defineStore('CardQueue', {
   actions: {
     // Callback runs on word submition
     // TODO? also have a callback for word failure?
-    async addWord(word, action, callback) {
+    async addWord(
+      word,
+      action,
+      callback = (() => {}),
+    ) {
       this.wordList.push({
         word,
         action,

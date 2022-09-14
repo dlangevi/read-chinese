@@ -1,4 +1,5 @@
 <template>
+  <div class="text-3xl m-4">Pick a sentence</div>
   <n-radio-group v-model:value="sentence" name="sentences">
     <n-space vertical>
       <n-radio

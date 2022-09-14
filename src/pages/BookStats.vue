@@ -29,10 +29,7 @@
       </n-layout-content>
       <n-layout-footer class="p-4" bordered>
         <n-space justify="end">
-          <n-button type="primary">
-            Mark words known
-          </n-button>
-          <n-button type="primary">
+          <n-button type="primary" @click="makeFlashCards">
             Make flash cards
           </n-button>
         </n-space>
@@ -47,6 +44,7 @@ import {
   NLayout, NLayoutSider, NLayoutHeader, NLayoutContent,
   NLayoutFooter, NButton, NSpace, NTabs, NTabPane,
 } from 'naive-ui';
+import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 
 const props = defineProps({
   bookId: String,
@@ -60,4 +58,13 @@ const likelyKnown = (
 const knownCharacters = (
   (book.knownCharacters / book.totalCharacters) * 100).toFixed(2);
 console.log(book);
+
+const store = useCardQueue();
+async function makeFlashCards() {
+  const words = await window.ipc.topUnknownWords(props.bookId, 10);
+  words.forEach(({ word }) => {
+    store.addWord(word, ActionsEnum.CREATE);
+  });
+  console.log(words);
+}
 </script>

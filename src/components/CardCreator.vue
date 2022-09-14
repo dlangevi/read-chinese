@@ -1,27 +1,19 @@
 <template>
     <n-modal
-      class="w-4/5 max-h-[80vh]"
+      class="w-4/5 h-[80vh]"
       v-model:show="showModal"
       :mask-closable="false"
       :closable="true"
       preset="card"
       :on-close="onClose"
+      content-style="display:flex; flex-direction: column;"
     >
       <template #header>
         <p class="text-xl">
           Creating card for {{card.fields.word}}
         </p>
       </template>
-      <n-layout has-sider sider-placement="right" style="height: 500px">
-        <n-layout-content content-style="padding: 24px;"
-          :native-scrollbar="false">
-          <edit-sentence v-if="step==StepsEnum.SENTENCE"
-            :word="card.fields.word" :sentence="card.fields.sentence"
-            @updateSentence="updateSentence"/>
-          <edit-english-definition v-if="step==StepsEnum.ENGLISH"
-            :word="card.fields.word" :definition="card.fields.englishDefn"
-            @updateDefinition="updateDefinition"/>
-        </n-layout-content>
+      <n-layout has-sider sider-placement="left" class="flex-grow" >
         <n-layout-sider v-if="card !== undefined"
           collapse-mode="transform"
           :collapsed-width="50"
@@ -34,6 +26,15 @@
         >
           <anki-card-preview :ankiCard="card" @changeStep="changeStep"/>
         </n-layout-sider>
+        <n-layout-content content-style="padding: 24px;"
+          :native-scrollbar="false">
+          <edit-sentence v-if="step==StepsEnum.SENTENCE"
+            :word="card.fields.word" :sentence="card.fields.sentence"
+            @updateSentence="updateSentence"/>
+          <edit-english-definition v-if="step==StepsEnum.ENGLISH"
+            :word="card.fields.word" :definition="card.fields.englishDefn"
+            @updateDefinition="updateDefinition"/>
+        </n-layout-content>
       </n-layout>
 
       <template #action>
@@ -63,11 +64,27 @@ const showModal = ref(false);
 const card = ref(undefined);
 let originalValues;
 const step = ref(undefined);
+let steps = [];
 let word;
 let action;
 let callback;
 
-const changeStep = (estep) => { step.value = estep; };
+// Manually change the step from an edit button.
+const changeStep = (estep) => {
+  step.value = estep;
+  // Remove any set steps progression since the user has taken control
+  steps = [];
+};
+
+const nextStep = (currentStep) => {
+  if (steps.length > 0 && currentStep === step.value) {
+    const idx = steps.indexOf(currentStep);
+    if (idx !== -1 && idx + 1 <= steps.length) {
+      step.value = steps[idx + 1];
+    }
+  }
+};
+
 const message = useMessage();
 store.$subscribe(async (mutation, state) => {
   // Later we can prefetch new words sentences possibly
@@ -82,14 +99,22 @@ store.$subscribe(async (mutation, state) => {
     let ankiCard;
     if (action === ActionsEnum.CREATE) {
       ankiCard = await window.ipc.createAnkiNoteSkeleton(word);
+      steps = [
+        StepsEnum.SENTENCE,
+        StepsEnum.ENGLISH,
+      ];
     } else {
+      // Right now for EDIT we only edit the sentence so start there
       ankiCard = await window.ipc.getAnkiNote(word);
+      steps = [
+        StepsEnum.SENTENCE,
+      ];
     }
     card.value = reactive(ankiCard);
     originalValues = {
       ...ankiCard.fields,
     };
-    step.value = 1;
+    [step.value] = steps;
     console.log(card.value);
     console.log(originalValues);
   }
@@ -99,6 +124,7 @@ store.$subscribe(async (mutation, state) => {
 const updateSentence = (newSentence) => {
   if (newSentence.length > 0) {
     card.value.fields.sentence = newSentence;
+    nextStep(StepsEnum.SENTENCE);
   }
 };
 
@@ -106,6 +132,7 @@ const updateDefinition = (newDefinition) => {
   if (newDefinition.definition.length > 0) {
     card.value.fields.englishDefn = newDefinition.definition;
     card.value.fields.pinyin = newDefinition.pronunciation;
+    nextStep(StepsEnum.ENGLISH);
   }
 };
 

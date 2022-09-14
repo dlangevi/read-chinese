@@ -2,7 +2,7 @@
   <div class="flex flex-col container mx-auto px-4 h-full">
     <ag-grid-vue
         class="ag-theme-alpine w-5/6 mx-auto
-        h-full flex-grow-1 text-xl"
+        h-full flex-grow text-xl"
         :getRowId="getRowId"
         :columnDefs="columnDefs"
         :rowData="rowData"

@@ -100,7 +100,6 @@ export async function topWords(bookIds) {
     .limit(200);
 
   if (bookIds !== undefined && bookIds.length > 0) {
-    console.log(bookIds);
     top.whereIn('book', bookIds);
   }
 
@@ -110,6 +109,21 @@ export async function topWords(bookIds) {
     row.definition = getDefinition(row.word);
     return row;
   });
+}
+
+export async function topUnknownWords(bookId, numWords) {
+  const top = await knex('frequency')
+    .select('word')
+    .where('book', bookId)
+    .whereNotExists(function wordTable() {
+      this.select('word')
+        .from('words')
+        .whereRaw('words.word==frequency.word');
+    })
+    .orderBy('count', 'desc')
+    .limit(numWords);
+
+  return top;
 }
 
 async function knownWords(book) {
@@ -146,5 +160,5 @@ async function learningTarget(bookIds) {
 }
 
 export const bookLibraryIpc = {
-  loadBooks, learningTarget, loadBook,
+  loadBooks, learningTarget, loadBook, topUnknownWords,
 };
