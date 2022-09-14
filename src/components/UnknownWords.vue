@@ -38,11 +38,6 @@ const columnDefs = [
     field: 'occurance',
     sort: 'desc',
   },
-  {
-    headerName: 'markLearned',
-    field: 'markButton',
-    cellRenderer: MarkLearned,
-  },
 ];
 
 if (props.showDefinitions) {
@@ -58,6 +53,13 @@ if (props.showDefinitions) {
 columnDefs.push(
   {
     headerName: '',
+    field: 'markButton',
+    cellRenderer: MarkLearned,
+  },
+);
+columnDefs.push(
+  {
+    headerName: '',
     field: 'Make FlashCard',
     width: 200,
     cellRenderer: AddToCardQueue,
@@ -66,7 +68,6 @@ columnDefs.push(
       create: true,
     },
   },
-
 );
 
 const rowData = ref([]);

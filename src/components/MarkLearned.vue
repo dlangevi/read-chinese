@@ -1,17 +1,13 @@
 <template>
-  <img @click="markKnown" class="
-    font-black
-    bg-red-600
-    hover:bg-green-600
-    absolute
-    top-1/2
-    rounded-xl
-    -translate-y-1/2
-    h-5
-    w-5" src="../assets/circle-check.svg" alt="checkmark"/>
+  <n-button type="primary"
+    @click="markKnown">
+    Mark Known
+  </n-button>
 </template>
 
 <script setup>
+import { NButton } from 'naive-ui';
+
 const props = defineProps({
   params: {
     type: Object,
