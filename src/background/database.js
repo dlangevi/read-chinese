@@ -37,6 +37,15 @@ export function getTimesRan() {
   return metadataStore.get('ran', 0);
 }
 
+// TODO, should there be some white list of valid keys?
+function getOptionValue(key, defaultValue) {
+  return metadataStore.get(key, defaultValue);
+}
+
+function setOptionValue(key, value) {
+  metadataStore.set(key, value);
+}
+
 export function dbSaveDictPath(name, path) {
   const dicts = metadataStore.get('dicts', {});
   dicts[name] = path;
@@ -220,3 +229,7 @@ export async function dbBookExists(author, title) {
   });
   return books.length === 1;
 }
+
+export const databaseIpc = {
+  getOptionValue, setOptionValue,
+};

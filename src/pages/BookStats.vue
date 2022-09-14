@@ -29,6 +29,10 @@
       </n-layout-content>
       <n-layout-footer class="p-4" bordered>
         <n-space justify="end">
+
+          <n-icon size="40">
+            <CashOutline />
+          </n-icon>
           <n-button type="primary" @click="makeFlashCards">
             Make flash cards
           </n-button>
@@ -44,6 +48,8 @@ import {
   NLayout, NLayoutSider, NLayoutHeader, NLayoutContent,
   NLayoutFooter, NButton, NSpace, NTabs, NTabPane,
 } from 'naive-ui';
+// import { SettingTwotone } from '@vicons/antd/SettingTwotone';
+import { CashOutline } from '@vicons/ionicons5';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 
 const props = defineProps({

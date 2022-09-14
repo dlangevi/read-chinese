@@ -1,8 +1,8 @@
 <template>
   <div class="text-3xl m-4">Pick a definition</div>
-  <n-radio-group v-model:value="definition" name="definitions">
+  <n-checkbox-group v-model:value="definition" name="definitions">
     <n-space vertical>
-      <n-radio
+      <n-checkbox
         class="text-3xl"
         v-for="(definition, i) in definitions"
         :key="i"
@@ -12,13 +12,13 @@
         definition.definition"
       />
     </n-space>
-  </n-radio-group>
+  </n-checkbox-group>
 </template>
 
 <script setup>
 import { watch, onBeforeMount, ref } from 'vue';
 import {
-  NSpace, NRadioGroup, NRadio,
+  NSpace, NCheckboxGroup, NCheckbox,
 } from 'naive-ui';
 
 const emit = defineEmits(['updateDefinition']);

@@ -4,6 +4,7 @@ import { bookLibraryIpc } from './background/bookLibrary';
 import { ankiInterfaceIpc } from './background/ankiInterface';
 import { dictionariesIpc } from './background/dictionaries';
 import { generateSentencesIpc } from './background/generateSentences';
+import { databaseIpc } from './background/database';
 
 // Concatenate all the functions we want accessed via IPC
 // TODO should have some way to ensure no name collisions
@@ -13,6 +14,7 @@ const ipcFunctions = {
   ...generateSentencesIpc,
   ...ankiInterfaceIpc,
   ...dictionariesIpc,
+  ...databaseIpc,
 };
 
 // To be called from background.js to initialize handlers
