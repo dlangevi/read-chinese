@@ -20,14 +20,15 @@ import { watch, onBeforeMount, ref } from 'vue';
 import {
   NSpace, NCheckboxGroup, NCheckbox,
 } from 'naive-ui';
+import UserSettings from '@/userSettings';
 
 const emit = defineEmits(['updateDefinition']);
 const definitions = ref([]);
 const definition = ref(null);
 
-watch(definition, () => {
-  console.log(definition);
-  emit('updateDefinition', definition.value);
+watch(definition, async () => {
+  const autoAdvance = await UserSettings.AutoAdvanceEnglish.read();
+  emit('updateDefinition', definition.value, autoAdvance);
 });
 
 const props = defineProps({

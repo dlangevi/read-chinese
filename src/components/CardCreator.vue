@@ -16,21 +16,25 @@
     <template #header-extra>
       <card-creation-settings/>
     </template>
-    <n-layout has-sider sider-placement="left" class="flex-grow" >
+    <n-layout has-sider
+      sider-placement="left"
+      class="flex-grow max-h-full"
+      style="max-height: 60vh">
       <n-layout-sider v-if="card !== undefined"
         collapse-mode="transform"
         :collapsed-width="50"
-        :native-scrollbar="true"
         :show-collapsed-content="false"
         :width="500"
         show-trigger="arrow-circle"
         content-style="padding: 24px;"
         bordered
       >
+      <Suspense>
         <anki-card-preview :ankiCard="card" @changeStep="changeStep"/>
+      </Suspense>
       </n-layout-sider>
       <n-layout-content content-style="padding: 24px;"
-        :native-scrollbar="false">
+        :native-scrollbar="true">
         <edit-sentence v-if="step==StepsEnum.SENTENCE"
           :word="card.fields.word" :sentence="card.fields.sentence"
           @updateSentence="updateSentence"/>
@@ -42,6 +46,10 @@
 
     <template #action>
       <n-space justify="end">
+        <n-button type=info
+          @click="nextStep()">Next Step</n-button>
+        <n-button type=info
+          @click="store.clearFront()">Skip Word</n-button>
         <n-button type=info
           @click="submit()">Submit</n-button>
       </n-space>
@@ -81,24 +89,37 @@ const changeStep = (estep) => {
   steps = [];
 };
 
-const nextStep = (currentStep) => {
-  if (steps.length > 0 && currentStep === step.value) {
-    const idx = steps.indexOf(currentStep);
-    if (idx !== -1 && idx + 1 <= steps.length) {
-      step.value = steps[idx + 1];
+const nextStep = async () => {
+  if (steps.length === 0) {
+    return;
+  }
+
+  const idx = steps.indexOf(step.value);
+  if (idx === -1) {
+    return;
+  }
+  if (idx + 1 === steps.length) {
+    // We were on the last step
+    const autoAdvanceCard = await UserSettings.AutoAdvanceCard.read();
+    if (autoAdvanceCard) {
+      submit();
+    }
+  }
+  if (idx + 1 <= steps.length) {
+    step.value = steps[idx + 1];
+  }
+};
+
+const updateSentence = (newSentence, updateStep = false) => {
+  if (newSentence.length > 0) {
+    card.value.fields.sentence = newSentence;
+    if (updateStep) {
+      nextStep();
     }
   }
 };
 
-const updateSentence = (newSentence) => {
-  if (newSentence.length > 0) {
-    card.value.fields.sentence = newSentence;
-    nextStep(StepsEnum.SENTENCE);
-  }
-};
-
-const updateDefinition = (newDefinitions, updateStep = true) => {
-  console.log(newDefinitions);
+const updateDefinition = (newDefinitions, updateStep = false) => {
   if (newDefinitions.length > 0) {
     card.value.fields.englishDefn = newDefinitions.map(
       (def) => def.definition,
@@ -107,7 +128,7 @@ const updateDefinition = (newDefinitions, updateStep = true) => {
       (def) => def.pronunciation,
     ).join(', ');
     if (updateStep) {
-      nextStep(StepsEnum.ENGLISH);
+      nextStep();
     }
   }
 };
@@ -116,12 +137,15 @@ const message = useMessage();
 store.$subscribe(async (mutation, state) => {
   // Later we can prefetch new words sentences possibly
   // if (mutation.events.type === 'add' && mutation.events.key === '0') {
+  console.log('mutation');
+  step.value = undefined;
   if (state.wordList.length > 0) {
     [{
       word,
       action,
       callback,
     }] = state.wordList;
+    console.log(word);
 
     let ankiCard;
     if (action === ActionsEnum.CREATE) {
@@ -148,6 +172,7 @@ store.$subscribe(async (mutation, state) => {
       const autoFill = await UserSettings.PopulateEnglish.read();
       if (autoFill) {
         const definitions = await window.ipc.getDefinitionsForWord(word);
+        console.log(definitions);
         if (definitions.length === 1) {
           updateDefinition(definitions);
           steps.splice(englishIdx, 1);
@@ -156,8 +181,6 @@ store.$subscribe(async (mutation, state) => {
     }
 
     [step.value] = steps;
-    console.log(card.value);
-    console.log(originalValues);
   }
   showModal.value = state.wordList.length !== 0;
 });
@@ -169,13 +192,18 @@ function onClose() {
 
 async function submit() {
   // Todo track changes to the card and submit those for update
-  message.info('Card submited');
+  const messageReactive = message.create('Card submited', {
+    type: 'loading',
+    duration: 1e4,
+  });
   // TODO figure out the logic for determining changes better
-
   if (action === ActionsEnum.CREATE) {
-    console.log('creating card', card.value.fields);
     const res = await window.ipc.createAnkiCard({ ...card.value.fields });
-    message.info(JSON.stringify(res));
+    messageReactive.content = JSON.stringify(res);
+    messageReactive.type = 'success';
+    setTimeout(() => {
+      messageReactive.destroy();
+    }, 1000);
   } else {
     const newData = {};
     Object.entries(card.value.fields).forEach(([field, value]) => {
@@ -189,7 +217,11 @@ async function submit() {
       newData.SentenceAudio = '';
     }
     const res = await window.ipc.updateAnkiCard(card.value.noteId, newData);
-    message.info(JSON.stringify(res));
+    messageReactive.content = JSON.stringify(res);
+    messageReactive.type = 'success';
+    setTimeout(() => {
+      messageReactive.destroy();
+    }, 1000);
   }
   callback();
   store.clearFront();

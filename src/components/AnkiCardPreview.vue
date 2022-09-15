@@ -1,38 +1,43 @@
 <template>
   <n-card>
     <h2 class="text-xl font-bold">Hanzi: {{ankiCard.fields.word}}</h2>
-    <p>
-      <span class="text-l font-bold">Sentence:</span>
-      {{ankiCard.fields.sentence}}
-      <n-button type=info size=tiny class="inline"
+    <div>
+      <n-button type=info size=tiny class="inline m-2"
         @click="$emit('changeStep', StepsEnum.SENTENCE)">Edit</n-button>
-    </p>
-    <h2 class="text-l font-bold">Definition:</h2>
-    <p>
-      <span v-html="ankiCard.fields.englishDefn"/>
-      <n-button type=info size=tiny
+      <h2 class="inline text-l font-bold">Sentence:</h2>
+      <span> {{ankiCard.fields.sentence}}</span>
+    </div>
+    <div>
+      <n-button type=info size=tiny class="m-2"
         @click="$emit('changeStep', StepsEnum.ENGLISH)">Edit</n-button>
-    </p>
-    <h2 class="text-l font-bold">ChineseDefinition:</h2>
-    <p>
-      <span v-html="ankiCard.fields.chinesDefn"/>
-      <n-button type=info size=tiny
+      <h2 class="inline text-l font-bold">Definition:</h2>
+      <p>
+        <span v-html="ankiCard.fields.englishDefn"/>
+      </p>
+    </div>
+    <div v-if="enableChinese">
+      <n-button type=info size=tiny class="m-2"
         @click="$emit('changeStep', StepsEnum.CHINESE)">Edit</n-button>
-    </p>
+      <h2 class="text-l font-bold">ChineseDefinition:</h2>
+      <p >
+        <span v-html="ankiCard.fields.chinesDefn"/>
+      </p>
+    </div>
   </n-card>
 </template>
 
 <script setup>
 import { NCard, NButton } from 'naive-ui';
 import StepsEnum from '@/components/CardCreatorSteps/StepsEnum';
+import UserSettings from '@/userSettings';
 
-const props = defineProps({
+const enableChinese = await UserSettings.EnableChinese.read();
+
+defineProps({
   ankiCard: {
     type: Object,
     required: true,
   },
 });
-
-console.log(props.ankiCard);
 
 </script>

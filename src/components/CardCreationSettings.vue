@@ -26,6 +26,18 @@
           <settings-checkbox :setting="UserSettings.PopulateEnglish" />
         </n-gi>
         <n-gi>
+          <settings-checkbox :setting="UserSettings.AutoAdvanceSentence" />
+        </n-gi>
+        <n-gi>
+          <settings-checkbox :setting="UserSettings.AutoAdvanceEnglish" />
+        </n-gi>
+        <n-gi>
+          <settings-checkbox :setting="UserSettings.AutoAdvanceCard" />
+        </n-gi>
+        <n-gi>
+          <settings-checkbox :setting="UserSettings.EnableChinese" />
+        </n-gi>
+        <n-gi>
           <settings-checkbox :setting="UserSettings.PopulateChinese" />
         </n-gi>
         <n-gi>

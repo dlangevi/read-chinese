@@ -38,7 +38,7 @@ export function getDefinition(word) {
 function getDefinitionsForWord(word) {
   const term = dicts.ccdict[word];
   if (term === undefined) {
-    return undefined;
+    return [];
   }
   console.log(term);
   return term.map((def) => ({
