@@ -46,7 +46,7 @@
 
     <template #action>
       <n-space justify="end">
-        <n-button type=info
+        <n-button v-if="steps.length > 0" type=info
           @click="nextStep()">Next Step</n-button>
         <n-button type=info
           @click="store.clearFront()">Skip Word</n-button>
@@ -77,7 +77,7 @@ const showModal = ref(false);
 const card = ref(undefined);
 let originalValues;
 const step = ref(undefined);
-let steps = [];
+const steps = ref([]);
 let word;
 let action;
 let callback;
@@ -86,27 +86,27 @@ let callback;
 const changeStep = (estep) => {
   step.value = estep;
   // Remove any set steps progression since the user has taken control
-  steps = [];
+  steps.value = [];
 };
 
 const nextStep = async () => {
-  if (steps.length === 0) {
+  if (steps.value.length === 0) {
     return;
   }
 
-  const idx = steps.indexOf(step.value);
+  const idx = steps.value.indexOf(step.value);
   if (idx === -1) {
     return;
   }
-  if (idx + 1 === steps.length) {
+  if (idx + 1 === steps.value.length) {
     // We were on the last step
     const autoAdvanceCard = await UserSettings.AutoAdvanceCard.read();
     if (autoAdvanceCard) {
       submit();
     }
   }
-  if (idx + 1 <= steps.length) {
-    step.value = steps[idx + 1];
+  if (idx + 1 <= steps.value.length) {
+    step.value = steps.value[idx + 1];
   }
 };
 
@@ -150,14 +150,14 @@ store.$subscribe(async (mutation, state) => {
     let ankiCard;
     if (action === ActionsEnum.CREATE) {
       ankiCard = await window.ipc.createAnkiNoteSkeleton(word);
-      steps = [
+      steps.value = [
         StepsEnum.SENTENCE,
         StepsEnum.ENGLISH,
       ];
     } else {
       // Right now for EDIT we only edit the sentence so start there
       ankiCard = await window.ipc.getAnkiNote(word);
-      steps = [
+      steps.value = [
         StepsEnum.SENTENCE,
       ];
     }
@@ -167,7 +167,7 @@ store.$subscribe(async (mutation, state) => {
     };
 
     // TODO this needs to be written in a more modular way
-    const englishIdx = steps.indexOf(StepsEnum.ENGLISH);
+    const englishIdx = steps.value.indexOf(StepsEnum.ENGLISH);
     if (englishIdx !== -1) {
       const autoFill = await UserSettings.PopulateEnglish.read();
       if (autoFill) {
@@ -175,12 +175,12 @@ store.$subscribe(async (mutation, state) => {
         console.log(definitions);
         if (definitions.length === 1) {
           updateDefinition(definitions);
-          steps.splice(englishIdx, 1);
+          steps.value.splice(englishIdx, 1);
         }
       }
     }
 
-    [step.value] = steps;
+    [step.value] = steps.value;
   }
   showModal.value = state.wordList.length !== 0;
 });
