@@ -36,13 +36,5 @@ const sections = {
     UserSettings.GenerateTermAudio.Render,
     UserSettings.GenerateSentenceAudio.Render,
   ],
-  // about2: ['1', '2', '3'],
-  // about44: ['1', '2', '3'],
 };
-
-/*          <div
-            v-for="content in contents" :key="content"
-            >{{content}}
-          </div>
-        </div> */
 </script>

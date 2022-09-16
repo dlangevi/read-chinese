@@ -58,7 +58,8 @@ import {
   NIcon, NButton, NModal, NGrid, NGi,
 } from 'naive-ui';
 import { SettingsSharp } from '@vicons/ionicons5';
-import SettingsCheckbox from '@/components/SettingsCheckbox.vue';
+import SettingsCheckbox
+  from '@/components/SettingsWidgets/SettingsCheckbox.vue';
 import UserSettings from '@/userSettings';
 
 const showSettings = ref(false);

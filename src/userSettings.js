@@ -1,4 +1,5 @@
-import SettingsCheckbox from './components/SettingsCheckbox.vue';
+import SettingsCheckbox
+  from './components/SettingsWidgets/SettingsCheckbox.vue';
 
 const items = {
   AutoAdvanceSentence: {
