@@ -29,13 +29,11 @@ import { watch, ref } from 'vue';
 
 const route = useRoute();
 // TODO get the image working better
-
-// TODO have the current somehow match the current page
 const navigation = ref([
   { name: 'BookLibrary', href: '/BookLibrary', current: false },
   { name: 'Manage FlashCards', href: '/FlashCards', current: false },
   { name: 'Manage Wordlist', href: '/WordLists', current: false },
-  { name: 'Settings', href: '/SettingsAbout', current: false },
+  { name: 'Settings', href: '/Settings', current: false },
   { name: 'About', href: '/About', current: false },
 ]);
 function updateNav(currentRoute) {
