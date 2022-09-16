@@ -1,4 +1,5 @@
 <template>
+  <div>
   <n-checkbox
     :value="setting.value"
     :label="setting.label"
@@ -14,6 +15,7 @@
       </template>
       <span> {{setting.tooltip}}</span>
     </n-tooltip>
+    </div>
 </template>
 
 <script setup>
@@ -37,4 +39,11 @@ function submitChange(checked) {
   props.setting.write(checked);
 }
 
+</script>
+
+<script>
+export function hello() {
+  console.log('hi man');
+  console.log(this);
+}
 </script>

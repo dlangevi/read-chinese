@@ -1,3 +1,5 @@
+import SettingsCheckbox from './components/SettingsCheckbox.vue';
+
 const items = {
   AutoAdvanceSentence: {
     value: 'AutoAdvanceSentence',
@@ -52,6 +54,12 @@ Object.values(items).forEach((option) => {
   };
   option.write = async function write(value) {
     return window.ipc.setOptionValue(option.value, value);
+  };
+  option.Render = {
+    type: SettingsCheckbox,
+    props: {
+      setting: option,
+    },
   };
 });
 
