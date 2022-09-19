@@ -5,17 +5,6 @@ import {
 import tmp from 'tmp';
 import { getOptionValue } from './database';
 
-// TODO optionally run this code
-const subscriptionKey = getOptionValue('AzureApiKey');
-const serviceRegion = 'eastus';
-
-const speechConfig = SpeechConfig.fromSubscription(
-  subscriptionKey,
-  serviceRegion,
-);
-speechConfig.speechRecognitionLanguage = 'zh-CN';
-speechConfig.speechSynthesisLanguage = 'zh-CN';
-
 // Favorite three for now
 const myVoices = [
   'zh-CN-YunxiNeural',
@@ -31,6 +20,16 @@ const nextVoice = (function nextVoice() {
 }());
 
 export async function synthesize(text) {
+  // TODO optionally run this code
+  const subscriptionKey = getOptionValue('AzureApiKey');
+  const serviceRegion = 'eastus';
+
+  const speechConfig = SpeechConfig.fromSubscription(
+    subscriptionKey,
+    serviceRegion,
+  );
+  speechConfig.speechRecognitionLanguage = 'zh-CN';
+  speechConfig.speechSynthesisLanguage = 'zh-CN';
   const voice = myVoices[nextVoice()];
   const audioFile = tmp.fileSync({ postfix: '.wav' });
   const audioConfig = AudioConfig.fromAudioFileOutput(audioFile.name);
