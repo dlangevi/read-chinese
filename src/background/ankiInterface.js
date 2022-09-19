@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import { addWords } from './knownWords';
+import { synthesize } from './textToSpeech';
 // Must have ankiconnect installed as a plugin in your anki installation
 async function invoke(action, params) {
   const response = await fetch('http://localhost:8765', {
@@ -170,7 +171,8 @@ async function updateAnkiCard(noteID, fields) {
 
 export async function createAnkiCard(fields) {
   // TODO make this based on used defined fields
-  console.log(fields);
+  const wordAudioFile = await synthesize(fields.word);
+  const sentenceAudioFile = await synthesize(fields.sentence);
   const res = await invoke('addNote', {
     note: {
       deckName: 'Reading',
@@ -185,6 +187,21 @@ export async function createAnkiCard(fields) {
       options: {
         allowDuplicate: true,
       },
+      audio: [{
+        path: wordAudioFile,
+        filename: `read-chinese-hanzi-${new Date().getTime()}.wav`,
+        fields: [
+          'HanziAudio',
+        ],
+      },
+      {
+        path: sentenceAudioFile,
+        filename: `read-chinese-sentence-${new Date().getTime()}.wav`,
+        fields: [
+          'SentenceAudio',
+        ],
+      },
+      ],
       /* audio: [{
         url: 'https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=猫&kana=ねこ',
         filename: 'yomichan_ねこ_猫.mp3',

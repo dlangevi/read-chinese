@@ -1,67 +1,137 @@
 import SettingsCheckbox
   from './components/SettingsWidgets/SettingsCheckbox.vue';
+import SettingsTextbox
+  from './components/SettingsWidgets/SettingsTextbox.vue';
 
-const items = {
-  AutoAdvanceSentence: {
-    value: 'AutoAdvanceSentence',
-    label: 'Auto advance after sentence selection',
-    tooltip: 'After picking a sentence, move to the next step',
-  },
-  PopulateEnglish: {
-    value: 'PopulateEnglish',
-    label: 'Auto fill english definitions',
-    tooltip: 'If only one definition exists, auto select it',
-  },
-  AutoAdvanceEnglish: {
-    value: 'AutoAdvanceEnglish',
-    label: 'Auto advance after definition selection',
-    tooltip: 'After picking a definition, move to the next step',
-  },
-  PopulateChinese: {
-    value: 'PopulateChinese',
-    label: 'Auto fill chinese definitions',
-    tooltip: 'Not implemented yet',
-    disabled: true,
-  },
-  EnableChinese: {
-    value: 'EnableChinese',
-    label: 'Use Chinese definitions',
-    tooltip: 'Allow flashcards to use chinese '
-    + 'definitions instead of just english ones',
-    disabled: true,
-  },
-  GenerateTermAudio: {
-    value: 'GenerateTermAudio',
-    label: 'Auto generate audio for keyword',
-    tooltip: 'Not implemented yet',
-    disabled: true,
-  },
-  GenerateSentenceAudio: {
-    value: 'GenerateSentenceAudio',
-    label: 'Auto generate audio for example sentence',
-    tooltip: 'Not implemented yet',
-    disabled: true,
-  },
-  AutoAdvanceCard: {
-    value: 'AutoAdvanceCard',
-    label: 'Create card once all fields have been filled',
-  },
-};
-
-// TODO save some cached value on the renderer side
-Object.values(items).forEach((option) => {
-  option.read = async function read() {
-    return window.ipc.getOptionValue(option.value);
-  };
-  option.write = async function write(value) {
-    return window.ipc.setOptionValue(option.value, value);
-  };
-  option.Render = {
+function checkBox(value, label, tooltip, other) {
+  const option = {
+    value,
+    label,
+    tooltip,
     type: SettingsCheckbox,
-    props: {
-      setting: option,
-    },
+    ...other,
+    // TODO save some cached value on the renderer side
   };
-});
+
+  option.read = function read() {
+    if (!option.cached) {
+      console.error('Early read');
+    }
+    return option.cached;
+  };
+  option.readFromBackEnd = async function readFromBackEnd() {
+    option.cached = window.ipc.getOptionValue(value);
+    return option.cached;
+  };
+  option.write = async function write(newValue) {
+    option.cached = newValue;
+    return window.ipc.setOptionValue(value, newValue);
+  };
+  return option;
+}
+
+function textBox(value, label, tooltip, other) {
+  const option = {
+    value,
+    label,
+    tooltip,
+    type: SettingsTextbox,
+    ...other,
+    // TODO save some cached value on the renderer side
+  };
+
+  option.read = function read() {
+    if (!option.cached) {
+      console.error('Early read');
+    }
+    return option.cached;
+  };
+  option.readFromBackEnd = async function readFromBackEnd() {
+    option.cached = window.ipc.getOptionValue(value);
+    return option.cached;
+  };
+  option.write = async function write(newValue) {
+    option.cached = newValue;
+    return window.ipc.setOptionValue(value, newValue);
+  };
+  return option;
+}
+
+const items = (function List() {
+  const CardCreation = {
+    AutoAdvanceSentence: checkBox(
+      'AutoAdvanceSentence',
+      'Auto advance after sentence selection',
+      'After picking a sentence, move to the next step',
+    ),
+    PopulateEnglish: checkBox(
+      'PopulateEnglish',
+      'Auto fill english definitions',
+      'If only one definition exists, auto select it',
+    ),
+    AutoAdvanceEnglish: checkBox(
+      'AutoAdvanceEnglish',
+      'Auto advance after definition selection',
+      'After picking a definition, move to the next step',
+    ),
+    PopulateChinese: checkBox(
+      'PopulateChinese',
+      'Auto fill chinese definitions',
+      'Not implemented yet',
+      { disabled: true },
+    ),
+    GenerateTermAudio: checkBox(
+      'GenerateTermAudio',
+      'Auto generate audio for keyword',
+      'Not implemented yet',
+      { disabled: true },
+    ),
+    GenerateSentenceAudio: checkBox(
+      'GenerateSentenceAudio',
+      'Auto generate audio for example sentence',
+      'Not implemented yet',
+      { disabled: true },
+
+    ),
+    AutoAdvanceCard: checkBox(
+      'AutoAdvanceCard',
+      'Create card once all fields have been filled',
+      'Create card once all fields have been filled',
+    ),
+  };
+  const Dictionaries = {
+    ShowDefinitions: checkBox(
+      'ShowDefinitions',
+      'Show Definitions',
+      'Show the definitions for words in various tables',
+    ),
+    EnableChinese: checkBox(
+      'EnableChinese',
+      'Use Chinese definitions',
+      'Allow flashcards to use chinese '
+      + 'definitions instead of just english ones',
+    ),
+    APIGenerationKey: textBox(
+      'AzureApiKey',
+      'Azure Api Key',
+      'Setup an free azure tts account and put your key here',
+    ),
+  };
+
+  [CardCreation, Dictionaries].forEach(
+    (section) => {
+      Object.values(section).forEach(
+        async (option) => {
+          option.readFromBackEnd();
+        },
+      );
+    },
+  );
+
+  return {
+    CardCreation,
+    Dictionaries,
+  };
+}());
 
 export default items;

@@ -16,18 +16,23 @@
 </template>
 
 <script setup>
-import { watch, onBeforeMount, ref } from 'vue';
+import {
+  watch, onBeforeMount, ref, inject,
+} from 'vue';
 import {
   NSpace, NCheckboxGroup, NCheckbox,
 } from 'naive-ui';
-import UserSettings from '@/userSettings';
+
+const UserSettings = inject('userSettings');
 
 const emit = defineEmits(['updateDefinition']);
 const definitions = ref([]);
 const definition = ref(null);
 
 watch(definition, async () => {
-  const autoAdvance = await UserSettings.AutoAdvanceEnglish.read();
+  const autoAdvance = await (
+    UserSettings.CardCreation.AutoAdvanceEnglish.read()
+  );
   emit('updateDefinition', definition.value, autoAdvance);
 });
 

@@ -22,29 +22,9 @@
 
     <Suspense>
       <n-grid :y-gap="8" :cols="2">
-        <n-gi>
-          <settings-checkbox :setting="UserSettings.PopulateEnglish" />
-        </n-gi>
-        <n-gi>
-          <settings-checkbox :setting="UserSettings.AutoAdvanceSentence" />
-        </n-gi>
-        <n-gi>
-          <settings-checkbox :setting="UserSettings.AutoAdvanceEnglish" />
-        </n-gi>
-        <n-gi>
-          <settings-checkbox :setting="UserSettings.AutoAdvanceCard" />
-        </n-gi>
-        <n-gi>
-          <settings-checkbox :setting="UserSettings.EnableChinese" />
-        </n-gi>
-        <n-gi>
-          <settings-checkbox :setting="UserSettings.PopulateChinese" />
-        </n-gi>
-        <n-gi>
-          <settings-checkbox :setting="UserSettings.GenerateTermAudio" />
-        </n-gi>
-        <n-gi>
-          <settings-checkbox :setting="UserSettings.GenerateSentenceAudio" />
+        <n-gi v-for="content in UserSettings.CardCreation" :key="content"
+          >
+          <settings-checkbox :setting="content" />
         </n-gi>
       </n-grid>
     </Suspense>
@@ -53,14 +33,15 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
 import {
   NIcon, NButton, NModal, NGrid, NGi,
 } from 'naive-ui';
 import { SettingsSharp } from '@vicons/ionicons5';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
-import UserSettings from '@/userSettings';
+
+const UserSettings = inject('userSettings');
 
 const showSettings = ref(false);
 

@@ -24,7 +24,6 @@ import {
   NCheckbox, NTooltip, NIcon,
 } from 'naive-ui';
 import { InformationCircle } from '@vicons/ionicons5';
-// import UserSettings from '@/userSettings.js';
 
 const props = defineProps({
   setting: {
@@ -39,11 +38,4 @@ function submitChange(checked) {
   props.setting.write(checked);
 }
 
-</script>
-
-<script>
-export function hello() {
-  console.log('hi man');
-  console.log(this);
-}
 </script>

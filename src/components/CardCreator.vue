@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, inject } from 'vue';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import AnkiCardPreview from '@/components/AnkiCardPreview.vue';
 import CardCreationSettings from '@/components/CardCreationSettings.vue';
@@ -70,7 +70,8 @@ import EditSentence from '@/components/CardCreatorSteps/EditSentence.vue';
 import EditEnglishDefinition from
   '@/components/CardCreatorSteps/EditEnglishDefinition.vue';
 import StepsEnum from '@/components/CardCreatorSteps/StepsEnum';
-import UserSettings from '@/userSettings';
+
+const UserSettings = inject('userSettings');
 
 const store = useCardQueue();
 const showModal = ref(false);
@@ -100,7 +101,9 @@ const nextStep = async () => {
   }
   if (idx + 1 === steps.value.length) {
     // We were on the last step
-    const autoAdvanceCard = await UserSettings.AutoAdvanceCard.read();
+    const autoAdvanceCard = await (
+      UserSettings.CardCreation.AutoAdvanceCard.read()
+    );
     if (autoAdvanceCard) {
       submit();
     }
@@ -169,7 +172,7 @@ store.$subscribe(async (mutation, state) => {
     // TODO this needs to be written in a more modular way
     const englishIdx = steps.value.indexOf(StepsEnum.ENGLISH);
     if (englishIdx !== -1) {
-      const autoFill = await UserSettings.PopulateEnglish.read();
+      const autoFill = await UserSettings.CardCreation.PopulateEnglish.read();
       if (autoFill) {
         const definitions = await window.ipc.getDefinitionsForWord(word);
         console.log(definitions);

@@ -11,10 +11,12 @@
 <script setup>
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { onBeforeMount, ref } from 'vue';
+import { onBeforeMount, ref, inject } from 'vue';
 import { AgGridVue } from 'ag-grid-vue3';
 import MarkLearned from '@/components/MarkLearned.vue';
 import AddToCardQueue from '@/components/AddToCardQueue.vue';
+
+const UserSettings = inject('userSettings');
 
 const props = defineProps({
   showDefinitions: {
@@ -40,7 +42,9 @@ const columnDefs = [
   },
 ];
 
-if (props.showDefinitions) {
+const showDefinitions = UserSettings.Dictionaries.ShowDefinitions.read();
+console.log('show defs', showDefinitions);
+if (showDefinitions) {
   columnDefs.push(
     {
       headerName: 'definition',

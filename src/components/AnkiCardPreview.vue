@@ -29,9 +29,11 @@
 <script setup>
 import { NCard, NButton } from 'naive-ui';
 import StepsEnum from '@/components/CardCreatorSteps/StepsEnum';
-import UserSettings from '@/userSettings';
+import { inject } from 'vue';
 
-const enableChinese = await UserSettings.EnableChinese.read();
+const UserSettings = inject('userSettings');
+
+const enableChinese = UserSettings.Dictionaries.EnableChinese.read();
 
 defineProps({
   ankiCard: {

@@ -38,7 +38,7 @@ export function getTimesRan() {
 }
 
 // TODO, should there be some white list of valid keys?
-function getOptionValue(key, defaultValue) {
+export function getOptionValue(key, defaultValue) {
   return metadataStore.get(key, defaultValue);
 }
 

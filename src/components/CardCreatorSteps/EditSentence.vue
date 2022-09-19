@@ -17,11 +17,14 @@
 </template>
 
 <script setup>
-import { watch, onBeforeMount, ref } from 'vue';
+import {
+  watch, onBeforeMount, ref, inject,
+} from 'vue';
 import {
   NSpace, NRadioGroup, NRadio,
 } from 'naive-ui';
-import UserSettings from '@/userSettings';
+
+const UserSettings = inject('userSettings');
 
 const emit = defineEmits(['updateSentence']);
 const sentences = ref([]);
@@ -29,7 +32,9 @@ const sentence = ref(null);
 const loaded = ref(false);
 
 watch(sentence, async () => {
-  const autoAdvance = await UserSettings.AutoAdvanceSentence.read();
+  const autoAdvance = await (
+    UserSettings.CardCreation.AutoAdvanceSentence.read()
+  );
   emit('updateSentence', sentence.value, autoAdvance);
 });
 
