@@ -59,10 +59,49 @@ async function computeExtraData(book) {
   book.totalCharacters = totalCharacters;
 }
 
+async function computeWordTargets(book) {
+  const top = await knex('frequency')
+    .select('word')
+    .select('count')
+    .where('book', book.bookId)
+    .whereNotExists(function wordTable() {
+      this.select('word')
+        .from('words')
+        .whereRaw('words.word==frequency.word');
+    })
+    .orderBy('count', 'desc');
+
+  const targets = [
+    80, 84, 86, 90, 92, 94, 96, 98, 100,
+  ];
+  const targetOccurances = targets.map(
+    (target) => (target / 100) * book.totalWords,
+  );
+  const needToKnow = targetOccurances.map(
+    (targetOccurance) => {
+      let soFar = book.totalKnownWords;
+      let needToLearn = 0;
+      // I actually do need a loop here so I can short circut
+      for (const entry of top) { // eslint-disable-line no-restricted-syntax
+        if (soFar > targetOccurance) {
+          break;
+        }
+        soFar += entry.count;
+        needToLearn += 1;
+      }
+      return needToLearn;
+    },
+  );
+  book.targets = targets;
+  book.targetOccuances = targetOccurances;
+  book.needToKnow = needToKnow;
+}
+
 async function loadBook(bookId) {
   const book = await dbGetBookById(bookId);
   await computeBookData(book);
   await computeExtraData(book);
+  await computeWordTargets(book);
   return book;
 }
 

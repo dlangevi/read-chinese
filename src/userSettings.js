@@ -14,13 +14,13 @@ function checkBox(value, label, tooltip, other) {
   };
 
   option.read = function read() {
-    if (!option.cached) {
-      console.error('Early read');
+    if (option.cached === undefined) {
+      console.error(`Early read, ${option.cached}`);
     }
     return option.cached;
   };
   option.readFromBackEnd = async function readFromBackEnd() {
-    option.cached = window.ipc.getOptionValue(value);
+    option.cached = await window.ipc.getOptionValue(value);
     return option.cached;
   };
   option.write = async function write(newValue) {
@@ -47,7 +47,7 @@ function textBox(value, label, tooltip, other) {
     return option.cached;
   };
   option.readFromBackEnd = async function readFromBackEnd() {
-    option.cached = window.ipc.getOptionValue(value);
+    option.cached = await window.ipc.getOptionValue(value);
     return option.cached;
   };
   option.write = async function write(newValue) {
@@ -119,13 +119,11 @@ const items = (function List() {
   };
 
   [CardCreation, Dictionaries].forEach(
-    (section) => {
-      Object.values(section).forEach(
-        async (option) => {
-          option.readFromBackEnd();
-        },
-      );
-    },
+    async (section) => Object.values(section).forEach(
+      async (option) => {
+        option.readFromBackEnd();
+      },
+    ),
   );
 
   return {

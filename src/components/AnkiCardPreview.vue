@@ -34,6 +34,7 @@ import { inject } from 'vue';
 const UserSettings = inject('userSettings');
 
 const enableChinese = UserSettings.Dictionaries.EnableChinese.read();
+console.log(`enablechinese ${enableChinese}`);
 
 defineProps({
   ankiCard: {

@@ -14,9 +14,39 @@
       <n-layout-content class="p-8">
         <n-tabs type="line" animated>
           <n-tab-pane name="Stats" tab="Stats">
-            Known: {{known}}%
-            Can Read: {{likelyKnown}}
-            Characters Known: {{knownCharacters}}
+            <n-statistic label="Known" :value="known">
+              <template #suffix>
+                %
+              </template>
+            </n-statistic>
+            <n-statistic label="Can Read" :value="likelyKnown">
+              <template #suffix>
+                %
+              </template>
+            </n-statistic>
+            <n-statistic label="Known Characters" :value="knownCharacters">
+              <template #suffix>
+                %
+              </template>
+            </n-statistic>
+
+            <n-table :bordered="false" :single-line="false">
+              <thead>
+                <tr>
+                  <th>Target</th>
+                  <th>Needed Words</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="pair in targetPairs"
+                             :key="pair.target"
+                  :label="pair.target"
+                  :value="pair.words">
+                  <td>{{pair.target}}</td>
+                  <td>{{pair.words}}</td>
+                </tr>
+              </tbody>
+            </n-table>
           </n-tab-pane>
           <n-tab-pane name="UnknownWords" tab="View Unknown Words">
             <unknown-words
@@ -30,9 +60,6 @@
       <n-layout-footer class="p-4" bordered>
         <n-space justify="end">
 
-          <n-icon size="40">
-            <CashOutline />
-          </n-icon>
           <n-button type="primary" @click="makeFlashCards">
             Make flash cards
           </n-button>
@@ -47,9 +74,8 @@ import UnknownWords from '@/components/UnknownWords.vue';
 import {
   NLayout, NLayoutSider, NLayoutHeader, NLayoutContent,
   NLayoutFooter, NButton, NSpace, NTabs, NTabPane,
+  NStatistic, NTable,
 } from 'naive-ui';
-// import { SettingTwotone } from '@vicons/antd/SettingTwotone';
-import { CashOutline } from '@vicons/ionicons5';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 
 const props = defineProps({
@@ -64,6 +90,12 @@ const likelyKnown = (
 const knownCharacters = (
   (book.knownCharacters / book.totalCharacters) * 100).toFixed(2);
 console.log(book);
+
+const firstTarget = book.needToKnow.findIndex((n) => n !== 0);
+const targets = book.targets.slice(firstTarget, firstTarget + 3);
+const needToKnow = book.needToKnow.slice(firstTarget, firstTarget + 3);
+const targetPairs = targets.map((e, i) => (
+  { target: e, words: needToKnow[i] }));
 
 const store = useCardQueue();
 async function makeFlashCards() {
