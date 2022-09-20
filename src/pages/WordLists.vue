@@ -52,6 +52,5 @@ function importAnki() {
     --ag-header-background-color: rgb(209, 64, 129);
     --ag-odd-row-background-color: rgb(0, 0, 0, 0.03);
     --ag-header-column-resize-handle-color: rgb(126, 46, 132);
-    --ag-font-size: 25px;
 }
 </style>

@@ -1,5 +1,9 @@
 <template>
-  <n-button type="primary"
+  <n-button type="default"
+            size="tiny"
+            round
+            color="#8a2be2"
+            class="w-28"
     @click="markKnown">
     Mark Known
   </n-button>

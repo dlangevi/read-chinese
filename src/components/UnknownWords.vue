@@ -3,7 +3,8 @@
     class="ag-theme-alpine text-xl"
     :getRowId="getRowId"
     :columnDefs="columnDefs"
-    :rowData="rowData" >
+    :rowData="rowData"
+    @grid-ready="onGridReady">
 </ag-grid-vue>
 
 </template>
@@ -30,15 +31,28 @@ const props = defineProps({
 });
 const getRowId = (params) => params.data.word;
 
+function onGridReady(params) {
+  params.api.sizeColumnsToFit();
+  window.addEventListener('resize', () => {
+    setTimeout(() => {
+      params.api.sizeColumnsToFit();
+    });
+  });
+  params.api.sizeColumnsToFit();
+}
+
 const columnDefs = [
   {
     headerName: 'word',
     field: 'word',
+    width: 100,
+    cellClass: 'text-xl',
   },
   {
     headerName: 'occurance',
     field: 'occurance',
     sort: 'desc',
+    minWidth: 50,
   },
 ];
 
@@ -49,7 +63,7 @@ if (showDefinitions) {
     {
       headerName: 'definition',
       field: 'definition',
-      width: 600,
+      minWidth: 400,
     },
   );
 }
@@ -58,6 +72,7 @@ columnDefs.push(
   {
     headerName: '',
     field: 'markButton',
+    width: 120,
     cellRenderer: MarkLearned,
   },
 );
@@ -65,7 +80,7 @@ columnDefs.push(
   {
     headerName: '',
     field: 'Make FlashCard',
-    width: 200,
+    width: 120,
     cellRenderer: AddToCardQueue,
     cellRendererParams: {
       text: 'Create FlashCard',

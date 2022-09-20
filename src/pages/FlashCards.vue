@@ -28,11 +28,13 @@ const columnDefs = [
     headerName: 'word',
     field: 'word',
     suppressSizeToFit: true,
+    cellClass: 'text-xl',
   },
   {
     headerName: 'sentence',
     field: 'sentence',
     sort: 'desc',
+    cellClass: 'text-xl',
   },
   {
     headerName: '',
@@ -50,6 +52,12 @@ function onGridReady(params) {
   api = params.api;
   // I know this will probably be used
   // columnApi = params.columnApi;
+  api.sizeColumnsToFit();
+  window.addEventListener('resize', () => {
+    setTimeout(() => {
+      api.sizeColumnsToFit();
+    });
+  });
   api.sizeColumnsToFit();
 }
 
@@ -74,6 +82,5 @@ onBeforeMount(async () => {
     --ag-header-background-color: rgb(209, 64, 129);
     --ag-odd-row-background-color: rgb(0, 0, 0, 0.03);
     --ag-header-column-resize-handle-color: rgb(126, 46, 132);
-    --ag-font-size: 25px;
 }
 </style>
