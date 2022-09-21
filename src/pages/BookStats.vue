@@ -3,7 +3,7 @@
     <n-layout-sider width=500 bordered content-style="padding: 24px;">
       <img
         class="rounded rounded-t w-auto"
-        :src="'data:image/png;base64,' + book.imgData"
+        :src="'atom:///' + book.cover"
         :alt="book.title"
       />
     </n-layout-sider>

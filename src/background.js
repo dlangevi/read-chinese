@@ -84,6 +84,17 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
+app.whenReady().then(() => {
+  console.log('register protocol');
+  protocol.interceptFileProtocol(
+    'atom',
+    (request, callback) => {
+      const pathname = request.url.replace('atom:///', '');
+      callback(pathname);
+    },
+  );
+});
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -98,6 +109,7 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString());
     }
   }
+
   try {
     await syncWords();
     setApplicationMenu();

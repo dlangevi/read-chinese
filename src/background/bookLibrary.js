@@ -1,5 +1,4 @@
 import { performance } from 'perf_hooks';
-import fs from 'fs';
 import { knownArray, isKnown, isKnownChar } from './knownWords';
 import { loadJieba } from './segmentation';
 import { getDefinition } from './dictionaries';
@@ -27,8 +26,6 @@ export async function bookExists(author, title) {
 async function computeBookData(book) {
   // compute at runtime stuff I dont want to save right now
   await computeStats(book);
-  const imgData = await fs.promises.readFile(book.cover);
-  book.imgData = imgData.toString('base64');
 }
 
 async function computeExtraData(book) {

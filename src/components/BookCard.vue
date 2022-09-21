@@ -4,7 +4,8 @@
     <template #cover>
       <img
         class="rounded rounded-t h-full w-auto"
-        :src="'data:image/png;base64,' + book.imgData"
+        :srsc="'data:image/png;base64,' + book.imgData"
+        :src="'atom:///' + book.cover"
         :alt="book.title"
         @click="bookBigMode"
       />
