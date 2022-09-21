@@ -13,10 +13,12 @@ export async function getBooks() {
 }
 
 export async function addBook(author, title, cover, filepath) {
-  await dbAddBook(author, title, cover, filepath);
-  const book = await dbGetBook(author, title);
-  const wordTable = await computeWordTable(book);
-  return dbSaveWordTable(book, wordTable);
+  const inserted = await dbAddBook(author, title, cover, filepath);
+  if (inserted) {
+    const book = await dbGetBook(author, title);
+    const wordTable = await computeWordTable(book);
+    await dbSaveWordTable(book, wordTable);
+  }
 }
 export async function bookExists(author, title) {
   return dbBookExists(author, title);
@@ -103,6 +105,11 @@ async function loadBook(bookId) {
   await computeExtraData(book);
   await computeWordTargets(book);
   return book;
+}
+
+async function deleteBook(bookId) {
+  await knex('books').where('bookId', bookId).del();
+  await knex('frequency').where('book', bookId).del();
 }
 
 async function computeWordTable(book) {
@@ -199,5 +206,5 @@ async function learningTarget(bookIds) {
 }
 
 export const bookLibraryIpc = {
-  loadBooks, learningTarget, loadBook, topUnknownWords,
+  loadBooks, learningTarget, loadBook, topUnknownWords, deleteBook,
 };

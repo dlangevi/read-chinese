@@ -137,13 +137,17 @@ export async function dbWordExists(word) {
 export async function dbAddBook(author, title, cover, filepath) {
   // For now just point to the actual txt file location in calibre.
   // Later we will make our own copy
-  knex('books').insert({
+  return knex('books').insert({
     author,
     title,
     cover,
     filepath,
-  }).onConflict(['title', 'author']).ignore()
-    .catch((err) => console.log(err));
+  })
+    .then(() => true)
+    .catch((err) => {
+      console.log(err);
+      return false;
+    });
 }
 
 export async function dbSaveWordTable(book, wordTable) {
