@@ -18,7 +18,7 @@
     </template>
     <n-layout has-sider
       sider-placement="left"
-      class="flex-grow max-h-full"
+      class="flex-grow"
       style="max-height: 60vh">
       <n-layout-sider v-if="card !== undefined"
         collapse-mode="transform"
