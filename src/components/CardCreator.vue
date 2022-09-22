@@ -41,6 +41,9 @@
         <edit-english-definition v-if="step==StepsEnum.ENGLISH"
           :word="card.fields.word" :definition="card.fields.englishDefn"
           @updateDefinition="updateDefinition"/>
+        <edit-images v-if="step==StepsEnum.IMAGE"
+          :word="card.fields.word"
+          @updateImages="updateImages"/>
       </n-layout-content>
     </n-layout>
 
@@ -69,6 +72,8 @@ import {
 import EditSentence from '@/components/CardCreatorSteps/EditSentence.vue';
 import EditEnglishDefinition from
   '@/components/CardCreatorSteps/EditEnglishDefinition.vue';
+import EditImages from
+  '@/components/CardCreatorSteps/EditImages.vue';
 import StepsEnum from '@/components/CardCreatorSteps/StepsEnum';
 
 const UserSettings = inject('userSettings');
@@ -136,6 +141,17 @@ const updateDefinition = (newDefinitions, updateStep = false) => {
   }
 };
 
+const updateImages = (newImage, updateStep = false) => {
+  console.log(newImage);
+  if (newImage) {
+    // TODO support multiple
+    card.value.fields.imageUrl = newImage[0].thumbnailUrl;
+    if (updateStep) {
+      nextStep();
+    }
+  }
+};
+
 const message = useMessage();
 store.$subscribe(async (mutation, state) => {
   // Later we can prefetch new words sentences possibly
@@ -156,6 +172,7 @@ store.$subscribe(async (mutation, state) => {
       steps.value = [
         StepsEnum.SENTENCE,
         StepsEnum.ENGLISH,
+        StepsEnum.IMAGE,
       ];
     } else {
       // Right now for EDIT we only edit the sentence so start there

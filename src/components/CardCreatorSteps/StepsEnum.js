@@ -1,6 +1,6 @@
 const StepsEnum = Object.freeze({
   SENTENCE: 'sentence',
-  PICTURE: 'picture',
+  IMAGE: 'image',
   ENGLISH: 'english',
   CHINESE: 'chinese',
 });

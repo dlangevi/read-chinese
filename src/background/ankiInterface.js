@@ -83,6 +83,7 @@ async function createAnkiNoteSkeleton(word) {
       englishDefn: '',
       chineseDefn: '',
       pinyin: '',
+      imageUrl: '',
     },
   };
 }
@@ -100,6 +101,9 @@ async function getAnkiNote(word) {
       englishDefn: rawNote.fields.EnglishDefinition.value,
       chineseDefn: rawNote.fields.ChineseDefinition.value,
       pinyin: rawNote.fields.Pinyin.value,
+      // TODO how to load the image from a card which already exists?
+      // use retrieveMediaFile to get base64 encoded image
+      imageUrl: '',
     },
     rawNote,
   };
@@ -173,6 +177,7 @@ export async function createAnkiCard(fields) {
   // TODO make this based on used defined fields
   const wordAudioFile = await synthesize(fields.word);
   const sentenceAudioFile = await synthesize(fields.sentence);
+  console.log(fields);
   const res = await invoke('addNote', {
     note: {
       deckName: 'Reading',
@@ -202,22 +207,14 @@ export async function createAnkiCard(fields) {
         ],
       },
       ],
-      /* audio: [{
-        url: 'https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=猫&kana=ねこ',
-        filename: 'yomichan_ねこ_猫.mp3',
-        skipHash: '7e2c2f954ef6051373ba916f000168dc',
+      picture: [{
+        url: fields.imageUrl,
+        // TODO dont guess the encoding format
+        filename: `read-chinese-image-${new Date().getTime()}.jpg`,
         fields: [
-          'Audio',
+          'Images',
         ],
       }],
-      picture: [{
-        url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/A_black_cat_named_Tilly.jpg/220px-A_black_cat_named_Tilly.jpg',
-        filename: 'black_cat.jpg',
-        skipHash: '8d6e4646dfae812bf39651b59d7429ce',
-        fields: [
-          'SentenceImage',
-        ],
-      }], */
     },
   });
   if (res.error === null) {

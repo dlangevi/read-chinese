@@ -4,6 +4,7 @@ import { bookLibraryIpc } from './background/bookLibrary';
 import { ankiInterfaceIpc } from './background/ankiInterface';
 import { dictionariesIpc } from './background/dictionaries';
 import { generateSentencesIpc } from './background/generateSentences';
+import { imageSearchIpc } from './background/imageSearch';
 import { databaseIpc } from './background/database';
 
 // Concatenate all the functions we want accessed via IPC
@@ -15,6 +16,7 @@ const ipcFunctions = {
   ...ankiInterfaceIpc,
   ...dictionariesIpc,
   ...databaseIpc,
+  ...imageSearchIpc,
 };
 
 // To be called from background.js to initialize handlers

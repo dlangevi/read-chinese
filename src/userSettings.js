@@ -74,6 +74,11 @@ const items = (function List() {
       'Auto advance after definition selection',
       'After picking a definition, move to the next step',
     ),
+    AutoAdvanceImage: checkBox(
+      'AutoAdvanceImage',
+      'Auto advance after image selection',
+      'After picking a image, move to the next step',
+    ),
     PopulateChinese: checkBox(
       'PopulateChinese',
       'Auto fill chinese definitions',
@@ -111,10 +116,15 @@ const items = (function List() {
       'Allow flashcards to use chinese '
       + 'definitions instead of just english ones',
     ),
-    APIGenerationKey: textBox(
+    AzureApiKey: textBox(
       'AzureApiKey',
-      'Azure Api Key',
+      'Azure Audio Api Key',
       'Setup an free azure tts account and put your key here',
+    ),
+    AzureImageApiKey: textBox(
+      'AzureImageApiKey',
+      'Azure Image Api Key',
+      'Setup an free azure bing search and put your key here',
     ),
   };
 
