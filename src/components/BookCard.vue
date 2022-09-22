@@ -3,7 +3,7 @@
     :class="(known > 90) ? 'bg-green-300 p-4' : 'p-4'">
     <template #cover>
       <img
-        class="rounded rounded-t h-full w-auto"
+        class="rounded rounded-t max-h-full w-auto m-auto"
         :srsc="'data:image/png;base64,' + book.imgData"
         :src="'atom:///' + book.cover"
         :alt="book.title"

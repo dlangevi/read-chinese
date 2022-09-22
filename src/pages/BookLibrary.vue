@@ -6,7 +6,7 @@
 
   <n-grid x-gap="12" y-gap="12" :cols="4" v-if="books.length > 0">
     <n-gi v-for="(book, i) in books" :key="i">
-      <book-card :book="book" />
+      <book-card class="h-[700px]" :book="book" />
     </n-gi>
   </n-grid>
 </template>
