@@ -109,14 +109,12 @@ const items = (function List() {
       'Auto generate audio for keyword',
       'Not implemented yet',
       false,
-      { disabled: true },
     ),
     GenerateSentenceAudio: checkBox(
       'GenerateSentenceAudio',
       'Auto generate audio for example sentence',
       'Not implemented yet',
       false,
-      { disabled: true },
 
     ),
     AutoAdvanceCard: checkBox(
