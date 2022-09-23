@@ -7,10 +7,11 @@
         v-for="(definition, i) in definitions"
         :key="i"
         :value="definition"
-        :label="
-        '[' + definition.pronunciation + '] ' +
-        definition.definition"
-      />
+        >
+        <span v-html="'[' + definition.pronunciation + '] ' +
+          definition.definition"
+          />
+        </n-checkbox>
     </n-space>
   </n-checkbox-group>
 </template>
@@ -30,9 +31,11 @@ const definitions = ref([]);
 const definition = ref(null);
 
 watch(definition, async () => {
+  // TODO either rename this option or have a select based on type
   const autoAdvance = await (
     UserSettings.CardCreation.AutoAdvanceEnglish.read()
   );
+  console.log('update definition');
   emit('updateDefinition', definition.value, autoAdvance);
 });
 
@@ -41,10 +44,17 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  type: {
+    type: String,
+    required: true,
+  },
 });
 
 onBeforeMount(async () => {
-  definitions.value = await window.ipc.getDefinitionsForWord(props.word);
+  definitions.value = await window.ipc.getDefinitionsForWord(
+    props.word,
+    props.type,
+  );
 });
 
 </script>

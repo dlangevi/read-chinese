@@ -1,7 +1,7 @@
 import { performance } from 'perf_hooks';
 import { knownArray, isKnown, isKnownChar } from './knownWords';
 import { loadJieba } from './segmentation';
-import { getDefinition } from './dictionaries';
+import { getDefaultDefinition } from './dictionaries';
 import {
   dbGetBooks, dbGetBookById, dbAddBook, dbBookExists, dbSaveWordTable,
   dbGetBook, knex,
@@ -149,7 +149,7 @@ export async function topWords(bookIds) {
   const results = await top;
 
   return results.map((row) => {
-    row.definition = getDefinition(row.word);
+    row.definition = getDefaultDefinition(row.word);
     return row;
   });
 }

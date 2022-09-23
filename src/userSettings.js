@@ -2,6 +2,8 @@ import SettingsCheckbox
   from './components/SettingsWidgets/SettingsCheckbox.vue';
 import SettingsTextbox
   from './components/SettingsWidgets/SettingsTextbox.vue';
+import DictionariesList
+  from './components/SettingsWidgets/DictionariesList.vue';
 
 function checkBox(value, label, tooltip, defaultValue, other) {
   const option = {
@@ -125,6 +127,11 @@ const items = (function List() {
     ),
   };
   const Dictionaries = {
+    Dictionaries: {
+      value: 'Dictionaries',
+      type: DictionariesList,
+      readFromBackEnd: () => {},
+    },
     ShowDefinitions: checkBox(
       'ShowDefinitions',
       'Show Definitions',

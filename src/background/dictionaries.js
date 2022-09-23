@@ -1,20 +1,32 @@
 // load dictionary
 import fs from 'fs';
-import { dbSaveDictPath, dbLoadDictPaths } from './database';
+import { dbSaveDict, dbLoadDicts } from './database';
 
-const dicts = {};
+const dicts = {
+  english: {},
+  chinese: {},
+};
+// TODO have these user set
+const defaultType = 'english';
+const defaultDict = 'ccdict';
 
-export function addDictionary(path) {
+export function addDictionary(name, path, type) {
   // Just for now
   // Later we will make our own copy of the dictionary
-  dbSaveDictPath('ccdict', path);
+  dbSaveDict(name, path, type);
+  // After adding a new dict load it
+  loadDictionaries();
+}
+
+export function dictionaryInfo() {
+  return dbLoadDicts();
 }
 
 export function loadDictionaries() {
-  const dictPaths = dbLoadDictPaths();
-  Object.entries(dictPaths).forEach(([name, path]) => {
-    console.log(name, path);
-    const fileContents = fs.readFileSync(path);
+  const ldicts = dbLoadDicts();
+  Object.entries(ldicts).forEach(([name, entry]) => {
+    console.log(name, entry);
+    const fileContents = fs.readFileSync(entry.path);
     const contents = JSON.parse(fileContents);
     const dictionary = {};
     contents.forEach((term) => {
@@ -24,29 +36,43 @@ export function loadDictionaries() {
       }
       dictionary[word].push(term);
     });
-    dicts[name] = dictionary;
+    dicts[entry.type][name] = dictionary;
   });
 }
 
-export function getDefinition(word) {
-  const term = dicts.ccdict[word];
+// This is just used for a simple definition when displaying
+// in large word lists
+export function getDefaultDefinition(word) {
+  const term = dicts[defaultType][defaultDict][word];
   if (term === undefined) {
     return undefined;
   }
   return term[0].definition;
 }
-function getDefinitionsForWord(word) {
-  const term = dicts.ccdict[word];
-  if (term === undefined) {
-    return [];
-  }
-  console.log(term);
-  return term.map((def) => ({
-    definition: def.definition,
-    pronunciation: def.pronunciation,
-  }));
+
+// type = 'english' or 'chinese'
+function getDefinitionsForWord(word, type) {
+  const filteredDicts = dicts[type];
+  const answers = [];
+
+  Object.values(filteredDicts).forEach((dict) => {
+    const term = dict[word];
+    if (term === undefined) {
+      return;
+    }
+    term.forEach((def) => {
+      answers.push({
+        definition: def.definition.replace(/\n/g, '<br>'),
+        pronunciation: def.pronunciation,
+      });
+    });
+  });
+
+  return answers;
 }
 
 export const dictionariesIpc = {
   getDefinitionsForWord,
+  dictionaryInfo,
+  addDictionary,
 };

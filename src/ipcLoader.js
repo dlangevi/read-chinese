@@ -1,4 +1,6 @@
-import { ipcMain, contextBridge, ipcRenderer } from 'electron';
+import {
+  ipcMain, contextBridge, ipcRenderer, dialog,
+} from 'electron';
 import { knownWordsIpc } from './background/knownWords';
 import { bookLibraryIpc } from './background/bookLibrary';
 import { ankiInterfaceIpc } from './background/ankiInterface';
@@ -6,6 +8,17 @@ import { dictionariesIpc } from './background/dictionaries';
 import { generateSentencesIpc } from './background/generateSentences';
 import { imageSearchIpc } from './background/imageSearch';
 import { databaseIpc } from './background/database';
+
+// Put this here for now
+function filePicker(extension) {
+  const file = dialog.showOpenDialogSync({
+    properties: ['openFile'],
+    filters: [
+      { name: 'Any File', extensions: [extension] },
+    ],
+  });
+  return file[0];
+}
 
 // Concatenate all the functions we want accessed via IPC
 // TODO should have some way to ensure no name collisions
@@ -17,6 +30,7 @@ const ipcFunctions = {
   ...dictionariesIpc,
   ...databaseIpc,
   ...imageSearchIpc,
+  filePicker,
 };
 
 // To be called from background.js to initialize handlers

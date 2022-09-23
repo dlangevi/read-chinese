@@ -18,10 +18,23 @@
     <div v-if="enableChinese">
       <n-button type=info size=tiny class="m-2"
         @click="$emit('changeStep', StepsEnum.CHINESE)">Edit</n-button>
-      <h2 class="text-l font-bold">ChineseDefinition:</h2>
+      <h2 class="inline text-l font-bold">ChineseDefinition:</h2>
       <p >
-        <span v-html="ankiCard.fields.chinesDefn"/>
+        <span v-html="ankiCard.fields.chineseDefn"/>
       </p>
+    </div>
+    <div>
+      <n-button type=info size=tiny class="m-2"
+        @click="$emit('changeStep', StepsEnum.IMAGE)">Edit</n-button>
+      <h2 class="inline text-l font-bold">Images:</h2>
+      <div class="flex gap-1">
+      <img
+          v-for="image in ankiCard.fields.imageUrls"
+          :key="image"
+          class="max-h-24 w-auto"
+          :src="image" alt="image for word"/>
+      </div>
+
     </div>
   </n-card>
 </template>
@@ -34,7 +47,6 @@ import { inject } from 'vue';
 const UserSettings = inject('userSettings');
 
 const enableChinese = UserSettings.Dictionaries.EnableChinese.read();
-console.log(`enablechinese ${enableChinese}`);
 
 defineProps({
   ankiCard: {

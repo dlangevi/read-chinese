@@ -46,13 +46,16 @@ function setOptionValue(key, value) {
   metadataStore.set(key, value);
 }
 
-export function dbSaveDictPath(name, path) {
+export function dbSaveDict(name, path, type) {
   const dicts = metadataStore.get('dicts', {});
-  dicts[name] = path;
+  dicts[name] = {
+    path,
+    type,
+  };
   metadataStore.set('dicts', dicts);
 }
 
-export function dbLoadDictPaths() {
+export function dbLoadDicts() {
   return metadataStore.get('dicts', {});
 }
 /** *********************************

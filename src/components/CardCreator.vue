@@ -38,9 +38,14 @@
         <edit-sentence v-if="step==StepsEnum.SENTENCE"
           :word="card.fields.word" :sentence="card.fields.sentence"
           @updateSentence="updateSentence"/>
-        <edit-english-definition v-if="step==StepsEnum.ENGLISH"
+        <edit-definition v-if="step==StepsEnum.ENGLISH"
           :word="card.fields.word" :definition="card.fields.englishDefn"
-          @updateDefinition="updateDefinition"/>
+          type="english"
+          @updateDefinition="updateEnglishDefinition"/>
+        <edit-definition v-if="step==StepsEnum.CHINESE"
+          :word="card.fields.word" :definition="card.fields.englishDefn"
+          type="chinese"
+          @updateDefinition="updateChineseDefinition"/>
         <edit-images v-if="step==StepsEnum.IMAGE"
           :word="card.fields.word"
           @updateImages="updateImages"/>
@@ -72,11 +77,11 @@ import {
   NLayoutSider, NLayout, NLayoutContent,
 } from 'naive-ui';
 import EditSentence from '@/components/CardCreatorSteps/EditSentence.vue';
-import EditEnglishDefinition from
-  '@/components/CardCreatorSteps/EditEnglishDefinition.vue';
 import EditImages from
   '@/components/CardCreatorSteps/EditImages.vue';
 import StepsEnum from '@/components/CardCreatorSteps/StepsEnum';
+import EditDefinition from
+  '@/components/CardCreatorSteps/EditDefinition.vue';
 
 const UserSettings = inject('userSettings');
 
@@ -129,11 +134,26 @@ const updateSentence = (newSentence, updateStep = false) => {
   }
 };
 
-const updateDefinition = (newDefinitions, updateStep = false) => {
+const updateEnglishDefinition = (newDefinitions, updateStep = false) => {
   if (newDefinitions.length > 0) {
     card.value.fields.englishDefn = newDefinitions.map(
       (def) => def.definition,
     ).join('<br>');
+    card.value.fields.pinyin = newDefinitions.map(
+      (def) => def.pronunciation,
+    ).join(', ');
+    if (updateStep) {
+      nextStep();
+    }
+  }
+};
+
+const updateChineseDefinition = (newDefinitions, updateStep = false) => {
+  if (newDefinitions.length > 0) {
+    card.value.fields.chineseDefn = newDefinitions.map(
+      (def) => def.definition,
+    ).join('<br>');
+    // TODO join these with the english ones?
     card.value.fields.pinyin = newDefinitions.map(
       (def) => def.pronunciation,
     ).join(', ');
@@ -161,6 +181,8 @@ store.$subscribe(async (mutation, state) => {
   // if (mutation.events.type === 'add' && mutation.events.key === '0') {
   console.log('mutation');
   step.value = undefined;
+  // TODO this is a complete mess and needs to be refined if we are going to
+  // start doing anything more complicated
   if (state.wordList.length > 0) {
     [{
       word,
@@ -172,11 +194,22 @@ store.$subscribe(async (mutation, state) => {
     let ankiCard;
     if (action === ActionsEnum.CREATE) {
       ankiCard = await window.ipc.createAnkiNoteSkeleton(word);
-      steps.value = [
-        StepsEnum.SENTENCE,
-        StepsEnum.ENGLISH,
-        StepsEnum.IMAGE,
-      ];
+
+      const enableChinese = UserSettings.Dictionaries.EnableChinese.read();
+      if (enableChinese) {
+        steps.value = [
+          StepsEnum.SENTENCE,
+          StepsEnum.ENGLISH,
+          StepsEnum.CHINESE,
+          StepsEnum.IMAGE,
+        ];
+      } else {
+        steps.value = [
+          StepsEnum.SENTENCE,
+          StepsEnum.ENGLISH,
+          StepsEnum.IMAGE,
+        ];
+      }
     } else {
       // Right now for EDIT we only edit the sentence so start there
       ankiCard = await window.ipc.getAnkiNote(word);
@@ -194,10 +227,14 @@ store.$subscribe(async (mutation, state) => {
     if (englishIdx !== -1) {
       const autoFill = await UserSettings.CardCreation.PopulateEnglish.read();
       if (autoFill) {
-        const definitions = await window.ipc.getDefinitionsForWord(word);
+        // TODO base this on default dict
+        const definitions = await window.ipc.getDefinitionsForWord(
+          word,
+          'english',
+        );
         console.log(definitions);
         if (definitions.length === 1) {
-          updateDefinition(definitions);
+          updateEnglishDefinition(definitions);
           steps.value.splice(englishIdx, 1);
         }
       }
