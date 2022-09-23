@@ -3,24 +3,31 @@ import SettingsCheckbox
 import SettingsTextbox
   from './components/SettingsWidgets/SettingsTextbox.vue';
 
-function checkBox(value, label, tooltip, other) {
+function checkBox(value, label, tooltip, defaultValue, other) {
   const option = {
     value,
     label,
     tooltip,
+    defaultValue,
     type: SettingsCheckbox,
     ...other,
+    loaded: false,
     // TODO save some cached value on the renderer side
   };
 
   option.read = function read() {
+    if (!option.loaded) {
+      console.error(`Early read, ${option.value}`);
+      return option.defaultValue;
+    }
     if (option.cached === undefined) {
-      console.error(`Early read, ${option.cached}`);
+      return option.defaultValue;
     }
     return option.cached;
   };
   option.readFromBackEnd = async function readFromBackEnd() {
     option.cached = await window.ipc.getOptionValue(value);
+    option.loaded = true;
     return option.cached;
   };
   option.write = async function write(newValue) {
@@ -30,24 +37,31 @@ function checkBox(value, label, tooltip, other) {
   return option;
 }
 
-function textBox(value, label, tooltip, other) {
+function textBox(value, label, tooltip, defaultValue, other) {
   const option = {
     value,
     label,
     tooltip,
+    defaultValue,
     type: SettingsTextbox,
     ...other,
     // TODO save some cached value on the renderer side
+    loaded: false,
   };
 
   option.read = function read() {
-    if (!option.cached) {
-      console.error('Early read');
+    if (!option.loaded) {
+      console.error(`Early read, ${option.value}`);
+      return option.defaultValue;
+    }
+    if (option.cached === undefined) {
+      return option.defaultValue;
     }
     return option.cached;
   };
   option.readFromBackEnd = async function readFromBackEnd() {
     option.cached = await window.ipc.getOptionValue(value);
+    option.loaded = true;
     return option.cached;
   };
   option.write = async function write(newValue) {
@@ -63,38 +77,45 @@ const items = (function List() {
       'AutoAdvanceSentence',
       'Auto advance after sentence selection',
       'After picking a sentence, move to the next step',
+      true,
     ),
     PopulateEnglish: checkBox(
       'PopulateEnglish',
       'Auto fill english definitions',
       'If only one definition exists, auto select it',
+      false,
     ),
     AutoAdvanceEnglish: checkBox(
       'AutoAdvanceEnglish',
       'Auto advance after definition selection',
       'After picking a definition, move to the next step',
+      false,
     ),
     AutoAdvanceImage: checkBox(
       'AutoAdvanceImage',
       'Auto advance after image selection',
       'After picking a image, move to the next step',
+      false,
     ),
     PopulateChinese: checkBox(
       'PopulateChinese',
       'Auto fill chinese definitions',
       'Not implemented yet',
+      false,
       { disabled: true },
     ),
     GenerateTermAudio: checkBox(
       'GenerateTermAudio',
       'Auto generate audio for keyword',
       'Not implemented yet',
+      false,
       { disabled: true },
     ),
     GenerateSentenceAudio: checkBox(
       'GenerateSentenceAudio',
       'Auto generate audio for example sentence',
       'Not implemented yet',
+      false,
       { disabled: true },
 
     ),
@@ -102,6 +123,7 @@ const items = (function List() {
       'AutoAdvanceCard',
       'Create card once all fields have been filled',
       'Create card once all fields have been filled',
+      true,
     ),
   };
   const Dictionaries = {
@@ -109,22 +131,26 @@ const items = (function List() {
       'ShowDefinitions',
       'Show Definitions',
       'Show the definitions for words in various tables',
+      true,
     ),
     EnableChinese: checkBox(
       'EnableChinese',
       'Use Chinese definitions',
       'Allow flashcards to use chinese '
       + 'definitions instead of just english ones',
+      true,
     ),
     AzureApiKey: textBox(
       'AzureApiKey',
       'Azure Audio Api Key',
       'Setup an free azure tts account and put your key here',
+      '',
     ),
     AzureImageApiKey: textBox(
       'AzureImageApiKey',
       'Azure Image Api Key',
       'Setup an free azure bing search and put your key here',
+      '',
     ),
   };
 
