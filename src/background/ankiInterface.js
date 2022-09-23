@@ -83,7 +83,7 @@ async function createAnkiNoteSkeleton(word) {
       englishDefn: '',
       chineseDefn: '',
       pinyin: '',
-      imageUrl: '',
+      imageUrls: [],
     },
   };
 }
@@ -103,7 +103,7 @@ async function getAnkiNote(word) {
       pinyin: rawNote.fields.Pinyin.value,
       // TODO how to load the image from a card which already exists?
       // use retrieveMediaFile to get base64 encoded image
-      imageUrl: '',
+      imageUrl: [],
     },
     rawNote,
   };
@@ -207,14 +207,15 @@ export async function createAnkiCard(fields) {
         ],
       },
       ],
-      picture: [{
-        url: fields.imageUrl,
-        // TODO dont guess the encoding format
-        filename: `read-chinese-image-${new Date().getTime()}.jpg`,
-        fields: [
-          'Images',
-        ],
-      }],
+      picture:
+        fields.imageUrls.map((imageUrl) => ({
+          url: imageUrl,
+          // TODO dont guess the encoding format
+          filename: `read-chinese-image-${new Date().getTime()}.jpg`,
+          fields: [
+            'Images',
+          ],
+        })),
     },
   });
   if (res.error === null) {

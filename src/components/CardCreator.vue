@@ -61,7 +61,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, inject } from 'vue';
+import {
+  toRaw, ref, reactive, inject,
+} from 'vue';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import AnkiCardPreview from '@/components/AnkiCardPreview.vue';
 import CardCreationSettings from '@/components/CardCreationSettings.vue';
@@ -141,11 +143,12 @@ const updateDefinition = (newDefinitions, updateStep = false) => {
   }
 };
 
-const updateImages = (newImage, updateStep = false) => {
-  console.log(newImage);
-  if (newImage) {
+const updateImages = (newImages, updateStep = false) => {
+  console.log(newImages);
+  if (newImages) {
     // TODO support multiple
-    card.value.fields.imageUrl = newImage[0].thumbnailUrl;
+    card.value.fields.imageUrls = newImages.map((image) => image.thumbnailUrl);
+    console.log(card.value.fields.imageUrls);
     if (updateStep) {
       nextStep();
     }
@@ -218,7 +221,8 @@ async function submit() {
   });
   // TODO figure out the logic for determining changes better
   if (action === ActionsEnum.CREATE) {
-    const res = await window.ipc.createAnkiCard({ ...card.value.fields });
+    const cardValues = toRaw(card.value.fields);
+    const res = await window.ipc.createAnkiCard(cardValues);
     messageReactive.content = JSON.stringify(res);
     messageReactive.type = 'success';
     setTimeout(() => {
