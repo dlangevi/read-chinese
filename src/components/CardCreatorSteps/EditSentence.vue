@@ -5,9 +5,18 @@
   </div>
   <n-radio-group v-model:value="sentence" name="sentences">
     <n-space vertical :size="40">
+    <p v-if="multiSection" class="text-4xl">From Current Book</p>
       <n-radio
         class="text-3xl"
         v-for="(sentence, i) in sentences"
+        :key="i"
+        :value="sentence"
+        :label="sentence"
+      />
+    <p v-if="multiSection" class="text-4xl">From All Books</p>
+      <n-radio
+        class="text-3xl"
+        v-for="(sentence, i) in allSentences"
         :key="i"
         :value="sentence"
         :label="sentence"
@@ -28,6 +37,7 @@ const UserSettings = inject('userSettings');
 
 const emit = defineEmits(['updateSentence']);
 const sentences = ref([]);
+const allSentences = ref([]);
 const sentence = ref(null);
 const loaded = ref(false);
 
@@ -43,10 +53,29 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  preferBook: {
+    type: String,
+  },
 });
 
+const multiSection = props.preferBook !== undefined;
+
+console.log('preferbook', props.preferBook);
 onBeforeMount(async () => {
-  sentences.value = await window.ipc.getSentencesForWord(props.word);
+  if (props.preferBook) {
+    sentences.value = await window.ipc.getSentencesForWord(
+      props.word,
+      [props.preferBook],
+    );
+    // TODO filter out repeats
+    allSentences.value = await window.ipc.getSentencesForWord(
+      props.word,
+    );
+  } else {
+    sentences.value = await window.ipc.getSentencesForWord(
+      props.word,
+    );
+  }
   loaded.value = true;
 });
 

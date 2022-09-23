@@ -178,8 +178,8 @@ export async function dbLoadWordTable(book) {
 }
 
 // Seems a bit repetative ...
-export async function dbGetBooks() {
-  const books = await knex('books').select(
+export async function dbGetBooks(bookIds = []) {
+  const books = knex('books').select(
     {
       author: 'author',
       title: 'title',
@@ -188,6 +188,9 @@ export async function dbGetBooks() {
       bookId: 'bookId',
     },
   );
+  if (bookIds.length > 0) {
+    books.whereIn('bookId', bookIds);
+  }
   return books;
 }
 

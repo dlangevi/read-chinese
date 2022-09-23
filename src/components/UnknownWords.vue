@@ -4,6 +4,7 @@
     :getRowId="getRowId"
     :columnDefs="columnDefs"
     :rowData="rowData"
+    :context="gridContext"
     @grid-ready="onGridReady">
 </ag-grid-vue>
 
@@ -25,11 +26,14 @@ const props = defineProps({
     default: false,
   },
   bookFilter: {
-    type: Array,
-    default: () => ([]),
+    type: String,
   },
 });
 const getRowId = (params) => params.data.word;
+
+const gridContext = {
+  bookId: props.bookFilter,
+};
 
 function onGridReady(params) {
   params.api.sizeColumnsToFit();
@@ -92,6 +96,10 @@ columnDefs.push(
 const rowData = ref([]);
 onBeforeMount(async () => {
   console.log(props.bookFilter);
-  rowData.value = await window.ipc.learningTarget(props.bookFilter);
+  if (props.bookFilter) {
+    rowData.value = await window.ipc.learningTarget([props.bookFilter]);
+  } else {
+    rowData.value = await window.ipc.learningTarget();
+  }
 });
 </script>

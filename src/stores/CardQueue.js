@@ -11,12 +11,13 @@ export const useCardQueue = defineStore('CardQueue', {
     async addWord(
       word,
       action,
-      callback = (() => {}),
+      options = {
+      },
     ) {
       this.wordList.push({
         word,
         action,
-        callback,
+        ...options,
       });
     },
     clearFront() {

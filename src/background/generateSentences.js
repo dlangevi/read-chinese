@@ -67,10 +67,8 @@ export async function whatShouldILearn(books = []) {
   return sorted;
 }
 
-async function getSentencesForWord(word, books = []) {
-  if (books.length === 0) {
-    books = await getBooks();
-  }
+async function getSentencesForWord(word, bookIds = []) {
+  const books = await getBooks(bookIds);
   const candidates = new Set();
   await Promise.all(books.map(async (bookInfo) => {
     const segmented = await loadJieba(bookInfo.filepath);
@@ -138,7 +136,7 @@ export async function generateSentences(
       }
       return 0;
     });
-  console.log(sorted);
+  return sorted;
 }
 
 export const generateSentencesIpc = { getSentencesForWord };

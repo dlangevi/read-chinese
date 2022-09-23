@@ -51,7 +51,7 @@
           <n-tab-pane name="UnknownWords" tab="View Unknown Words">
             <unknown-words
               class="h-96"
-              :bookFilter="[parseInt(props.bookId)]"
+              :bookFilter="bookId"
               />
           </n-tab-pane>
         </n-tabs>
@@ -71,6 +71,7 @@
 
 <script setup>
 import UnknownWords from '@/components/UnknownWords.vue';
+import { provide } from 'vue';
 import {
   NLayout, NLayoutSider, NLayoutHeader, NLayoutContent,
   NLayoutFooter, NButton, NSpace, NTabs, NTabPane,
@@ -81,6 +82,8 @@ import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 const props = defineProps({
   bookId: String,
 });
+
+provide('preferBook', props.bookId);
 
 const book = await window.ipc.loadBook(props.bookId);
 
@@ -101,7 +104,7 @@ const store = useCardQueue();
 async function makeFlashCards() {
   const words = await window.ipc.topUnknownWords(props.bookId, 10);
   words.forEach(({ word }) => {
-    store.addWord(word, ActionsEnum.CREATE);
+    store.addWord(word, ActionsEnum.CREATE, { preferBook: props.bookId });
   });
   console.log(words);
 }

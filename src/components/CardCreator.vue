@@ -36,6 +36,7 @@
       <n-layout-content content-style="padding: 24px;"
         :native-scrollbar="true">
         <edit-sentence v-if="step==StepsEnum.SENTENCE"
+          :preferBook="preferBookRef"
           :word="card.fields.word" :sentence="card.fields.sentence"
           @updateSentence="updateSentence"/>
         <edit-definition v-if="step==StepsEnum.ENGLISH"
@@ -94,6 +95,8 @@ const steps = ref([]);
 let word;
 let action;
 let callback;
+const preferBookRef = ref('');
+let preferBook;
 
 // Manually change the step from an edit button.
 const changeStep = (estep) => {
@@ -164,11 +167,9 @@ const updateChineseDefinition = (newDefinitions, updateStep = false) => {
 };
 
 const updateImages = (newImages, updateStep = false) => {
-  console.log(newImages);
   if (newImages) {
     // TODO support multiple
     card.value.fields.imageUrls = newImages.map((image) => image.thumbnailUrl);
-    console.log(card.value.fields.imageUrls);
     if (updateStep) {
       nextStep();
     }
@@ -179,7 +180,6 @@ const message = useMessage();
 store.$subscribe(async (mutation, state) => {
   // Later we can prefetch new words sentences possibly
   // if (mutation.events.type === 'add' && mutation.events.key === '0') {
-  console.log('mutation');
   step.value = undefined;
   // TODO this is a complete mess and needs to be refined if we are going to
   // start doing anything more complicated
@@ -187,9 +187,10 @@ store.$subscribe(async (mutation, state) => {
     [{
       word,
       action,
+      preferBook,
       callback,
     }] = state.wordList;
-    console.log(word);
+    preferBookRef.value = preferBook;
 
     let ankiCard;
     if (action === ActionsEnum.CREATE) {
@@ -232,7 +233,6 @@ store.$subscribe(async (mutation, state) => {
           word,
           'english',
         );
-        console.log(definitions);
         if (definitions.length === 1) {
           updateEnglishDefinition(definitions);
           steps.value.splice(englishIdx, 1);
@@ -284,7 +284,9 @@ async function submit() {
       messageReactive.destroy();
     }, 1000);
   }
-  callback();
+  if (callback) {
+    callback();
+  }
   store.clearFront();
 }
 

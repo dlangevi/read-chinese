@@ -1,5 +1,5 @@
 import { performance } from 'perf_hooks';
-import { knownArray, isKnown, isKnownChar } from './knownWords';
+import { isKnown, isKnownChar } from './knownWords';
 import { loadJieba } from './segmentation';
 import { getDefaultDefinition } from './dictionaries';
 import {
@@ -7,8 +7,8 @@ import {
   dbGetBook, knex,
 } from './database';
 
-export async function getBooks() {
-  return dbGetBooks();
+export async function getBooks(bookIds = []) {
+  return dbGetBooks(bookIds);
 }
 
 export async function addBook(author, title, cover, filepath) {
@@ -137,7 +137,11 @@ export async function topWords(bookIds) {
   const top = knex('frequency')
     .select('word')
     .sum({ occurance: 'count' })
-    .whereNotIn('word', knownArray())
+    .whereNotExists(function wordTable() {
+      this.select('word')
+        .from('words')
+        .whereRaw('words.word==frequency.word');
+    })
     .groupBy('word')
     .orderBy('occurance', 'desc')
     .limit(200);
