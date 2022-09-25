@@ -1,14 +1,3 @@
-// const { defineConfig } = require('@vue/cli-service');
-
-// module.exports = defineConfig({
-// transpileDependencies: true,
-// pluginOptions: {
-//   electronBuilder: {
-//     preload: 'src/preload.js',
-//   },
-// },
-// });
-
 module.exports = {
   pluginOptions: {
     electronBuilder: {
@@ -36,7 +25,17 @@ module.exports = {
         ],
       },
       // This line: add knex and sqlite3
-      externals: ['knex', 'sqlite3'],
+      externals: [
+        'knex',
+        'sqlite3',
+        // mark external to prevent minification,
+        // I tried many different configurations to webpack but could
+        // not figureout how to preserve the AbortSignal class name, best
+        // I could get was it to be set to abort_controller_AbortSignal,
+        // which would still cause issues. Related to
+        // https://github.com/node-fetch/node-fetch/issues/784
+        '@azure/cognitiveservices-imagesearch',
+      ],
     },
   },
 };
