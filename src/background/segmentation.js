@@ -3,6 +3,7 @@ import path from 'path';
 import { once } from 'events';
 import fs from 'fs';
 import readline from 'readline';
+import { app } from 'electron';
 import { isInDictionary } from './dictionaries';
 // direct from db to prevent cyclic dependency
 import { dbGetBooks } from './database';
@@ -11,9 +12,13 @@ const cache = { };
 
 async function computeDict() {
   // Load a copy of the jieba dict
-  const inputStream = fs.createReadStream('./dict/jieba.dict.utf8');
+  const inputFile = process.env.NODE_ENV === 'production'
+    ? path.join(process.resourcesPath, './dict/jieba.dict.utf8')
+    : './node_modules/nodejieba/dict/jieba.dict.utf8';
+  const outputFile = path.join(app.getPath('userData'), 'jieba.mod.dict.utf8');
+  const inputStream = fs.createReadStream(inputFile);
   const outputStream = fs.createWriteStream(
-    './dict/mod.dict.utf8',
+    outputFile,
     { encoding: 'utf8' },
   );
   const lineReader = readline.createInterface({
@@ -33,7 +38,7 @@ async function computeDict() {
     // The default dict doesn't load from the asar archive for some reason
     // If in production use the copies we have made in resources
     jieba.load({
-      dict: './dict/mod.dict.utf8',
+      dict: outputFile,
       hmmDict: path.join(process.resourcesPath, './dict/hmm_model.utf8'),
       userDict: path.join(process.resourcesPath, './dict/user.dict.utf8'),
       idfDict: path.join(process.resourcesPath, './dict/idf.utf8'),
@@ -41,7 +46,7 @@ async function computeDict() {
     });
   } else {
     jieba.load({
-      dict: './dict/mod.dict.utf8',
+      dict: outputFile,
     });
   }
 }
