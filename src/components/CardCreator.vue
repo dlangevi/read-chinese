@@ -146,6 +146,7 @@ const updateEnglishDefinition = (newDefinitions, updateStep = false) => {
     newDefinitions.forEach((def) => {
       pinyin.add(def.pronunciation);
     });
+    pinyin.delete('');
     card.value.fields.pinyin = [...pinyin].join(', ');
     if (updateStep) {
       nextStep();
@@ -159,6 +160,7 @@ const updateChineseDefinition = (newDefinitions, updateStep = false) => {
       (def) => def.definition,
     ).join('<br>');
     const pinyin = new Set(card.value.fields.pinyin.split(', '));
+    pinyin.delete('');
     newDefinitions.forEach((def) => {
       pinyin.add(def.pronunciation);
     });
