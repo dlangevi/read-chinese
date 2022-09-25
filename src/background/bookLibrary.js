@@ -1,4 +1,3 @@
-import { performance } from 'perf_hooks';
 import { isKnown, isKnownChar } from './knownWords';
 import { loadJieba } from './segmentation';
 import { getDefaultDefinition } from './dictionaries';
@@ -199,10 +198,7 @@ async function loadBooks() {
   return books;
 }
 async function learningTarget(bookIds) {
-  const start = performance.now();
   const words = await topWords(bookIds);
-  const end = performance.now();
-  console.log(`Learning target took ${(end - start) / 1000}s`);
   return words;
 }
 

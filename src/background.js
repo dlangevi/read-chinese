@@ -115,8 +115,8 @@ app.on('ready', async () => {
     setApplicationMenu();
     initIpcMain();
     await createWindow();
+    await loadDictionaries();
     preloadWords();
-    loadDictionaries();
   } catch (e) {
     console.error('Error in init', e.stack);
   }

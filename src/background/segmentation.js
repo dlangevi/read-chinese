@@ -1,21 +1,49 @@
 import jieba from 'nodejieba';
 import path from 'path';
+import { once } from 'events';
 import fs from 'fs';
+import readline from 'readline';
+import { isInDictionary } from './dictionaries';
 // direct from db to prevent cyclic dependency
 import { dbGetBooks } from './database';
 
 const cache = { };
 
-if (process.env.NODE_ENV === 'production') {
-  // The default dict doesn't load from the asar archive for some reason
-  // If in production use the copies we have made in resources
-  jieba.load({
-    dict: path.join(process.resourcesPath, './dict/jieba.dict.utf8'),
-    hmmDict: path.join(process.resourcesPath, './dict/hmm_model.utf8'),
-    userDict: path.join(process.resourcesPath, './dict/user.dict.utf8'),
-    idfDict: path.join(process.resourcesPath, './dict/idf.utf8'),
-    stopWordDict: path.join(process.resourcesPath, './dict/stop_words.utf8'),
+async function computeDict() {
+  // Load a copy of the jieba dict
+  const inputStream = fs.createReadStream('./dict/jieba.dict.utf8');
+  const outputStream = fs.createWriteStream(
+    './dict/mod.dict.utf8',
+    { encoding: 'utf8' },
+  );
+  const lineReader = readline.createInterface({
+    input: inputStream,
+    terminal: false,
   });
+  lineReader.on('line', (line) => {
+    const items = line.split(' ');
+    const [word] = items;
+    if (isInDictionary(word)) {
+      outputStream.write(`${line}\n`);
+    }
+  });
+  await once(lineReader, 'close');
+
+  if (process.env.NODE_ENV === 'production') {
+    // The default dict doesn't load from the asar archive for some reason
+    // If in production use the copies we have made in resources
+    jieba.load({
+      dict: './dict/mod.dict.utf8',
+      hmmDict: path.join(process.resourcesPath, './dict/hmm_model.utf8'),
+      userDict: path.join(process.resourcesPath, './dict/user.dict.utf8'),
+      idfDict: path.join(process.resourcesPath, './dict/idf.utf8'),
+      stopWordDict: path.join(process.resourcesPath, './dict/stop_words.utf8'),
+    });
+  } else {
+    jieba.load({
+      dict: './dict/mod.dict.utf8',
+    });
+  }
 }
 
 export async function loadJieba(txtPath) {
@@ -102,6 +130,7 @@ export async function loadJieba(txtPath) {
 }
 
 export async function preloadWords() {
+  await computeDict();
   const books = await dbGetBooks();
   books.forEach((bookInfo) => {
     loadJieba(bookInfo.filepath);

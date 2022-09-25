@@ -50,6 +50,10 @@ export function getDefaultDefinition(word) {
   return term[0].definition;
 }
 
+export function isInDictionary(word) {
+  return word in dicts[defaultType][defaultDict];
+}
+
 // type = 'english' or 'chinese'
 function getDefinitionsForWord(word, type) {
   const filteredDicts = dicts[type];
