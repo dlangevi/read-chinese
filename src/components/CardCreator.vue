@@ -142,9 +142,11 @@ const updateEnglishDefinition = (newDefinitions, updateStep = false) => {
     card.value.fields.englishDefn = newDefinitions.map(
       (def) => def.definition,
     ).join('<br>');
-    card.value.fields.pinyin = newDefinitions.map(
-      (def) => def.pronunciation,
-    ).join(', ');
+    const pinyin = new Set(card.value.fields.pinyin.split(', '));
+    newDefinitions.forEach((def) => {
+      pinyin.add(def.pronunciation);
+    });
+    card.value.fields.pinyin = [...pinyin].join(', ');
     if (updateStep) {
       nextStep();
     }
@@ -156,10 +158,11 @@ const updateChineseDefinition = (newDefinitions, updateStep = false) => {
     card.value.fields.chineseDefn = newDefinitions.map(
       (def) => def.definition,
     ).join('<br>');
-    // TODO join these with the english ones?
-    card.value.fields.pinyin = newDefinitions.map(
-      (def) => def.pronunciation,
-    ).join(', ');
+    const pinyin = new Set(card.value.fields.pinyin.split(', '));
+    newDefinitions.forEach((def) => {
+      pinyin.add(def.pronunciation);
+    });
+    card.value.fields.pinyin = [...pinyin].join(', ');
     if (updateStep) {
       nextStep();
     }
