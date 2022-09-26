@@ -1,6 +1,6 @@
 import { isKnown, isKnownChar } from './knownWords';
 import { loadJieba } from './segmentation';
-import { getDefaultDefinition } from './dictionaries';
+import { getDefaultDefinition, getPinyin } from './dictionaries';
 import {
   dbGetBooks, dbGetBookById, dbAddBook, dbBookExists, dbSaveWordTable,
   dbGetBook, knex,
@@ -153,6 +153,7 @@ export async function topWords(bookIds) {
 
   return results.map((row) => {
     row.definition = getDefaultDefinition(row.word);
+    row.pinyin = getPinyin(row.word);
     return row;
   });
 }

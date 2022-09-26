@@ -49,13 +49,26 @@ const columnDefs = [
   {
     headerName: 'word',
     field: 'word',
-    width: 100,
+    width: 50,
+    minWidth: 50,
     cellClass: 'text-xl',
+  },
+  {
+    headerName: 'pinyin',
+    field: 'pinyin',
+    width: 50,
+    cellClass: [
+      'border-2',
+      'text-opacity-0',
+      'text-black',
+      'hover:text-opacity-100',
+    ],
   },
   {
     headerName: 'occurance',
     field: 'occurance',
     sort: 'desc',
+    width: 150,
     minWidth: 50,
   },
 ];
@@ -101,5 +114,6 @@ onBeforeMount(async () => {
   } else {
     rowData.value = await window.ipc.learningTarget();
   }
+  console.log(rowData);
 });
 </script>

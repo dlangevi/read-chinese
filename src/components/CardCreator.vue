@@ -282,7 +282,8 @@ async function submit() {
     }, 1000);
   } else {
     const newData = {};
-    Object.entries(card.value.fields).forEach(([field, value]) => {
+    const cardValues = toRaw(card.value.fields);
+    Object.entries(cardValues).forEach(([field, value]) => {
       if (value !== originalValues[field]) {
         newData[field] = value;
       }
@@ -292,6 +293,7 @@ async function submit() {
     if (newData.ExampleSentence) {
       newData.SentenceAudio = '';
     }
+    console.log(toRaw(newData));
     const res = await window.ipc.updateAnkiCard(card.value.noteId, newData);
     messageReactive.content = JSON.stringify(res);
     messageReactive.type = 'success';

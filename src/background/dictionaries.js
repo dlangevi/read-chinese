@@ -50,6 +50,18 @@ export function getDefaultDefinition(word) {
   return term[0].definition;
 }
 
+export function getPinyin(word) {
+  const terms = dicts[defaultType][defaultDict][word];
+  if (!terms) {
+    // TODO do char by char lookup and concatinate?
+    return '';
+  }
+  if (terms.length === 0) {
+    return terms[0].pronunciation;
+  }
+  return [...new Set(terms.map((term) => term.pronunciation))].join(', ');
+}
+
 export function isInDictionary(word) {
   return word in dicts[defaultType][defaultDict];
 }

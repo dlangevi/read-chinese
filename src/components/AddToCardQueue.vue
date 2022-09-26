@@ -26,14 +26,18 @@ async function addToQueue() {
   if (props.params.create) {
     action = ActionsEnum.CREATE;
   }
-  store.addWord(rowData.word, action, {
-    preferBook: props.params.context.bookId,
+  const options = {
     callback: () => {
       props.params.api.applyTransaction({
         remove: [rowData],
       });
     },
-  });
+  };
+  const { context } = props.params;
+  if (context !== undefined) {
+    options.preferBook = props.params.context.bookId;
+  }
+  store.addWord(rowData.word, action, options);
 }
 
 </script>

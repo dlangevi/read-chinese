@@ -104,7 +104,7 @@ async function getAnkiNote(word) {
       pinyin: rawNote.fields.Pinyin.value,
       // TODO how to load the image from a card which already exists?
       // use retrieveMediaFile to get base64 encoded image
-      imageUrl: [],
+      imageUrls: [],
     },
     rawNote,
   };
