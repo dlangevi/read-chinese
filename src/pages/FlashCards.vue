@@ -17,8 +17,8 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
 import { onBeforeMount, ref } from 'vue';
-import AddToCardQueue from '@/components/AddToCardQueue.vue';
 import { useMessage } from 'naive-ui';
+import AddToCardQueue from '@/components/AddToCardQueue.vue';
 
 const message = useMessage();
 const getRowId = (params) => params.data.word;

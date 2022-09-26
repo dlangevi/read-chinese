@@ -41,7 +41,6 @@ const router = createRouter({
     },
   ],
 });
-console.log(router);
 
 const pinia = createPinia();
 const app = createApp(App);
