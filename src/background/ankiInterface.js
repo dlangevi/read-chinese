@@ -174,8 +174,9 @@ async function updateAnkiCard(noteID, fields) {
   return res;
 }
 
-export async function createAnkiCard(fields) {
+export async function createAnkiCard(fields, tags = []) {
   // TODO make this based on used defined fields
+  console.log('tags', tags);
   const audioArray = [];
   if (getOptionValue('GenerateTermAudio')) {
     const wordAudioFile = await synthesize(fields.word);
@@ -209,6 +210,10 @@ export async function createAnkiCard(fields) {
         ChineseDefinition: fields.chineseDefn,
         Pinyin: fields.pinyin,
       },
+      tags: [
+        'read-chinese',
+        ...tags,
+      ],
       options: {
         allowDuplicate: true,
       },

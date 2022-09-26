@@ -95,7 +95,7 @@ const steps = ref([]);
 let word;
 let action;
 let callback;
-const preferBookRef = ref('');
+const preferBookRef = ref(undefined);
 let preferBook;
 
 // Manually change the step from an edit button.
@@ -264,9 +264,19 @@ async function submit() {
   // TODO figure out the logic for determining changes better
   if (action === ActionsEnum.CREATE) {
     const cardValues = toRaw(card.value.fields);
-    const res = await window.ipc.createAnkiCard(cardValues);
+    const tags = [];
+    if (preferBookRef.value !== undefined) {
+      const book = await window.ipc.loadBook(preferBookRef.value);
+      tags.push(book.title);
+    }
+    const res = await window.ipc.createAnkiCard(cardValues, tags);
     messageReactive.content = JSON.stringify(res);
-    messageReactive.type = 'success';
+    if (res !== 'success') {
+      console.log(res);
+      messageReactive.type = 'error';
+    } else {
+      messageReactive.type = 'success';
+    }
     setTimeout(() => {
       messageReactive.destroy();
     }, 1000);
