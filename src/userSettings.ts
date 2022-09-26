@@ -5,7 +5,13 @@ import SettingsTextbox
 import DictionariesList
   from './components/SettingsWidgets/DictionariesList.vue';
 
-function checkBox(value, label, tooltip, defaultValue, other) {
+function checkBox(
+  value:string,
+  label:string,
+  tooltip:string,
+  defaultValue:any,
+  other?:any,
+) {
   const option = {
     value,
     label,
@@ -32,14 +38,20 @@ function checkBox(value, label, tooltip, defaultValue, other) {
     option.loaded = true;
     return option.cached;
   };
-  option.write = async function write(newValue) {
+  option.write = async function write(newValue:any) {
     option.cached = newValue;
     return window.ipc.setOptionValue(value, newValue);
   };
   return option;
 }
 
-function textBox(value, label, tooltip, defaultValue, other) {
+function textBox(
+  value:string,
+  label:string,
+  tooltip:string,
+  defaultValue:any,
+  other?:any,
+) {
   const option = {
     value,
     label,
@@ -66,7 +78,7 @@ function textBox(value, label, tooltip, defaultValue, other) {
     option.loaded = true;
     return option.cached;
   };
-  option.write = async function write(newValue) {
+  option.write = async function write(newValue:any) {
     option.cached = newValue;
     return window.ipc.setOptionValue(value, newValue);
   };

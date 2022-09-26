@@ -1,16 +1,14 @@
 module.exports = {
   root: true,
+
   env: {
     node: true,
   },
-  extends: [
-    'plugin:vue/vue3-essential',
-    '@vue/airbnb',
-  ],
+
   parserOptions: {
-    parser: '@babel/eslint-parser',
-    requireConfigFile: false,
+    parser: '@typescript-eslint/parser',
   },
+
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
@@ -31,6 +29,7 @@ module.exports = {
     // TODO turn these back on once I actually want to release this to people
     'vuejs-accessibility/click-events-have-key-events': 'off',
   },
+
   overrides: [
     {
       files: [
@@ -41,5 +40,11 @@ module.exports = {
         jest: true,
       },
     },
+  ],
+
+  extends: [
+    'plugin:vue/vue3-essential',
+    '@vue/airbnb',
+    '@vue/typescript',
   ],
 };

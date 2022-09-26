@@ -19,7 +19,6 @@ import { useRoute } from 'vue-router';
 import { NMessageProvider } from 'naive-ui';
 
 const route = useRoute();
-
 </script>
 
 <style src="./app.css"/>
