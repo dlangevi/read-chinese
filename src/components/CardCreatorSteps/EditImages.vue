@@ -2,13 +2,15 @@
   <div class="text-3xl m-4">Pick an image</div>
   <n-checkbox-group v-model:value="image" name="images">
     <n-space :size="40">
-        <n-checkbox
-          v-for="(imageData, i) in images"
-          :key="i"
-          :value="imageData"
-        >
-        <img class="h-48 w-auto"
-        :src="imageData.thumbnailUrl" alt="image for word"/>
+      <n-checkbox
+        v-for="(imageData, i) in images"
+        :key="i"
+        :value="imageData"
+      >
+        <img
+          class="h-48 w-auto"
+          :src="imageData.thumbnailUrl"
+          alt="image for word" />
       </n-checkbox>
     </n-space>
   </n-checkbox-group>

@@ -7,11 +7,12 @@
         v-for="(definition, i) in definitions"
         :key="i"
         :value="definition"
-        >
-        <span v-html="'[' + definition.pronunciation + '] ' +
-          definition.definition"
-          />
-        </n-checkbox>
+      >
+        <span
+          v-html="'[' + definition.pronunciation + '] '
+            + definition.definition"
+        />
+      </n-checkbox>
     </n-space>
   </n-checkbox-group>
 </template>

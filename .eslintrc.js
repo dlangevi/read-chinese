@@ -1,6 +1,16 @@
 module.exports = {
   root: true,
 
+  settings: {
+    'import/resolver': {
+      alias: {
+        map: [
+          ['@', './src'],
+        ],
+      },
+    },
+  },
+
   env: {
     node: true,
   },
@@ -28,6 +38,16 @@ module.exports = {
     'import/prefer-default-export': 'off',
     // TODO turn these back on once I actually want to release this to people
     'vuejs-accessibility/click-events-have-key-events': 'off',
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {
+        js: 'never',
+        jsx: 'never',
+        ts: 'never',
+        tsx: 'never',
+      },
+    ],
   },
 
   overrides: [
@@ -46,5 +66,8 @@ module.exports = {
     'plugin:vue/vue3-essential',
     '@vue/airbnb',
     '@vue/typescript',
+    'plugin:import/errors',
+    'plugin:import/warnings',
+    'plugin:import/typescript',
   ],
 };

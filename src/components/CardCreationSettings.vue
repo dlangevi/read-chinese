@@ -1,7 +1,8 @@
 <template>
   <n-button
     @click="openSettings"
-    text type="info">
+    text
+    type="info">
     <template #icon>
       <n-icon size="20">
         <settings-sharp />
@@ -22,8 +23,10 @@
 
     <Suspense>
       <n-grid :y-gap="8" :cols="2">
-        <n-gi v-for="content in UserSettings.CardCreation" :key="content"
-          >
+        <n-gi
+          v-for="content in UserSettings.CardCreation"
+          :key="content"
+        >
           <settings-checkbox :setting="content" />
         </n-gi>
       </n-grid>

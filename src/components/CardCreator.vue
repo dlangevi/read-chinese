@@ -14,13 +14,15 @@
       </p>
     </template>
     <template #header-extra>
-      <card-creation-settings/>
+      <card-creation-settings />
     </template>
-    <n-layout has-sider
+    <n-layout
+      has-sider
       sider-placement="left"
       class="flex-grow"
       style="max-height: 60vh">
-      <n-layout-sider v-if="card !== undefined"
+      <n-layout-sider
+        v-if="card !== undefined"
         collapse-mode="transform"
         :collapsed-width="50"
         :show-collapsed-content="false"
@@ -29,37 +31,49 @@
         content-style="padding: 24px;"
         bordered
       >
-      <Suspense>
-        <anki-card-preview :ankiCard="card" @changeStep="changeStep"/>
-      </Suspense>
+        <Suspense>
+          <anki-card-preview :ankiCard="card" @changeStep="changeStep" />
+        </Suspense>
       </n-layout-sider>
-      <n-layout-content content-style="padding: 24px;"
+      <n-layout-content
+        content-style="padding: 24px;"
         :native-scrollbar="true">
-        <edit-sentence v-if="step==StepsEnum.SENTENCE"
+        <edit-sentence
+          v-if="step == StepsEnum.SENTENCE"
           :preferBook="preferBookRef"
-          :word="card.fields.word" :sentence="card.fields.sentence"
-          @updateSentence="updateSentence"/>
-        <edit-definition v-if="step==StepsEnum.ENGLISH"
-          :word="card.fields.word" :definition="card.fields.englishDefn"
-          type="english"
-          @updateDefinition="updateEnglishDefinition"/>
-        <edit-definition v-if="step==StepsEnum.CHINESE"
-          :word="card.fields.word" :definition="card.fields.englishDefn"
-          type="chinese"
-          @updateDefinition="updateChineseDefinition"/>
-        <edit-images v-if="step==StepsEnum.IMAGE"
           :word="card.fields.word"
-          @updateImages="updateImages"/>
+          :sentence="card.fields.sentence"
+          @updateSentence="updateSentence" />
+        <edit-definition
+          v-if="step == StepsEnum.ENGLISH"
+          :word="card.fields.word"
+          :definition="card.fields.englishDefn"
+          type="english"
+          @updateDefinition="updateEnglishDefinition" />
+        <edit-definition
+          v-if="step == StepsEnum.CHINESE"
+          :word="card.fields.word"
+          :definition="card.fields.englishDefn"
+          type="chinese"
+          @updateDefinition="updateChineseDefinition" />
+        <edit-images
+          v-if="step == StepsEnum.IMAGE"
+          :word="card.fields.word"
+          @updateImages="updateImages" />
       </n-layout-content>
     </n-layout>
 
     <template #action>
       <n-space justify="end">
-        <n-button v-if="steps.length > 0" type=info
+        <n-button
+          v-if="steps.length > 0"
+          type=info
           @click="nextStep()">Next Step</n-button>
-        <n-button type=info
+        <n-button
+          type=info
           @click="store.clearFront()">Skip Word</n-button>
-        <n-button type=info
+        <n-button
+          type=info
           @click="submit()">Submit</n-button>
       </n-space>
     </template>

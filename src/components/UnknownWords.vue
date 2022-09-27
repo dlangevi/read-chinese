@@ -1,12 +1,11 @@
 <template>
-<ag-grid-vue
+  <ag-grid-vue
     class="ag-theme-alpine text-xl"
     :getRowId="getRowId"
     :columnDefs="columnDefs"
     :rowData="rowData"
     :context="gridContext"
-    @grid-ready="onGridReady">
-</ag-grid-vue>
+    @grid-ready="onGridReady" />
 
 </template>
 
@@ -27,6 +26,7 @@ const props = defineProps({
   },
   bookFilter: {
     type: String,
+    default: '',
   },
 });
 const getRowId = (params) => params.data.word;
@@ -109,7 +109,7 @@ columnDefs.push(
 const rowData = ref([]);
 onBeforeMount(async () => {
   console.log(props.bookFilter);
-  if (props.bookFilter) {
+  if (props.bookFilter !== '') {
     rowData.value = await window.ipc.learningTarget([props.bookFilter]);
   } else {
     rowData.value = await window.ipc.learningTarget();

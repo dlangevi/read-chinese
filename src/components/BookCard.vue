@@ -1,5 +1,6 @@
 <template>
-  <n-card :title="`${book.title} - ${book.author}`"
+  <n-card
+    :title="`${book.title} - ${book.author}`"
     :class="(known > 90) ? 'bg-green-300 p-4' : 'p-4'">
     <template #cover>
       <img

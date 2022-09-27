@@ -1,11 +1,11 @@
 <template>
   <div>
-  <n-checkbox
-    :value="setting.value"
-    :label="setting.label"
-    @update:checked="submitChange"
-    :default-checked="isChecked"
-    :disabled="setting.disabled"
+    <n-checkbox
+      :value="setting.value"
+      :label="setting.label"
+      @update:checked="submitChange"
+      :default-checked="isChecked"
+      :disabled="setting.disabled"
     />
     <n-tooltip v-if="setting.tooltip" placement="right" trigger="hover">
       <template #trigger>
@@ -15,7 +15,7 @@
       </template>
       <span> {{setting.tooltip}}</span>
     </n-tooltip>
-    </div>
+  </div>
 </template>
 
 <script setup>

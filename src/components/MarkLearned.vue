@@ -1,9 +1,10 @@
 <template>
-  <n-button type="default"
-            size="tiny"
-            round
-            color="#8a2be2"
-            class="w-28"
+  <n-button
+    type="default"
+    size="tiny"
+    round
+    color="#8a2be2"
+    class="w-28"
     @click="markKnown">
     Mark Known
   </n-button>
@@ -15,6 +16,7 @@ import { NButton } from 'naive-ui';
 const props = defineProps({
   params: {
     type: Object,
+    required: true,
   },
 });
 

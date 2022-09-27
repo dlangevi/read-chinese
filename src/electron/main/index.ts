@@ -26,7 +26,8 @@ import {
 } from './background/database';
 
 process.env.DIST = join(__dirname, '../..');
-process.env.PUBLIC = app.isPackaged ? process.env.DIST : join(process.env.DIST, '../public');
+process.env.PUBLIC = app.isPackaged
+  ? process.env.DIST : join(process.env.DIST, '../public');
 console.log(process.resourcesPath);
 
 // Disable GPU Acceleration for Windows 7
@@ -48,18 +49,21 @@ if (!app.requestSingleInstanceLock()) {
 let win: BrowserWindow | null = null;
 // Here, you can also use other preload
 const preload = join(__dirname, '../preload/index.js');
-const url = process.env.VITE_DEV_SERVER_URL as string;
+const devUrl = process.env.VITE_DEV_SERVER_URL as string;
 const indexHtml = join(process.env.DIST, 'index.html');
 
 async function createWindow() {
+  updateTimesRan();
+  console.log(`Ran ${getTimesRan()}`);
+  console.log(`Data stored at ${app.getPath('userData')}`);
   win = new BrowserWindow({
     title: 'read-chinese',
     icon: join(process.env.PUBLIC, 'favicon.ico'),
     webPreferences: {
       preload,
-      // TODO Because the preload loads a bunch of other libraries this causes issues,
-      // so turn it to true now with the intention of having this work another way
-      // in the future
+      // TODO Because the preload loads a bunch of other libraries this causes
+      // issues, so turn it to true now with the intention of having this work
+      // another way in the future
       nodeIntegration: true,
       contextIsolation: true,
     },
@@ -68,7 +72,7 @@ async function createWindow() {
   if (app.isPackaged) {
     win.loadFile(indexHtml);
   } else {
-    win.loadURL(url);
+    win.loadURL(devUrl);
     // Open devTool if the app is not packaged
     win.webContents.openDevTools();
   }
@@ -93,6 +97,7 @@ app.whenReady().then(async () => {
       callback(pathname);
     },
   );
+  await initializeDatabase();
   await syncWords();
   // setApplicationMenu();
   initIpcMain();

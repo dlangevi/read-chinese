@@ -1,11 +1,11 @@
 <template>
   <n-message-provider>
     <div id="app" class="bg-white max-h-screen max-w-screen">
-      <TopNav class="w-screen h-16"/>
-      <CardCreator/>
+      <TopNav class="w-screen h-16" />
+      <CardCreator />
       <div class="w-screen h-[calc(100vh-4rem)] overflow-auto">
         <Suspense>
-          <router-view :key="route.fullPath"/>
+          <router-view :key="route.fullPath" />
         </Suspense>
       </div>
     </div>
@@ -21,7 +21,7 @@ import { NMessageProvider } from 'naive-ui';
 const route = useRoute();
 </script>
 
-<style src="./app.css"/>
+<style src="./app.css" />
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

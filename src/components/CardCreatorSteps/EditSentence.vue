@@ -5,7 +5,7 @@
   </div>
   <n-radio-group v-model:value="sentence" name="sentences">
     <n-space vertical :size="40">
-    <p v-if="multiSection" class="text-4xl">From Current Book</p>
+      <p v-if="multiSection" class="text-4xl">From Current Book</p>
       <n-radio
         class="text-3xl"
         v-for="(sentence, i) in sentences"
@@ -13,7 +13,7 @@
         :value="sentence"
         :label="sentence"
       />
-    <p v-if="multiSection" class="text-4xl">From All Books</p>
+      <p v-if="multiSection" class="text-4xl">From All Books</p>
       <n-radio
         class="text-3xl"
         v-for="(sentence, i) in allSentences"
@@ -55,6 +55,7 @@ const props = defineProps({
   },
   preferBook: {
     type: String,
+    default: undefined,
   },
 });
 

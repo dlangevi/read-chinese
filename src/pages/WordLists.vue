@@ -2,17 +2,16 @@
   <div class="flex h-full">
     <div class="flex-shrink-0 m-4">
       <n-space vertical>
-      <n-button type="primary" @click="importLegacy">
-        Import Legacy Words
-      </n-button>
-      <n-button type="primary" @click="importCSV">
-        Import CSV file
-      </n-button>
-      <n-button type="primary" @click="importAnki">
-        Sync from Anki
-      </n-button>
+        <n-button type="primary" @click="importLegacy">
+          Import Legacy Words
+        </n-button>
+        <n-button type="primary" @click="importCSV">
+          Import CSV file
+        </n-button>
+        <n-button type="primary" @click="importAnki">
+          Sync from Anki
+        </n-button>
       </n-space>
-
     </div>
     <div class="flex flex-col w-full h-full">
       <div class="text-center flex-shrink-0">
@@ -22,7 +21,7 @@
       <unknown-words
         class="w-5/6 mx-auto h-full flex-grow"
         showDefinitions
-        />
+      />
     </div>
   </div>
 </template>

@@ -1,14 +1,13 @@
 <template>
   <div class="flex flex-col container mx-auto px-4 h-full">
     <ag-grid-vue
-        class="ag-theme-alpine w-5/6 mx-auto
+      class="ag-theme-alpine w-5/6 mx-auto
         h-full flex-grow text-xl"
-        :getRowId="getRowId"
-        :columnDefs="columnDefs"
-        :rowData="rowData"
-        @grid-ready="onGridReady"
-        >
-    </ag-grid-vue>
+      :getRowId="getRowId"
+      :columnDefs="columnDefs"
+      :rowData="rowData"
+      @grid-ready="onGridReady"
+    />
   </div>
 </template>
 

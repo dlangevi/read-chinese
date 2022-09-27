@@ -39,7 +39,7 @@
       <n-select
         v-model:value="newDictType"
         :options="options"
-        />
+      />
     </div>
     <template #action>
       <n-button @click="submit">

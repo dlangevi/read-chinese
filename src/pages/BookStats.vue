@@ -38,8 +38,9 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="pair in targetPairs"
-                             :key="pair.target"
+                <tr
+                  v-for="pair in targetPairs"
+                  :key="pair.target"
                   :label="pair.target"
                   :value="pair.words">
                   <td>{{pair.target}}</td>
@@ -52,7 +53,7 @@
             <unknown-words
               class="h-96"
               :bookFilter="bookId"
-              />
+            />
           </n-tab-pane>
         </n-tabs>
 
@@ -80,7 +81,10 @@ import {
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 
 const props = defineProps({
-  bookId: String,
+  bookId: {
+    required: true,
+    type: String,
+  },
 });
 
 provide('preferBook', props.bookId);
