@@ -3,6 +3,7 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import electron from 'vite-plugin-electron';
+import WindiCss from 'vite-plugin-windicss';
 import pkg from './package.json';
 
 rmSync('dist', { recursive: true, force: true }); // v14.14.0
@@ -11,6 +12,7 @@ rmSync('dist', { recursive: true, force: true }); // v14.14.0
 export default defineConfig({
   plugins: [
     vue(),
+    WindiCss(),
     electron({
       main: {
         entry: 'src/electron/main/index.ts',
