@@ -1,7 +1,7 @@
 // Update with your config settings.
 
-const path = require('path');
-const electron = require('electron');
+import path from 'path';
+import electron from 'electron';
 
 // These will exist when prod app is running
 const userData = electron.app ? electron.app.getPath('userData') : '';
@@ -11,7 +11,7 @@ console.log(`Prod db at ${userData}`);
 /**
  * @type { Object.<string, import("knex").Knex.Config> }
  */
-module.exports = {
+const config = {
 
   development: {
     client: 'sqlite3',
@@ -41,3 +41,5 @@ module.exports = {
   },
 
 };
+
+export default config;

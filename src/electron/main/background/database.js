@@ -6,9 +6,12 @@
 import Store from 'electron-store';
 import Knex from 'knex';
 // For now we do the sync whenever the db changes.
-import knexConfigMap from '../../knexfile';
+import knexConfigMap from '../../../../knexfile';
 
-const knexConfig = knexConfigMap[process.env.NODE_ENV];
+console.log(knexConfigMap);
+// console.log(process.env);
+console.log(import.meta.env.MODE);
+const knexConfig = knexConfigMap[import.meta.env.MODE];
 export const knex = Knex(knexConfig);
 
 // This is called and awaited before before anyother code can run
