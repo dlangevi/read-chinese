@@ -1,4 +1,21 @@
 <template>
+  <button
+    type="button"
+    class="bg-purple-700
+           text-white
+           hover:bg-purple-500
+           hover:text-white
+           px-1
+           rounded-lg
+           text-sm"
+    @click="addToQueue">
+    {{params.text}}
+  </button>
+</template>
+
+<script setup>
+/*
+import { NButton } from 'naive-ui';
   <n-button
     type="default"
     size="tiny"
@@ -8,11 +25,9 @@
     @click="addToQueue">
     {{params.text}}
   </n-button>
-</template>
 
-<script setup>
+*/
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
-import { NButton } from 'naive-ui';
 
 const props = defineProps({
   params: {

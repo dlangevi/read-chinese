@@ -138,9 +138,7 @@ export async function loadJieba(txtPath) {
 export async function preloadWords() {
   await computeDict();
   const books = await dbGetBooks();
-  books.forEach((bookInfo) => {
-    loadJieba(bookInfo.filepath);
-  });
+  await Promise.all(books.map((bookInfo) => loadJieba(bookInfo.filepath)));
 }
 /* const TYPE = {
   NONE: 0, // None - Indicative of an error

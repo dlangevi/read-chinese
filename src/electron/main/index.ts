@@ -97,13 +97,20 @@ app.whenReady().then(async () => {
       callback(pathname);
     },
   );
+  console.log('init database ...');
   await initializeDatabase();
+  console.log('syncWords ...');
   await syncWords();
   // setApplicationMenu();
+  console.log('init IPC...');
   initIpcMain();
+  console.log('create Window...');
   await createWindow();
+  console.log('load dictionaries ...');
   await loadDictionaries();
-  preloadWords();
+  console.log('preload words ...');
+  await preloadWords();
+  console.log('done ...');
 });
 
 app.on('window-all-closed', () => {
