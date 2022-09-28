@@ -99,6 +99,12 @@ const items = (function List() {
       'If only one definition exists, auto select it',
       false,
     ),
+    PopulateChinese: checkBox(
+      'PopulateChinese',
+      'Auto fill chinese definitions',
+      'If only one definition exists, auto select it',
+      false,
+    ),
     AutoAdvanceEnglish: checkBox(
       'AutoAdvanceEnglish',
       'Auto advance after definition selection',
@@ -110,13 +116,6 @@ const items = (function List() {
       'Auto advance after image selection',
       'After picking a image, move to the next step',
       false,
-    ),
-    PopulateChinese: checkBox(
-      'PopulateChinese',
-      'Auto fill chinese definitions',
-      'Not implemented yet',
-      false,
-      { disabled: true },
     ),
     GenerateTermAudio: checkBox(
       'GenerateTermAudio',

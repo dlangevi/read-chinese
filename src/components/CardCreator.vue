@@ -259,6 +259,22 @@ store.$subscribe(async (mutation, state) => {
       }
     }
 
+    const chineseIdx = steps.value.indexOf(StepsEnum.CHINESE);
+    if (chineseIdx !== -1) {
+      const autoFill = await UserSettings.CardCreation.PopulateChinese.read();
+      if (autoFill) {
+        // TODO base this on default dict
+        const definitions = await window.ipc.getDefinitionsForWord(
+          word,
+          'chinese',
+        );
+        if (definitions.length === 1) {
+          updateChineseDefinition(definitions);
+          steps.value.splice(englishIdx, 1);
+        }
+      }
+    }
+
     [step.value] = steps.value;
   }
   showModal.value = state.wordList.length !== 0;

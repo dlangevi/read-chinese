@@ -1,11 +1,14 @@
 <template>
   <n-list class="col-span-2 row-span-4">
     <n-list-item
-      v-for="dict in dicts"
-      :key="dict">
+      v-for="(dict, name) in dicts"
+      :key="name">
       {{dict}}
       <template #suffix>
-        <n-button @click="deleteDict(dict)">
+        <n-button @click="makePrimary(name)">
+          Make Primary
+        </n-button>
+        <n-button @click="deleteDict(name)">
           Delete
         </n-button>
       </template>
@@ -58,8 +61,12 @@ import { onBeforeMount, ref } from 'vue';
 const dicts = ref([]);
 const addDictModal = ref(false);
 
-function deleteDict(dict) {
-  console.log('pretend to delete ', dict);
+function makePrimary(name) {
+  window.ipc.setPrimaryDict(name);
+}
+
+function deleteDict(name) {
+  window.ipc.deleteDictionary(name);
 }
 
 const newDictFile = ref('');

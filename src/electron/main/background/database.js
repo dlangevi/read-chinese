@@ -58,8 +58,21 @@ export function dbSaveDict(name, path, type) {
   metadataStore.set('dicts', dicts);
 }
 
+export function dbDeleteDict(name) {
+  const dicts = metadataStore.get('dicts', {});
+  delete dicts[name];
+  metadataStore.set('dicts', dicts);
+}
+
 export function dbLoadDicts() {
   return metadataStore.get('dicts', {});
+}
+
+export function dbSetPrimaryDict(dictName) {
+  return metadataStore.set('primaryDict', dictName);
+}
+export function dbGetPrimaryDict() {
+  return metadataStore.get('primaryDict', 'ccdict');
 }
 /** *********************************
  *
