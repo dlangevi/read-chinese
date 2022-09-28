@@ -1,27 +1,33 @@
 <template>
   <div class="text-3xl m-4">Pick a sentence</div>
-  <div v-if="loaded && sentences.length == 0">
+  <div v-if="loaded && (allSentences.length + sentences.length) == 0">
     No sentences found, please skip for now
   </div>
   <n-radio-group v-model:value="sentence" name="sentences">
-    <n-space vertical :size="40">
-      <p v-if="multiSection" class="text-4xl">From Current Book</p>
-      <n-radio
-        class="text-3xl"
-        v-for="(sentence, i) in sentences"
-        :key="i"
-        :value="sentence"
-        :label="sentence"
-      />
-      <p v-if="multiSection" class="text-4xl">From All Books</p>
-      <n-radio
-        class="text-3xl"
-        v-for="(sentence, i) in allSentences"
-        :key="i"
-        :value="sentence"
-        :label="sentence"
-      />
-    </n-space>
+    <div v-if="singleBook">
+      <n-space vertical :size="40">
+        <p class="text-4xl">From Current Book</p>
+        <n-radio
+          class="text-3xl"
+          v-for="(sentence, i) in sentences"
+          :key="i"
+          :value="sentence"
+          :label="sentence"
+        />
+      </n-space>
+    </div>
+    <div>
+      <n-space vertical :size="40">
+        <p class="text-4xl">From All Books</p>
+        <n-radio
+          class="text-3xl"
+          v-for="(sentence, i) in allSentences"
+          :key="i"
+          :value="sentence"
+          :label="sentence"
+        />
+      </n-space>
+    </div>
   </n-radio-group>
 </template>
 
@@ -59,24 +65,18 @@ const props = defineProps({
   },
 });
 
-const multiSection = props.preferBook !== undefined;
-
-console.log('preferbook', props.preferBook);
+const singleBook = !!props.preferBook;
 onBeforeMount(async () => {
   if (props.preferBook) {
     sentences.value = await window.ipc.getSentencesForWord(
       props.word,
       [props.preferBook],
     );
-    // TODO filter out repeats
-    allSentences.value = await window.ipc.getSentencesForWord(
-      props.word,
-    );
-  } else {
-    sentences.value = await window.ipc.getSentencesForWord(
-      props.word,
-    );
   }
+  // TODO filter out repeats
+  allSentences.value = await window.ipc.getSentencesForWord(
+    props.word,
+  );
   loaded.value = true;
 });
 

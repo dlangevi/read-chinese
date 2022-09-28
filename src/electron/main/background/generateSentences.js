@@ -82,7 +82,12 @@ async function getSentencesForWord(word, bookIds = []) {
     });
   }));
   const sentences = [...candidates];
-  sentences.sort((a, b) => (b.length - a.length));
+  sentences.sort((a, b) => {
+    // Ideal sentence is 20 characters, no real reason
+    const aScore = Math.abs(a.length - 20);
+    const bScore = Math.abs(b.length - 20);
+    return aScore - bScore;
+  });
   sentences.splice(10);
   return sentences;
 }
