@@ -12,7 +12,10 @@ const cache = { };
 
 async function computeDict() {
   // Load a copy of the jieba dict
-  const inputFile = './node_modules/nodejieba/dict/jieba.dict.utf8';
+  const prodDictFolder = path.join(process.resourcesPath, 'dict');
+  const inputFile = import.meta.env.MODE === 'production'
+    ? path.join(prodDictFolder, 'jieba.dict.utf8')
+    : './node_modules/nodejieba/dict/jieba.dict.utf8';
   const outputFile = path.join(app.getPath('userData'), 'jieba.mod.dict.utf8');
   const inputStream = fs.createReadStream(inputFile);
   const outputStream = fs.createWriteStream(
@@ -35,17 +38,12 @@ async function computeDict() {
   if (import.meta.env.MODE === 'production') {
     // The default dict doesn't load from the asar archive for some reason
     // If in production use the copies we have made in resources
-    const unpacked = 'app.asar.unpacked/node_modules/nodejieba/dict';
     jieba.load({
       dict: outputFile,
-      hmmDict: path.join(process.resourcesPath, unpacked, 'hmm_model.utf8'),
-      userDict: path.join(process.resourcesPath, unpacked, 'user.dict.utf8'),
-      idfDict: path.join(process.resourcesPath, unpacked, 'idf.utf8'),
-      stopWordDict: path.join(
-        process.resourcesPath,
-        unpacked,
-        'stop_words.utf8',
-      ),
+      hmmDict: path.join(prodDictFolder, 'hmm_model.utf8'),
+      userDict: path.join(prodDictFolder, 'user.dict.utf8'),
+      idfDict: path.join(prodDictFolder, 'idf.utf8'),
+      stopWordDict: path.join(prodDictFolder, 'stop_words.utf8'),
     });
   } else {
     jieba.load({

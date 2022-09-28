@@ -15,7 +15,7 @@ install:
   - yarn
 
 artifacts:
-  - path: 'dist_electron\read-chinese Setup 0.1.0.exe'
+  - path: 'release\0.1.0\read-chinese Setup 0.1.0.exe'
     name: Windows Install Program
 
 build_script:
