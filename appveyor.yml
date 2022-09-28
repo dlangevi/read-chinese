@@ -19,7 +19,7 @@ artifacts:
     name: Windows Install Program
 
 build_script:
-  - yarn electron:build 
+  - yarn build 
 
 test: off
 
