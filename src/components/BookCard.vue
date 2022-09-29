@@ -15,7 +15,12 @@
       Known: {{known}}%
     </div>
     <n-space justify="end">
-      <n-button @click="favorite">Add To Favorites</n-button>
+      <n-button v-if="!isFavorite" @click="favorite(true)">
+        Add To Favorites
+      </n-button>
+      <n-button v-if="isFavorite" @click="favorite(false)">
+        Remove From Favorites
+      </n-button>
       <n-button @click="markRead">Mark Read</n-button>
       <n-button @click="deleteBook">Delete</n-button>
     </n-space>
@@ -25,6 +30,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { NSpace, NCard, NButton } from 'naive-ui';
+import { ref } from 'vue';
 
 const router = useRouter();
 const props = defineProps({
@@ -34,8 +40,10 @@ const props = defineProps({
   },
 });
 
-function favorite() {
-
+const isFavorite = ref(props.book.favorite);
+function favorite(setTo) {
+  window.ipc.setFavorite(props.book.bookId, setTo);
+  isFavorite.value = setTo;
 }
 function markRead() {
 

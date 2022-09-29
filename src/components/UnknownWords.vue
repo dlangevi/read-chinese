@@ -49,14 +49,14 @@ const columnDefs = [
   {
     headerName: 'word',
     field: 'word',
-    width: 50,
-    minWidth: 50,
+    width: 80,
+    minWidth: 80,
     cellClass: 'text-xl',
   },
   {
     headerName: 'pinyin',
     field: 'pinyin',
-    width: 50,
+    width: 100,
     cellClass: [
       'border-2',
       'text-opacity-0',
@@ -68,7 +68,7 @@ const columnDefs = [
     headerName: 'occurance',
     field: 'occurance',
     sort: 'desc',
-    width: 150,
+    width: 50,
     minWidth: 50,
   },
 ];

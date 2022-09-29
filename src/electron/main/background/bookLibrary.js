@@ -203,6 +203,12 @@ async function learningTarget(bookIds) {
   return words;
 }
 
+async function setFavorite(bookId, isFavorite) {
+  return knex('books').where('bookId', bookId).update({
+    favorite: isFavorite,
+  });
+}
+
 export const bookLibraryIpc = {
-  loadBooks, learningTarget, loadBook, topUnknownWords, deleteBook,
+  loadBooks, learningTarget, loadBook, topUnknownWords, deleteBook, setFavorite,
 };

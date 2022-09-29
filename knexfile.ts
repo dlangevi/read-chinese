@@ -21,6 +21,7 @@ const config = {
       filename: path.join(userData, 'db.sqlite3'),
     },
     migrations: {
+      extension: 'mjs',
       tableName: 'knex_migrations',
       directory: './migrations',
     },
@@ -33,6 +34,7 @@ const config = {
       filename: path.join(userData, 'db.sqlite3'),
     },
     migrations: {
+      extension: 'mjs',
       tableName: 'knex_migrations',
       directory: path.join(prodPrefix, 'migrations'),
     },

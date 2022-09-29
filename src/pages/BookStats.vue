@@ -106,7 +106,7 @@ const targetPairs = targets.map((e, i) => (
 
 const store = useCardQueue();
 async function makeFlashCards() {
-  const words = await window.ipc.topUnknownWords(props.bookId, 10);
+  const words = await window.ipc.topUnknownWords(props.bookId, 50);
   words.forEach(({ word }) => {
     store.addWord(word, ActionsEnum.CREATE, { preferBook: props.bookId });
   });

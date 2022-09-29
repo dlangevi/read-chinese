@@ -6,11 +6,9 @@
 import Store from 'electron-store';
 import Knex from 'knex';
 // For now we do the sync whenever the db changes.
-import knexConfigMap from '../../../../knexfile';
+import knexConfigMap from '../../../../knexfile.mjs';
 
 console.log(knexConfigMap);
-// console.log(process.env);
-console.log(import.meta.env.MODE);
 const knexConfig = knexConfigMap[import.meta.env.MODE];
 export const knex = Knex(knexConfig);
 
@@ -202,6 +200,7 @@ export async function dbGetBooks(bookIds = []) {
       cover: 'cover',
       filepath: 'filepath',
       bookId: 'bookId',
+      favorite: 'favorite',
     },
   );
   if (bookIds.length > 0) {
@@ -218,6 +217,7 @@ export async function dbGetBook(author, title) {
       cover: 'cover',
       filepath: 'filepath',
       bookId: 'bookId',
+      favorite: 'favorite',
     },
   ).where({
     author, title,
@@ -233,6 +233,7 @@ export async function dbGetBookById(bookId) {
       cover: 'cover',
       filepath: 'filepath',
       bookId: 'bookId',
+      favorite: 'favorite',
     },
   ).where({
     bookId,
@@ -249,6 +250,7 @@ export async function dbBookExists(author, title) {
       cover: 'cover',
       filepath: 'filepath',
       bookId: 'bookId',
+      favorite: 'favorite',
     },
   ).where({
     author, title,

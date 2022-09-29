@@ -169,8 +169,16 @@ const items = (function List() {
       '',
     ),
   };
+  const BookLibrary = {
+    OnlyFavorites: checkBox(
+      'OnlyFavorites',
+      'Only show favorited books',
+      '',
+      false,
+    ),
+  };
 
-  [CardCreation, Dictionaries].forEach(
+  [CardCreation, Dictionaries, BookLibrary].forEach(
     async (section) => Object.values(section).forEach(
       async (option) => {
         option.readFromBackEnd();
@@ -181,6 +189,7 @@ const items = (function List() {
   return {
     CardCreation,
     Dictionaries,
+    BookLibrary,
   };
 }());
 

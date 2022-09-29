@@ -70,9 +70,6 @@ export function getPinyin(word) {
     // TODO do char by char lookup and concatinate?
     return '';
   }
-  if (terms.length === 0) {
-    return terms[0].pronunciation;
-  }
   return [...new Set(terms.map((term) => term.pronunciation))].join(', ');
 }
 
@@ -94,7 +91,8 @@ function getDefinitionsForWord(word, type) {
       term.forEach((def) => {
         answers.push({
           definition: def.definition.replace(/\n/g, '<br>'),
-          pronunciation: def.pronunciation,
+          // No spaces in pinyin
+          pronunciation: def.pronunciation.replace(/ /g, ''),
         });
       });
     });

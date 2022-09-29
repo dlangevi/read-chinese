@@ -25,6 +25,8 @@ import {
 } from 'naive-ui';
 import { InformationCircle } from '@vicons/ionicons5';
 
+const emit = defineEmits(['update']);
+
 const props = defineProps({
   setting: {
     type: Object,
@@ -36,6 +38,7 @@ const isChecked = await props.setting.read();
 
 function submitChange(checked) {
   props.setting.write(checked);
+  emit('update', checked);
 }
 
 </script>
