@@ -70,7 +70,7 @@ onBeforeMount(async () => {
   if (props.preferBook) {
     sentences.value = await window.ipc.getSentencesForWord(
       props.word,
-      [props.preferBook],
+      { bookIds: [props.preferBook] },
     );
   }
   // TODO filter out repeats

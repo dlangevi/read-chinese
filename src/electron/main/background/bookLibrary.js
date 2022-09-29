@@ -6,7 +6,9 @@ import {
   dbGetBook, knex,
 } from './database';
 
-export async function getBooks(bookIds = []) {
+export async function getBooks(bookIds) {
+  bookIds = bookIds || [];
+
   return dbGetBooks(bookIds);
 }
 
@@ -193,9 +195,7 @@ async function allWords(book) {
 
 async function loadBooks() {
   const books = await dbGetBooks();
-  console.time('loadBooks');
   await Promise.all(books.map((book) => computeBookData(book)));
-  console.timeEnd('loadBooks');
   return books;
 }
 async function learningTarget(bookIds) {

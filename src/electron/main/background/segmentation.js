@@ -1,12 +1,12 @@
 import jieba from 'nodejieba';
 import path from 'path';
+import { app } from 'electron';
 import { once } from 'events';
 import fs from 'fs';
 import readline from 'readline';
-import { app } from 'electron';
 import { isInDictionary } from './dictionaries';
 // direct from db to prevent cyclic dependency
-import { dbGetBooks } from './database';
+import { dbGetBooks, dbBookSetCache } from './database';
 
 const cache = { };
 
@@ -51,11 +51,71 @@ async function computeDict() {
     });
   }
 }
+export async function loadSegmentedText(book) {
+  // If the book has already been reduced to sentences
+  if (book.segmentedFile) {
+    if (book.segmentedFile in cache) {
+      return cache[book.segmentedFile];
+    }
 
-export async function loadJieba(txtPath) {
-  if (txtPath in cache) {
-    return cache[txtPath];
+    const cacheLocation = path.join(
+      app.getPath('userData'),
+      'segmentationCache',
+      book.segmentedFile,
+    );
+    const sentenceSeg = await fs.promises.readFile(
+      cacheLocation,
+      'UTF-8',
+      'r',
+    );
+    const parsed = JSON.parse(sentenceSeg);
+    cache[book.segmentedFile] = parsed;
+    return parsed;
   }
+
+  // Otherwise we need to calculate the text
+  const fullSegmentation = await loadJieba(book);
+  console.log(typeof fullSegmentation);
+  const joinedSentences = fullSegmentation.map(
+    (sentence) => sentence.map(([word]) => word).join(''),
+  );
+  const fileName = `${book.title}-${book.author}.json`;
+  const cacheLocation = path.join(
+    app.getPath('userData'),
+    'segmentationCache',
+    fileName,
+  );
+  await fs.promises.writeFile(cacheLocation, JSON.stringify(joinedSentences));
+  dbBookSetCache(book.bookId, fileName);
+  return joinedSentences;
+}
+
+export function segmentSentence(sentence) {
+  const json = jieba.cut(sentence);
+
+  return json.map((word) => {
+    // const punc = /\p{Script_Extensions=Han}/u;
+    // const punc = /\p{CJK_Symbols_and_Punctuation}/u;
+    const punc = /\p{P}/u;
+    if (punc.test(word)) {
+      // punctuation
+      return [word, 1];
+    } if (/\s+/.test(word)) {
+      // whitespace
+      return [word, 1];
+    } if (/\p{Script=Latin}+/u.test(word)) {
+      // english
+      return [word, 1];
+    } if (/\p{Script=Han}+/u.test(word)) {
+      return [word, 3];
+    }
+    console.log(`unknown ${word}`);
+    return [word, 1];
+  });
+}
+
+export async function loadJieba(book) {
+  const txtPath = book.filepath;
   // console.log(`Loading ${txtPath} for the first time`);
   const txt = await fs.promises.readFile(txtPath, 'UTF-8', 'r');
   // Misses names, but also makes less compound words
@@ -131,14 +191,19 @@ export async function loadJieba(txtPath) {
     }
     return result;
   }, [[]]);
-  cache[txtPath] = finalResult;
+  // cache[txtPath] = finalResult;
   return finalResult;
 }
 
 export async function preloadWords() {
   await computeDict();
   const books = await dbGetBooks();
-  await Promise.all(books.map((bookInfo) => loadJieba(bookInfo.filepath)));
+  // await Promise.all(books.map((bookInfo) => loadJieba(bookInfo)));
+  await Promise.all(
+    books.map(
+      (bookInfo) => loadSegmentedText(bookInfo),
+    ),
+  );
 }
 /* const TYPE = {
   NONE: 0, // None - Indicative of an error

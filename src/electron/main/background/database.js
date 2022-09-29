@@ -191,18 +191,25 @@ export async function dbLoadWordTable(book) {
   return wordDict;
 }
 
+export async function dbBookSetCache(bookId, filepath) {
+  return knex('books').where('bookId', bookId).update({
+    segmented_file: filepath,
+  });
+}
+
+const bookFields = {
+  author: 'author',
+  title: 'title',
+  cover: 'cover',
+  filepath: 'filepath',
+  bookId: 'bookId',
+  favorite: 'favorite',
+  segmentedFile: 'segmented_file',
+};
+
 // Seems a bit repetative ...
 export async function dbGetBooks(bookIds = []) {
-  const books = knex('books').select(
-    {
-      author: 'author',
-      title: 'title',
-      cover: 'cover',
-      filepath: 'filepath',
-      bookId: 'bookId',
-      favorite: 'favorite',
-    },
-  );
+  const books = knex('books').select(bookFields);
   if (bookIds.length > 0) {
     books.whereIn('bookId', bookIds);
   }
@@ -211,14 +218,7 @@ export async function dbGetBooks(bookIds = []) {
 
 export async function dbGetBook(author, title) {
   const books = await knex('books').select(
-    {
-      author: 'author',
-      title: 'title',
-      cover: 'cover',
-      filepath: 'filepath',
-      bookId: 'bookId',
-      favorite: 'favorite',
-    },
+    bookFields,
   ).where({
     author, title,
   });
@@ -227,14 +227,7 @@ export async function dbGetBook(author, title) {
 
 export async function dbGetBookById(bookId) {
   const books = await knex('books').select(
-    {
-      author: 'author',
-      title: 'title',
-      cover: 'cover',
-      filepath: 'filepath',
-      bookId: 'bookId',
-      favorite: 'favorite',
-    },
+    bookFields,
   ).where({
     bookId,
   });
@@ -244,14 +237,7 @@ export async function dbGetBookById(bookId) {
 // For now we will use author and title to do book uniqueness
 export async function dbBookExists(author, title) {
   const books = await knex('books').select(
-    {
-      author: 'author',
-      title: 'title',
-      cover: 'cover',
-      filepath: 'filepath',
-      bookId: 'bookId',
-      favorite: 'favorite',
-    },
+    bookFields,
   ).where({
     author, title,
   });

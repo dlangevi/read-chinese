@@ -25,6 +25,7 @@ import {
   initializeDatabase,
 } from './background/database';
 
+console.time('bootup');
 process.env.DIST = join(__dirname, '../..');
 process.env.PUBLIC = app.isPackaged
   ? process.env.DIST : join(process.env.DIST, '../public');
@@ -111,6 +112,7 @@ app.whenReady().then(async () => {
   console.log('preload words ...');
   await preloadWords();
   console.log('done ...');
+  console.timeEnd('bootup');
 });
 
 app.on('window-all-closed', () => {
