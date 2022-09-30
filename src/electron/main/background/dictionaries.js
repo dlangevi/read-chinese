@@ -74,7 +74,7 @@ export function getPinyin(word) {
 }
 
 export function isInDictionary(word) {
-  return word in dicts[defaultDict].dictionary;
+  return Object.values(dicts).some((dict) => word in dict.dictionary);
 }
 
 // type = 'english' or 'chinese'

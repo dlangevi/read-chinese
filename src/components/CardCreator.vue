@@ -74,6 +74,11 @@
           @click="store.clearFront()">Skip Word</n-button>
         <n-button
           type=info
+          @click="markKnown">
+          Mark Known
+        </n-button>
+        <n-button
+          type=info
           @click="submit()">Submit</n-button>
       </n-space>
     </template>
@@ -334,6 +339,11 @@ async function submit() {
   if (callback) {
     callback();
   }
+  store.clearFront();
+}
+
+function markKnown() {
+  window.ipc.addWord(card.value.fields.word, 10000);
   store.clearFront();
 }
 

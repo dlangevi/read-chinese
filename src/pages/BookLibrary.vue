@@ -9,7 +9,9 @@
   </div>
 
   <n-grid x-gap="12" y-gap="12" :cols="4" v-if="books.length > 0">
-    <n-gi v-for="(book, i) in favoriteFilter" :key="i">
+    <n-gi
+      v-for="book in favoriteFilter"
+      :key="book.bookId">
       <book-card class="h-[700px]" :book="book" />
     </n-gi>
   </n-grid>
@@ -33,10 +35,18 @@ function updateFilter() {
 }
 const books = ref([]);
 
-const favoriteFilter = computed(() => books.value.filter((book) => {
-  if (!onlyFavorites.value) return true;
-  return book.favorite;
-}));
+const favoriteFilter = computed(
+  () => books.value
+    .filter((book) => {
+      if (!onlyFavorites.value) return true;
+      return book.favorite;
+    // }).sort((bookA, bookB) => bookA.author.localeCompare(bookB.author))
+    }).sort((bookA, bookB) => {
+      const aKnown = (bookA.totalKnownWords / bookA.totalWords);
+      const bKnown = (bookB.totalKnownWords / bookB.totalWords);
+      return bKnown - aKnown;
+    }),
+);
 onBeforeMount(async () => {
   books.value = await window.ipc.loadBooks();
 });

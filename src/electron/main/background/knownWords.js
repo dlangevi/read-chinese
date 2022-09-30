@@ -1,5 +1,6 @@
 import { dialog } from 'electron';
 import fs from 'fs';
+import { isInDictionary } from './dictionaries';
 import {
   dbLoadWords, dbUpdateWord, dbUpdateWords, getOptionValue,
 } from './database';
@@ -15,6 +16,18 @@ export async function syncWords() {
   });
   console.log(`Known words: ${Object.keys(known).length}
 Known characters: ${knownCharacters.size} `);
+}
+
+export function checkWords() {
+  let wackWords = 0;
+  Object.keys(known).forEach((word) => {
+    if (!isInDictionary(word)) {
+      wackWords += 1;
+      console.log(word);
+    }
+  });
+
+  console.log(`You got ${wackWords} wack ass words`);
 }
 
 // For now the db code will update the word set here on each addition.

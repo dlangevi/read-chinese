@@ -15,7 +15,7 @@ import {
 import { release } from 'os';
 import { join } from 'path';
 
-import { syncWords } from './background/knownWords';
+import { syncWords, checkWords } from './background/knownWords';
 import { loadDictionaries } from './background/dictionaries';
 import { preloadWords } from './background/segmentation';
 import { initIpcMain } from '../ipcLoader';
@@ -111,6 +111,7 @@ app.whenReady().then(async () => {
   await preloadWords();
   console.log('done ...');
   console.timeEnd('bootup');
+  checkWords();
 });
 
 app.on('window-all-closed', () => {
