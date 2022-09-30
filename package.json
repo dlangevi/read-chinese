@@ -36,7 +36,7 @@
     "@vitejs/plugin-vue": "^3.0.1",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/eslint-config-airbnb": "^7.0.0",
-    "electron": "^18.0.0",
+    "electron": "^19.0.0",
     "electron-builder": "^23.3.3",
     "eslint": "^7.32.0",
     "eslint-import-resolver-alias": "^1.1.2",

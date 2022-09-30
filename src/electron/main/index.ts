@@ -63,6 +63,7 @@ async function createWindow() {
     webPreferences: {
       preload,
       nodeIntegration: false,
+      sandbox: false,
       contextIsolation: true,
     },
   });
