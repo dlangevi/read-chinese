@@ -109,7 +109,7 @@ export function segmentSentence(sentence) {
     } if (/\p{Script=Han}+/u.test(word)) {
       return [word, 3];
     }
-    console.log(`unknown ${word}`);
+    // console.log(`unknown ${word}`);
     return [word, 1];
   });
 }

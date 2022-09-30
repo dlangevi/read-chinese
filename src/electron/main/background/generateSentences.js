@@ -1,6 +1,6 @@
 import { getBooks } from './bookLibrary';
 import { loadSegmentedText, segmentSentence } from './segmentation';
-import { isKnown } from './knownWords';
+import { isKnown, updateInterval } from './knownWords';
 
 function isT1Candidate(sentence, t1word) {
   // TODO its possible the t1word is actually split across two neighbours, and
@@ -17,6 +17,7 @@ async function getSentencesForWord(word, {
   bookIds,
   skipBook,
 } = {}) {
+  updateInterval();
   const books = await getBooks(bookIds);
   const candidates = new Set();
   await Promise.all(books.map(async (bookInfo) => {
@@ -27,7 +28,8 @@ async function getSentencesForWord(word, {
     fullSegmented.forEach((sentence) => {
       if (sentence.includes(word)) {
         const segmented = segmentSentence(sentence);
-        if (isT1Candidate(segmented, word)) {
+        const justWords = segmented.map(([w]) => w);
+        if (justWords.includes(word) && isT1Candidate(segmented, word)) {
           candidates.add(sentence);
         }
       }
@@ -40,6 +42,7 @@ async function getSentencesForWord(word, {
     const bScore = Math.abs(b.length - 20);
     return aScore - bScore;
   });
+  console.log(`generated ${sentences.length} sentences`);
   sentences.splice(10);
   return sentences;
 }

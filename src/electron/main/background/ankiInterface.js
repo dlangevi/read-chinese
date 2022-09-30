@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { addWords } from './knownWords';
+import { addWords, addWord } from './knownWords';
 import { synthesize } from './textToSpeech';
 import { getOptionValue } from './database';
 // Must have ankiconnect installed as a plugin in your anki installation
@@ -230,6 +230,7 @@ export async function createAnkiCard(fields, tags = []) {
     },
   });
   if (res.error === null) {
+    addWord(fields.word, 0, true);
     return 'success';
   }
   return res;

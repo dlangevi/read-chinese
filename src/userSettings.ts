@@ -4,12 +4,15 @@ import SettingsTextbox
   from './components/SettingsWidgets/SettingsTextbox.vue';
 import DictionariesList
   from './components/SettingsWidgets/DictionariesList.vue';
+import SettingsSlider
+  from './components/SettingsWidgets/SettingsSlider.vue';
 
-function checkBox(
+function settingsObject(
   value:string,
   label:string,
   tooltip:string,
   defaultValue:any,
+  widgetType: any,
   other?:any,
 ) {
   const option = {
@@ -17,7 +20,7 @@ function checkBox(
     label,
     tooltip,
     defaultValue,
-    type: SettingsCheckbox,
+    type: widgetType,
     ...other,
     loaded: false,
     // TODO save some cached value on the renderer side
@@ -45,6 +48,23 @@ function checkBox(
   return option;
 }
 
+function checkBox(
+  value:string,
+  label:string,
+  tooltip:string,
+  defaultValue:any,
+  other?:any,
+) {
+  return settingsObject(
+    value,
+    label,
+    tooltip,
+    defaultValue,
+    SettingsCheckbox,
+    other,
+  );
+}
+
 function textBox(
   value:string,
   label:string,
@@ -52,37 +72,31 @@ function textBox(
   defaultValue:any,
   other?:any,
 ) {
-  const option = {
+  return settingsObject(
     value,
     label,
     tooltip,
     defaultValue,
-    type: SettingsTextbox,
-    ...other,
-    // TODO save some cached value on the renderer side
-    loaded: false,
-  };
+    SettingsTextbox,
+    other,
+  );
+}
 
-  option.read = function read() {
-    if (!option.loaded) {
-      console.error(`Early read, ${option.value}`);
-      return option.defaultValue;
-    }
-    if (option.cached === undefined) {
-      return option.defaultValue;
-    }
-    return option.cached;
-  };
-  option.readFromBackEnd = async function readFromBackEnd() {
-    option.cached = await window.ipc.getOptionValue(value);
-    option.loaded = true;
-    return option.cached;
-  };
-  option.write = async function write(newValue:any) {
-    option.cached = newValue;
-    return window.ipc.setOptionValue(value, newValue);
-  };
-  return option;
+function slider(
+  value:string,
+  label:string,
+  tooltip:string,
+  defaultValue:any,
+  other?:any,
+) {
+  return settingsObject(
+    value,
+    label,
+    tooltip,
+    defaultValue,
+    SettingsSlider,
+    other,
+  );
 }
 
 const items = (function List() {
@@ -167,6 +181,14 @@ const items = (function List() {
       'Azure Image Api Key',
       'Setup an free azure bing search and put your key here',
       '',
+    ),
+    KnownInterval: slider(
+      'KnownInterval',
+      'Time before a word is considered "known"',
+      'How long of an interval in anki before a word is '
+      + ' included in generated sentences',
+      10,
+
     ),
   };
   const BookLibrary = {

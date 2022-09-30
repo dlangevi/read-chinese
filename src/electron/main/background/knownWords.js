@@ -1,6 +1,8 @@
 import { dialog } from 'electron';
 import fs from 'fs';
-import { dbLoadWords, dbUpdateWord, dbUpdateWords } from './database';
+import {
+  dbLoadWords, dbUpdateWord, dbUpdateWords, getOptionValue,
+} from './database';
 
 // Memory cache of the set of known words for performance
 let known = {};
@@ -8,28 +10,24 @@ let knownCharacters = new Set();
 export async function syncWords() {
   known = await dbLoadWords();
   knownCharacters = new Set();
-  known.forEach((word) => {
+  Object.keys(known).forEach((word) => {
     Array.from(word).forEach((ch) => knownCharacters.add(ch));
   });
-  console.log(`Known words: ${known.size}
+  console.log(`Known words: ${Object.keys(known).length}
 Known characters: ${knownCharacters.size} `);
-}
-
-export function knownArray() {
-  return [...known];
 }
 
 // For now the db code will update the word set here on each addition.
 // In the future there should not be two seperate sets of words
 export function addWord(word, age = 0, hasFlashCard = false) {
-  known.add(word);
+  known[word] = { interval: age };
   dbUpdateWord(word, age, hasFlashCard);
 }
 
 // wordRows expects [{word, interval, has_flash_card}]
 export function addWords(wordRows) {
   wordRows.forEach((row) => {
-    known.add(row.word);
+    known[row.word] = { interval: row.interval };
   });
   dbUpdateWords(wordRows);
 }
@@ -82,8 +80,13 @@ export function importCSVWords() {
   });
 }
 
+let knownInterval = getOptionValue('KnownInterval', 100);
+export function updateInterval() {
+  knownInterval = getOptionValue('KnownInterval', 100);
+}
+
 export function isKnown(word) {
-  return known.has(word);
+  return (word in known) && known[word].interval >= knownInterval;
 }
 
 export function isKnownChar(char) {

@@ -119,11 +119,11 @@ export async function dbUpdateWords(wordRows) {
 
 export async function dbLoadWords() {
   const rows = await knex('words')
-    .select({ word: 'word' })
+    .select({ word: 'word', interval: 'interval' })
     .catch((error) => { console.log(error); });
-  const words = new Set();
+  const words = {};
   rows.forEach((row) => {
-    words.add(row.word);
+    words[row.word] = { interval: row.interval };
   });
   return words;
 }
