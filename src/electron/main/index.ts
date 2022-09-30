@@ -62,10 +62,7 @@ async function createWindow() {
     icon: join(process.env.PUBLIC, 'favicon.ico'),
     webPreferences: {
       preload,
-      // TODO Because the preload loads a bunch of other libraries this causes
-      // issues, so turn it to true now with the intention of having this work
-      // another way in the future
-      nodeIntegration: true,
+      nodeIntegration: false,
       contextIsolation: true,
     },
   });
