@@ -23,11 +23,9 @@ export function checkWords() {
   Object.keys(known).forEach((word) => {
     if (!isInDictionary(word)) {
       wackWords += 1;
-      console.log(word);
     }
   });
-
-  console.log(`You got ${wackWords} wack ass words`);
+  console.log(`You got ${wackWords} wack words`);
 }
 
 // For now the db code will update the word set here on each addition.
