@@ -43,7 +43,7 @@ const props = defineProps({
 
 const value = ref(props.setting.read());
 
-function submitChange(newValue) {
+function submitChange(newValue:number | null) {
   props.setting.write(newValue);
   emit('update', newValue);
 }

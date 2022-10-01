@@ -12,7 +12,7 @@ function settingsObject(
   label:string,
   tooltip:string,
   defaultValue:any,
-  widgetType: any,
+  widgetType:any,
   other?:any,
 ) {
   const option = {
