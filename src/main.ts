@@ -24,6 +24,11 @@ const router = createRouter({
       component: () => import('./pages/GlobalSettings.vue'),
     },
     {
+      path: '/Stats',
+      name: 'Stats',
+      component: () => import('./pages/UserStats.vue'),
+    },
+    {
       path: '/WordLists',
       name: 'WordLists',
       component: () => import('./pages/WordLists.vue'),

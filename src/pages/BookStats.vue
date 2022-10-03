@@ -56,7 +56,6 @@
             />
           </n-tab-pane>
         </n-tabs>
-
       </n-layout-content>
       <n-layout-footer class="p-4" bordered>
         <n-space justify="end">

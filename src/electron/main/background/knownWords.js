@@ -18,6 +18,14 @@ export async function syncWords() {
 Known characters: ${knownCharacters.size} `);
 }
 
+function wordStats() {
+  return {
+    words: Object.keys(known).length,
+    characters: knownCharacters.size,
+    wack: checkWords(),
+  };
+}
+
 export function checkWords() {
   let wackWords = 0;
   Object.keys(known).forEach((word) => {
@@ -25,7 +33,7 @@ export function checkWords() {
       wackWords += 1;
     }
   });
-  console.log(`You got ${wackWords} wack words`);
+  return wackWords;
 }
 
 // For now the db code will update the word set here on each addition.
@@ -104,4 +112,9 @@ export function isKnownChar(char) {
   return knownCharacters.has(char);
 }
 
-export const knownWordsIpc = { addWord, importLegacyWords, importCSVWords };
+export const knownWordsIpc = {
+  addWord,
+  importLegacyWords,
+  importCSVWords,
+  wordStats,
+};
