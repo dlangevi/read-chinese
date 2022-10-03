@@ -21,7 +21,8 @@
       <n-button v-if="isFavorite" @click="favorite(false)">
         Remove From Favorites
       </n-button>
-      <n-button @click="markRead">Mark Read</n-button>
+      <n-button v-if="!isRead" @click="markRead(true)">Mark Read</n-button>
+      <n-button v-if="isRead" @click="markRead(false)">Unmark Read</n-button>
       <n-button @click="deleteBook">Delete</n-button>
     </n-space>
   </n-card>
@@ -40,13 +41,15 @@ const props = defineProps({
   },
 });
 
+const isRead = ref(props.book.hasRead);
 const isFavorite = ref(props.book.favorite);
 function favorite(setTo) {
   window.ipc.setFavorite(props.book.bookId, setTo);
   isFavorite.value = setTo;
 }
-function markRead() {
-
+function markRead(setTo) {
+  window.ipc.setRead(props.book.bookId, setTo);
+  isRead.value = setTo;
 }
 
 function deleteBook() {

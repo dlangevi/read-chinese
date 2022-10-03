@@ -29,6 +29,7 @@
                 %
               </template>
             </n-statistic>
+            <n-statistic label="Total Words" :value="totalWords" />
 
             <n-table :bordered="false" :single-line="false">
               <thead>
@@ -97,6 +98,7 @@ const knownCharacters = (
   (book.knownCharacters / book.totalCharacters) * 100).toFixed(2);
 console.log(book);
 
+const { totalWords } = book;
 const firstTarget = book.needToKnow.findIndex((n) => n !== 0);
 const targets = book.targets.slice(firstTarget, firstTarget + 3);
 const needToKnow = book.needToKnow.slice(firstTarget, firstTarget + 3);

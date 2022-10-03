@@ -205,6 +205,7 @@ const bookFields = {
   bookId: 'bookId',
   favorite: 'favorite',
   segmentedFile: 'segmented_file',
+  hasRead: 'has_read',
 };
 
 // Seems a bit repetative ...

@@ -209,6 +209,31 @@ async function setFavorite(bookId, isFavorite) {
   });
 }
 
+async function setRead(bookId, hasRead) {
+  return knex('books').where('bookId', bookId).update({
+    has_read: hasRead,
+  });
+}
+
+async function totalRead() {
+  const top = await knex('frequency')
+    .sum({ totalWords: 'count' })
+    .whereExists(function wordTable() {
+      this.select('bookId')
+        .from('books')
+        .where('has_read', true)
+        .whereRaw('books.bookId==frequency.book');
+    });
+  return top[0];
+}
+
 export const bookLibraryIpc = {
-  loadBooks, learningTarget, loadBook, topUnknownWords, deleteBook, setFavorite,
+  loadBooks,
+  learningTarget,
+  loadBook,
+  topUnknownWords,
+  deleteBook,
+  setFavorite,
+  setRead,
+  totalRead,
 };
