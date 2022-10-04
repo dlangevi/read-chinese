@@ -304,17 +304,18 @@ async function submit() {
       const book = await window.ipc.loadBook(preferBookRef.value);
       tags.push(book.title);
     }
-    const res = await window.ipc.createAnkiCard(cardValues, tags);
-    messageReactive.content = JSON.stringify(res);
-    if (res !== 'success') {
-      console.log(res);
-      messageReactive.type = 'error';
-    } else {
-      messageReactive.type = 'success';
-    }
-    setTimeout(() => {
-      messageReactive.destroy();
-    }, 1000);
+    window.ipc.createAnkiCard(cardValues, tags).then((res) => {
+      messageReactive.content = JSON.stringify(res);
+      if (res !== 'success') {
+        console.log(res);
+        messageReactive.type = 'error';
+      } else {
+        messageReactive.type = 'success';
+      }
+      setTimeout(() => {
+        messageReactive.destroy();
+      }, 1000);
+    });
   } else {
     const newData = {};
     const cardValues = toRaw(card.value.fields);

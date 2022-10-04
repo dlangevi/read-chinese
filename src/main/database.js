@@ -6,7 +6,7 @@
 import Store from 'electron-store';
 import Knex from 'knex';
 // For now we do the sync whenever the db changes.
-import knexConfigMap from '../../../../knexfile.mjs';
+import knexConfigMap from '../../knexfile.mjs';
 
 console.log(knexConfigMap);
 const knexConfig = knexConfigMap[import.meta.env.MODE];

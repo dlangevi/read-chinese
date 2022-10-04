@@ -15,7 +15,7 @@ export default defineConfig({
     WindiCss(),
     electron({
       main: {
-        entry: 'src/electron/main/index.ts',
+        entry: 'src/main/index.ts',
         vite: {
           build: {
             // For Debug
@@ -28,7 +28,7 @@ export default defineConfig({
       preload: {
         input: {
           // You can configure multiple preload here
-          index: path.join(__dirname, 'src/electron/preload/index.ts'),
+          index: path.join(__dirname, 'src/preload/index.ts'),
         },
 
         vite: {
@@ -41,12 +41,15 @@ export default defineConfig({
       },
       // Enables use of Node.js API in the Renderer-process
       // https://github.com/electron-vite/vite-plugin-electron/tree/main/packages/electron-renderer#electron-renderervite-serve
-      // renderer: {},
+      renderer: {
+
+      },
     }),
   ],
   resolve: {
     alias: {
-      '@': `${path.resolve(__dirname, './src')}`,
+      '@': `${path.resolve(__dirname, './src/renderer')}`,
+      '@shared': `${path.resolve(__dirname, './src/shared')}`,
     },
   },
   server: process.env.VSCODE_DEBUG ? {

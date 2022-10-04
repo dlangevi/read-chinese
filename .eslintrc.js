@@ -5,7 +5,8 @@ module.exports = {
     'import/resolver': {
       alias: {
         map: [
-          ['@', './src'],
+          ['@', './src/renderer'],
+          ['@shared', './src/shared'],
         ],
       },
     },

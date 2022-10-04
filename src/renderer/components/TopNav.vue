@@ -3,7 +3,7 @@
     <div class="block flex items-center justify-between h-16">
       <img
         class="block h-32 w-auto"
-        src="../assets/logo_transparent.png"
+        src="../../assets/logo_transparent.png"
         alt="Read More" />
       <div
         class="flex-1 flex items-center justify-center

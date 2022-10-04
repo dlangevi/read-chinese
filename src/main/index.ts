@@ -15,15 +15,15 @@ import {
 import { release } from 'os';
 import { join } from 'path';
 
-import { syncWords, checkWords } from './background/knownWords';
-import { loadDictionaries } from './background/dictionaries';
-import { preloadWords } from './background/segmentation';
-import { initIpcMain } from '../ipcLoader';
+import { initIpcMain } from '../shared/ipcLoader';
+import { syncWords, checkWords } from './knownWords';
+import { loadDictionaries } from './dictionaries';
+import { preloadWords } from './segmentation';
 import {
   updateTimesRan,
   getTimesRan,
   initializeDatabase,
-} from './background/database';
+} from './database';
 
 console.time('bootup');
 process.env.DIST = join(__dirname, '../..');

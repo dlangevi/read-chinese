@@ -13,17 +13,16 @@
 </template>
 
 <script setup>
-import TopNav from '@/components/TopNav.vue';
-import CardCreator from '@/components/CardCreator.vue';
 import { useRoute } from 'vue-router';
 import { NMessageProvider } from 'naive-ui';
+import TopNav from '@/components/TopNav.vue';
+import CardCreator from '@/components/CardCreator.vue';
 // eslint-disable-next-line import/no-unresolved
 import 'virtual:windi.css';
 
 const route = useRoute();
 </script>
 
-<style src="./app.css" />
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

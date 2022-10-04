@@ -1,6 +1,6 @@
 import { app, dialog } from 'electron';
-import { importCalibreBooks } from '../main/background/calibre';
-import { addDictionary } from '../main/background/dictionaries';
+import { importCalibreBooks } from '../calibre';
+import { addDictionary } from '../dictionaries';
 
 export default {
   label: 'App',

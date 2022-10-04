@@ -11,7 +11,11 @@
     "sourceMap": true,
     "baseUrl": "./",
     "strict": true,
-    "paths": {},
+    "paths": {
+      "@/*": ["src/renderer/*"],
+      "@shared/*": ["src/shared/*"] 
+
+    },
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true
   },
