@@ -3,7 +3,7 @@ import { addWords, addWord } from './knownWords';
 import { synthesize } from './textToSpeech';
 import { getOptionValue } from './database';
 // Must have ankiconnect installed as a plugin in your anki installation
-async function invoke(action, params) {
+async function invoke(action:string, params:any):Promise<any> {
   const response = await fetch('http://localhost:8765', {
     method: 'Post',
     body: JSON.stringify({
@@ -17,7 +17,17 @@ async function invoke(action, params) {
   return response.json();
 }
 
-function isChinese(word) {
+type Fields = {
+  word: string,
+  sentence: string,
+  englishDefn: string,
+  chineseDefn: string,
+  pinyin: string,
+  imageUrls: [string],
+}
+
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+function isChinese(word:string) {
   // unicode ranges for chinese characters
   const isOnlyChinese = /^[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]*$/
     .test(word);
@@ -27,7 +37,7 @@ function isChinese(word) {
   return isOnlyChinese;
 }
 
-function fixWord(origWord) {
+function fixWord(origWord:string) {
   let word = origWord;
   word = word.replace(/<br>/gi, '');
   word = word.replace(/<div>/gi, '');
@@ -41,28 +51,7 @@ function fixWord(origWord) {
   return word;
 }
 
-export async function addSentenceToCard(word, sentence) {
-  const notes = await invoke('findNotes', { query: `Hanzi:${word}` });
-  if (notes.result.length !== 1) {
-    console.log(`Too many or few notes match ${word}, ${notes.result}`);
-    return;
-  }
-  const noteID = notes.result[0];
-  console.log(`Adding sentence to card for ${word} (noteID ${noteID})`);
-  const result = await invoke('updateNoteFields', {
-    note: {
-      id: noteID,
-      fields: {
-        ExampleSentence: sentence,
-      },
-    },
-  });
-  if (result.error) {
-    console.log(result);
-  }
-}
-
-async function getAnkiNoteRaw(word) {
+async function getAnkiNoteRaw(word:string) {
   const noteID = await invoke('findNotes', { query: `Hanzi:${word}` });
   if (noteID.result.length > 1) {
     console.log(`Too many or few notes match ${word}, ${noteID.result}`);
@@ -74,7 +63,7 @@ async function getAnkiNoteRaw(word) {
   return noteInfo.result[0];
 }
 
-async function createAnkiNoteSkeleton(word) {
+async function createAnkiNoteSkeleton(word:string) {
   // TODO for now just do this simple thing to provide a skeleton
   return {
     noteId: undefined,
@@ -89,7 +78,7 @@ async function createAnkiNoteSkeleton(word) {
   };
 }
 
-async function getAnkiNote(word) {
+async function getAnkiNote(word:string) {
   const rawNote = await getAnkiNoteRaw(word);
 
   // TODO make this mapping user configureable
@@ -111,31 +100,6 @@ async function getAnkiNote(word) {
   return note;
 }
 
-async function getAnkiCard(word) {
-  const cardID = await invoke('findCards', { query: `Hanzi:${word}` });
-  if (cardID.result.length !== 1) {
-    console.log(`Too many or few notes match ${word}, ${cardID.result}`);
-    return 'error';
-  }
-  const cardInfo = await invoke('cardsInfo', {
-    cards: cardID.result,
-  });
-  return cardInfo.result[0];
-}
-
-export async function getLackingCards(deck) {
-  const skritter = await invoke('findCards', {
-    query: `deck:${deck} ExampleSentence:`,
-  });
-  const skritterInfo = await invoke('cardsInfo', {
-    cards: skritter.result,
-  });
-  const allWords = skritterInfo.result
-    .map((card) => fixWord(card.fields.Hanzi.value))
-    .filter((word) => isChinese(word));
-  return allWords;
-}
-
 // TODO filter by deck
 async function loadFlaggedCards() {
   const flaggedIDs = await invoke('findCards', {
@@ -145,21 +109,22 @@ async function loadFlaggedCards() {
     cards: flaggedIDs.result,
   });
   return flaggedCards.result
-    .map((card) => ({
+    .map((card:any) => ({
       word: fixWord(card.fields.Hanzi.value),
       sentence: card.fields.ExampleSentence.value,
     }));
 }
 
-async function updateCards(ankiCards) {
-  addWords(ankiCards.map((ankiCard) => ({
+async function updateCards(ankiCards:any) {
+  addWords(ankiCards.map((ankiCard:any) => ({
     word: ankiCard.fields.Hanzi.value,
     interval: ankiCard.interval,
     has_flash_card: true,
   })));
 }
 
-async function updateAnkiCard(noteID, fields) {
+// TODO use Fields object
+async function updateAnkiCard(noteID:any, fields:any) {
   const res = await invoke('updateNoteFields', {
     note: {
       id: noteID,
@@ -174,7 +139,7 @@ async function updateAnkiCard(noteID, fields) {
   return res;
 }
 
-export async function createAnkiCard(fields, tags = []) {
+async function createAnkiCard(fields:Fields, tags = []) {
   // TODO make this based on used defined fields
   console.log('tags', tags);
   const audioArray = [];
@@ -219,7 +184,7 @@ export async function createAnkiCard(fields, tags = []) {
       },
       audio: audioArray,
       picture:
-        fields.imageUrls.map((imageUrl) => ({
+        fields.imageUrls.map((imageUrl:string) => ({
           url: imageUrl,
           // TODO dont guess the encoding format
           filename: `read-chinese-image-${new Date().getTime()}.jpg`,
@@ -236,7 +201,7 @@ export async function createAnkiCard(fields, tags = []) {
   return res;
 }
 
-async function removeFlag(noteID) {
+async function removeFlag(noteID:string) {
   const noteInfo = await invoke('notesInfo', {
     notes: [noteID],
   });
@@ -256,9 +221,9 @@ async function removeFlag(noteID) {
 }
 
 // @todo: make this configurable from the app to pick certian decks and fields
-export async function importAnkiKeywords() {
+async function importAnkiKeywords() {
   const reading = await invoke('findCards', {
-    query: 'deck:Reading -"note:Audio Card"',
+    query: 'deck:Reading',
   });
   const readingInfo = await invoke('cardsInfo', {
     cards: reading.result,
@@ -278,7 +243,6 @@ export async function importAnkiKeywords() {
 export const ankiInterfaceIpc = {
   createAnkiCard,
   createAnkiNoteSkeleton,
-  getAnkiCard,
   getAnkiNote,
   updateAnkiCard,
   loadFlaggedCards,
