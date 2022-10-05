@@ -6,6 +6,7 @@
       :setting="UserSettings.BookLibrary.OnlyFavorites"
       @update="updateFilter"
     />
+    <n-button @click="syncCalibre">Sync Calibre</n-button>
   </div>
 
   <n-grid x-gap="12" y-gap="12" :cols="4" v-if="books.length > 0">
@@ -21,10 +22,14 @@
 import {
   onBeforeMount, inject, ref, computed,
 } from 'vue';
-import { NGrid, NGi } from 'naive-ui';
+import { NGrid, NGi, NButton } from 'naive-ui';
 import BookCard from '@/components/BookCard.vue';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
+
+function syncCalibre() {
+  window.ipc.importCalibreBooks();
+}
 
 const UserSettings = inject('userSettings');
 

@@ -8,6 +8,7 @@ import { dictionariesIpc } from '../main/dictionaries';
 import { generateSentencesIpc } from '../main/generateSentences';
 import { imageSearchIpc } from '../main/imageSearch';
 import { databaseIpc } from '../main/database';
+import { calibreIpc } from '../main/calibre';
 
 // Put this here for now
 function filePicker(extension) {
@@ -30,6 +31,7 @@ const ipcFunctions = {
   ...dictionariesIpc,
   ...databaseIpc,
   ...imageSearchIpc,
+  ...calibreIpc,
   filePicker,
 };
 

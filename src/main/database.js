@@ -242,6 +242,9 @@ export async function dbBookExists(author, title) {
   ).where({
     author, title,
   });
+  if (books.length !== 1) {
+    console.log(books);
+  }
   return books.length === 1;
 }
 

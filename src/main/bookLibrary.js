@@ -112,7 +112,7 @@ async function deleteBook(bookId) {
 
 async function computeWordTable(book) {
   console.log(`computing wordtable for ${book.filepath}`);
-  const segText = await loadJieba(book.filepath);
+  const segText = await loadJieba(book);
   const wordTable = {};
   segText.forEach((sentence) => {
     sentence.forEach(([word, type]) => {
