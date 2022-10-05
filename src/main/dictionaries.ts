@@ -3,13 +3,16 @@ import fs from 'fs';
 import {
   dbSaveDict, dbLoadDicts, dbGetPrimaryDict, dbSetPrimaryDict, dbDeleteDict,
 } from './database';
+import {
+  dictionaryType,
+} from '../shared/sharedTypes';
 
-const dicts = {
+const dicts: {[key:string]:any} = {
 };
 // TODO have these user set
 let defaultDict = 'ccdict';
 
-export function addDictionary(name, path, type) {
+export function addDictionary(name:string, path:string, type:dictionaryType) {
   // Just for now
   // Later we will make our own copy of the dictionary
   dbSaveDict(name, path, type);
@@ -17,12 +20,12 @@ export function addDictionary(name, path, type) {
   loadDictionaries();
 }
 
-export function deleteDictionary(name) {
+export function deleteDictionary(name:string) {
   dbDeleteDict(name);
   delete dicts[name];
 }
 
-function setPrimaryDict(dictName) {
+function setPrimaryDict(dictName:string) {
   console.log('setting primary dict to ', dictName);
   defaultDict = dictName;
   dbSetPrimaryDict(dictName);
@@ -38,9 +41,9 @@ export function loadDictionaries() {
   Object.entries(ldicts).forEach(([name, entry]) => {
     console.log(name, entry);
     const fileContents = fs.readFileSync(entry.path);
-    const contents = JSON.parse(fileContents);
-    const dictionary = {};
-    contents.forEach((term) => {
+    const contents = JSON.parse(fileContents.toString());
+    const dictionary: {[key:string]:any} = {};
+    contents.forEach((term:any) => {
       const word = term.term;
       if (!(word in dictionary)) {
         dictionary[word] = [];
@@ -56,7 +59,7 @@ export function loadDictionaries() {
 
 // This is just used for a simple definition when displaying
 // in large word lists
-export function getDefaultDefinition(word) {
+export function getDefaultDefinition(word:string) {
   const term = dicts[defaultDict].dictionary[word];
   if (term === undefined) {
     return undefined;
@@ -64,22 +67,22 @@ export function getDefaultDefinition(word) {
   return term[0].definition;
 }
 
-export function getPinyin(word) {
+export function getPinyin(word:string) {
   const terms = dicts[defaultDict].dictionary[word];
   if (!terms) {
     // TODO do char by char lookup and concatinate?
     return '';
   }
-  return [...new Set(terms.map((term) => term.pronunciation))].join(', ');
+  return [...new Set(terms.map((term:any) => term.pronunciation))].join(', ');
 }
 
-export function isInDictionary(word) {
+export function isInDictionary(word:string) {
   return Object.values(dicts).some((dict) => word in dict.dictionary);
 }
 
 // type = 'english' or 'chinese'
-function getDefinitionsForWord(word, type) {
-  const answers = [];
+function getDefinitionsForWord(word:string, type:dictionaryType) {
+  const answers:any[] = [];
 
   Object.values(dicts)
     .filter((dict) => dict.type === type)
@@ -88,7 +91,7 @@ function getDefinitionsForWord(word, type) {
       if (term === undefined) {
         return;
       }
-      term.forEach((def) => {
+      term.forEach((def:any) => {
         answers.push({
           definition: def.definition.replace(/\n/g, '<br>'),
           // No spaces in pinyin

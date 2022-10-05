@@ -143,7 +143,7 @@ async function createAnkiCard(fields:Fields, tags = []) {
   // TODO make this based on used defined fields
   console.log('tags', tags);
   const audioArray = [];
-  if (getOptionValue('GenerateTermAudio')) {
+  if (getOptionValue('GenerateTermAudio', false)) {
     const wordAudioFile = await synthesize(fields.word);
     audioArray.push({
       path: wordAudioFile,
@@ -153,7 +153,7 @@ async function createAnkiCard(fields:Fields, tags = []) {
       ],
     });
   }
-  if (getOptionValue('GenerateSentenceAudio')) {
+  if (getOptionValue('GenerateSentenceAudio', false)) {
     const sentenceAudioFile = await synthesize(fields.sentence);
     audioArray.push({
       path: sentenceAudioFile,

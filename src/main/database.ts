@@ -3,10 +3,13 @@
 // persistant storage will have to go through functions prefixed 'db' in this
 // file. If we want to swap out backends later on at least all the code to be
 // changed will be in the same place
-import Store from 'electron-store';
+import Store, { Schema } from 'electron-store';
 import Knex from 'knex';
 // For now we do the sync whenever the db changes.
 import knexConfigMap from '../../knexfile.mjs';
+import {
+  dictionaryType,
+} from '../shared/sharedTypes';
 
 console.log(knexConfigMap);
 const knexConfig = knexConfigMap[import.meta.env.MODE];
@@ -14,14 +17,42 @@ export const knex = Knex(knexConfig);
 
 // This is called and awaited before before anyother code can run
 export async function initializeDatabase() {
-  await knex.migrate.latest(knexConfig).catch((err) => {
+  await knex.migrate.latest().catch((err) => {
     console.log(err);
   });
 }
 
-// Books and metadata can be stored in electron-store for now since they should
-// be low footprint
-const metadataStore = new Store({ name: 'metadata' });
+interface metadata {
+  ran: number;
+  dicts: {
+    [name:string] : {
+    path: string,
+    type: dictionaryType,
+    }
+  };
+  primaryDict: string
+}
+const metadataSchema : Schema<metadata> = {
+  ran: {
+    type: 'number',
+    default: 0,
+  },
+  dicts: {
+    type: 'object',
+    default: {},
+  },
+  primaryDict: {
+    type: 'string',
+    default: 'ccdict',
+  },
+};
+
+// Dictionaries and User settings can be stored in electron-store
+// since they are low footprint
+const metadataStore = new Store({
+  name: 'metadata',
+  schema: metadataSchema,
+});
 
 /** *********************************
  *
@@ -29,26 +60,28 @@ const metadataStore = new Store({ name: 'metadata' });
  *
  ********************************** */
 
-export function updateTimesRan() {
-  const timesRan = metadataStore.get('ran', 0);
+export function updateTimesRan():void {
+  const timesRan:number = metadataStore.get('ran');
   metadataStore.set('ran', timesRan + 1);
 }
 
-export function getTimesRan() {
-  return metadataStore.get('ran', 0);
+export function getTimesRan():number {
+  return metadataStore.get('ran');
 }
 
 // TODO, should there be some white list of valid keys?
-export function getOptionValue(key, defaultValue) {
+// import schema type info from usersettings.ts, including
+// default values
+export function getOptionValue(key:string, defaultValue:any) {
   return metadataStore.get(key, defaultValue);
 }
 
-function setOptionValue(key, value) {
+function setOptionValue(key:string, value:any) {
   metadataStore.set(key, value);
 }
 
-export function dbSaveDict(name, path, type) {
-  const dicts = metadataStore.get('dicts', {});
+export function dbSaveDict(name:string, path:string, type:dictionaryType) {
+  const dicts = metadataStore.get('dicts');
   dicts[name] = {
     path,
     type,
@@ -56,21 +89,21 @@ export function dbSaveDict(name, path, type) {
   metadataStore.set('dicts', dicts);
 }
 
-export function dbDeleteDict(name) {
-  const dicts = metadataStore.get('dicts', {});
+export function dbDeleteDict(name:string) {
+  const dicts = metadataStore.get('dicts');
   delete dicts[name];
   metadataStore.set('dicts', dicts);
 }
 
 export function dbLoadDicts() {
-  return metadataStore.get('dicts', {});
+  return metadataStore.get('dicts');
 }
 
-export function dbSetPrimaryDict(dictName) {
+export function dbSetPrimaryDict(dictName:string) {
   return metadataStore.set('primaryDict', dictName);
 }
 export function dbGetPrimaryDict() {
-  return metadataStore.get('primaryDict', 'ccdict');
+  return metadataStore.get('primaryDict');
 }
 /** *********************************
  *
@@ -85,7 +118,11 @@ export function dbGetPrimaryDict() {
  *
  ********************************** */
 
-export async function dbUpdateWord(word, interval = 0, hasFlashCard = false) {
+export async function dbUpdateWord(
+  word:string,
+  interval = 0,
+  hasFlashCard = false,
+) {
   console.log(`Adding new word: ${word}`);
   knex('words')
     .insert({
@@ -99,7 +136,7 @@ export async function dbUpdateWord(word, interval = 0, hasFlashCard = false) {
 }
 
 // Insert words in chunks of chunkSize
-export async function dbUpdateWords(wordRows) {
+export async function dbUpdateWords(wordRows:any) {
   try {
     await knex.transaction(async (trx) => {
       const chunkSize = 50;
@@ -117,18 +154,29 @@ export async function dbUpdateWords(wordRows) {
   }
 }
 
-export async function dbLoadWords() {
-  const rows = await knex('words')
-    .select({ word: 'word', interval: 'interval' })
-    .catch((error) => { console.log(error); });
-  const words = {};
-  rows.forEach((row) => {
-    words[row.word] = { interval: row.interval };
-  });
-  return words;
+interface Word {
+  word: string;
+  has_flash_card: boolean;
+  has_sentence: boolean;
+  interval: number;
+  created_at: Date;
+  updated_at: Date;
 }
 
-export async function dbWordExists(word) {
+export async function dbLoadWords() {
+  return knex<Word>('words')
+    .select({ word: 'word', interval: 'interval' })
+    .then((rows) => {
+      const words: {[key:string]:{ interval:number} } = {};
+      rows.forEach((row:any) => {
+        words[row.word] = { interval: row.interval };
+      });
+      return words;
+    })
+    .catch((error) => { console.log(error); });
+}
+
+export async function dbWordExists(word:string) {
   const exists = await knex('words').select().where('word', word);
   return exists.length !== 0;
 }
@@ -151,7 +199,12 @@ export async function dbWordExists(word) {
  * word frequencies
  *
  ********************************** */
-export async function dbAddBook(author, title, cover, filepath) {
+export async function dbAddBook(
+  author:string,
+  title:string,
+  cover:string,
+  filepath:string,
+) {
   // For now just point to the actual txt file location in calibre.
   // Later we will make our own copy
   return knex('books').insert({
@@ -167,7 +220,7 @@ export async function dbAddBook(author, title, cover, filepath) {
     });
 }
 
-export async function dbSaveWordTable(book, wordTable) {
+export async function dbSaveWordTable(book:any, wordTable:any) {
   const wordRows = Object.entries(wordTable)
     .map(([word, frequency]) => ({
       book: book.bookId,
@@ -180,18 +233,18 @@ export async function dbSaveWordTable(book, wordTable) {
   });
 }
 
-export async function dbLoadWordTable(book) {
+export async function dbLoadWordTable(book:any) {
   const wordRows = await knex('frequency')
     .select({ word: 'word', count: 'count' })
     .where('book', book.bookId);
-  const wordDict = {};
+  const wordDict: {[key:string]: number } = {};
   wordRows.forEach(({ word, count }) => {
     wordDict[word] = count;
   });
   return wordDict;
 }
 
-export async function dbBookSetCache(bookId, filepath) {
+export async function dbBookSetCache(bookId:number, filepath:string) {
   return knex('books').where('bookId', bookId).update({
     segmented_file: filepath,
   });
@@ -217,7 +270,7 @@ export async function dbGetBooks(bookIds = []) {
   return books;
 }
 
-export async function dbGetBook(author, title) {
+export async function dbGetBook(author:string, title:string) {
   const books = await knex('books').select(
     bookFields,
   ).where({
@@ -226,7 +279,7 @@ export async function dbGetBook(author, title) {
   return books[0];
 }
 
-export async function dbGetBookById(bookId) {
+export async function dbGetBookById(bookId:number) {
   const books = await knex('books').select(
     bookFields,
   ).where({
@@ -236,7 +289,7 @@ export async function dbGetBookById(bookId) {
 }
 
 // For now we will use author and title to do book uniqueness
-export async function dbBookExists(author, title) {
+export async function dbBookExists(author:string, title:string) {
   const books = await knex('books').select(
     bookFields,
   ).where({
