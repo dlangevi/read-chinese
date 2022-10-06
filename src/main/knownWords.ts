@@ -4,12 +4,16 @@ import { isInDictionary } from './dictionaries';
 import {
   dbLoadWords, dbUpdateWord, dbUpdateWords, getOptionValue,
 } from './database';
+import { KnownWords } from '../shared/sharedTypes';
 
 // Memory cache of the set of known words for performance
-let known = {};
+let known: KnownWords = {};
 let knownCharacters = new Set();
 export async function syncWords() {
-  known = await dbLoadWords();
+  await dbLoadWords().then((words) => {
+    known = words;
+  });
+
   knownCharacters = new Set();
   Object.keys(known).forEach((word) => {
     Array.from(word).forEach((ch) => knownCharacters.add(ch));
@@ -38,43 +42,17 @@ export function checkWords() {
 
 // For now the db code will update the word set here on each addition.
 // In the future there should not be two seperate sets of words
-export function addWord(word, age = 0, hasFlashCard = false) {
+export function addWord(word:any, age = 0, hasFlashCard = false) {
   known[word] = { interval: age };
   dbUpdateWord(word, age, hasFlashCard);
 }
 
 // wordRows expects [{word, interval, has_flash_card}]
-export function addWords(wordRows) {
-  wordRows.forEach((row) => {
+export function addWords(wordRows:any) {
+  wordRows.forEach((row:any) => {
     known[row.word] = { interval: row.interval };
   });
   dbUpdateWords(wordRows);
-}
-
-export function importLegacyWords() {
-  const wordsFile = dialog.showOpenDialogSync({
-    properties: ['openFile'],
-    filters: [
-      { name: 'Json format', extensions: ['json'] },
-    ],
-  });
-  if (wordsFile === undefined) {
-    return;
-  }
-  const contents = fs.readFileSync(wordsFile[0], {
-    encoding: 'utf-8',
-    flags: 'r',
-  });
-  try {
-    // Dont worry about validating since this is only for my personal use
-    const words = JSON.parse(contents);
-    const wordRows = Object.entries(words).map(
-      ([word, entry]) => ({ word, interval: entry.interval }),
-    );
-    addWords(wordRows);
-  } catch (error) {
-    console.error(error);
-  }
 }
 
 export function importCSVWords() {
@@ -90,7 +68,7 @@ export function importCSVWords() {
   }
   const contents = fs.readFileSync(wordsFile[0], {
     encoding: 'utf-8',
-    flags: 'r',
+    flag: 'r',
   });
   // For now its just one word per line no other data?
   const words = contents.split('\n');
@@ -104,17 +82,16 @@ export function updateInterval() {
   knownInterval = getOptionValue('KnownInterval', 100);
 }
 
-export function isKnown(word) {
+export function isKnown(word:string) {
   return (word in known) && known[word].interval >= knownInterval;
 }
 
-export function isKnownChar(char) {
+export function isKnownChar(char:string) {
   return knownCharacters.has(char);
 }
 
 export const knownWordsIpc = {
   addWord,
-  importLegacyWords,
   importCSVWords,
   wordStats,
 };

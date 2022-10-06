@@ -8,7 +8,7 @@ import Knex from 'knex';
 // For now we do the sync whenever the db changes.
 import knexConfigMap from '../../knexfile.mjs';
 import {
-  dictionaryType,
+  dictionaryType, KnownWords,
 } from '../shared/sharedTypes';
 
 console.log(knexConfigMap);
@@ -167,13 +167,16 @@ export async function dbLoadWords() {
   return knex<Word>('words')
     .select({ word: 'word', interval: 'interval' })
     .then((rows) => {
-      const words: {[key:string]:{ interval:number} } = {};
-      rows.forEach((row:any) => {
+      const words: KnownWords = {};
+      rows.forEach((row) => {
         words[row.word] = { interval: row.interval };
       });
       return words;
     })
-    .catch((error) => { console.log(error); });
+    .catch((error) => {
+      console.log(error);
+      return error;
+    });
 }
 
 export async function dbWordExists(word:string) {

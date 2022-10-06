@@ -2,9 +2,6 @@
   <div class="flex h-full">
     <div class="flex-shrink-0 m-4">
       <n-space vertical>
-        <n-button type="primary" @click="importLegacy">
-          Import Legacy Words
-        </n-button>
         <n-button type="primary" @click="importCSV">
           Import CSV file
         </n-button>
@@ -29,10 +26,6 @@
 <script setup>
 import { NButton, NSpace } from 'naive-ui';
 import UnknownWords from '@/components/UnknownWords.vue';
-
-function importLegacy() {
-  window.ipc.importLegacyWords();
-}
 
 function importCSV() {
   window.ipc.importCSVWords();
