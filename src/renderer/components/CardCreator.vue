@@ -275,7 +275,7 @@ store.$subscribe(async (mutation, state) => {
         );
         if (definitions.length === 1) {
           updateChineseDefinition(definitions);
-          steps.value.splice(englishIdx, 1);
+          steps.value.splice(chineseIdx, 1);
         }
       }
     }
