@@ -7,8 +7,14 @@ import readline from 'readline';
 import { isInDictionary } from './dictionaries';
 // direct from db to prevent cyclic dependency
 import { dbGetBooks, dbBookSetCache } from './database';
+import {
+  Book,
+  SegmentedSentence,
+} from '../shared/types';
 
-const cache = {};
+const cache: {
+  [path:string]: any
+} = {};
 
 async function computeDict() {
   // Load a copy of the jieba dict
@@ -48,7 +54,7 @@ async function computeDict() {
     });
   }
 }
-export async function loadSegmentedText(book) {
+export async function loadSegmentedText(book:Book) {
   // If the book has already been reduced to sentences
   if (book.segmentedFile) {
     if (book.segmentedFile in cache) {
@@ -60,7 +66,10 @@ export async function loadSegmentedText(book) {
       'segmentationCache',
       book.segmentedFile,
     );
-    const sentenceSeg = await fs.promises.readFile(cacheLocation, 'UTF-8', 'r');
+    const sentenceSeg = await fs.promises.readFile(cacheLocation, {
+      encoding: 'utf-8',
+      flag: 'r',
+    });
     const parsed = JSON.parse(sentenceSeg);
     cache[book.segmentedFile] = parsed;
     return parsed;
@@ -83,7 +92,7 @@ export async function loadSegmentedText(book) {
   return joinedSentences;
 }
 
-export function segmentSentence(sentence) {
+export function segmentSentence(sentence:string):SegmentedSentence {
   const json = jieba.cut(sentence);
 
   return json.map((word) => {
@@ -110,10 +119,13 @@ export function segmentSentence(sentence) {
   });
 }
 
-export async function loadJieba(book) {
+export async function loadJieba(book:Book) {
   const txtPath = book.filepath;
   // console.log(`Loading ${txtPath} for the first time`);
-  const txt = await fs.promises.readFile(txtPath, 'UTF-8', 'r');
+  const txt = await fs.promises.readFile(txtPath, {
+    encoding: 'utf-8',
+    flag: 'r',
+  });
   // Misses names, but also makes less compound words
   // Haha, I see why they recommended the default. This still produces a
   // 'lower' accuracy than CTA, but it is not as bad as others
@@ -133,9 +145,9 @@ export async function loadJieba(book) {
   // Doesn't get as many names still makes 两条腿
   // const json = nodejieba.cutForSearch(txt);
 
-  const finalResult = json.reduce(
+  return json.reduce(
     (result, origword) => {
-      let type = '';
+      let type:number;
       let word = origword;
       // const punc = /\p{Script_Extensions=Han}/u;
       // const punc = /\p{CJK_Symbols_and_Punctuation}/u;
@@ -195,16 +207,13 @@ export async function loadJieba(book) {
       }
       return result;
     },
-    [[]],
+    ([[]] as [string, number][][]),
   );
-  // cache[txtPath] = finalResult;
-  return finalResult;
 }
 
 export async function preloadWords() {
   await computeDict();
   const books = await dbGetBooks();
-  // await Promise.all(books.map((bookInfo) => loadJieba(bookInfo)));
   await Promise.all(books.map((bookInfo) => loadSegmentedText(bookInfo)));
 }
 /* const TYPE = {

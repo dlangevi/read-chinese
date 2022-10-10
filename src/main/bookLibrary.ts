@@ -5,14 +5,20 @@ import {
   dbGetBooks, dbGetBookById, dbAddBook, dbBookExists, dbSaveWordTable,
   dbGetBook, knex,
 } from './database';
+import {
+  Book, initBookStats,
+} from '../shared/types';
 
-export async function getBooks(bookIds) {
-  bookIds = bookIds || [];
-
+export async function getBooks(bookIds: number[]) {
   return dbGetBooks(bookIds);
 }
 
-export async function addBook(author, title, cover, filepath) {
+export async function addBook(
+  author:string,
+  title:string,
+  cover:string,
+  filepath:string,
+) {
   const inserted = await dbAddBook(author, title, cover, filepath);
   if (inserted) {
     const book = await dbGetBook(author, title);
@@ -20,46 +26,48 @@ export async function addBook(author, title, cover, filepath) {
     await dbSaveWordTable(book, wordTable);
   }
 }
-export async function bookExists(author, title) {
+export async function bookExists(author:string, title:string) {
   return dbBookExists(author, title);
 }
 
-async function computeBookData(book) {
+async function computeBookData(book:Book) {
   // compute at runtime stuff I dont want to save right now
   await computeStats(book);
 }
 
-async function computeExtraData(book) {
-  const top = await knex('frequency')
+async function computeExtraData(book:Book) {
+  return knex<{word:string, occurance:number}[]>('frequency')
     .select('word')
     .sum({ occurance: 'count' })
     .where('book', book.bookId)
-    .groupBy('word');
+    .groupBy('word')
+    .then((rows) => {
+      let probablyKnownWords = 0;
+      let knownCharacters = 0;
+      let totalCharacters = 0;
+      rows.forEach(({ word, occurance }) => {
+        totalCharacters += word.length * occurance;
+        let allKnown = true;
+        const charArray:string[] = Array.from(word);
+        charArray.forEach((char:string) => {
+          if (isKnownChar(char)) {
+            knownCharacters += occurance;
+          } else {
+            allKnown = false;
+          }
+        });
+        if (isKnown(word) || allKnown) {
+          probablyKnownWords += occurance;
+        }
+      });
 
-  let probablyKnownWords = 0;
-  let knownCharacters = 0;
-  let totalCharacters = 0;
-  top.forEach(({ word, occurance }) => {
-    totalCharacters += word.length * occurance;
-    let allKnown = true;
-    Array.from(word).forEach((char) => {
-      if (isKnownChar(char)) {
-        knownCharacters += occurance;
-      } else {
-        allKnown = false;
-      }
+      book.stats.probablyKnownWords = probablyKnownWords;
+      book.stats.knownCharacters = knownCharacters;
+      book.stats.totalCharacters = totalCharacters;
     });
-    if (isKnown(word) || allKnown) {
-      probablyKnownWords += occurance;
-    }
-  });
-
-  book.probablyKnownWords = probablyKnownWords;
-  book.knownCharacters = knownCharacters;
-  book.totalCharacters = totalCharacters;
 }
 
-async function computeWordTargets(book) {
+async function computeWordTargets(book:Book) {
   const top = await knex('frequency')
     .select('word')
     .select('count')
@@ -75,11 +83,11 @@ async function computeWordTargets(book) {
     80, 84, 86, 90, 92, 94, 96, 98, 100,
   ];
   const targetOccurances = targets.map(
-    (target) => (target / 100) * book.totalWords,
+    (target) => (target / 100) * book.stats.totalWords,
   );
   const needToKnow = targetOccurances.map(
     (targetOccurance) => {
-      let soFar = book.totalKnownWords;
+      let soFar = book.stats.totalKnownWords;
       let needToLearn = 0;
       // I actually do need a loop here so I can short circut
       for (const entry of top) { // eslint-disable-line no-restricted-syntax
@@ -92,28 +100,31 @@ async function computeWordTargets(book) {
       return needToLearn;
     },
   );
-  book.targets = targets;
-  book.targetOccuances = targetOccurances;
-  book.needToKnow = needToKnow;
+  book.stats.targets = targets;
+  book.stats.targetOccurances = targetOccurances;
+  book.stats.needToKnow = needToKnow;
 }
 
-async function loadBook(bookId) {
+async function loadBook(bookId:number) {
   const book = await dbGetBookById(bookId);
+  book.stats = initBookStats();
   await computeBookData(book);
   await computeExtraData(book);
   await computeWordTargets(book);
   return book;
 }
 
-async function deleteBook(bookId) {
+async function deleteBook(bookId:number) {
   await knex('books').where('bookId', bookId).del();
   await knex('frequency').where('book', bookId).del();
 }
 
-async function computeWordTable(book) {
+async function computeWordTable(book:Book) {
   console.log(`computing wordtable for ${book.filepath}`);
   const segText = await loadJieba(book);
-  const wordTable = {};
+  const wordTable:{
+    [key:string]: number;
+  } = {};
   segText.forEach((sentence) => {
     sentence.forEach(([word, type]) => {
       if (type !== 3) return;
@@ -127,15 +138,15 @@ async function computeWordTable(book) {
   return wordTable;
 }
 
-async function computeStats(book) {
-  book.totalKnownWords = await knownWords(book);
-  book.totalWords = await allWords(book);
+async function computeStats(book:Book) {
+  book.stats.totalKnownWords = await knownWords(book);
+  book.stats.totalWords = await allWords(book);
 }
 
 // This is where I get tripped up on the seperation layer. This is a db
 // specific operation
-export async function topWords(bookIds) {
-  const top = knex('frequency')
+export async function topWords(bookIds:number[]) {
+  const top = knex<{word:string, occurance:number}[]>('frequency')
     .select('word')
     .sum({ occurance: 'count' })
     .whereNotExists(function wordTable() {
@@ -160,7 +171,7 @@ export async function topWords(bookIds) {
   });
 }
 
-export async function topUnknownWords(bookId, numWords) {
+export async function topUnknownWords(bookId:number, numWords:number) {
   const top = await knex('frequency')
     .select('word')
     .where('book', bookId)
@@ -175,7 +186,7 @@ export async function topUnknownWords(bookId, numWords) {
   return top;
 }
 
-async function knownWords(book) {
+async function knownWords(book:Book) {
   const top = await knex('frequency')
     .sum({ occurance: 'count' })
     .where('book', book.bookId)
@@ -186,7 +197,7 @@ async function knownWords(book) {
     });
   return top[0].occurance;
 }
-async function allWords(book) {
+async function allWords(book:Book) {
   const top = await knex('frequency')
     .sum({ occurance: 'count' })
     .where('book', book.bookId);
@@ -195,21 +206,24 @@ async function allWords(book) {
 
 async function loadBooks() {
   const books = await dbGetBooks();
-  await Promise.all(books.map((book) => computeBookData(book)));
+  await Promise.all(books.map((book) => {
+    book.stats = initBookStats();
+    return computeBookData(book);
+  }));
   return books;
 }
-async function learningTarget(bookIds) {
+async function learningTarget(bookIds:number[]) {
   const words = await topWords(bookIds);
   return words;
 }
 
-async function setFavorite(bookId, isFavorite) {
+async function setFavorite(bookId:number, isFavorite:boolean) {
   return knex('books').where('bookId', bookId).update({
     favorite: isFavorite,
   });
 }
 
-async function setRead(bookId, hasRead) {
+async function setRead(bookId:number, hasRead:boolean) {
   return knex('books').where('bookId', bookId).update({
     has_read: hasRead,
   });

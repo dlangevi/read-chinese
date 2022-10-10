@@ -8,8 +8,8 @@ import Knex from 'knex';
 // For now we do the sync whenever the db changes.
 import knexConfigMap from '../../knexfile.mjs';
 import {
-  dictionaryType, KnownWords,
-} from '../shared/sharedTypes';
+  dictionaryType, KnownWords, Book,
+} from '../shared/types';
 
 console.log(knexConfigMap);
 const knexConfig = knexConfigMap[import.meta.env.MODE];
@@ -265,7 +265,7 @@ const bookFields = {
 };
 
 // Seems a bit repetative ...
-export async function dbGetBooks(bookIds = []) {
+export async function dbGetBooks(bookIds:number[] = []) :Promise<Book[]> {
   const books = knex('books').select(bookFields);
   if (bookIds.length > 0) {
     books.whereIn('bookId', bookIds);
@@ -273,7 +273,7 @@ export async function dbGetBooks(bookIds = []) {
   return books;
 }
 
-export async function dbGetBook(author:string, title:string) {
+export async function dbGetBook(author:string, title:string):Promise<Book> {
   const books = await knex('books').select(
     bookFields,
   ).where({
@@ -282,7 +282,7 @@ export async function dbGetBook(author:string, title:string) {
   return books[0];
 }
 
-export async function dbGetBookById(bookId:number) {
+export async function dbGetBookById(bookId:number):Promise<Book> {
   const books = await knex('books').select(
     bookFields,
   ).where({
@@ -292,7 +292,10 @@ export async function dbGetBookById(bookId:number) {
 }
 
 // For now we will use author and title to do book uniqueness
-export async function dbBookExists(author:string, title:string) {
+export async function dbBookExists(
+  author:string,
+  title:string,
+):Promise<Boolean> {
   const books = await knex('books').select(
     bookFields,
   ).where({

@@ -5,7 +5,7 @@ import {
 } from './database';
 import {
   dictionaryType,
-} from '../shared/sharedTypes';
+} from '../shared/types';
 
 const dicts: {[key:string]:any} = {
 };

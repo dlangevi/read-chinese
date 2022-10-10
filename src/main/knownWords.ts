@@ -4,7 +4,7 @@ import { isInDictionary } from './dictionaries';
 import {
   dbLoadWords, dbUpdateWord, dbUpdateWords, getOptionValue,
 } from './database';
-import { KnownWords } from '../shared/sharedTypes';
+import { KnownWords } from '../shared/types';
 
 // Memory cache of the set of known words for performance
 let known: KnownWords = {};
