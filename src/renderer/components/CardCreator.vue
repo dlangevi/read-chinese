@@ -102,8 +102,9 @@ import EditImages from
 import StepsEnum from '@/components/CardCreatorSteps/StepsEnum';
 import EditDefinition from
   '@/components/CardCreatorSteps/EditDefinition.vue';
+import { UserSettingsKey } from '../../shared/types';
 
-const UserSettings = inject('userSettings');
+const UserSettings = inject(UserSettingsKey);
 
 const store = useCardQueue();
 const showModal = ref(false);

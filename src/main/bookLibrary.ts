@@ -183,7 +183,7 @@ export async function topUnknownWords(bookId:number, numWords:number) {
     .orderBy('count', 'desc')
     .limit(numWords);
 
-  return top;
+  return top.map(({ word }) => word);
 }
 
 async function knownWords(book:Book) {

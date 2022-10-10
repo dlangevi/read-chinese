@@ -38,8 +38,9 @@ import {
 import {
   NSpace, NRadioGroup, NRadio,
 } from 'naive-ui';
+import { UserSettingsKey } from '../../../shared/types';
 
-const UserSettings = inject('userSettings');
+const UserSettings = inject(UserSettingsKey);
 
 const emit = defineEmits(['updateSentence']);
 const sentences = ref([]);

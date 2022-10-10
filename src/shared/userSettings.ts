@@ -6,6 +6,7 @@ import DictionariesList
   from '@/components/SettingsWidgets/DictionariesList.vue';
 import SettingsSlider
   from '@/components/SettingsWidgets/SettingsSlider.vue';
+import { UserSetting, UserSettingsType } from './types';
 
 function settingsObject(
   value:string,
@@ -14,8 +15,8 @@ function settingsObject(
   defaultValue:any,
   widgetType:any,
   other?:any,
-) {
-  const option = {
+):UserSetting {
+  const option:UserSetting = {
     value,
     label,
     tooltip,
@@ -99,7 +100,7 @@ function slider(
   );
 }
 
-const items = (function List() {
+const items:UserSettingsType = (function List() {
   const CardCreation = {
     AutoAdvanceSentence: checkBox(
       'AutoAdvanceSentence',
@@ -154,6 +155,8 @@ const items = (function List() {
   const Dictionaries = {
     Dictionaries: {
       value: 'Dictionaries',
+      label: 'Dictionaries',
+      defaultValue: [],
       type: DictionariesList,
       readFromBackEnd: () => {},
     },
@@ -216,3 +219,5 @@ const items = (function List() {
 }());
 
 export default items;
+console.log(typeof items);
+export type SettingsType = typeof items;

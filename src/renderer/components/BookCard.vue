@@ -12,7 +12,7 @@
       />
     </template>
     <div class="m-4 text-center">
-      Known: {{known}}%
+      Known: {{known.toFixed(2)}}%
     </div>
     <n-space justify="end">
       <n-button v-if="!isFavorite" @click="favorite(true)">
@@ -28,7 +28,7 @@
   </n-card>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { useRouter } from 'vue-router';
 import { NSpace, NCard, NButton } from 'naive-ui';
 import { ref } from 'vue';
@@ -43,11 +43,11 @@ const props = defineProps({
 
 const isRead = ref(props.book.hasRead);
 const isFavorite = ref(props.book.favorite);
-function favorite(setTo) {
+function favorite(setTo:boolean) {
   window.ipc.setFavorite(props.book.bookId, setTo);
   isFavorite.value = setTo;
 }
-function markRead(setTo) {
+function markRead(setTo:boolean) {
   window.ipc.setRead(props.book.bookId, setTo);
   isRead.value = setTo;
 }
@@ -57,7 +57,8 @@ function deleteBook() {
 }
 
 const known = (
-  (props.book.totalKnownWords / props.book.totalWords) * 100).toFixed(2);
+  (props.book.stats.totalKnownWords / props.book.stats.totalWords) * 100
+);
 
 function bookBigMode() {
   router.push(`/book/${props.book.bookId}`);

@@ -1,3 +1,5 @@
+import type { InjectionKey } from 'vue';
+
 export type dictionaryType = 'english' | 'chinese';
 
 export type KnownWords = {
@@ -43,3 +45,24 @@ export type Book = {
   hasRead: boolean;
   stats: BookStats;
 }
+
+export type UserSetting = {
+  value:string;
+  label:string;
+  tooltip?:string;
+  defaultValue:any;
+  type:any
+  other?:any;
+  read?: any;
+  write?:any;
+  readFromBackEnd?:any;
+  loaded?:boolean;
+  cached?:boolean;
+}
+
+export type UserSettingsType = {
+  [section:string]: {
+    [label:string]: UserSetting;
+  }
+}
+export const UserSettingsKey = Symbol('u') as InjectionKey<UserSettingsType>;

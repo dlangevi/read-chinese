@@ -56,8 +56,9 @@
 import { NCard, NButton } from 'naive-ui';
 import StepsEnum from '@/components/CardCreatorSteps/StepsEnum';
 import { inject } from 'vue';
+import { UserSettingsKey } from '../../shared/types';
 
-const UserSettings = inject('userSettings');
+const UserSettings = inject(UserSettingsKey);
 
 const enableChinese = UserSettings.Dictionaries.EnableChinese.read();
 

@@ -43,8 +43,9 @@ import {
 import { SettingsSharp } from '@vicons/ionicons5';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
+import { UserSettingsKey } from '../../shared/types';
 
-const UserSettings = inject('userSettings');
+const UserSettings = inject(UserSettingsKey);
 
 const showSettings = ref(false);
 

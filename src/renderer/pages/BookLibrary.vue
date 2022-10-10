@@ -18,37 +18,37 @@
   </n-grid>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import {
-  onBeforeMount, inject, ref, computed,
+  onBeforeMount, inject, ref, computed, Ref,
 } from 'vue';
 import { NGrid, NGi, NButton } from 'naive-ui';
 import BookCard from '@/components/BookCard.vue';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
+import { Book, UserSettingsKey, UserSettingsType } from '../../shared/types';
 
 function syncCalibre() {
   window.ipc.importCalibreBooks();
 }
 
-const UserSettings = inject('userSettings');
+const UserSettings = inject(UserSettingsKey) as UserSettingsType;
 
 // TODO Would be nice if these properties them selves were reactive
 const onlyFavorites = ref(UserSettings.BookLibrary.OnlyFavorites.read());
 function updateFilter() {
   onlyFavorites.value = UserSettings.BookLibrary.OnlyFavorites.read();
 }
-const books = ref([]);
+const books: Ref<Book[]> = ref([]);
 
 const favoriteFilter = computed(
   () => books.value
-    .filter((book) => {
+    .filter((book:Book) => {
       if (!onlyFavorites.value) return true;
       return book.favorite;
-    // }).sort((bookA, bookB) => bookA.author.localeCompare(bookB.author))
     }).sort((bookA, bookB) => {
-      const aKnown = (bookA.totalKnownWords / bookA.totalWords);
-      const bKnown = (bookB.totalKnownWords / bookB.totalWords);
+      const aKnown = (bookA.stats.totalKnownWords / bookA.stats.totalWords);
+      const bKnown = (bookB.stats.totalKnownWords / bookB.stats.totalWords);
       return bKnown - aKnown;
     }),
 );

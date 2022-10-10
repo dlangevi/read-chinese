@@ -70,7 +70,7 @@
   </n-layout>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import UnknownWords from '@/components/UnknownWords.vue';
 import { provide } from 'vue';
 import {
@@ -79,6 +79,7 @@ import {
   NStatistic, NTable,
 } from 'naive-ui';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
+import { Book } from '../../shared/types';
 
 const props = defineProps({
   bookId: {
@@ -89,26 +90,27 @@ const props = defineProps({
 
 provide('preferBook', props.bookId);
 
-const book = await window.ipc.loadBook(props.bookId);
+const book:Book = await window.ipc.loadBook(props.bookId);
+const { stats } = book;
 
-const known = ((book.totalKnownWords / book.totalWords) * 100).toFixed(2);
+const known = (
+  (stats.totalKnownWords / stats.totalWords) * 100).toFixed(2);
 const likelyKnown = (
-  (book.probablyKnownWords / book.totalWords) * 100).toFixed(2);
+  (stats.probablyKnownWords / stats.totalWords) * 100).toFixed(2);
 const knownCharacters = (
-  (book.knownCharacters / book.totalCharacters) * 100).toFixed(2);
-console.log(book);
+  (stats.knownCharacters / stats.totalCharacters) * 100).toFixed(2);
 
-const { totalWords } = book;
-const firstTarget = book.needToKnow.findIndex((n) => n !== 0);
-const targets = book.targets.slice(firstTarget, firstTarget + 3);
-const needToKnow = book.needToKnow.slice(firstTarget, firstTarget + 3);
+const { totalWords } = book.stats;
+const firstTarget = stats.needToKnow.findIndex((n) => n !== 0);
+const targets = stats.targets.slice(firstTarget, firstTarget + 3);
+const needToKnow = stats.needToKnow.slice(firstTarget, firstTarget + 3);
 const targetPairs = targets.map((e, i) => (
   { target: e, words: needToKnow[i] }));
 
 const store = useCardQueue();
 async function makeFlashCards() {
-  const words = await window.ipc.topUnknownWords(props.bookId, 50);
-  words.forEach(({ word }) => {
+  const words: string[] = await window.ipc.topUnknownWords(props.bookId, 50);
+  words.forEach((word) => {
     store.addWord(word, ActionsEnum.CREATE, { preferBook: props.bookId });
   });
   console.log(words);

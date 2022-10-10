@@ -2,6 +2,7 @@ import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import { createPinia } from 'pinia';
 import UserSettings from '@shared/userSettings';
+import { UserSettingsKey } from '@shared/types';
 
 import BookLibrary from '@/pages/BookLibrary.vue';
 import AboutPage from '@/pages/AboutPage.vue';
@@ -57,7 +58,7 @@ const router = createRouter({
 
 const pinia = createPinia();
 const app = createApp(App);
-app.provide('userSettings', UserSettings);
+app.provide(UserSettingsKey, UserSettings);
 app.use(router);
 app.use(pinia);
 app.mount('#app');

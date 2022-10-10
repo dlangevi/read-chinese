@@ -23,10 +23,11 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { inject } from 'vue';
+import { UserSettingsKey, UserSettingsType } from '../../shared/types';
 
-const UserSettings = inject('userSettings');
+const UserSettings = inject(UserSettingsKey) as UserSettingsType;
 
 const sections = {
   CardCreationSettings:

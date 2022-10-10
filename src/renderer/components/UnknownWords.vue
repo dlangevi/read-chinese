@@ -16,8 +16,9 @@ import { onBeforeMount, ref, inject } from 'vue';
 import { AgGridVue } from 'ag-grid-vue3';
 import MarkLearned from '@/components/MarkLearned.vue';
 import AddToCardQueue from '@/components/AddToCardQueue.vue';
+import { UserSettingsKey } from '../../shared/types';
 
-const UserSettings = inject('userSettings');
+const UserSettings = inject(UserSettingsKey);
 
 const props = defineProps({
   showDefinitions: {
