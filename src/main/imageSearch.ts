@@ -1,10 +1,15 @@
-import { ImageSearchClient } from '@azure/cognitiveservices-imagesearch';
+import {
+  ImageSearchClient,
+} from '@azure/cognitiveservices-imagesearch';
+import {
+  ImagesSearchOptionalParams,
+} from '@azure/cognitiveservices-imagesearch/esm/models';
 import { CognitiveServicesCredentials } from '@azure/ms-rest-azure-js';
 import { getOptionValue } from './database';
 // replace this value with your valid subscription key.
 
-async function getImagesForWord(word) {
-  const imageSearchKey = getOptionValue('AzureImageApiKey');
+async function getImagesForWord(word:string) {
+  const imageSearchKey = getOptionValue('AzureImageApiKey', false);
   const imageSearchEndPoint = 'https://api.bing.microsoft.com/v7.0/images/search';
   const cognitiveServiceCredentials = new CognitiveServicesCredentials(
     imageSearchKey,
@@ -13,7 +18,7 @@ async function getImagesForWord(word) {
     endpoint: imageSearchEndPoint,
   });
 
-  const options = {
+  const options : ImagesSearchOptionalParams = {
     // color: 'Monochrome',
     count: 5,
     imageType: 'Photo',

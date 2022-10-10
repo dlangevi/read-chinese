@@ -8,7 +8,7 @@ import { isInDictionary } from './dictionaries';
 // direct from db to prevent cyclic dependency
 import { dbGetBooks, dbBookSetCache } from './database';
 
-const cache = { };
+const cache = {};
 
 async function computeDict() {
   // Load a copy of the jieba dict
@@ -18,10 +18,7 @@ async function computeDict() {
     : './node_modules/nodejieba/dict/jieba.dict.utf8';
   const outputFile = path.join(app.getPath('userData'), 'jieba.mod.dict.utf8');
   const inputStream = fs.createReadStream(inputFile);
-  const outputStream = fs.createWriteStream(
-    outputFile,
-    { encoding: 'utf8' },
-  );
+  const outputStream = fs.createWriteStream(outputFile, { encoding: 'utf8' });
   const lineReader = readline.createInterface({
     input: inputStream,
     terminal: false,
@@ -63,11 +60,7 @@ export async function loadSegmentedText(book) {
       'segmentationCache',
       book.segmentedFile,
     );
-    const sentenceSeg = await fs.promises.readFile(
-      cacheLocation,
-      'UTF-8',
-      'r',
-    );
+    const sentenceSeg = await fs.promises.readFile(cacheLocation, 'UTF-8', 'r');
     const parsed = JSON.parse(sentenceSeg);
     cache[book.segmentedFile] = parsed;
     return parsed;
@@ -100,13 +93,16 @@ export function segmentSentence(sentence) {
     if (punc.test(word)) {
       // punctuation
       return [word, 1];
-    } if (/\s+/.test(word)) {
+    }
+    if (/\s+/.test(word)) {
       // whitespace
       return [word, 1];
-    } if (/\p{Script=Latin}+/u.test(word)) {
+    }
+    if (/\p{Script=Latin}+/u.test(word)) {
       // english
       return [word, 1];
-    } if (/\p{Script=Han}+/u.test(word)) {
+    }
+    if (/\p{Script=Han}+/u.test(word)) {
       return [word, 3];
     }
     // console.log(`unknown ${word}`);
@@ -137,60 +133,70 @@ export async function loadJieba(book) {
   // Doesn't get as many names still makes 两条腿
   // const json = nodejieba.cutForSearch(txt);
 
-  const finalResult = json.reduce((result, origword) => {
-    let type = '';
-    let word = origword;
-    // const punc = /\p{Script_Extensions=Han}/u;
-    // const punc = /\p{CJK_Symbols_and_Punctuation}/u;
-    const punc = /\p{P}/u;
-    if (punc.test(word)) {
+  const finalResult = json.reduce(
+    (result, origword) => {
+      let type = '';
+      let word = origword;
+      // const punc = /\p{Script_Extensions=Han}/u;
+      // const punc = /\p{CJK_Symbols_and_Punctuation}/u;
+      const punc = /\p{P}/u;
+      if (punc.test(word)) {
       // punctuation
-      type = 1;
-    } else if (/\s+/.test(word)) {
+        type = 1;
+      } else if (/\s+/.test(word)) {
       // whitespace
-      type = 1;
-    } else if (/\p{Script=Latin}+/u.test(word)) {
+        type = 1;
+      } else if (/\p{Script=Latin}+/u.test(word)) {
       // english
-      type = 1;
-    } else if (/\p{Script=Han}+/u.test(word)) {
-      type = 3;
-    } else {
-      type = 1;
-    }
-    const end = result[result.length - 1];
-    if (word.length > 1 && word.includes('.')) {
-      // It sees 15. 14. etc as being words, so remove the . since it breaks db
-      // storage
-      word = word.replaceAll('.', '');
-    }
-    if (word === '\n') {
-      if (end.length > 0) {
-        result.push([]);
+        type = 1;
+      } else if (/\p{Script=Han}+/u.test(word)) {
+        type = 3;
+      } else {
+        type = 1;
       }
-    } else if (word === '？' || word === '！' || word === '。'
-      || word === '…' || word === '.') {
-      if (end.length === 0) {
+      const end = result[result.length - 1];
+      if (word.length > 1 && word.includes('.')) {
+      // It sees 15. 14. etc as being words,
+      // so remove the . since it breaks db storage
+        word = word.replaceAll('.', '');
+      }
+      if (word === '\n') {
+        if (end.length > 0) {
+          result.push([]);
+        }
+      } else if (
+        word === '？'
+        || word === '！'
+        || word === '。'
+        || word === '…'
+        || word === '.'
+      ) {
+        if (end.length === 0) {
+          const previous = result[result.length - 2];
+          previous.push([word, type]);
+        } else {
+          end.push([word, type]);
+          result.push([]);
+        }
+      } else if (word === ' ' || word === '　' || word === '\t') {
+      // cta strips leading spaces
+        if (end.length > 0) {
+          end.push([word, type]);
+        }
+      } else if (
+        (word === '”' || word === '‘' || word === '』')
+        && end.length === 0
+      ) {
+      // Closing quotes go onto previous
         const previous = result[result.length - 2];
         previous.push([word, type]);
       } else {
         end.push([word, type]);
-        result.push([]);
       }
-    } else if (word === ' ' || word === '　' || word === '\t') {
-      // cta strips leading spaces
-      if (end.length > 0) {
-        end.push([word, type]);
-      }
-    } else if ((word === '”' || word === '‘' || word === '』')
-      && end.length === 0) {
-      // Closing quotes go onto previous
-      const previous = result[result.length - 2];
-      previous.push([word, type]);
-    } else {
-      end.push([word, type]);
-    }
-    return result;
-  }, [[]]);
+      return result;
+    },
+    [[]],
+  );
   // cache[txtPath] = finalResult;
   return finalResult;
 }
@@ -199,11 +205,7 @@ export async function preloadWords() {
   await computeDict();
   const books = await dbGetBooks();
   // await Promise.all(books.map((bookInfo) => loadJieba(bookInfo)));
-  await Promise.all(
-    books.map(
-      (bookInfo) => loadSegmentedText(bookInfo),
-    ),
-  );
+  await Promise.all(books.map((bookInfo) => loadSegmentedText(bookInfo)));
 }
 /* const TYPE = {
   NONE: 0, // None - Indicative of an error
