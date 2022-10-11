@@ -41,15 +41,19 @@ module.exports = {
     'vuejs-accessibility/click-events-have-key-events': 'off',
     'import/extensions': [
       'error',
-      'ignorePackages',
+      'never',
       {
-        js: 'never',
-        jsx: 'never',
-        ts: 'never',
-        tsx: 'never',
+        ignorePackages: true,
+        pattern: {
+          js: 'never',
+          jsx: 'never',
+          ts: 'never',
+          tsx: 'never',
+        },
       },
     ],
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+    'import/no-unresolved': 'off',
   },
 
   overrides: [

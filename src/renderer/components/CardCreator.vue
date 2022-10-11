@@ -87,7 +87,7 @@
 
 <script setup>
 import {
-  toRaw, ref, reactive, inject,
+  toRaw, ref, reactive,
 } from 'vue';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import AnkiCardPreview from '@/components/AnkiCardPreview.vue';
@@ -102,9 +102,9 @@ import EditImages from
 import StepsEnum from '@/components/CardCreatorSteps/StepsEnum';
 import EditDefinition from
   '@/components/CardCreatorSteps/EditDefinition.vue';
-import { UserSettingsKey } from '../../shared/types';
+import { getUserSettings } from '@/UserSettings';
 
-const UserSettings = inject(UserSettingsKey);
+const UserSettings = getUserSettings();
 
 const store = useCardQueue();
 const showModal = ref(false);

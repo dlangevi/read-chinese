@@ -33,14 +33,14 @@
 
 <script setup>
 import {
-  watch, onBeforeMount, ref, inject,
+  watch, onBeforeMount, ref,
 } from 'vue';
 import {
   NSpace, NRadioGroup, NRadio,
 } from 'naive-ui';
-import { UserSettingsKey } from '../../../shared/types';
+import { getUserSettings } from '@/UserSettings';
 
-const UserSettings = inject(UserSettingsKey);
+const UserSettings = getUserSettings();
 
 const emit = defineEmits(['updateSentence']);
 const sentences = ref([]);

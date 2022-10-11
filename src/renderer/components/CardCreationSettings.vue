@@ -36,16 +36,16 @@
 </template>
 
 <script setup>
-import { ref, inject } from 'vue';
+import { ref } from 'vue';
 import {
   NIcon, NButton, NModal, NGrid, NGi,
 } from 'naive-ui';
 import { SettingsSharp } from '@vicons/ionicons5';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
-import { UserSettingsKey } from '../../shared/types';
+import { getUserSettings } from '@/UserSettings';
 
-const UserSettings = inject(UserSettingsKey);
+const UserSettings = getUserSettings();
 
 const showSettings = ref(false);
 

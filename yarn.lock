@@ -2040,6 +2040,11 @@ date-fns@^2.28.0:
   resolved "https://registry.npmjs.org/date-fns/-/date-fns-2.29.2.tgz"
   integrity sha512-0VNbwmWJDS/G3ySwFSJA3ayhbURMTJLtwM2DTxf9CWondCnh6DTNlO9JgRSq6ibf4eD0lfMJNBxUdEAHHix+bA==
 
+de-indent@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/de-indent/-/de-indent-1.0.2.tgz#b2038e846dc33baa5796128d0804b455b8c1e21d"
+  integrity sha512-e/1zu3xH5MQryN2zdVaF0OrdNLUbvWxzMbi+iNA6Bky7l1RoP8a2fIbRocyHclXt/arDrrR6lL3TqFD9pMQTsg==
+
 debounce-fn@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmjs.org/debounce-fn/-/debounce-fn-4.0.0.tgz"
@@ -3442,6 +3447,11 @@ has@^1.0.3:
   integrity sha512-f2dvO0VU6Oej7RkWJGrehjbzMAjFp5/VKPp5tTpWIV4JHHZK1/BxbFRtf/siA2SWTe09caDmVtYYzWEIbBS4zw==
   dependencies:
     function-bind "^1.1.1"
+
+he@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
+  integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
 
 heimdalljs@^0.2.3:
   version "0.2.6"
@@ -5875,6 +5885,11 @@ truncate-utf8-bytes@^1.0.0:
   dependencies:
     utf8-byte-length "^1.0.1"
 
+ts-vue-plugin@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/ts-vue-plugin/-/ts-vue-plugin-0.1.3.tgz#f752752e64b315195bef3374d8115e741994e5a3"
+  integrity sha512-FBfURLnwEMc9ynbdRHjI/X0R17mCyi/BdnyMFxIU833nMeprTsCNEIZSYdDybYx04jc+LbzkjgfYVk+GeEV+Hg==
+
 tsc-files@^1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/tsc-files/-/tsc-files-1.1.3.tgz#ef4cfcb7affc9b90577d707a879dc53bb105be83"
@@ -6171,6 +6186,21 @@ vue-router@^4.1.5:
   integrity sha512-IsvoF5D2GQ/EGTs/Th4NQms9gd2NSqV+yylxIyp/OYp8xOwxmU8Kj/74E9DTSYAyH5LX7idVUngN3JSj1X4xcQ==
   dependencies:
     "@vue/devtools-api" "^6.1.4"
+
+vue-template-compiler@^2.2.1:
+  version "2.7.11"
+  resolved "https://registry.yarnpkg.com/vue-template-compiler/-/vue-template-compiler-2.7.11.tgz#e18e8e0dcb2647e8d6ff2ede8a3a92e677ff8dea"
+  integrity sha512-17QnXkFiBLOH3gGCA3nWAWpmdlTjOWLyP/2eg5ptgY1OvDBuIDGOW9FZ7ZSKmF1UFyf56mLR3/E1SlCTml1LWQ==
+  dependencies:
+    de-indent "^1.0.2"
+    he "^1.2.0"
+
+vue-ts-plugin@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/vue-ts-plugin/-/vue-ts-plugin-0.1.0.tgz#d12e956010fc2b60ddf4b440ecd80ef8c0048716"
+  integrity sha512-EHbhGk//KGn7yhMhNaLSWw829y0b0EJzdoxVfkx5z8qaZoaC0lMizJ40uv8lox/cuO7oMsYKbEoDd4sjlTiJCw==
+  dependencies:
+    vue-template-compiler "^2.2.1"
 
 vue-tsc@^0.40.1:
   version "0.40.13"

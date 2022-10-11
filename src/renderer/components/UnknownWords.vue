@@ -12,13 +12,13 @@
 <script setup>
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { onBeforeMount, ref, inject } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 import { AgGridVue } from 'ag-grid-vue3';
 import MarkLearned from '@/components/MarkLearned.vue';
 import AddToCardQueue from '@/components/AddToCardQueue.vue';
-import { UserSettingsKey } from '../../shared/types';
+import { getUserSettings } from '@/UserSettings';
 
-const UserSettings = inject(UserSettingsKey);
+const UserSettings = getUserSettings();
 
 const props = defineProps({
   showDefinitions: {

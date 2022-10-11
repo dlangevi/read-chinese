@@ -20,19 +20,20 @@
 
 <script lang="ts" setup>
 import {
-  onBeforeMount, inject, ref, computed, Ref,
+  onBeforeMount, ref, computed, Ref,
 } from 'vue';
 import { NGrid, NGi, NButton } from 'naive-ui';
 import BookCard from '@/components/BookCard.vue';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
-import { Book, UserSettingsKey, UserSettingsType } from '../../shared/types';
+import { getUserSettings } from '@/UserSettings';
+import { Book } from '../../shared/types';
 
 function syncCalibre() {
   window.ipc.importCalibreBooks();
 }
 
-const UserSettings = inject(UserSettingsKey) as UserSettingsType;
+const UserSettings = getUserSettings();
 
 // TODO Would be nice if these properties them selves were reactive
 const onlyFavorites = ref(UserSettings.BookLibrary.OnlyFavorites.read());

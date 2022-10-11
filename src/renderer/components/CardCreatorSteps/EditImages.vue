@@ -18,14 +18,14 @@
 
 <script setup>
 import {
-  watch, onBeforeMount, ref, inject,
+  watch, onBeforeMount, ref,
 } from 'vue';
 import {
   NSpace, NCheckboxGroup, NCheckbox,
 } from 'naive-ui';
-import { UserSettingsKey } from '../../../shared/types';
+import { getUserSettings } from '@/UserSettings';
 
-const UserSettings = inject(UserSettingsKey);
+const UserSettings = getUserSettings();
 
 const emit = defineEmits(['updateImages']);
 const images = ref([]);
