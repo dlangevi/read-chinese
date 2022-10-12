@@ -4,15 +4,15 @@ import {
   dbSaveDict, dbLoadDicts, dbGetPrimaryDict, dbSetPrimaryDict, dbDeleteDict,
 } from './database';
 import {
-  dictionaryType,
+  DictionaryType,
 } from '../shared/types';
 
-const dicts: {[key:string]:any} = {
+const dicts: { [key:string]:any } = {
 };
 // TODO have these user set
 let defaultDict = 'ccdict';
 
-export function addDictionary(name:string, path:string, type:dictionaryType) {
+export function addDictionary(name:string, path:string, type:DictionaryType) {
   // Just for now
   // Later we will make our own copy of the dictionary
   dbSaveDict(name, path, type);
@@ -42,7 +42,7 @@ export function loadDictionaries() {
     console.log(name, entry);
     const fileContents = fs.readFileSync(entry.path);
     const contents = JSON.parse(fileContents.toString());
-    const dictionary: {[key:string]:any} = {};
+    const dictionary: { [key:string]:any } = {};
     contents.forEach((term:any) => {
       const word = term.term;
       if (!(word in dictionary)) {
@@ -81,7 +81,7 @@ export function isInDictionary(word:string) {
 }
 
 // type = 'english' or 'chinese'
-function getDefinitionsForWord(word:string, type:dictionaryType) {
+function getDefinitionsForWord(word:string, type:DictionaryType) {
   const answers:any[] = [];
 
   Object.values(dicts)

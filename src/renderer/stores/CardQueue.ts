@@ -1,7 +1,21 @@
 import { defineStore } from 'pinia';
 
+export enum ActionsEnum {
+  CREATE = 'create',
+  MODIFY = 'modify',
+}
+
+type WordlistEntry = {
+  word:string
+  action:ActionsEnum
+  preferBook?:number
+  callback?: () => void
+};
+
 export const useCardQueue = defineStore('CardQueue', {
-  state: () => ({ wordList: [] }),
+  state: () => ({
+    wordList: [],
+  } as { wordList: WordlistEntry[] }),
   getters: {
     words: (state) => state.wordList,
   },
@@ -9,9 +23,12 @@ export const useCardQueue = defineStore('CardQueue', {
     // Callback runs on word submition
     // TODO? also have a callback for word failure?
     async addWord(
-      word,
-      action,
-      options = {
+      word:string,
+      action:ActionsEnum,
+      options: {
+        preferBook?: number,
+        callback?: () => void,
+      } = {
       },
     ) {
       this.wordList.push({
@@ -27,9 +44,4 @@ export const useCardQueue = defineStore('CardQueue', {
       this.wordList.splice(0);
     },
   },
-});
-
-export const ActionsEnum = Object.freeze({
-  CREATE: 'create',
-  MODIFY: 'modify',
 });

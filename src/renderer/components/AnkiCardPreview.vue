@@ -54,7 +54,7 @@
 
 <script setup>
 import { NCard, NButton } from 'naive-ui';
-import StepsEnum from '@/components/CardCreatorSteps/StepsEnum';
+import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
 import { getUserSettings } from '@/UserSettings';
 
 const UserSettings = getUserSettings();

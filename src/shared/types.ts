@@ -1,6 +1,6 @@
 import type { InjectionKey } from 'vue';
 
-export type dictionaryType = 'english' | 'chinese';
+export type DictionaryType = 'english' | 'chinese';
 
 export type KnownWords = {
   [key:string]: {
@@ -19,7 +19,7 @@ export type BookStats = {
   targets: number[];
   targetOccurances: number[];
   needToKnow: number[];
-}
+};
 
 export function initBookStats():BookStats {
   return {
@@ -44,7 +44,7 @@ export type Book = {
   segmentedFile: string;
   hasRead: boolean;
   stats: BookStats;
-}
+};
 
 export type UserSetting = {
   value:string;
@@ -58,11 +58,11 @@ export type UserSetting = {
   readFromBackEnd?:any;
   loaded?:boolean;
   cached?:boolean;
-}
+};
 
 export type UserSettingsType = {
   [section:string]: {
     [label:string]: UserSetting;
   }
-}
+};
 export const UserSettingsKey = Symbol('u') as InjectionKey<UserSettingsType>;

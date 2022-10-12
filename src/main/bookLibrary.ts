@@ -36,7 +36,7 @@ async function computeBookData(book:Book) {
 }
 
 async function computeExtraData(book:Book) {
-  return knex<{word:string, occurance:number}[]>('frequency')
+  return knex<{ word:string, occurance:number }[]>('frequency')
     .select('word')
     .sum({ occurance: 'count' })
     .where('book', book.bookId)
@@ -146,7 +146,7 @@ async function computeStats(book:Book) {
 // This is where I get tripped up on the seperation layer. This is a db
 // specific operation
 export async function topWords(bookIds:number[]) {
-  const top = knex<{word:string, occurance:number}[]>('frequency')
+  const top = knex<{ word:string, occurance:number }[]>('frequency')
     .select('word')
     .sum({ occurance: 'count' })
     .whereNotExists(function wordTable() {

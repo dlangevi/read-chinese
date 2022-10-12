@@ -99,9 +99,9 @@ import {
 import EditSentence from '@/components/CardCreatorSteps/EditSentence.vue';
 import EditImages from
   '@/components/CardCreatorSteps/EditImages.vue';
-import StepsEnum from '@/components/CardCreatorSteps/StepsEnum';
 import EditDefinition from
   '@/components/CardCreatorSteps/EditDefinition.vue';
+import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
 import { getUserSettings } from '@/UserSettings';
 
 const UserSettings = getUserSettings();

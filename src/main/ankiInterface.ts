@@ -24,7 +24,7 @@ type Fields = {
   chineseDefn: string,
   pinyin: string,
   imageUrls: [string],
-}
+};
 
 // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
 function isChinese(word:string) {

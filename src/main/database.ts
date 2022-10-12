@@ -8,7 +8,7 @@ import Knex from 'knex';
 // For now we do the sync whenever the db changes.
 import knexConfigMap from '../../knexfile.mjs';
 import {
-  dictionaryType, KnownWords, Book,
+  DictionaryType, KnownWords, Book,
 } from '../shared/types';
 
 console.log(knexConfigMap);
@@ -22,17 +22,17 @@ export async function initializeDatabase() {
   });
 }
 
-interface metadata {
+interface MetaData {
   ran: number;
   dicts: {
     [name:string] : {
-    path: string,
-    type: dictionaryType,
+      path: string,
+      type: DictionaryType,
     }
   };
   primaryDict: string
 }
-const metadataSchema : Schema<metadata> = {
+const metadataSchema : Schema<MetaData> = {
   ran: {
     type: 'number',
     default: 0,
@@ -80,7 +80,7 @@ function setOptionValue(key:string, value:any) {
   metadataStore.set(key, value);
 }
 
-export function dbSaveDict(name:string, path:string, type:dictionaryType) {
+export function dbSaveDict(name:string, path:string, type:DictionaryType) {
   const dicts = metadataStore.get('dicts');
   dicts[name] = {
     path,
@@ -240,7 +240,7 @@ export async function dbLoadWordTable(book:any) {
   const wordRows = await knex('frequency')
     .select({ word: 'word', count: 'count' })
     .where('book', book.bookId);
-  const wordDict: {[key:string]: number } = {};
+  const wordDict: { [key:string]: number } = {};
   wordRows.forEach(({ word, count }) => {
     wordDict[word] = count;
   });

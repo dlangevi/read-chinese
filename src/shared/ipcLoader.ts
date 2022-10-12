@@ -38,10 +38,10 @@ const ipcFunctions = {
   filePicker,
 };
 
-export type ipcTypes = typeof ipcFunctions;
+export type IpcTypes = typeof ipcFunctions;
 type IpcFunction = (...args: any[]) => Promise<any>;
 
-// To be called from background.js to initialize handlers
+// To be called from background.js to initialize handle
 export function initIpcMain() {
   // Wipe out the types of ipcFunctions here because we know it will be typesafe
   Object.entries(ipcFunctions).forEach(([name, fn]: [string, any]) => {
@@ -59,8 +59,8 @@ export function initIpcRenderer() {
     // function by its name in vue land
     Object.keys(ipcFunctions).reduce((
       acc:{
-          [fnName:string]: IpcFunction
-        },
+        [fnName:string]: IpcFunction
+      },
       name:string,
     ) => {
       acc[name] = (...a:any[]) => ipcRenderer.invoke(name, ...a);

@@ -28,9 +28,10 @@ module.exports = {
       ['error', { argsIgnorePattern: '_', vars: 'local' }],
     'no-param-reassign': 'off',
     'no-await-in-loop': 'off',
-    'no-use-before-define': ['error', {
+    '@typescript-eslint/no-use-before-define': ['error', {
       functions: false,
     }],
+
     'max-len': ['error', {
       code: 80,
       ignoreRegExpLiterals: true,
@@ -41,6 +42,7 @@ module.exports = {
     'import/prefer-default-export': 'off',
     // TODO turn these back on once I actually want to release this to people
     'vuejs-accessibility/click-events-have-key-events': 'off',
+    'vue/block-lang': 'off',
     'import/extensions': [
       'error',
       'never',
@@ -72,8 +74,9 @@ module.exports = {
 
   extends: [
     'plugin:vue/vue3-essential',
-    '@vue/airbnb',
     '@vue/typescript',
+    '@vue/airbnb',
+    '@vue/eslint-config-airbnb-with-typescript',
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/typescript',
