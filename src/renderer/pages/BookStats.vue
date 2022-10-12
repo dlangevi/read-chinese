@@ -84,7 +84,7 @@ import { Book } from '../../shared/types';
 const props = defineProps({
   bookId: {
     required: true,
-    type: String,
+    type: Number,
   },
 });
 

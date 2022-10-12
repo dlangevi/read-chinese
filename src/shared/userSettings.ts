@@ -38,7 +38,7 @@ function settingsObject(
     return option.cached;
   };
   option.readFromBackEnd = async function readFromBackEnd() {
-    option.cached = await window.ipc.getOptionValue(value);
+    option.cached = await window.ipc.getOptionValue(value, defaultValue);
     option.loaded = true;
     return option.cached;
   };

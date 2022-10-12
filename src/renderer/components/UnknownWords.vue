@@ -26,8 +26,9 @@ const props = defineProps({
     default: false,
   },
   bookFilter: {
-    type: String,
-    default: '',
+    type: Number,
+    required: false,
+    default: undefined,
   },
 });
 const getRowId = (params) => params.data.word;
@@ -110,7 +111,7 @@ columnDefs.push(
 const rowData = ref([]);
 onBeforeMount(async () => {
   console.log(props.bookFilter);
-  if (props.bookFilter !== '') {
+  if (props.bookFilter !== undefined) {
     rowData.value = await window.ipc.learningTarget([props.bookFilter]);
   } else {
     rowData.value = await window.ipc.learningTarget();
