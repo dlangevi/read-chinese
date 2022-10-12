@@ -1,8 +1,9 @@
 import { getBooks } from './bookLibrary';
 import { loadSegmentedText, segmentSentence } from './segmentation';
 import { isKnown, updateInterval } from './knownWords';
+import { SegmentedSentence } from '../shared/types';
 
-function isT1Candidate(sentence, t1word) {
+function isT1Candidate(sentence:SegmentedSentence, t1word:string) {
   // TODO its possible the t1word is actually split across two neighbours, and
   // is not actually in the sentence. On the other hand, this can help in
   // finding extra instances of _some_ words
@@ -13,19 +14,19 @@ function isT1Candidate(sentence, t1word) {
   });
 }
 
-async function getSentencesForWord(word, {
+async function getSentencesForWord(word:string, {
   bookIds,
   skipBook,
-} = {}) {
+}: { bookIds?: number[], skipBook?: number } = {}) {
   updateInterval();
   const books = await getBooks(bookIds);
-  const candidates = new Set();
+  const candidates = new Set<string>();
   await Promise.all(books.map(async (bookInfo) => {
     if (bookInfo.bookId === skipBook) {
       return;
     }
     const fullSegmented = await loadSegmentedText(bookInfo);
-    fullSegmented.forEach((sentence) => {
+    fullSegmented.forEach((sentence:string) => {
       if (sentence.includes(word)) {
         const segmented = segmentSentence(sentence);
         const justWords = segmented.map(([w]) => w);
@@ -36,7 +37,7 @@ async function getSentencesForWord(word, {
     });
   }));
   const sentences = [...candidates];
-  sentences.sort((a, b) => {
+  sentences.sort((a:string, b:string) => {
     // Ideal sentence is 20 characters, no real reason
     const aScore = Math.abs(a.length - 20);
     const bScore = Math.abs(b.length - 20);

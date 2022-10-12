@@ -9,7 +9,7 @@ import {
   Book, initBookStats,
 } from '../shared/types';
 
-export async function getBooks(bookIds: number[]) {
+export async function getBooks(bookIds?: number[]) {
   return dbGetBooks(bookIds);
 }
 

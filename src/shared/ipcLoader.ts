@@ -39,17 +39,17 @@ const ipcFunctions = {
 };
 
 export type ipcTypes = typeof ipcFunctions;
+type IpcFunction = (...args: any[]) => Promise<any>;
 
 // To be called from background.js to initialize handlers
 export function initIpcMain() {
-  Object.entries(ipcFunctions).forEach(([name, fn]) => {
+  // Wipe out the types of ipcFunctions here because we know it will be typesafe
+  Object.entries(ipcFunctions).forEach(([name, fn]: [string, any]) => {
     // For each function register it to be handled and drop the
     // event argument (here as _)
     ipcMain.handle(name, (_, ...args) => fn(...args));
   });
 }
-
-type IpcFunction = (...args: any[]) => Promise<any>;
 
 // To be called from preload to initialize callers
 export function initIpcRenderer() {

@@ -19,9 +19,9 @@ const nextVoice = (function nextVoice() {
   };
 }());
 
-export async function synthesize(text) {
+export async function synthesize(text:string) {
   // TODO optionally run this code
-  const subscriptionKey = getOptionValue('AzureApiKey');
+  const subscriptionKey = getOptionValue('AzureApiKey', '');
   const serviceRegion = 'eastus';
 
   const speechConfig = SpeechConfig.fromSubscription(
@@ -34,7 +34,7 @@ export async function synthesize(text) {
   const audioFile = tmp.fileSync({ postfix: '.wav' });
   const audioConfig = AudioConfig.fromAudioFileOutput(audioFile.name);
   speechConfig.speechSynthesisVoiceName = voice;
-  let synthesizer = new SpeechSynthesizer(speechConfig, audioConfig);
+  const synthesizer = new SpeechSynthesizer(speechConfig, audioConfig);
   return new Promise((resolve, reject) => {
     synthesizer.speakTextAsync(
       text,
@@ -48,13 +48,11 @@ export async function synthesize(text) {
           }\nDid you update the subscription info?`);
         }
         synthesizer.close();
-        synthesizer = undefined;
         resolve(audioFile.name);
       },
       (err) => {
         console.trace(`err - ${err}`);
         synthesizer.close();
-        synthesizer = undefined;
         reject(err);
       },
     );
