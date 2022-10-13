@@ -2,6 +2,11 @@ import type { InjectionKey } from 'vue';
 
 export type DictionaryType = 'english' | 'chinese';
 
+export type DictionaryEntry = {
+  definition: string;
+  pronunciation: string;
+};
+
 export type KnownWords = {
   [key:string]: {
     interval:number;
@@ -57,7 +62,7 @@ export type UserSetting = {
   write?:any;
   readFromBackEnd?:any;
   loaded?:boolean;
-  cached?:boolean;
+  cached?:any;
 };
 
 export type UserSettingsType = {

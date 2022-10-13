@@ -38,7 +38,25 @@ const ipcFunctions = {
   filePicker,
 };
 
-export type IpcTypes = typeof ipcFunctions;
+// When called as an ipc, the function on the renderer side will
+// return a promise. So we massage the types of actual implementations
+// to reflect that
+type Promised<Type> =
+  // If the type already has a Promise being returned
+  Type extends (...params: infer P) => Promise<infer R>
+    // We can just return that same promise
+    ? (...params: P) => Promise<R>
+    // Otherwise take the return value
+    : Type extends (...params: infer P) => infer R
+      // And wrap it in a promise
+      ? (...params: P) => Promise<R>
+      : never;
+
+type BasicIpcTypes = typeof ipcFunctions;
+export type IpcTypes = {
+  [Property in keyof BasicIpcTypes]: Promised<BasicIpcTypes[Property]>
+};
+
 type IpcFunction = (...args: any[]) => Promise<any>;
 
 // To be called from background.js to initialize handle

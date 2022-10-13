@@ -6,7 +6,7 @@
         class="text-3xl"
         v-for="(definition, i) in definitions"
         :key="i"
-        :value="definition"
+        :value="definition.definition"
       >
         <span
           v-html="'[' + definition.pronunciation + '] '
@@ -17,7 +17,7 @@
   </n-checkbox-group>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import {
   watch, onBeforeMount, ref,
 } from 'vue';
@@ -25,32 +25,31 @@ import {
   NSpace, NCheckboxGroup, NCheckbox,
 } from 'naive-ui';
 import { getUserSettings } from '@/UserSettings';
+import { DictionaryType, DictionaryEntry } from '@/../shared/types';
 
 const UserSettings = getUserSettings();
 
 const emit = defineEmits(['updateDefinition']);
-const definitions = ref([]);
-const definition = ref(null);
+const definitions = ref<DictionaryEntry[]>([]);
+const definition = ref<string[]>([]);
 
 watch(definition, async () => {
   // TODO either rename this option or have a select based on type
+  const selected = new Set<string>(definition.value.values());
+  const selectedDefinitions = definitions.value.filter(
+    (def) => selected.has(def.definition),
+  );
   const autoAdvance = await (
     UserSettings.CardCreation.AutoAdvanceEnglish.read()
   );
   console.log('update definition');
-  emit('updateDefinition', definition.value, autoAdvance);
+  emit('updateDefinition', selectedDefinitions, autoAdvance);
 });
 
-const props = defineProps({
-  word: {
-    type: String,
-    required: true,
-  },
-  type: {
-    type: String,
-    required: true,
-  },
-});
+const props = defineProps<{
+  word: string
+  type: DictionaryType
+}>();
 
 onBeforeMount(async () => {
   definitions.value = await window.ipc.getDefinitionsForWord(

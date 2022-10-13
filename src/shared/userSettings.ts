@@ -100,7 +100,7 @@ function slider(
   );
 }
 
-const items:UserSettingsType = (function List() {
+export async function generateUserSettings() :Promise<UserSettingsType> {
   const CardCreation = {
     AutoAdvanceSentence: checkBox(
       'AutoAdvanceSentence',
@@ -203,11 +203,13 @@ const items:UserSettingsType = (function List() {
     ),
   };
 
-  [CardCreation, Dictionaries, BookLibrary].forEach(
-    async (section) => Object.values(section).forEach(
-      async (option) => {
-        option.readFromBackEnd();
-      },
+  await Promise.all(
+    [CardCreation, Dictionaries, BookLibrary].map(
+      async (section) => Promise.all(
+        Object.values(section).map(
+          async (option) => option.readFromBackEnd(),
+        ),
+      ),
     ),
   );
 
@@ -216,8 +218,4 @@ const items:UserSettingsType = (function List() {
     Dictionaries,
     BookLibrary,
   };
-}());
-
-export default items;
-console.log(typeof items);
-export type SettingsType = typeof items;
+}

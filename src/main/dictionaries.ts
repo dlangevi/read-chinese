@@ -4,7 +4,7 @@ import {
   dbSaveDict, dbLoadDicts, dbGetPrimaryDict, dbSetPrimaryDict, dbDeleteDict,
 } from './database';
 import {
-  DictionaryType,
+  DictionaryType, DictionaryEntry,
 } from '../shared/types';
 
 const dicts: { [key:string]:any } = {
@@ -82,7 +82,7 @@ export function isInDictionary(word:string) {
 
 // type = 'english' or 'chinese'
 function getDefinitionsForWord(word:string, type:DictionaryType) {
-  const answers:any[] = [];
+  const answers:DictionaryEntry[] = [];
 
   Object.values(dicts)
     .filter((dict) => dict.type === type)
