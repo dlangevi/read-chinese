@@ -145,7 +145,7 @@ async function computeStats(book:Book) {
 
 // This is where I get tripped up on the seperation layer. This is a db
 // specific operation
-export async function topWords(bookIds:number[]) {
+export async function topWords(bookIds?:number[]) {
   const top = knex<{ word:string, occurance:number }[]>('frequency')
     .select('word')
     .sum({ occurance: 'count' })
@@ -212,7 +212,7 @@ async function loadBooks() {
   }));
   return books;
 }
-async function learningTarget(bookIds:number[]) {
+async function learningTarget(bookIds?:number[]) {
   const words = await topWords(bookIds);
   return words;
 }

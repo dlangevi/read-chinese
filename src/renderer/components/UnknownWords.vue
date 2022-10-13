@@ -9,7 +9,7 @@
 
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { onBeforeMount, ref } from 'vue';
@@ -17,27 +17,21 @@ import { AgGridVue } from 'ag-grid-vue3';
 import MarkLearned from '@/components/MarkLearned.vue';
 import AddToCardQueue from '@/components/AddToCardQueue.vue';
 import { getUserSettings } from '@/UserSettings';
+import type { GetRowIdParams, GridReadyEvent, ColDef } from 'ag-grid-community';
 
 const UserSettings = getUserSettings();
 
-const props = defineProps({
-  showDefinitions: {
-    type: Boolean,
-    default: false,
-  },
-  bookFilter: {
-    type: Number,
-    required: false,
-    default: undefined,
-  },
-});
-const getRowId = (params) => params.data.word;
+const props = defineProps<{
+  bookFilter?: number,
+}>();
+
+const getRowId = (params:GetRowIdParams) => params.data.word;
 
 const gridContext = {
   bookId: props.bookFilter,
 };
 
-function onGridReady(params) {
+function onGridReady(params:GridReadyEvent) {
   params.api.sizeColumnsToFit();
   window.addEventListener('resize', () => {
     setTimeout(() => {
@@ -47,7 +41,7 @@ function onGridReady(params) {
   params.api.sizeColumnsToFit();
 }
 
-const columnDefs = [
+const columnDefs:ColDef[] = [
   {
     headerName: 'word',
     field: 'word',
@@ -76,7 +70,6 @@ const columnDefs = [
 ];
 
 const showDefinitions = UserSettings.Dictionaries.ShowDefinitions.read();
-console.log('show defs', showDefinitions);
 if (showDefinitions) {
   columnDefs.push(
     {
@@ -108,9 +101,8 @@ columnDefs.push(
   },
 );
 
-const rowData = ref([]);
+const rowData = ref<any[]>([]);
 onBeforeMount(async () => {
-  console.log(props.bookFilter);
   if (props.bookFilter !== undefined) {
     rowData.value = await window.ipc.learningTarget([props.bookFilter]);
   } else {
