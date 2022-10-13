@@ -12,7 +12,7 @@
   </n-message-provider>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { useRoute } from 'vue-router';
 import { NMessageProvider } from 'naive-ui';
 import TopNav from '@/components/TopNav.vue';

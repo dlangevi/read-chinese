@@ -28,8 +28,9 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { useRoute } from 'vue-router';
+import type { RouteLocationNormalizedLoaded } from 'vue-router';
 import { watch, ref } from 'vue';
 
 const route = useRoute();
@@ -42,7 +43,7 @@ const navigation = ref([
   { name: 'Settings', href: '/Settings', current: false },
   { name: 'About', href: '/About', current: false },
 ]);
-function updateNav(currentRoute) {
+function updateNav(currentRoute:RouteLocationNormalizedLoaded) {
   navigation.value.forEach((item) => {
     item.current = item.href === currentRoute.fullPath;
   });

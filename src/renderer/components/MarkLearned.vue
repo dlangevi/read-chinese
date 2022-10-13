@@ -13,7 +13,7 @@
   </button>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 /*
 import { NButton } from 'naive-ui';
   <n-button
@@ -26,13 +26,9 @@ import { NButton } from 'naive-ui';
     Mark Known
   </n-button>
 */
+import type { ICellRendererParams } from 'ag-grid-community';
 
-const props = defineProps({
-  params: {
-    type: Object,
-    required: true,
-  },
-});
+const props = defineProps<{ params:ICellRendererParams }>();
 
 function markKnown() {
   const rowData = props.params.data;
