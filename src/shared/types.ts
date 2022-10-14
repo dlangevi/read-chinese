@@ -1,5 +1,10 @@
 import type { InjectionKey } from 'vue';
 
+export type DictionaryInfo = {
+  path: string,
+  type: DictionaryType,
+};
+
 export type DictionaryType = 'english' | 'chinese';
 
 export type DictionaryEntry = {

@@ -5,10 +5,10 @@
       :key="name">
       {{dict}}
       <template #suffix>
-        <n-button @click="makePrimary(name)">
+        <n-button @click="makePrimary(name as string)">
           Make Primary
         </n-button>
-        <n-button @click="deleteDict(name)">
+        <n-button @click="deleteDict(name as string)">
           Delete
         </n-button>
       </template>
@@ -52,26 +52,26 @@
   </n-modal>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import {
   NModal, NButton, NList, NListItem, NInput, NSelect,
 } from 'naive-ui';
 import { onBeforeMount, ref } from 'vue';
+import type { DictionaryInfo, DictionaryType } from '../../../shared/types';
 
-const dicts = ref([]);
 const addDictModal = ref(false);
 
-function makePrimary(name) {
+function makePrimary(name:string) {
   window.ipc.setPrimaryDict(name);
 }
 
-function deleteDict(name) {
+function deleteDict(name:string) {
   window.ipc.deleteDictionary(name);
 }
 
 const newDictFile = ref('');
 const newDictName = ref('');
-const newDictType = ref('');
+const newDictType = ref<DictionaryType>('english');
 const options = [
   {
     label: 'English - Chinese',
@@ -90,7 +90,7 @@ function addDictionary() {
   // Reset whatever state
   newDictFile.value = '';
   newDictName.value = '';
-  newDictType.value = '';
+  newDictType.value = 'english';
   addDictModal.value = true;
 }
 
@@ -103,6 +103,7 @@ function submit() {
   );
 }
 
+const dicts = ref<{ [name:string]: DictionaryInfo }>({});
 onBeforeMount(async () => {
   dicts.value = await window.ipc.dictionaryInfo();
   console.log(dicts.value);

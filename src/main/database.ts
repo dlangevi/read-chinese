@@ -7,8 +7,8 @@ import Store, { Schema } from 'electron-store';
 import Knex from 'knex';
 // For now we do the sync whenever the db changes.
 import knexConfigMap from '../../knexfile.mjs';
-import {
-  DictionaryType, KnownWords, Book,
+import type {
+  DictionaryInfo, DictionaryType, KnownWords, Book,
 } from '../shared/types';
 
 console.log(knexConfigMap);
@@ -25,10 +25,7 @@ export async function initializeDatabase() {
 interface MetaData {
   ran: number;
   dicts: {
-    [name:string] : {
-      path: string,
-      type: DictionaryType,
-    }
+    [name:string] : DictionaryInfo
   };
   primaryDict: string
 }
