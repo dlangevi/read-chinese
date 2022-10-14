@@ -8,6 +8,5 @@
   </div>
 </template>
 
-<script setup>
-console.log('hello');
+<script lang="ts" setup>
 </script>

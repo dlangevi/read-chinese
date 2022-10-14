@@ -23,7 +23,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { NButton, NSpace } from 'naive-ui';
 import UnknownWords from '@/components/UnknownWords.vue';
 

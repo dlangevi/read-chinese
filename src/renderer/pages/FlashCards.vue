@@ -11,18 +11,19 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
 import { onBeforeMount, ref } from 'vue';
 import { useMessage } from 'naive-ui';
 import AddToCardQueue from '@/components/AddToCardQueue.vue';
+import type { GetRowIdParams, GridReadyEvent, ColDef } from 'ag-grid-community';
 
 const message = useMessage();
-const getRowId = (params) => params.data.word;
+const getRowId = (params:GetRowIdParams) => params.data.word;
 
-const columnDefs = [
+const columnDefs:ColDef[] = [
   {
     headerName: 'word',
     field: 'word',
@@ -45,19 +46,17 @@ const columnDefs = [
     },
   },
 ];
-let api = null;
 // let columnApi = null;
-function onGridReady(params) {
-  api = params.api;
+function onGridReady(params:GridReadyEvent) {
   // I know this will probably be used
   // columnApi = params.columnApi;
-  api.sizeColumnsToFit();
+  params.api.sizeColumnsToFit();
   window.addEventListener('resize', () => {
     setTimeout(() => {
-      api.sizeColumnsToFit();
+      params.api.sizeColumnsToFit();
     });
   });
-  api.sizeColumnsToFit();
+  params.api.sizeColumnsToFit();
 }
 
 const rowData = ref([]);

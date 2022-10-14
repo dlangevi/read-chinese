@@ -5,6 +5,11 @@ export enum ActionsEnum {
   MODIFY = 'modify',
 }
 
+export type WordOptions = {
+  preferBook?:number
+  callback?: () => void
+};
+
 type WordlistEntry = {
   word:string
   action:ActionsEnum
@@ -25,10 +30,7 @@ export const useCardQueue = defineStore('CardQueue', {
     async addWord(
       word:string,
       action:ActionsEnum,
-      options: {
-        preferBook?: number,
-        callback?: () => void,
-      } = {
+      options:WordOptions = {
       },
     ) {
       this.wordList.push({

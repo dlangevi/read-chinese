@@ -13,7 +13,7 @@
   </button>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 /*
 import { NButton } from 'naive-ui';
   <n-button
@@ -28,13 +28,17 @@ import { NButton } from 'naive-ui';
 
 */
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
+import type { ICellRendererParams } from 'ag-grid-community';
+import type { WordOptions } from '@/stores/CardQueue';
 
-const props = defineProps({
-  params: {
-    type: Object,
-    required: true,
-  },
-});
+interface ButtonParams extends ICellRendererParams {
+  text: string;
+  create?: boolean;
+}
+
+const props = defineProps<{
+  params: ButtonParams,
+}>();
 
 const store = useCardQueue();
 async function addToQueue() {
@@ -43,7 +47,7 @@ async function addToQueue() {
   if (props.params.create) {
     action = ActionsEnum.CREATE;
   }
-  const options = {
+  const options:WordOptions = {
     callback: () => {
       props.params.api.applyTransaction({
         remove: [rowData],
