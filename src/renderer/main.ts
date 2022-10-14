@@ -18,6 +18,10 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
+      path: '/',
+      redirect: '/BookLibrary',
+    },
+    {
       path: '/BookLibrary',
       name: 'BookLibrary',
       component: BookLibrary,
