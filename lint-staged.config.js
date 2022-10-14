@@ -1,5 +1,5 @@
 module.exports = {
-  '*.{js,jsx,vue}': 'eslint',
+  '*.{js,ts,vue}': 'eslint',
   '*.{vue,ts}': [
     () => 'vue-tsc --noEmit',
   ],
