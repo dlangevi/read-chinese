@@ -38,6 +38,10 @@
       <n-layout-content
         content-style="padding: 24px;"
         :native-scrollbar="true">
+
+        <p class="text-4xl">
+          {{card.fields.word}}
+        </p>
         <edit-sentence
           v-if="step == StepsEnum.SENTENCE"
           :preferBook="preferBookRef"
@@ -160,7 +164,7 @@ const updateSentence = (newSentence, updateStep = false) => {
 const updateEnglishDefinition = (newDefinitions, updateStep = false) => {
   if (newDefinitions.length > 0) {
     card.value.fields.englishDefn = newDefinitions.map(
-      (def) => def.definition,
+      (def) => `[${def.pronunciation}] ${def.definition}`,
     ).join('<br>');
     const pinyin = new Set(card.value.fields.pinyin.split(', '));
     newDefinitions.forEach((def) => {
@@ -177,7 +181,7 @@ const updateEnglishDefinition = (newDefinitions, updateStep = false) => {
 const updateChineseDefinition = (newDefinitions, updateStep = false) => {
   if (newDefinitions.length > 0) {
     card.value.fields.chineseDefn = newDefinitions.map(
-      (def) => def.definition,
+      (def) => `[${def.pronunciation}] ${def.definition}`,
     ).join('<br>');
     const pinyin = new Set(card.value.fields.pinyin.split(', '));
     pinyin.delete('');
