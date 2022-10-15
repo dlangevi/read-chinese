@@ -60,10 +60,13 @@ const router = createRouter({
   ],
 });
 
-const pinia = createPinia();
-const app = createApp(App);
-const userSettings = await generateUserSettings();
-app.provide(UserSettingsKey, userSettings);
-app.use(router);
-app.use(pinia);
-app.mount('#app');
+async function init() {
+  const pinia = createPinia();
+  const app = createApp(App);
+  const userSettings = await generateUserSettings();
+  app.provide(UserSettingsKey, userSettings);
+  app.use(router);
+  app.use(pinia);
+  app.mount('#app');
+}
+init();
