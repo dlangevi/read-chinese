@@ -14,9 +14,9 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { onBeforeMount, ref } from 'vue';
 import { AgGridVue } from 'ag-grid-vue3';
-import MarkLearned from '@/components/MarkLearned.vue';
-import AddToCardQueue from '@/components/AddToCardQueue.vue';
-import { getUserSettings } from '@/UserSettings';
+import MarkLearned from '@components/MarkLearned.vue';
+import AddToCardQueue from '@components/AddToCardQueue.vue';
+import { getUserSettings } from '@/renderer/UserSettings';
 import type { GetRowIdParams, GridReadyEvent, ColDef } from 'ag-grid-community';
 
 const UserSettings = getUserSettings();

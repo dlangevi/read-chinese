@@ -1,7 +1,7 @@
+import type { SegmentedSentence } from '@/shared/types';
 import { getBooks } from './bookLibrary';
 import { loadSegmentedText, segmentSentence } from './segmentation';
 import { isKnown, updateInterval } from './knownWords';
-import { SegmentedSentence } from '../shared/types';
 
 function isT1Candidate(sentence:SegmentedSentence, t1word:string) {
   // TODO its possible the t1word is actually split across two neighbours, and

@@ -15,7 +15,7 @@ import {
 import { release } from 'os';
 import { join } from 'path';
 
-import { initIpcMain } from '../shared/ipcLoader';
+import { initIpcMain } from '@/shared/ipcLoader';
 import { syncWords, checkWords } from './knownWords';
 import { loadDictionaries } from './dictionaries';
 import { preloadWords } from './segmentation';

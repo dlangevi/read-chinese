@@ -23,7 +23,7 @@ import {
 import {
   NSpace, NCheckboxGroup, NCheckbox,
 } from 'naive-ui';
-import { getUserSettings } from '@/UserSettings';
+import { getUserSettings } from '@/renderer/UserSettings';
 
 const UserSettings = getUserSettings();
 

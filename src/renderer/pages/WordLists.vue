@@ -25,7 +25,7 @@
 
 <script lang="ts" setup>
 import { NButton, NSpace } from 'naive-ui';
-import UnknownWords from '@/components/UnknownWords.vue';
+import UnknownWords from '@components/UnknownWords.vue';
 
 function importCSV() {
   window.ipc.importCSVWords();

@@ -1,11 +1,11 @@
 // load dictionary
 import fs from 'fs';
+import type {
+  DictionaryType, DictionaryEntry,
+} from '@/shared/types';
 import {
   dbSaveDict, dbLoadDicts, dbGetPrimaryDict, dbSetPrimaryDict, dbDeleteDict,
 } from './database';
-import {
-  DictionaryType, DictionaryEntry,
-} from '../shared/types';
 
 const dicts: { [key:string]:any } = {
 };

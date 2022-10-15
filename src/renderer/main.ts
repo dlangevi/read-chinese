@@ -1,16 +1,16 @@
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import { createPinia } from 'pinia';
-import { generateUserSettings } from '@shared/userSettings';
-import { UserSettingsKey } from '@shared/types';
+import { generateUserSettings } from '@/shared/userSettings';
+import { UserSettingsKey } from '@/shared/types';
 
-import BookLibrary from '@/pages/BookLibrary.vue';
-import AboutPage from '@/pages/AboutPage.vue';
-import GlobalSettings from '@/pages/GlobalSettings.vue';
-import UserStats from '@/pages/UserStats.vue';
-import WordLists from '@/pages/WordLists.vue';
-import FlashCards from '@/pages/FlashCards.vue';
-import BookStats from '@/pages/BookStats.vue';
+import BookLibrary from '@/renderer/pages/BookLibrary.vue';
+import AboutPage from '@/renderer/pages/AboutPage.vue';
+import GlobalSettings from '@/renderer/pages/GlobalSettings.vue';
+import UserStats from '@/renderer/pages/UserStats.vue';
+import WordLists from '@/renderer/pages/WordLists.vue';
+import FlashCards from '@/renderer/pages/FlashCards.vue';
+import BookStats from '@/renderer/pages/BookStats.vue';
 
 import App from './App.vue';
 

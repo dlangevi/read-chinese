@@ -1,11 +1,11 @@
 import SettingsCheckbox
-  from '@/components/SettingsWidgets/SettingsCheckbox.vue';
+  from '@components/SettingsWidgets/SettingsCheckbox.vue';
 import SettingsTextbox
-  from '@/components/SettingsWidgets/SettingsTextbox.vue';
+  from '@components/SettingsWidgets/SettingsTextbox.vue';
 import DictionariesList
-  from '@/components/SettingsWidgets/DictionariesList.vue';
+  from '@components/SettingsWidgets/DictionariesList.vue';
 import SettingsSlider
-  from '@/components/SettingsWidgets/SettingsSlider.vue';
+  from '@components/SettingsWidgets/SettingsSlider.vue';
 import { UserSetting, UserSettingsType } from './types';
 
 function settingsObject(

@@ -17,7 +17,7 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
 import { onBeforeMount, ref } from 'vue';
 import { useMessage } from 'naive-ui';
-import AddToCardQueue from '@/components/AddToCardQueue.vue';
+import AddToCardQueue from '@components/AddToCardQueue.vue';
 import type { GetRowIdParams, GridReadyEvent, ColDef } from 'ag-grid-community';
 
 const message = useMessage();

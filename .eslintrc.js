@@ -5,8 +5,8 @@ module.exports = {
     'import/resolver': {
       alias: {
         map: [
-          ['@', './src/renderer'],
-          ['@shared', './src/shared'],
+          ['@', './src'],
+          ['@components', './src/renderer/components/'],
         ],
       },
     },
@@ -31,7 +31,6 @@ module.exports = {
     '@typescript-eslint/no-use-before-define': ['error', {
       functions: false,
     }],
-
     'max-len': ['error', {
       code: 80,
       ignoreRegExpLiterals: true,
@@ -49,6 +48,7 @@ module.exports = {
       {
         ignorePackages: true,
         pattern: {
+          json: 'always',
           js: 'never',
           jsx: 'never',
           ts: 'never',

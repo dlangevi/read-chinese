@@ -23,11 +23,11 @@ import {
   onBeforeMount, ref, computed, Ref,
 } from 'vue';
 import { NGrid, NGi, NButton } from 'naive-ui';
-import BookCard from '@/components/BookCard.vue';
+import BookCard from '@components/BookCard.vue';
 import SettingsCheckbox
-  from '@/components/SettingsWidgets/SettingsCheckbox.vue';
-import { getUserSettings } from '@/UserSettings';
-import { Book } from '../../shared/types';
+  from '@components/SettingsWidgets/SettingsCheckbox.vue';
+import { getUserSettings } from '@/renderer/UserSettings';
+import type { Book } from '@/shared/types';
 
 function syncCalibre() {
   window.ipc.importCalibreBooks();

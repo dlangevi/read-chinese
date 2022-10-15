@@ -21,7 +21,11 @@ export default defineConfig({
             // For Debug
             sourcemap: true,
             outDir: 'dist/electron/main',
-
+          },
+          resolve: {
+            alias: {
+              '@': `${path.resolve(__dirname, './src/')}`,
+            },
           },
         },
       },
@@ -37,6 +41,11 @@ export default defineConfig({
             sourcemap: 'inline',
             outDir: 'dist/electron/preload',
           },
+          resolve: {
+            alias: {
+              '@': `${path.resolve(__dirname, './src/')}`,
+            },
+          },
         },
       },
       // Enables use of Node.js API in the Renderer-process
@@ -48,8 +57,8 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': `${path.resolve(__dirname, './src/renderer')}`,
-      '@shared': `${path.resolve(__dirname, './src/shared')}`,
+      '@': `${path.resolve(__dirname, './src/')}`,
+      '@components': `${path.resolve(__dirname, './src/renderer/components/')}`,
     },
   },
   server: process.env.VSCODE_DEBUG ? {

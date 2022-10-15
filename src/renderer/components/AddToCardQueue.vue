@@ -27,9 +27,9 @@ import { NButton } from 'naive-ui';
   </n-button>
 
 */
-import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
+import { useCardQueue, ActionsEnum } from '@/renderer/stores/CardQueue';
 import type { ICellRendererParams } from 'ag-grid-community';
-import type { WordOptions } from '@/stores/CardQueue';
+import type { WordOptions } from '@/renderer/stores/CardQueue';
 
 interface ButtonParams extends ICellRendererParams {
   text: string;

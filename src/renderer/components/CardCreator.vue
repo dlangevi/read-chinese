@@ -93,20 +93,20 @@
 import {
   toRaw, ref, reactive,
 } from 'vue';
-import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
-import AnkiCardPreview from '@/components/AnkiCardPreview.vue';
-import CardCreationSettings from '@/components/CardCreationSettings.vue';
+import { useCardQueue, ActionsEnum } from '@/renderer/stores/CardQueue';
+import AnkiCardPreview from '@components/AnkiCardPreview.vue';
+import CardCreationSettings from '@components/CardCreationSettings.vue';
 import {
   useMessage, NSpace, NButton, NModal,
   NLayoutSider, NLayout, NLayoutContent,
 } from 'naive-ui';
-import EditSentence from '@/components/CardCreatorSteps/EditSentence.vue';
+import EditSentence from '@components/CardCreatorSteps/EditSentence.vue';
 import EditImages from
-  '@/components/CardCreatorSteps/EditImages.vue';
+  '@components/CardCreatorSteps/EditImages.vue';
 import EditDefinition from
-  '@/components/CardCreatorSteps/EditDefinition.vue';
-import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
-import { getUserSettings } from '@/UserSettings';
+  '@components/CardCreatorSteps/EditDefinition.vue';
+import { StepsEnum } from '@components/CardCreatorSteps/StepsEnum';
+import { getUserSettings } from '@/renderer/UserSettings';
 
 const UserSettings = getUserSettings();
 

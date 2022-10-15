@@ -4,13 +4,13 @@ import { app } from 'electron';
 import { once } from 'events';
 import fs from 'fs';
 import readline from 'readline';
+import type {
+  Book,
+  SegmentedSentence,
+} from '@/shared/types';
 import { isInDictionary } from './dictionaries';
 // direct from db to prevent cyclic dependency
 import { dbGetBooks, dbBookSetCache } from './database';
-import {
-  Book,
-  SegmentedSentence,
-} from '../shared/types';
 
 const cache: {
   [path:string]: any

@@ -42,8 +42,8 @@ import {
 } from 'naive-ui';
 import { SettingsSharp } from '@vicons/ionicons5';
 import SettingsCheckbox
-  from '@/components/SettingsWidgets/SettingsCheckbox.vue';
-import { getUserSettings } from '@/UserSettings';
+  from '@components/SettingsWidgets/SettingsCheckbox.vue';
+import { getUserSettings } from '@/renderer/UserSettings';
 
 const UserSettings = getUserSettings();
 

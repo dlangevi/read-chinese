@@ -1,3 +1,3 @@
-import { initIpcRenderer } from '../shared/ipcLoader';
+import { initIpcRenderer } from '@/shared/ipcLoader';
 
 initIpcRenderer();

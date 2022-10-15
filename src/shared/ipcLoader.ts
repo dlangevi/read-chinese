@@ -1,14 +1,14 @@
 import {
   ipcMain, contextBridge, ipcRenderer, dialog,
 } from 'electron';
-import { knownWordsIpc } from '../main/knownWords';
-import { bookLibraryIpc } from '../main/bookLibrary';
-import { ankiInterfaceIpc } from '../main/ankiInterface';
-import { dictionariesIpc } from '../main/dictionaries';
-import { generateSentencesIpc } from '../main/generateSentences';
-import { imageSearchIpc } from '../main/imageSearch';
-import { databaseIpc } from '../main/database';
-import { calibreIpc } from '../main/calibre';
+import { knownWordsIpc } from '@/main/knownWords';
+import { bookLibraryIpc } from '@/main/bookLibrary';
+import { ankiInterfaceIpc } from '@/main/ankiInterface';
+import { dictionariesIpc } from '@/main/dictionaries';
+import { generateSentencesIpc } from '@/main/generateSentences';
+import { imageSearchIpc } from '@/main/imageSearch';
+import { databaseIpc } from '@/main/database';
+import { calibreIpc } from '@/main/calibre';
 
 // Put this here for now
 function filePicker(extension:string) {

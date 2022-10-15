@@ -1,10 +1,10 @@
 import { dialog } from 'electron';
 import fs from 'fs';
+import type { KnownWords } from '@/shared/types';
 import { isInDictionary } from './dictionaries';
 import {
   dbLoadWords, dbUpdateWord, dbUpdateWords, getOptionValue,
 } from './database';
-import { KnownWords } from '../shared/types';
 
 // Memory cache of the set of known words for performance
 let known: KnownWords = {};

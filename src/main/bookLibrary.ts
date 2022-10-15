@@ -1,3 +1,9 @@
+import type {
+  Book,
+} from '@/shared/types';
+import {
+  initBookStats,
+} from '@/shared/types';
 import { isKnown, isKnownChar } from './knownWords';
 import { loadJieba } from './segmentation';
 import { getDefaultDefinition, getPinyin } from './dictionaries';
@@ -5,9 +11,6 @@ import {
   dbGetBooks, dbGetBookById, dbAddBook, dbBookExists, dbSaveWordTable,
   dbGetBook, knex,
 } from './database';
-import {
-  Book, initBookStats,
-} from '../shared/types';
 
 export async function getBooks(bookIds?: number[]) {
   return dbGetBooks(bookIds);

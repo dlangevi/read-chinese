@@ -71,15 +71,15 @@
 </template>
 
 <script lang="ts" setup>
-import UnknownWords from '@/components/UnknownWords.vue';
+import UnknownWords from '@components/UnknownWords.vue';
 import { provide } from 'vue';
 import {
   NLayout, NLayoutSider, NLayoutHeader, NLayoutContent,
   NLayoutFooter, NButton, NSpace, NTabs, NTabPane,
   NStatistic, NTable,
 } from 'naive-ui';
-import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
-import { Book } from '../../shared/types';
+import { useCardQueue, ActionsEnum } from '@/renderer/stores/CardQueue';
+import type { Book } from '@/shared/types';
 
 const props = defineProps({
   bookId: {

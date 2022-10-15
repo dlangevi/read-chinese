@@ -24,8 +24,8 @@ import {
 import {
   NSpace, NCheckboxGroup, NCheckbox,
 } from 'naive-ui';
-import { getUserSettings } from '@/UserSettings';
-import { DictionaryType, DictionaryEntry } from '@/../shared/types';
+import { getUserSettings } from '@/renderer/UserSettings';
+import type { DictionaryType, DictionaryEntry } from '@/shared/types';
 
 const UserSettings = getUserSettings();
 

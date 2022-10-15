@@ -12,9 +12,8 @@
     "baseUrl": "./",
     "strict": true,
     "paths": {
-      "@/*": ["src/renderer/*"],
-      "@shared/*": ["src/shared/*"] 
-
+      "@/*": ["src/*"],
+      "@components/*": ["src/renderer/components"] 
     },
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true

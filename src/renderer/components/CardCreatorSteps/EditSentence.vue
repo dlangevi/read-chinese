@@ -38,7 +38,7 @@ import {
 import {
   NSpace, NRadioGroup, NRadio,
 } from 'naive-ui';
-import { getUserSettings } from '@/UserSettings';
+import { getUserSettings } from '@/renderer/UserSettings';
 
 const UserSettings = getUserSettings();
 

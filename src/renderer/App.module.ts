@@ -1,4 +1,4 @@
-import { IpcTypes } from '../shared/ipcLoader';
+import { IpcTypes } from '@/shared/ipcLoader';
 
 export {};
 

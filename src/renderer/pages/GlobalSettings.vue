@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getUserSettings } from '@/UserSettings';
+import { getUserSettings } from '@/renderer/UserSettings';
 
 const UserSettings = getUserSettings();
 
