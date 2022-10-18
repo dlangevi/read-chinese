@@ -1,26 +1,34 @@
-.DS_Store
 node_modules
+
+# Output directories
+/dist_electron
 /dist
 /release
+src-node/build/*
+src-tauri/binaries/*
 
 # local env files
 .env.local
 .env.*.local
 
 # Log files
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
 
 # Editor directories and files
+.vscode/*
+!.vscode/extensions.json
 .idea
-.vscode
+.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-#Electron-builder output
-/dist_electron
+*.local

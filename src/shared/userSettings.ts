@@ -1,11 +1,11 @@
 import SettingsCheckbox
-  from '@components/SettingsWidgets/SettingsCheckbox.vue';
+  from '@/components/SettingsWidgets/SettingsCheckbox.vue';
 import SettingsTextbox
-  from '@components/SettingsWidgets/SettingsTextbox.vue';
+  from '@/components/SettingsWidgets/SettingsTextbox.vue';
 import DictionariesList
-  from '@components/SettingsWidgets/DictionariesList.vue';
+  from '@/components/SettingsWidgets/DictionariesList.vue';
 import SettingsSlider
-  from '@components/SettingsWidgets/SettingsSlider.vue';
+  from '@/components/SettingsWidgets/SettingsSlider.vue';
 import { UserSetting, UserSettingsType } from './types';
 
 function settingsObject(
@@ -38,13 +38,13 @@ function settingsObject(
     return option.cached;
   };
   option.readFromBackEnd = async function readFromBackEnd() {
-    option.cached = await window.ipc.getOptionValue(value, defaultValue);
+    option.cached = await window.nodeIpc.getOptionValue(value, defaultValue);
     option.loaded = true;
     return option.cached;
   };
   option.write = async function write(newValue:any) {
     option.cached = newValue;
-    return window.ipc.setOptionValue(value, newValue);
+    return window.nodeIpc.setOptionValue(value, newValue);
   };
   return option;
 }
