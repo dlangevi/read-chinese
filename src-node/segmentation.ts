@@ -1,13 +1,13 @@
 import jieba from 'nodejieba';
 import path from 'path';
-// import { once } from 'events';
+import { once } from 'events';
 import fs from 'fs';
-// import readline from 'readline';
+import readline from 'readline';
 import type {
   Book,
   SegmentedSentence,
 } from './types';
-// import { isInDictionary } from './dictionaries';
+import { isInDictionary } from './dictionaries';
 // direct from db to prevent cyclic dependency
 import { dbGetBooks, dbBookSetCache } from './database';
 
@@ -18,50 +18,45 @@ const cache: {
 const jiebaFiles = {
   dict: path.join(
     __dirname,
-    '../../node_modules/nodejieba/dict/jieba.dict.utf8',
+    '../node_modules/nodejieba/dict/jieba.dict.utf8',
   ),
   hmmDict: path.join(
     __dirname,
-    '../../node_modules/nodejieba/dict/hmm_model.utf8',
+    '../node_modules/nodejieba/dict/hmm_model.utf8',
   ),
   userDict: path.join(
     __dirname,
-    '../../node_modules/nodejieba/dict/user.dict.utf8',
+    '../node_modules/nodejieba/dict/user.dict.utf8',
   ),
   idfDict: path.join(
     __dirname,
-    '../../node_modules/nodejieba/dict/idf.utf8',
+    '../node_modules/nodejieba/dict/idf.utf8',
   ),
   stopWordDict: path.join(
     __dirname,
-    '../../node_modules/nodejieba/dict/stop_words.utf8',
+    '../node_modules/nodejieba/dict/stop_words.utf8',
   ),
 };
+console.log(jiebaFiles);
 async function computeDict(userConfigDir:string) {
-  // TODO PORTOVER
-  // Load a copy of the jieba dict
-  // const prodDictFolder = path.join(process.resourcesPath, 'dict');
-  // const inputFile = import.meta.env.MODE === 'production'
-  //   ? path.join(prodDictFolder, 'jieba.dict.utf8')
-  //   : './node_modules/nodejieba/dict/jieba.dict.utf8';
-  // const outputFile = path.join(
-  // app.getPath('userData'), 'jieba.mod.dict.utf8');
-  // const inputStream = fs.createReadStream(inputFile);
-  // const outputStream = fs.createWriteStream(
-  // outputFile, { encoding: 'utf8' });
-  // const lineReader = readline.createInterface({
-  //   input: inputStream,
-  //   terminal: false,
-  // });
-  // lineReader.on('line', (line) => {
-  //   const items = line.split(' ');
-  //   const [word] = items;
-  //   if (isInDictionary(word)) {
-  //     outputStream.write(`${line}\n`);
-  //   }
-  // });
-  // await once(lineReader, 'close');
-  //
+  const inputFile = jiebaFiles.dict;
+  const outputFile = path.join(userConfigDir, 'jieba.mod.dict.utf8');
+  const inputStream = fs.createReadStream(inputFile);
+  const outputStream = fs.createWriteStream(outputFile, { encoding: 'utf8' });
+  const lineReader = readline.createInterface({
+    input: inputStream,
+    terminal: false,
+  });
+  lineReader.on('line', (line) => {
+    const items = line.split(' ');
+    const [word] = items;
+    if (isInDictionary(word)) {
+      outputStream.write(`${line}\n`);
+    }
+  });
+  await once(lineReader, 'close');
+
+  jiebaFiles.dict = outputFile;
   const copiedFiles = Object.fromEntries(
     Object.entries(jiebaFiles).map(
       ([key, filepath]) => {
@@ -75,11 +70,6 @@ async function computeDict(userConfigDir:string) {
     ),
   );
   jieba.load(copiedFiles);
-  // } else {
-  //   jieba.load({
-  //     dict: outputFile,
-  //   });
-  // }
 }
 export async function loadSegmentedText(book:Book) {
   if (!book.segmentedFile) {
@@ -102,10 +92,10 @@ async function doFullSegmentation(book:Book, userConfigDir:string) {
     });
     const parsed = JSON.parse(sentenceSeg);
     cache[book.segmentedFile] = parsed;
+    return;
   }
   // Otherwise we need to calculate the text
   const fullSegmentation = await loadJieba(book);
-  console.log(typeof fullSegmentation);
   const joinedSentences = fullSegmentation.map(
     (sentence) => sentence.map(([word]) => word).join(''),
   );

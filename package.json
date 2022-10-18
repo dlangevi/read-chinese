@@ -4,19 +4,6 @@
   "private": true,
   "description": "Tool for creating and managing flashcards to learn chinese",
   "author": "dlangevi",
-  "bin": "src-node/build/index.js",
-  "pkg": {
-    "build": [
-      "src-node/build/*.js",
-      "src-node/build/*.js.map"
-    ],
-    "assets": [
-      "./node_modules/sqlite3/lib/binding/napi-v6-linux-glibc-x64/node_sqlite3.node",
-      "./node_modules/nodejieba/build/Release/nodejieba.node",
-      "./src-node/migrations/*",
-      "./node_modules/nodejieba/dict/*"
-    ]
-  },
   "scripts": {
     "dev": "vite",
     "lint": "eslint src",
@@ -24,9 +11,9 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "buildnode": "tsc -p src-node/tsconfig.json --outDir src-node/build",
-    "package": "yarn buildnode && pkg package.json -o src-tauri/binaries/app && node scripts/move-binary.js",
-    "package:debug": "yarn buildnode && pkg package.json --debug -o src-tauri/binaries/app && node scripts/move-binary.js",
+    "build:node": "tsc -p src-node/tsconfig.json --outDir src-node/build",
+    "package": "yarn build:node && pkg src-node/package.json -o src-tauri/binaries/app && node scripts/move-binary.js",
+    "package:debug": "yarn build:node && pkg src-node/package.json --debug -o src-tauri/binaries/app && node scripts/move-binary.js",
     "migrate": "knex migrate:latest --knexfile knexfile.ts",
     "migrate:make": "knex migrate:make --knexfile knexfile.ts"
   },
