@@ -41,11 +41,13 @@ fn main() {
         .invoke_handler(tauri::generate_handler![greet, send_message])
         .setup(|app| {
             let window = app.get_window("main").unwrap();
-            // #[cfg(debug_assertions)] // only include this code on debug builds
             let mut app_dir = tauri::api::path::config_dir().unwrap();
             app_dir.push("read-chinese");
             println!("appdir is {}", app_dir.display());
-            window.open_devtools();
+            {
+                #[cfg(debug_assertions)] // only include this code on debug builds
+                window.open_devtools();
+            }
             tauri::async_runtime::spawn(async move {
                 let (mut rx, child) = Command::new_sidecar("app")
                     .expect("failed to setup `app` sidecar")
