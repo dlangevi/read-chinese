@@ -5,7 +5,7 @@
   "description": "Tool for creating and managing flashcards to learn chinese",
   "author": "dlangevi",
   "scripts": {
-    "dev": "vite",
+    "dev": "yarn bundle && vite",
     "lint": "eslint src",
     "typecheck": "vue-tsc --noEmit",
     "build:vite": "vue-tsc --noEmit && vite build",
