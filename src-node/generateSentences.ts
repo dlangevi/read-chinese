@@ -1,7 +1,7 @@
 import type { SegmentedSentence } from './types';
 import { getBooks } from './bookLibrary';
 import { loadSegmentedText, segmentSentence } from './segmentation';
-import { isKnown, updateInterval } from './knownWords';
+import { isWellKnown, updateInterval } from './knownWords';
 
 function isT1Candidate(sentence:SegmentedSentence, t1word:string) {
   // TODO its possible the t1word is actually split across two neighbours, and
@@ -10,7 +10,7 @@ function isT1Candidate(sentence:SegmentedSentence, t1word:string) {
   return sentence.every(([word, type]) => {
     if (type !== 3) return true;
     if (word === t1word) return true;
-    return isKnown(word);
+    return isWellKnown(word);
   });
 }
 

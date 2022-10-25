@@ -18,6 +18,16 @@ export type KnownWords = {
   };
 };
 
+export type UnknownWordEntry = {
+  word: string,
+  occurance?: number,
+  definition?: string,
+  pinyin?: string,
+};
+
+export type HskVersion = '2.0' | '3.0';
+export type HskLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
 export type SegmentedSentence = [token:string, type:number][];
 
 export type BookStats = {

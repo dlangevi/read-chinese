@@ -1,7 +1,7 @@
 // load dictionary
 import fs from 'fs';
 import type {
-  DictionaryType, DictionaryEntry,
+  DictionaryType, DictionaryEntry, UnknownWordEntry,
 } from './types';
 import {
   dbSaveDict, dbLoadDicts, dbGetPrimaryDict, dbSetPrimaryDict, dbDeleteDict,
@@ -76,6 +76,14 @@ export function getPinyin(word:string) {
   return [...new Set(terms.map((term:any) => term.pronunciation))].join(', ');
 }
 
+function getDefinitions(words:UnknownWordEntry[]) {
+  return words.map((word) => ({
+    ...word,
+    definition: getDefaultDefinition(word.word),
+    pinyin: getPinyin(word.word),
+  }));
+}
+
 export function isInDictionary(word:string) {
   return Object.values(dicts).some((dict) => word in dict.dictionary);
 }
@@ -109,4 +117,5 @@ export const dictionariesIpc = {
   addDictionary,
   setPrimaryDict,
   deleteDictionary,
+  getDefinitions,
 };

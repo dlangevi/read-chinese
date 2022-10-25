@@ -53,6 +53,7 @@
           <n-tab-pane name="UnknownWords" tab="View Unknown Words">
             <unknown-words
               class="h-96"
+              :words="words"
               :bookFilter="bookId"
             />
           </n-tab-pane>
@@ -91,6 +92,7 @@ const props = defineProps({
 provide('preferBook', props.bookId);
 
 const book:Book = await window.nodeIpc.loadBook(props.bookId);
+const words = await window.nodeIpc.learningTarget([book.bookId]);
 const { stats } = book;
 
 const known = (
@@ -109,12 +111,11 @@ const targetPairs = targets.map((e, i) => (
 
 const store = useCardQueue();
 async function makeFlashCards() {
-  const words: string[] = (
+  const topWords: string[] = (
     await window.nodeIpc.topUnknownWords(props.bookId, 50)
   );
-  words.forEach((word) => {
+  topWords.forEach((word) => {
     store.addWord(word, ActionsEnum.CREATE, { preferBook: props.bookId });
   });
-  console.log(words);
 }
 </script>

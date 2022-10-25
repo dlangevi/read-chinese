@@ -1,12 +1,13 @@
+import path from 'path';
+import fs from 'fs';
 import type {
-  Book,
+  Book, UnknownWordEntry, HskLevel, HskVersion,
 } from './types';
 import {
   initBookStats,
 } from './types';
 import { isKnown, isKnownChar } from './knownWords';
 import { loadJieba } from './segmentation';
-import { getDefaultDefinition, getPinyin } from './dictionaries';
 import {
   dbGetBooks, dbGetBookById, dbAddBook, dbBookExists, dbSaveWordTable,
   dbGetBook, getKnex,
@@ -148,7 +149,8 @@ async function computeStats(book:Book) {
 
 // This is where I get tripped up on the seperation layer. This is a db
 // specific operation
-export async function topWords(bookIds?:number[]) {
+export async function learningTarget(bookIds?:number[])
+  : Promise<UnknownWordEntry[]> {
   const top = getKnex()<{ word:string, occurance:number }[]>('frequency')
     .select('word')
     .sum({ occurance: 'count' })
@@ -165,13 +167,29 @@ export async function topWords(bookIds?:number[]) {
     top.whereIn('book', bookIds);
   }
 
-  const results = await top;
+  return top;
+}
 
-  return results.map((row) => {
-    row.definition = getDefaultDefinition(row.word);
-    row.pinyin = getPinyin(row.word);
-    return row;
+async function hskWords(version:HskVersion, level:HskLevel)
+  : Promise<UnknownWordEntry[]> {
+  const hskPath = path.join(
+    __dirname,
+    '../assets/HSK/',
+    version,
+    `L${level}.txt`,
+  );
+  const txt = fs.readFileSync(hskPath, {
+    encoding: 'utf-8',
+    flag: 'r',
   });
+  const words = txt.split('\n');
+  return words
+    .map((word) => word.trim())
+    .filter((word:string) => !isKnown(word))
+    .filter((word:string) => word.length > 0)
+    .map((word:string) => ({
+      word,
+    }));
 }
 
 export async function topUnknownWords(bookId:number, numWords:number) {
@@ -215,10 +233,6 @@ async function loadBooks() {
   }));
   return books;
 }
-async function learningTarget(bookIds?:number[]) {
-  const words = await topWords(bookIds);
-  return words;
-}
 
 async function setFavorite(bookId:number, isFavorite:boolean) {
   return getKnex()('books').where('bookId', bookId).update({
@@ -253,4 +267,5 @@ export const bookLibraryIpc = {
   setFavorite,
   setRead,
   totalRead,
+  hskWords,
 };

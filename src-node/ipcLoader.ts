@@ -59,7 +59,6 @@ export type IpcTypes = {
 
 export function registerIpc(app:Express) {
   app.post('/ipc', async (req, res) => {
-    console.log('from node', req.body);
     const functionName: keyof BasicIpcTypes = req.body.function;
     const args = JSON.parse(req.body.args);
     const ipcFunction:any = ipcFunctions[functionName];

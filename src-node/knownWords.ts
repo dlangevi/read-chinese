@@ -83,8 +83,12 @@ export function updateInterval() {
   knownInterval = getOptionValue('KnownInterval', 100);
 }
 
-export function isKnown(word:string) {
+export function isWellKnown(word:string) {
   return (word in known) && known[word].interval >= knownInterval;
+}
+
+export function isKnown(word:string) {
+  return (word in known);
 }
 
 export function isKnownChar(char:string) {
