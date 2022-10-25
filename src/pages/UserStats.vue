@@ -13,7 +13,6 @@
         ">
       <n-statistic label="Known Words" :value="words" />
       <n-statistic label="Known Characters" :value="characters" />
-      <n-statistic label="Wack words" :value="wack" />
       <n-statistic label="Total words read" :value="totalWords" />
     </div>
   </div>
@@ -23,15 +22,12 @@
 import { NStatistic } from 'naive-ui';
 
 const wordStats = await window.nodeIpc.wordStats();
-console.log(wordStats);
 const readWords = await window.nodeIpc.totalRead();
-console.log(readWords);
 
 const { totalWords } = readWords;
 const {
   words,
   characters,
-  wack,
 } = wordStats;
 
 </script>

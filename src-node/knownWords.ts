@@ -1,6 +1,5 @@
 import fs from 'fs';
 import type { KnownWords } from './types';
-import { isInDictionary } from './dictionaries';
 import {
   dbLoadWords, dbUpdateWord, dbUpdateWords, getOptionValue,
 } from './database';
@@ -25,18 +24,7 @@ function wordStats() {
   return {
     words: Object.keys(known).length,
     characters: knownCharacters.size,
-    wack: checkWords(),
   };
-}
-
-export function checkWords() {
-  let wackWords = 0;
-  Object.keys(known).forEach((word) => {
-    if (!isInDictionary(word)) {
-      wackWords += 1;
-    }
-  });
-  return wackWords;
 }
 
 // For now the db code will update the word set here on each addition.

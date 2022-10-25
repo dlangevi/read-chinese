@@ -38,6 +38,7 @@ const route = useRoute();
 const navigation = ref([
   { name: 'BookLibrary', href: '/BookLibrary', current: false },
   { name: 'Manage FlashCards', href: '/FlashCards', current: false },
+  { name: 'Create FlashCards', href: '/MakeCards', current: false },
   { name: 'Manage Wordlist', href: '/WordLists', current: false },
   { name: 'Stats', href: '/Stats', current: false },
   { name: 'Settings', href: '/Settings', current: false },

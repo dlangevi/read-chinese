@@ -3,6 +3,7 @@ import fs from 'fs';
 import type {
   DictionaryType, DictionaryEntry, UnknownWordEntry,
 } from './types';
+import { isKnown } from './knownWords';
 import {
   dbSaveDict, dbLoadDicts, dbGetPrimaryDict, dbSetPrimaryDict, dbDeleteDict,
 } from './database';
@@ -76,6 +77,19 @@ export function getPinyin(word:string) {
   return [...new Set(terms.map((term:any) => term.pronunciation))].join(', ');
 }
 
+function getPossibleWords(partialWord:string) {
+  const words = new Set(
+    Object.keys(dicts[defaultDict].dictionary)
+      .filter((word) => word.indexOf(partialWord) !== -1)
+      .filter((word) => !isKnown(word)),
+  );
+  return getDefinitions(
+    [...words].map((word) => ({
+      word,
+    })),
+  );
+}
+
 function getDefinitions(words:UnknownWordEntry[]) {
   return words.map((word) => ({
     ...word,
@@ -118,4 +132,5 @@ export const dictionariesIpc = {
   setPrimaryDict,
   deleteDictionary,
   getDefinitions,
+  getPossibleWords,
 };

@@ -1,7 +1,7 @@
 import readline from 'readline';
 import express from 'express';
 import bodyParser from 'body-parser';
-import { syncWords, checkWords } from './knownWords';
+import { syncWords } from './knownWords';
 import { loadDictionaries } from './dictionaries';
 import { preloadWords } from './segmentation';
 import {
@@ -27,7 +27,6 @@ async function main() {
   await preloadWords(userConfigDir);
   console.log('done ...');
   console.timeEnd('bootup');
-  checkWords();
 }
 main();
 
