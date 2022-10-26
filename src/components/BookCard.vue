@@ -41,7 +41,7 @@ const props = defineProps({
   },
 });
 
-const assetUrl = await convertFileSrc(props.book.cover);
+const assetUrl = convertFileSrc(props.book.cover);
 
 const isRead = ref(props.book.hasRead);
 const isFavorite = ref(props.book.favorite);

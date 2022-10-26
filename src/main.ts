@@ -12,6 +12,7 @@ import AboutPage from '@/pages/AboutPage.vue';
 import UserStats from '@/pages/UserStats.vue';
 import WordLists from '@/pages/WordLists.vue';
 import FlashCards from '@/pages/FlashCards.vue';
+import MakeCards from '@/pages/MakeCards.vue';
 import BookStats from '@/pages/BookStats.vue';
 
 import App from '@/App.vue';
@@ -52,6 +53,11 @@ const router = createRouter({
       path: '/FlashCards',
       name: 'FlashCards',
       component: FlashCards,
+    },
+    {
+      path: '/MakeCards',
+      name: 'MakeCards',
+      component: MakeCards,
     },
     {
       path: '/book/:bookId',
