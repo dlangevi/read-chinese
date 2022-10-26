@@ -63,7 +63,16 @@ const router = createRouter({
       path: '/book/:bookId',
       name: 'BookStats',
       component: BookStats,
-      props: true,
+      props: (route) => {
+        const bookIdParam = typeof route.params.bookId === 'object'
+          ? route.params.bookId[0] : route.params.bookId;
+        const bookId = Number.parseInt(bookIdParam, 10);
+        if (Number.isNaN(bookId)) {
+          console.error('failed to parse number');
+          return 0;
+        }
+        return { bookId };
+      },
     },
   ],
 });
