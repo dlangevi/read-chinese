@@ -29,7 +29,7 @@
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
-import { ref } from 'vue';
+import { ref, onUnmounted } from 'vue';
 import { NInput } from 'naive-ui';
 import AddToCardQueue from '@components/AddToCardQueue.vue';
 import MarkLearned from '@components/MarkLearned.vue';
@@ -92,18 +92,22 @@ const columnDefs:ColDef[] = [
     },
   },
 ];
-// let columnApi = null;
+
+let resizeCallback: () => void;
 function onGridReady(params:GridReadyEvent) {
-  // I know this will probably be used
-  // columnApi = params.columnApi;
   params.api.sizeColumnsToFit();
-  window.addEventListener('resize', () => {
+  resizeCallback = () => {
     setTimeout(() => {
       params.api.sizeColumnsToFit();
     });
-  });
+  };
+  window.addEventListener('resize', resizeCallback);
   params.api.sizeColumnsToFit();
 }
+
+onUnmounted(() => {
+  window.removeEventListener('resize', resizeCallback);
+});
 
 async function onUpdateSearchBox(newSearch:string) {
   currentSearch = newSearch;

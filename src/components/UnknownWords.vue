@@ -13,7 +13,7 @@
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import {
-  watch, onBeforeMount, ref, toRaw,
+  watch, onBeforeMount, ref, toRaw, onUnmounted,
 } from 'vue';
 import { AgGridVue } from 'ag-grid-vue3';
 import MarkLearned from '@components/MarkLearned.vue';
@@ -34,16 +34,6 @@ const getRowId = (params:GetRowIdParams) => params.data.word;
 const gridContext = {
   bookId: props.bookFilter,
 };
-
-function onGridReady(params:GridReadyEvent) {
-  params.api.sizeColumnsToFit();
-  window.addEventListener('resize', () => {
-    setTimeout(() => {
-      params.api.sizeColumnsToFit();
-    });
-  });
-  params.api.sizeColumnsToFit();
-}
 
 const columnDefs:ColDef[] = [
   {
@@ -111,9 +101,26 @@ watch(() => props.words, async (newWords) => {
   console.log('new Words', rowData.value);
 });
 
+let resizeCallback: () => void;
+function onGridReady(params:GridReadyEvent) {
+  params.api.sizeColumnsToFit();
+  resizeCallback = () => {
+    setTimeout(() => {
+      params.api.sizeColumnsToFit();
+    });
+  };
+  window.addEventListener('resize', resizeCallback);
+  params.api.sizeColumnsToFit();
+}
+
+onUnmounted(() => {
+  window.removeEventListener('resize', resizeCallback);
+});
+
 onBeforeMount(async () => {
   const rawWords = toRaw(props.words);
   rowData.value = await window.nodeIpc.getDefinitions(rawWords);
   console.log(rowData);
 });
+
 </script>

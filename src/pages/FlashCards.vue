@@ -15,7 +15,7 @@
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
-import { onBeforeMount, ref } from 'vue';
+import { onBeforeMount, ref, onUnmounted } from 'vue';
 import { useMessage } from 'naive-ui';
 import AddToCardQueue from '@components/AddToCardQueue.vue';
 import type { GetRowIdParams, GridReadyEvent, ColDef } from 'ag-grid-community';
@@ -46,18 +46,22 @@ const columnDefs:ColDef[] = [
     },
   },
 ];
-// let columnApi = null;
+
+let resizeCallback: () => void;
 function onGridReady(params:GridReadyEvent) {
-  // I know this will probably be used
-  // columnApi = params.columnApi;
   params.api.sizeColumnsToFit();
-  window.addEventListener('resize', () => {
+  resizeCallback = () => {
     setTimeout(() => {
       params.api.sizeColumnsToFit();
     });
-  });
+  };
+  window.addEventListener('resize', resizeCallback);
   params.api.sizeColumnsToFit();
 }
+
+onUnmounted(() => {
+  window.removeEventListener('resize', resizeCallback);
+});
 
 const rowData = ref([]);
 onBeforeMount(async () => {
