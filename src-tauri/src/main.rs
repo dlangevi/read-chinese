@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-mod database;
+mod commands;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use sqlx::sqlite::SqlitePool;
@@ -57,8 +57,8 @@ fn main() {
         .manage(pool)
         .invoke_handler(tauri::generate_handler![
             send_message,
-            database::learning_target,
-            database::learning_target_book
+            commands::book_library::learning_target,
+            commands::book_library::learning_target_book
         ])
         .setup(|app| {
             let window = app.get_window("main").unwrap();
