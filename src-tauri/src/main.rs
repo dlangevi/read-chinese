@@ -4,11 +4,10 @@
 )]
 
 mod commands;
+mod database;
+use sqlx::sqlite::SqlitePool;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use sqlx::sqlite::SqlitePool;
-use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteSynchronous};
-use std::str::FromStr;
 use tauri::{
     api::process::{Command, CommandEvent},
     Manager,
@@ -32,26 +31,15 @@ async fn send_message(function: String, args: String) -> String {
     resp
 }
 
-
-async fn create_pool(database_url: &str) -> Result<SqlitePool, Box<dyn std::error::Error>> {
-    let connection_options = SqliteConnectOptions::from_str(database_url)?
-        .create_if_missing(true)
-        .journal_mode(SqliteJournalMode::Wal)
-        .synchronous(SqliteSynchronous::Normal);
-
-    let sqlite_pool = SqlitePoolOptions::new()
-        .connect_with(connection_options)
-        .await?;
-
-    Ok(sqlite_pool)
-}
-
 fn main() {
-     // sqlx::migrate!().run(<&your_pool OR &mut your_connection>).await?;
+    use tauri::async_runtime::block_on;
+    const DATABASE_DIR: &str = "/home/dlangevi/.config/read-chinese";
+    const DATABASE_NAME: &str = "db.sqlite3";
 
-     use tauri::async_runtime::block_on;
-     const DATABASE: &str = "sqlite:/home/dlangevi/.config/read-chinese/db.sqlite3";
-     let pool: SqlitePool = block_on(create_pool(DATABASE)).expect("cannot connect");
+    let database_url = format!("sqlite:{}/{}", DATABASE_DIR, DATABASE_NAME);
+    let pool: SqlitePool = block_on(database::create_pool(&database_url)).expect("cannot connect");
+
+    block_on(database::migrate(&pool)).expect("failed to migrate db");
 
     tauri::Builder::default()
         .manage(pool)

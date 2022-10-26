@@ -46,6 +46,7 @@ export async function importCalibreBooks() {
       }
     }
   });
+  return 'finish';
 }
 
 export const calibreIpc = {

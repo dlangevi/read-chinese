@@ -49,7 +49,6 @@ export async function initializeDatabases(userConfigDir:string) {
 
   const knexConfig = knexConfigMap.development;
   knexConfig.connection.filename = path.join(userConfigDir, 'db.sqlite3');
-  knexConfig.migrations.directory = path.join(__dirname, '../migrations');
   knex = Knex(knexConfig);
   metadataStore = new Low(adapter) as Store;
   metadataStore.get = (key:string, defaultValue?: any) => {
@@ -67,9 +66,6 @@ export async function initializeDatabases(userConfigDir:string) {
   };
   await metadataStore.read();
   metadataStore.data = metadataStore.data || defaults;
-  await knex.migrate.latest().catch((err) => {
-    console.log(err);
-  });
 }
 
 /** *********************************
