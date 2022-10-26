@@ -3,8 +3,9 @@
     windows_subsystem = "windows"
 )]
 
-use std::sync::{Arc, Mutex};
+mod database;
 use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 
 // Learn more about Tauri commands at
 // https://tauri.app/v1/guides/features/command
@@ -20,12 +21,12 @@ use tauri::{
 
 #[tauri::command]
 async fn send_message(function: String, args: String) -> String {
-    // Lol there has got to be a better way of writing this
     let mut map = HashMap::new();
     map.insert("function", function);
     map.insert("args", args);
     let client = reqwest::Client::new();
-    let resp = client.post("http://localhost:3451/ipc")
+    let resp = client
+        .post("http://localhost:3451/ipc")
         .json(&map)
         .send()
         .await
@@ -37,8 +38,13 @@ async fn send_message(function: String, args: String) -> String {
 }
 
 fn main() {
+    // sqlx::migrate!().run(<&your_pool OR &mut your_connection>).await?;
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, send_message])
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            send_message,
+            database::learning_target
+        ])
         .setup(|app| {
             let window = app.get_window("main").unwrap();
             let mut app_dir = tauri::api::path::config_dir().unwrap();

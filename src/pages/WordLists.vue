@@ -35,6 +35,7 @@
 <script lang="ts" setup>
 import { NButton, NSpace, NCascader } from 'naive-ui';
 import type { CascaderOption } from 'naive-ui';
+import { invoke } from '@tauri-apps/api/tauri';
 import { ref } from 'vue';
 import type {
   UnknownWordEntry, HskLevel, HskVersion,
@@ -57,7 +58,9 @@ const options:CascaderOption[] = ['2.0', '3.0'].map((version) => ({
 }));
 
 const words = ref<UnknownWordEntry[]>([]);
-words.value = await window.nodeIpc.learningTarget();
+words.value = await invoke('learning_target', {
+  bookIds: [],
+});
 
 function importCSV() {
   window.nodeIpc.importCSVWords();

@@ -147,29 +147,6 @@ async function computeStats(book:Book) {
   book.stats.totalWords = await allWords(book);
 }
 
-// This is where I get tripped up on the seperation layer. This is a db
-// specific operation
-export async function learningTarget(bookIds?:number[])
-  : Promise<UnknownWordEntry[]> {
-  const top = getKnex()<{ word:string, occurance:number }[]>('frequency')
-    .select('word')
-    .sum({ occurance: 'count' })
-    .whereNotExists(function wordTable() {
-      this.select('word')
-        .from('words')
-        .whereRaw('words.word==frequency.word');
-    })
-    .groupBy('word')
-    .orderBy('occurance', 'desc')
-    .limit(200);
-
-  if (bookIds !== undefined && bookIds.length > 0) {
-    top.whereIn('book', bookIds);
-  }
-
-  return top;
-}
-
 async function hskWords(version:HskVersion, level:HskLevel)
   : Promise<UnknownWordEntry[]> {
   const hskPath = path.join(
@@ -260,7 +237,6 @@ async function totalRead() {
 
 export const bookLibraryIpc = {
   loadBooks,
-  learningTarget,
   loadBook,
   topUnknownWords,
   deleteBook,

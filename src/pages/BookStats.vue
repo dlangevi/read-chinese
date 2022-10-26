@@ -3,7 +3,7 @@
     <n-layout-sider width=500 bordered content-style="padding: 24px;">
       <img
         class="rounded rounded-t w-auto"
-        :src="'atom:///' + book.cover"
+        :src="assetUrl"
         :alt="book.title"
       />
     </n-layout-sider>
@@ -79,6 +79,7 @@ import {
   NLayoutFooter, NButton, NSpace, NTabs, NTabPane,
   NStatistic, NTable,
 } from 'naive-ui';
+import { invoke, convertFileSrc } from '@tauri-apps/api/tauri';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import type { Book } from '@/shared/types';
 
@@ -92,7 +93,10 @@ const props = defineProps({
 provide('preferBook', props.bookId);
 
 const book:Book = await window.nodeIpc.loadBook(props.bookId);
-const words = await window.nodeIpc.learningTarget([book.bookId]);
+const assetUrl = convertFileSrc(book.cover);
+const words = await invoke('learning_target', {
+  bookIds: [book.bookId],
+});
 const { stats } = book;
 
 const known = (
