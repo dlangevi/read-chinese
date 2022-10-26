@@ -17,14 +17,9 @@ import { useRoute } from 'vue-router';
 import { NMessageProvider } from 'naive-ui';
 import TopNav from '@/components/TopNav.vue';
 import CardCreator from '@/components/CardCreator.vue';
-import { appDir } from '@tauri-apps/api/path';
+
 // eslint-disable-next-line import/no-unresolved
-
 import 'virtual:windi.css';
-
-(async function f() {
-  console.log(await appDir());
-}());
 
 const route = useRoute();
 

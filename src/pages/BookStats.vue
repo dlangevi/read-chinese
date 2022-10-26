@@ -93,9 +93,9 @@ const props = defineProps({
 provide('preferBook', props.bookId);
 
 const book:Book = await window.nodeIpc.loadBook(props.bookId);
-const assetUrl = convertFileSrc(book.cover);
-const words = await invoke('learning_target', {
-  bookIds: [book.bookId],
+const assetUrl:string = convertFileSrc(book.cover);
+const words = await invoke('learning_target_book', {
+  bookId: book.bookId,
 });
 const { stats } = book;
 

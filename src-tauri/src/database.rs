@@ -1,8 +1,6 @@
 use serde::Serialize;
-use sqlx::sqlite::SqliteConnection;
-use sqlx::Connection;
-use sqlx::QueryBuilder;
 use std::vec::Vec;
+use tauri::State;
 
 #[derive(sqlx::FromRow, Serialize)]
 pub struct Target {
@@ -11,32 +9,52 @@ pub struct Target {
 }
 
 #[tauri::command]
-pub async fn learning_target(book_ids: Vec<i32>) -> Result<Vec<Target>, String> {
-    let mut conn =
-        SqliteConnection::connect("sqlite:/home/dlangevi/.config/read-chinese/db.sqlite3")
-            .await
-            .map_err(|e| e.to_string())?;
-    let mut builder: QueryBuilder<sqlx::Sqlite> = QueryBuilder::new(
-"SELECT word, sum(count) as occurance FROM frequency 
+pub async fn learning_target(
+    pool: State<'_, sqlx::SqlitePool>,
+) -> Result<Vec<Target>, String> {
+    let mut conn = pool.acquire().await.map_err(|e| e.to_string())?;
+    let query = sqlx::query_as::<_, Target>(
+        r#"
+SELECT word, sum(count) as occurance FROM frequency 
 WHERE NOT EXISTS (
     SELECT word
     FROM words
     WHERE words.word==frequency.word
-) ",
-    );
-    if book_ids.len() != 0 {
-        builder.push("AND book in ( ");
-        let mut separated = builder.separated(", ");
-        for value_type in book_ids.iter() {
-            separated.push_bind(value_type);
-        }
-        separated.push_unseparated(") ");
-    }
-    builder.push("GROUP BY word
-            ORDER BY occurance DESC
-            LIMIT 200");
-    let query = builder.build_query_as::<Target>().fetch_all(&mut conn)
-        .await
-        .map_err(|e| e.to_string())?;
+) 
+GROUP BY word
+ORDER BY occurance DESC
+LIMIT 200
+        "#,
+    )
+    .fetch_all(&mut conn)
+    .await
+    .map_err(|e| e.to_string())?;
+    Ok(query)
+}
+
+#[tauri::command]
+pub async fn learning_target_book(
+    pool: State<'_, sqlx::SqlitePool>,
+    book_id: i32,
+) -> Result<Vec<Target>, String> {
+    let mut conn = pool.acquire().await.map_err(|e| e.to_string())?;
+    let query = sqlx::query_as::<_, Target>(
+        r#"
+SELECT word, sum(count) as occurance FROM frequency 
+WHERE NOT EXISTS (
+    SELECT word
+    FROM words
+    WHERE words.word==frequency.word
+) 
+AND book == (?1)
+GROUP BY word
+ORDER BY occurance DESC
+LIMIT 200
+        "#,
+    )
+    .bind(book_id)
+    .fetch_all(&mut conn)
+    .await
+    .map_err(|e| e.to_string())?;
     Ok(query)
 }

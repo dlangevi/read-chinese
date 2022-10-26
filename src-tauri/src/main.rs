@@ -6,14 +6,9 @@
 mod database;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-
-// Learn more about Tauri commands at
-// https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello {}, {}! You've been greeted from Rust!", name, name)
-}
-
+use sqlx::sqlite::SqlitePool;
+use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteSynchronous};
+use std::str::FromStr;
 use tauri::{
     api::process::{Command, CommandEvent},
     Manager,
@@ -37,13 +32,33 @@ async fn send_message(function: String, args: String) -> String {
     resp
 }
 
+
+async fn create_pool(database_url: &str) -> Result<SqlitePool, Box<dyn std::error::Error>> {
+    let connection_options = SqliteConnectOptions::from_str(database_url)?
+        .create_if_missing(true)
+        .journal_mode(SqliteJournalMode::Wal)
+        .synchronous(SqliteSynchronous::Normal);
+
+    let sqlite_pool = SqlitePoolOptions::new()
+        .connect_with(connection_options)
+        .await?;
+
+    Ok(sqlite_pool)
+}
+
 fn main() {
-    // sqlx::migrate!().run(<&your_pool OR &mut your_connection>).await?;
+     // sqlx::migrate!().run(<&your_pool OR &mut your_connection>).await?;
+
+     use tauri::async_runtime::block_on;
+     const DATABASE: &str = "sqlite:/home/dlangevi/.config/read-chinese/db.sqlite3";
+     let pool: SqlitePool = block_on(create_pool(DATABASE)).expect("cannot connect");
+
     tauri::Builder::default()
+        .manage(pool)
         .invoke_handler(tauri::generate_handler![
-            greet,
             send_message,
-            database::learning_target
+            database::learning_target,
+            database::learning_target_book
         ])
         .setup(|app| {
             let window = app.get_window("main").unwrap();
