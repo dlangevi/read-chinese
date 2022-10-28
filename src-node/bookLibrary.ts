@@ -235,9 +235,31 @@ async function totalRead() {
   return top[0];
 }
 
+export async function learningTarget(bookIds?:number[])
+  : Promise<UnknownWordEntry[]> {
+  const top = getKnex()<{ word:string, occurance:number }[]>('frequency')
+    .select('word')
+    .sum({ occurance: 'count' })
+    .whereNotExists(function wordTable() {
+      this.select('word')
+        .from('words')
+        .whereRaw('words.word==frequency.word');
+    })
+    .groupBy('word')
+    .orderBy('occurance', 'desc')
+    .limit(200);
+
+  if (bookIds !== undefined && bookIds.length > 0) {
+    top.whereIn('book', bookIds);
+  }
+
+  return top;
+}
+
 export const bookLibraryIpc = {
   loadBooks,
   loadBook,
+  learningTarget,
   topUnknownWords,
   deleteBook,
   setFavorite,

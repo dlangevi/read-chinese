@@ -1,5 +1,3 @@
-import type { InjectionKey } from 'vue';
-
 export type DictionaryInfo = {
   path: string,
   type: DictionaryType,
@@ -85,4 +83,3 @@ export type UserSettingsType = {
     [label:string]: UserSetting;
   }
 };
-export const UserSettingsKey = Symbol('u') as InjectionKey<UserSettingsType>;

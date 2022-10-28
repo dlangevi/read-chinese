@@ -1,0 +1,15 @@
+{
+  "name": "read-chinese",
+  "outputfilename": "read-chinese",
+  "assetdir": "frontend/dist",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:build": "npm run build-only",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "http://localhost:5173",
+  "debounceMS": 500,
+  "author": {
+    "name": "David Langevin",
+    "email": "dlangevi@uwaterloo.ca"
+  }
+}

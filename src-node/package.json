@@ -23,10 +23,8 @@
     "typecheck": "vue-tsc --noEmit",
     "buildnode": "tsc -p tsconfig.json --outDir build",
     "packageold": "yarn buildnode && pkg package.json -o ../src-tauri/binaries/app && node scripts/move-binary.js",
-    "rename": "node scripts/move-binary.js",
-    "package": "pkg package.json -o ../src-tauri/binaries/app",
-    "package:debug": "pkg package.json --debug -o ../src-tauri/binaries/app",
-    "bundle": "yarn buildnode && yarn package && yarn rename",
+    "package": "pkg package.json -o ./build/app",
+    "bundle": "yarn buildnode && yarn package",
     "migrate": "knex migrate:latest --knexfile knexfile.ts",
     "migrate:make": "knex migrate:make --knexfile knexfile.ts"
   },
