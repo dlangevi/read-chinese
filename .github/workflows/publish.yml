@@ -1,9 +1,6 @@
 name: Wails build
 
-on:
-  push:
-    branches:
-      - release
+on: [push]
 
 jobs:
   build:
