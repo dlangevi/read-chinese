@@ -22,8 +22,7 @@
     "lint": "eslint src",
     "typecheck": "vue-tsc --noEmit",
     "buildnode": "tsc -p tsconfig.json --outDir build",
-    "packageold": "yarn buildnode && pkg package.json -o ../src-tauri/binaries/app && node scripts/move-binary.js",
-    "package": "pkg package.json -o ./build/app",
+    "package": "pkg package.json -o ./build/read-chinese.node",
     "bundle": "yarn buildnode && yarn package",
     "migrate": "knex migrate:latest --knexfile knexfile.ts",
     "migrate:make": "knex migrate:make --knexfile knexfile.ts"

@@ -1,18 +1,39 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"context"
+	_ "embed"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"os/exec"
+	"path"
+
+	"github.com/adrg/xdg"
 )
+
+//go:embed src-node/build/read-chinese.node
+var program []byte
+
+func configDir() string {
+	configDirPath, err := xdg.ConfigFile("read-chinese/")
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Config Dir at:", configDirPath)
+	return configDirPath
+}
 
 // App struct
 type App struct {
 	ctx context.Context
+	cmd *exec.Cmd
 }
 
 // NewApp creates a new App application struct
@@ -27,6 +48,30 @@ func (a *App) startup(ctx context.Context) {
 	// Perform your setup here
 	// 在这里执行初始化设置
 	a.ctx = ctx
+
+	userConfigDir := configDir()
+	userProgram := path.Join(userConfigDir, "read-chinese.node")
+	err := os.WriteFile(userProgram, program, 0777)
+	if err != nil {
+		log.Fatal(err)
+	}
+	cmd := exec.Command(userProgram, userConfigDir)
+	pipe, _ := cmd.StdoutPipe()
+	if err := cmd.Start(); err != nil {
+		log.Fatal(err)
+	}
+
+	go func(p io.ReadCloser) {
+		reader := bufio.NewReader(pipe)
+		line, err := reader.ReadString('\n')
+		for err == nil {
+			fmt.Println(line)
+			line, err = reader.ReadString('\n')
+		}
+	}(pipe)
+
+	a.cmd = cmd
+
 }
 
 func (a *App) NodeIpc(function string, argsJson string) string {
@@ -36,7 +81,7 @@ func (a *App) NodeIpc(function string, argsJson string) string {
 	})
 	responseBody := bytes.NewBuffer(postBody)
 
-  resp, err := http.Post("http://localhost:3451/ipc", "application/json", responseBody)
+	resp, err := http.Post("http://localhost:3451/ipc", "application/json", responseBody)
 	if err != nil {
 		log.Fatalf("An Error Occured %v", err)
 	}
@@ -76,4 +121,8 @@ func (a *App) beforeClose(ctx context.Context) (prevent bool) {
 func (a *App) shutdown(ctx context.Context) {
 	// Perform your teardown here
 	// 在此处做一些资源释放的操作
+	// Kill it:
+	if err := a.cmd.Process.Kill(); err != nil {
+		log.Fatal("failed to kill process: ", err)
+	}
 }
