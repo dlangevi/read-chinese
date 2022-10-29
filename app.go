@@ -14,21 +14,14 @@ import (
 	"os"
 	"os/exec"
 	"path"
+  
+  "github.com/dlangevi/read-chinese-wails/backend/core"
 
-	"github.com/adrg/xdg"
 )
 
 //go:embed src-node/build/read-chinese.node
 var program []byte
 
-func configDir() string {
-	configDirPath, err := xdg.ConfigFile("read-chinese/")
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Config Dir at:", configDirPath)
-	return configDirPath
-}
 
 // App struct
 type App struct {
@@ -49,7 +42,7 @@ func (a *App) startup(ctx context.Context) {
 	// 在这里执行初始化设置
 	a.ctx = ctx
 
-	userConfigDir := configDir()
+	userConfigDir := core.configDir()
 	userProgram := path.Join(userConfigDir, "read-chinese.node")
 	err := os.WriteFile(userProgram, program, 0777)
 	if err != nil {

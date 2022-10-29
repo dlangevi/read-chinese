@@ -1,9 +1,10 @@
-module changeme
+module github.com/dlangevi/read-chinese-wails
 
 go 1.18
 
 require (
 	github.com/adrg/xdg v0.4.0
+	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/wailsapp/wails/v2 v2.1.0
 )
 
@@ -33,3 +34,4 @@ require (
 )
 
 // replace github.com/wailsapp/wails/v2 v2.1.0 => /home/dlangevi/go/pkg/mod
+// replace github.com/dlangevi/read-chinese-wails/backend => ./backend
