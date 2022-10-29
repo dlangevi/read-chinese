@@ -1,1 +1,1 @@
-DROP TABLE frequency;
+DROP TABLE IF EXISTS frequency;

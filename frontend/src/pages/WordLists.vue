@@ -41,6 +41,8 @@ import type {
 } from '@/shared/types';
 import UnknownWords from '../components/UnknownWords.vue';
 
+import { LearningTarget } from '../../wailsjs/go/main/App';
+
 interface HskCascaderOption extends CascaderOption {
   level: HskLevel,
   version: HskVersion,
@@ -59,7 +61,9 @@ const options:CascaderOption[] = ['2.0', '3.0'].map((version) => ({
 const words = ref<UnknownWordEntry[]>([]);
 onBeforeMount(async () => {
   words.value = await window.nodeIpc.learningTarget();
-  console.log(words.value);
+  const sqlrows = await LearningTarget();
+  console.log(sqlrows);
+  // console.log(words.value);
 });
 
 function importCSV() {

@@ -1,1 +1,1 @@
-DROP TABLE words;
+DROP TABLE IF EXISTS words;

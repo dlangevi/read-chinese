@@ -1,6 +1,7 @@
 package main
 
 import (
+  "database/sql"
 	"bufio"
 	"bytes"
 	"context"
@@ -27,6 +28,7 @@ var program []byte
 type App struct {
 	ctx context.Context
 	cmd *exec.Cmd
+  db *sql.DB
 }
 
 // NewApp creates a new App application struct
@@ -73,7 +75,16 @@ func (a *App) startup(ctx context.Context) {
   if err != nil {
     log.Fatal(err)
   }
+  a.db = db
 
+}
+
+func (a *App) LearningTarget() []core.WordRow {
+  rows, err := core.LearningTarget(a.db)
+  if err != nil {
+    log.Println(err)
+  }
+  return rows;
 }
 
 func (a *App) NodeIpc(function string, argsJson string) string {

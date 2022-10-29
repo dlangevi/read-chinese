@@ -1,4 +1,4 @@
-CREATE TABLE `books` (
+CREATE TABLE IF NOT EXISTS `books` (
   `bookId` integer not null primary key autoincrement, 
   `author` varchar(255), 
   `title` varchar(255), 
