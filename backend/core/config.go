@@ -6,7 +6,7 @@ import (
 	"github.com/adrg/xdg"
 )
 
-func configDir() string {
+func ConfigDir() string {
 	configDirPath, err := xdg.ConfigFile("read-chinese/")
 	if err != nil {
 		log.Fatal(err)

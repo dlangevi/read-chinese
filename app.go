@@ -15,7 +15,7 @@ import (
 	"os/exec"
 	"path"
   
-  "github.com/dlangevi/read-chinese-wails/backend/core"
+  "read-chinese/backend/core"
 
 )
 
@@ -42,7 +42,7 @@ func (a *App) startup(ctx context.Context) {
 	// 在这里执行初始化设置
 	a.ctx = ctx
 
-	userConfigDir := core.configDir()
+	userConfigDir := core.ConfigDir()
 	userProgram := path.Join(userConfigDir, "read-chinese.node")
 	err := os.WriteFile(userProgram, program, 0777)
 	if err != nil {
@@ -64,6 +64,15 @@ func (a *App) startup(ctx context.Context) {
 	}(pipe)
 
 	a.cmd = cmd
+
+  db, err := core.NewDB( "/home/dlangevi/.config/read-chinese/db.sqlite3")
+  if err != nil {
+    log.Fatal(err)
+  }
+  err = core.RunMigrateScripts(db)
+  if err != nil {
+    log.Fatal(err)
+  }
 
 }
 
