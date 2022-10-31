@@ -1,4 +1,4 @@
-package core
+package backend 
 
 import (
 	"embed"
@@ -17,7 +17,9 @@ import (
 //go:embed migrations
 var fs embed.FS
 
-func NewDB(dbPath string) (*sqlx.DB, error) {
+var Conn *sqlx.DB;
+
+func NewDB(dbPath string) (error) {
 	if _, err := os.Stat(dbPath); err == nil {
 		// path/to/whatever exists
 
@@ -35,14 +37,15 @@ func NewDB(dbPath string) (*sqlx.DB, error) {
 	// sqliteDb, err := sql.Open("sqlite3", dbPath)
 	sqliteDb, err := sqlx.Connect("sqlite3", dbPath)
 	if err != nil {
-		log.Fatal(err, "failed to open sqlite DB")
+    return err
 	}
 
-	return sqliteDb, nil
+  Conn = sqliteDb
+	return nil
 }
 
-func RunMigrateScripts(db *sqlx.DB) error {
-	driver, err := sqlite3.WithInstance(db.DB, &sqlite3.Config{})
+func RunMigrateScripts() error {
+	driver, err := sqlite3.WithInstance(Conn.DB, &sqlite3.Config{})
 	if err != nil {
 		return fmt.Errorf("creating sqlite3 db driver failed %s", err)
 	}

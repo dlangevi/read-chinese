@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 
+	"read-chinese/backend"
+
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -47,6 +49,7 @@ func main() {
 	// 创建一个App结构体实例
 
 	app := NewApp()
+	backend := backend.StartBackend(&app.ctx)
 
 	// Create application with options
 	// 使用选项创建应用
@@ -76,6 +79,7 @@ func main() {
 		AssetsHandler:     NewFileLoader(),
 		Bind: []interface{}{
 			app,
+			backend.BookLibrary,
 		},
 		// Windows platform specific options
 		// Windows平台特定选项

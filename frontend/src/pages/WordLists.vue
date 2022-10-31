@@ -41,7 +41,7 @@ import type {
 } from '@/shared/types';
 import UnknownWords from '../components/UnknownWords.vue';
 
-import { LearningTarget } from '../../wailsjs/go/main/App';
+import { LearningTarget } from '../../wailsjs/go/backend/BookLibrary';
 
 interface HskCascaderOption extends CascaderOption {
   level: HskLevel,

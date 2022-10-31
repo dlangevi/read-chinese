@@ -1,4 +1,4 @@
-export namespace core {
+export namespace backend {
 	
 	export class WordRow {
 	    word: string;

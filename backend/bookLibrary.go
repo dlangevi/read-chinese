@@ -1,9 +1,7 @@
-package core
+package backend 
 
 import (
 	"log"
-
-	"github.com/jmoiron/sqlx"
 )
 
 type WordRow struct {
@@ -11,9 +9,12 @@ type WordRow struct {
 	Occurance int    `json:"occurance" db:"occurance"`
 }
 
-func LearningTarget(db *sqlx.DB) ([]WordRow, error) {
+type BookLibrary struct {
+}
+
+func (BookLibrary) LearningTarget() ([]WordRow) {
 	words := []WordRow{}
-	err := db.Select(&words, `
+	err := Conn.Select(&words, `
     SELECT word, sum(count) as occurance FROM frequency 
     WHERE NOT EXISTS (
         SELECT word
@@ -26,8 +27,8 @@ func LearningTarget(db *sqlx.DB) ([]WordRow, error) {
     `)
 	if err != nil {
 		log.Println(err)
-		return nil, err
+		return words 
 	}
 
-	return words, nil
+	return words 
 }

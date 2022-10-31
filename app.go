@@ -17,11 +17,39 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"read-chinese/backend/core"
+	"read-chinese/backend"
 )
 
 //go:embed src-node/build/read-chinese.node
 var program []byte
+
+func startNode() *exec.Cmd {
+
+	userConfigDir := backend.ConfigDir()
+	userProgram := path.Join(userConfigDir, "read-chinese.node")
+	err := os.WriteFile(userProgram, program, 0777)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	cmd := exec.Command(userProgram, userConfigDir)
+	pipe, _ := cmd.StdoutPipe()
+	if err := cmd.Start(); err != nil {
+		log.Fatal(err)
+	}
+
+	go func(p io.ReadCloser) {
+		reader := bufio.NewReader(pipe)
+		line, err := reader.ReadString('\n')
+		for err == nil {
+			fmt.Println(line)
+			line, err = reader.ReadString('\n')
+		}
+	}(pipe)
+
+	return cmd
+
+}
 
 // App struct
 type App struct {
@@ -43,47 +71,10 @@ func (a *App) startup(ctx context.Context) {
 	// 在这里执行初始化设置
 	a.ctx = ctx
 
-	userConfigDir := core.ConfigDir()
-	userProgram := path.Join(userConfigDir, "read-chinese.node")
-	err := os.WriteFile(userProgram, program, 0777)
-	if err != nil {
-		log.Fatal(err)
-	}
-	cmd := exec.Command(userProgram, userConfigDir)
-	pipe, _ := cmd.StdoutPipe()
-	if err := cmd.Start(); err != nil {
-		log.Fatal(err)
-	}
+	// While doing dev I will just run the node server myself,
+	// No need for launching a bundle
+	// a.cmd = startNode()
 
-	go func(p io.ReadCloser) {
-		reader := bufio.NewReader(pipe)
-		line, err := reader.ReadString('\n')
-		for err == nil {
-			fmt.Println(line)
-			line, err = reader.ReadString('\n')
-		}
-	}(pipe)
-
-	a.cmd = cmd
-
-	db, err := core.NewDB("/home/dlangevi/.config/read-chinese/db.sqlite3")
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = core.RunMigrateScripts(db)
-	if err != nil {
-		log.Fatal(err)
-	}
-	a.db = db
-
-}
-
-func (a *App) LearningTarget() []core.WordRow {
-	rows, err := core.LearningTarget(a.db)
-	if err != nil {
-		log.Println(err)
-	}
-	return rows
 }
 
 func (a *App) NodeIpc(function string, argsJson string) string {
@@ -92,7 +83,6 @@ func (a *App) NodeIpc(function string, argsJson string) string {
 		"args":     argsJson,
 	})
 	responseBody := bytes.NewBuffer(postBody)
-
 	resp, err := http.Post("http://localhost:3451/ipc", "application/json", responseBody)
 	if err != nil {
 		log.Fatalf("An Error Occured %v", err)
@@ -134,7 +124,7 @@ func (a *App) shutdown(ctx context.Context) {
 	// Perform your teardown here
 	// 在此处做一些资源释放的操作
 	// Kill it:
-	if err := a.cmd.Process.Kill(); err != nil {
-		log.Fatal("failed to kill process: ", err)
-	}
+	// if err := a.cmd.Process.Kill(); err != nil {
+	// 	log.Fatal("failed to kill process: ", err)
+	// }
 }
