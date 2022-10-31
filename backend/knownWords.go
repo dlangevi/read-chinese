@@ -4,6 +4,8 @@ import (
 	"log"
 )
 
+var known *KnownWords
+
 type KnownWords struct {
 	// For now just map word to interval
 	words      map[string]int
@@ -11,7 +13,7 @@ type KnownWords struct {
 }
 
 func NewKnownWords() *KnownWords {
-	known := &KnownWords{}
+	known = &KnownWords{}
 	known.words = map[string]int{}
 	known.characters = map[rune]bool{}
 	known.syncWords()
@@ -60,5 +62,22 @@ func (known *KnownWords) AddWord(word string, age int) {
     ON CONFLICT(word) DO UPDATE SET 
       interval=excluded.interval
   `, word, age)
-	// Update the node model as well?
+}
+
+// TODO importCSVWords
+// TODO updateInterval?
+
+func (known *KnownWords) isWellKnown(word string) bool {
+	interval, ok := known.words[word]
+	return ok && interval >= 100
+}
+
+func (known *KnownWords) isKnown(word string) bool {
+	_, ok := known.words[word]
+	return ok
+}
+
+func (known *KnownWords) isKnownChar(char rune) bool {
+	_, ok := known.characters[char]
+	return ok
 }

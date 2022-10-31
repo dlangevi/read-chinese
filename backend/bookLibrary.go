@@ -12,6 +12,10 @@ type WordOccuranceRow struct {
 type BookLibrary struct {
 }
 
+func (BookLibrary) Testing() {
+	println(known.isKnown("你好"))
+}
+
 func (BookLibrary) LearningTarget() []WordOccuranceRow {
 	words := []WordOccuranceRow{}
 	err := Conn.Select(&words, `

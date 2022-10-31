@@ -5,3 +5,7 @@
 export function LearningTarget() {
   return window['go']['backend']['BookLibrary']['LearningTarget']();
 }
+
+export function Testing() {
+  return window['go']['backend']['BookLibrary']['Testing']();
+}
