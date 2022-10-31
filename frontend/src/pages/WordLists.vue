@@ -60,10 +60,7 @@ const options:CascaderOption[] = ['2.0', '3.0'].map((version) => ({
 
 const words = ref<UnknownWordEntry[]>([]);
 onBeforeMount(async () => {
-  words.value = await window.nodeIpc.learningTarget();
-  const sqlrows = await LearningTarget();
-  console.log(sqlrows);
-  // console.log(words.value);
+  words.value = await LearningTarget();
 });
 
 function importCSV() {

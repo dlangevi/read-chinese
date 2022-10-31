@@ -1,7 +1,6 @@
 package main
 
 import (
-  "database/sql"
 	"bufio"
 	"bytes"
 	"context"
@@ -15,20 +14,20 @@ import (
 	"os"
 	"os/exec"
 	"path"
-  
-  "read-chinese/backend/core"
 
+	"github.com/jmoiron/sqlx"
+
+	"read-chinese/backend/core"
 )
 
 //go:embed src-node/build/read-chinese.node
 var program []byte
 
-
 // App struct
 type App struct {
 	ctx context.Context
 	cmd *exec.Cmd
-  db *sql.DB
+	db  *sqlx.DB
 }
 
 // NewApp creates a new App application struct
@@ -67,24 +66,24 @@ func (a *App) startup(ctx context.Context) {
 
 	a.cmd = cmd
 
-  db, err := core.NewDB( "/home/dlangevi/.config/read-chinese/db.sqlite3")
-  if err != nil {
-    log.Fatal(err)
-  }
-  err = core.RunMigrateScripts(db)
-  if err != nil {
-    log.Fatal(err)
-  }
-  a.db = db
+	db, err := core.NewDB("/home/dlangevi/.config/read-chinese/db.sqlite3")
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = core.RunMigrateScripts(db)
+	if err != nil {
+		log.Fatal(err)
+	}
+	a.db = db
 
 }
 
 func (a *App) LearningTarget() []core.WordRow {
-  rows, err := core.LearningTarget(a.db)
-  if err != nil {
-    log.Println(err)
-  }
-  return rows;
+	rows, err := core.LearningTarget(a.db)
+	if err != nil {
+		log.Println(err)
+	}
+	return rows
 }
 
 func (a *App) NodeIpc(function string, argsJson string) string {

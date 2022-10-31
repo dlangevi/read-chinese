@@ -7,6 +7,7 @@ go 1.18
 require (
 	github.com/adrg/xdg v0.4.0
 	github.com/golang-migrate/migrate/v4 v4.15.2
+	github.com/jmoiron/sqlx v1.3.5
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/wailsapp/wails/v2 v2.1.0
 )
