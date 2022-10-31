@@ -1,10 +1,10 @@
-package backend 
+package backend
 
 import (
 	"log"
 )
 
-type WordRow struct {
+type WordOccuranceRow struct {
 	Word      string `json:"word" db:"word"`
 	Occurance int    `json:"occurance" db:"occurance"`
 }
@@ -12,8 +12,8 @@ type WordRow struct {
 type BookLibrary struct {
 }
 
-func (BookLibrary) LearningTarget() ([]WordRow) {
-	words := []WordRow{}
+func (BookLibrary) LearningTarget() []WordOccuranceRow {
+	words := []WordOccuranceRow{}
 	err := Conn.Select(&words, `
     SELECT word, sum(count) as occurance FROM frequency 
     WHERE NOT EXISTS (
@@ -27,8 +27,8 @@ func (BookLibrary) LearningTarget() ([]WordRow) {
     `)
 	if err != nil {
 		log.Println(err)
-		return words 
+		return words
 	}
 
-	return words 
+	return words
 }

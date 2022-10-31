@@ -1,17 +1,31 @@
 export namespace backend {
 	
-	export class WordRow {
+	export class WordOccuranceRow {
 	    word: string;
 	    occurance: number;
 	
 	    static createFrom(source: any = {}) {
-	        return new WordRow(source);
+	        return new WordOccuranceRow(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.word = source["word"];
 	        this.occurance = source["occurance"];
+	    }
+	}
+	export class WordStats {
+	    words: number;
+	    characters: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new WordStats(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.words = source["words"];
+	        this.characters = source["characters"];
 	    }
 	}
 

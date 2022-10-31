@@ -80,6 +80,7 @@ func main() {
 		Bind: []interface{}{
 			app,
 			backend.BookLibrary,
+			backend.KnownWords,
 		},
 		// Windows platform specific options
 		// Windows平台特定选项

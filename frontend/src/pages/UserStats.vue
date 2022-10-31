@@ -20,11 +20,10 @@
 
 <script setup lang="ts">
 import { NStatistic } from 'naive-ui';
-import { NodeIpc } from "../../wailsjs/go/main/App";
-import { ref } from 'vue';
+import { GetWordStats } from '../../wailsjs/go/backend/KnownWords';
 
 const readWords = await window.nodeIpc.totalRead();
-const wordStats = await window.nodeIpc.wordStats();
+const wordStats = await GetWordStats();
 const { totalWords } = readWords;
 const {
   words,

@@ -8,6 +8,7 @@ import (
 type Backend struct {
 	RuntimeContext *context.Context
 	BookLibrary    *BookLibrary
+	KnownWords     *KnownWords
 }
 
 func StartBackend(ctx *context.Context) *Backend {
@@ -27,5 +28,6 @@ func StartBackend(ctx *context.Context) *Backend {
 	return &Backend{
 		RuntimeContext: ctx,
 		BookLibrary:    &BookLibrary{},
+		KnownWords:     NewKnownWords(),
 	}
 }
