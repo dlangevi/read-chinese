@@ -108,7 +108,7 @@ import EditDefinition from
 import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
 import { getUserSettings } from '@/UserSettings';
 
-import { AddWord } from '../../wailsjs/go/backend/KnownWords';
+import { AddWord } from '@wailsjs/backend/KnownWords';
 
 const UserSettings = getUserSettings();
 

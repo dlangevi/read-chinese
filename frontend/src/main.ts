@@ -12,7 +12,7 @@ import WordLists from '@/pages/WordLists.vue';
 import FlashCards from '@/pages/FlashCards.vue';
 import MakeCards from '@/pages/MakeCards.vue';
 import BookStats from '@/pages/BookStats.vue';
-import { NodeIpc } from '../wailsjs/go/main/App';
+import { NodeIpc } from '@wailsjs/main/App';
 
 import App from './App.vue';
 

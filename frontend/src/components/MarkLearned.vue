@@ -27,7 +27,7 @@ import { NButton } from 'naive-ui';
   </n-button>
 */
 import type { ICellRendererParams } from 'ag-grid-community';
-import { AddWord } from '../../wailsjs/go/backend/KnownWords';
+import { AddWord } from '@wailsjs/backend/KnownWords';
 
 const props = defineProps<{ params:ICellRendererParams }>();
 

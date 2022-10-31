@@ -39,9 +39,8 @@ import { ref, onBeforeMount } from 'vue';
 import type {
   UnknownWordEntry, HskLevel, HskVersion,
 } from '@/shared/types';
+import { LearningTarget } from '@wailsjs/backend/BookLibrary';
 import UnknownWords from '../components/UnknownWords.vue';
-
-import { LearningTarget } from '../../wailsjs/go/backend/BookLibrary';
 
 interface HskCascaderOption extends CascaderOption {
   level: HskLevel,
