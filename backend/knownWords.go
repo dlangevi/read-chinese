@@ -14,11 +14,11 @@ func NewKnownWords() *KnownWords {
 	known := &KnownWords{}
 	known.words = map[string]int{}
 	known.characters = map[rune]bool{}
-	known.loadWords()
+	known.syncWords()
 	return known
 }
 
-func (known *KnownWords) loadWords() {
+func (known *KnownWords) syncWords() {
 	type WordRow struct {
 		Word     string
 		Interval int
@@ -40,10 +40,6 @@ func (known *KnownWords) loadWords() {
 	}
 }
 
-func (known *KnownWords) GetWords() map[string]int {
-	return known.words
-}
-
 type WordStats struct {
 	Words      int `json:"words"`
 	Characters int `json:"characters"`
@@ -54,5 +50,15 @@ func (known *KnownWords) GetWordStats() WordStats {
 		len(known.words),
 		len(known.characters),
 	}
+}
 
+// TODO have the updated_at automatically update
+func (known *KnownWords) AddWord(word string, age int) {
+	known.words[word] = age
+	Conn.MustExec(`
+  INSERT INTO words (word, interval) VALUES ($1, $2)
+    ON CONFLICT(word) DO UPDATE SET 
+      interval=excluded.interval
+  `, word, age)
+	// Update the node model as well?
 }

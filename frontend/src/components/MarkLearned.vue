@@ -27,14 +27,15 @@ import { NButton } from 'naive-ui';
   </n-button>
 */
 import type { ICellRendererParams } from 'ag-grid-community';
+import { AddWord } from '../../wailsjs/go/backend/KnownWords';
 
 const props = defineProps<{ params:ICellRendererParams }>();
 
 function markKnown() {
   const rowData = props.params.data;
-  // Keep with the convention of 10000 == user has claimed
-  // they super known this one
-  window.nodeIpc.addWord(rowData.word, 10000);
+  // Keep with the convention of 10000 == user has claimed to known a word
+  console.log('adding with go');
+  AddWord(rowData.word, 10000);
   props.params.api.applyTransaction({
     remove: [rowData],
   });

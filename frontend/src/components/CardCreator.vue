@@ -108,6 +108,8 @@ import EditDefinition from
 import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
 import { getUserSettings } from '@/UserSettings';
 
+import { AddWord } from '../../wailsjs/go/backend/KnownWords';
+
 const UserSettings = getUserSettings();
 
 const store = useCardQueue();
@@ -349,7 +351,7 @@ async function submit() {
 }
 
 function markKnown() {
-  window.nodeIpc.addWord(card.value.fields.word, 10000);
+  AddWord(card.value.fields.word, 10000);
   store.clearFront();
 }
 
