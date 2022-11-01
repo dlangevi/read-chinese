@@ -1,4 +1,4 @@
-package backend 
+package backend
 
 import (
 	"embed"
@@ -17,9 +17,9 @@ import (
 //go:embed migrations
 var fs embed.FS
 
-var Conn *sqlx.DB;
+var Conn *sqlx.DB
 
-func NewDB(dbPath string) (error) {
+func NewDB(dbPath string) error {
 	if _, err := os.Stat(dbPath); err == nil {
 		// path/to/whatever exists
 
@@ -37,10 +37,10 @@ func NewDB(dbPath string) (error) {
 	// sqliteDb, err := sql.Open("sqlite3", dbPath)
 	sqliteDb, err := sqlx.Connect("sqlite3", dbPath)
 	if err != nil {
-    return err
+		return err
 	}
 
-  Conn = sqliteDb
+	Conn = sqliteDb
 	return nil
 }
 

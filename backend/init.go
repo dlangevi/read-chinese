@@ -2,6 +2,7 @@ package backend
 
 import (
 	"context"
+	"fmt"
 	"log"
 )
 
@@ -21,6 +22,14 @@ func StartBackend(ctx *context.Context) *Backend {
 	if err != nil {
 		log.Fatal(err)
 	}
+	err = LoadMetadata("/home/dlangevi/.config/read-chinese/newmetadata.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	UpdateTimesRan()
+	ran := GetTimesRan()
+	fmt.Println("Ran {} times", ran)
+
 	// settings, err := LoadSettings()
 	// if err != nil {
 	// 	log.Error().Msg("Failed to load settings")
