@@ -10,9 +10,12 @@ func TestDefault(t *testing.T) {
 	tmpMetaData := path.Join(os.TempDir(), "metadata.json")
 	LoadMetadata(tmpMetaData)
 	settingName := "EnableChinese"
-	setting, ok := userSettings.UserSettings[settingName]
+	setting, ok := userSettings.UserSettings.Settings[settingName]
 	if !ok {
 		t.Errorf("Failed to load basic setting %v", settingName)
+	}
+	if setting.Group != "Dictionaries" {
+		t.Errorf("%v, had the wrong group %#v", settingName, setting)
 	}
 	if setting.Value != "true" {
 		t.Errorf("%v, had the wrong value %v", settingName, setting.Value)
@@ -33,5 +36,28 @@ func TestDefault(t *testing.T) {
 		t.Errorf("%v was not updated", settingName)
 	}
 	os.Remove(tmpMetaData)
+}
 
+func TestGroupSettings(t *testing.T) {
+	tmpMetaData := path.Join(os.TempDir(), "metadatagroup.json")
+	LoadMetadata(tmpMetaData)
+	settings := &UserSettings{}
+	groups := settings.GetGroupSettings("CardCreation")
+	if len(groups) != 8 {
+		t.Errorf("Groups not good %v", len(groups))
+	}
+	os.Remove(tmpMetaData)
+}
+
+func TestLoadTwice(t *testing.T) {
+	tmpMetaData := path.Join(os.TempDir(), "metadatatwice.json")
+	LoadMetadata(tmpMetaData)
+	settingName := "EnableChinese"
+	settingA, _ := userSettings.UserSettings.Settings[settingName]
+	LoadMetadata(tmpMetaData)
+	settingB, _ := userSettings.UserSettings.Settings[settingName]
+	if settingA != settingB {
+		t.Errorf("Load twice %v, %v", settingA, settingB)
+	}
+	os.Remove(tmpMetaData)
 }

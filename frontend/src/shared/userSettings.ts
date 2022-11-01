@@ -6,6 +6,7 @@ import DictionariesList
   from '@/components/SettingsWidgets/DictionariesList.vue';
 import SettingsSlider
   from '@/components/SettingsWidgets/SettingsSlider.vue';
+import { GetGroupSettings } from '@wailsjs/backend/UserSettings';
 import { UserSetting, UserSettingsType } from './types';
 
 function settingsObject(
@@ -101,6 +102,8 @@ function slider(
 }
 
 export async function generateUserSettings() :Promise<UserSettingsType> {
+  const fromGo = await GetGroupSettings('CardCreation');
+  console.log(fromGo);
   const CardCreation = {
     AutoAdvanceSentence: checkBox(
       'AutoAdvanceSentence',

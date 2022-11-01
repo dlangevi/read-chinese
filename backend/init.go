@@ -10,6 +10,7 @@ type Backend struct {
 	RuntimeContext *context.Context
 	BookLibrary    *BookLibrary
 	KnownWords     *KnownWords
+	UserSettings   *UserSettings
 }
 
 func StartBackend(ctx *context.Context) *Backend {
@@ -26,17 +27,15 @@ func StartBackend(ctx *context.Context) *Backend {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	UpdateTimesRan()
 	ran := GetTimesRan()
 	fmt.Println("Ran {} times", ran)
 
-	// settings, err := LoadSettings()
-	// if err != nil {
-	// 	log.Error().Msg("Failed to load settings")
-	// }
 	return &Backend{
 		RuntimeContext: ctx,
 		BookLibrary:    &BookLibrary{},
 		KnownWords:     NewKnownWords(),
+		UserSettings:   &UserSettings{},
 	}
 }

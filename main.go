@@ -81,6 +81,7 @@ func main() {
 			app,
 			backend.BookLibrary,
 			backend.KnownWords,
+			backend.UserSettings,
 		},
 		// Windows platform specific options
 		// Windows平台特定选项
