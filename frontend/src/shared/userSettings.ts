@@ -6,7 +6,14 @@ import DictionariesList
   from '@/components/SettingsWidgets/DictionariesList.vue';
 import SettingsSlider
   from '@/components/SettingsWidgets/SettingsSlider.vue';
-import { GetGroupSettings } from '@wailsjs/backend/UserSettings';
+import {
+  GetUserSetting,
+  SetUserSetting,
+  GetUserSettingBool,
+  SetUserSettingBool,
+  GetUserSettingInt,
+  SetUserSettingInt,
+} from '@wailsjs/backend/UserSettings';
 import { UserSetting, UserSettingsType } from './types';
 
 function settingsObject(
@@ -15,7 +22,8 @@ function settingsObject(
   tooltip:string,
   defaultValue:any,
   widgetType:any,
-  other?:any,
+  getter:any,
+  setter:any,
 ):UserSetting {
   const option:UserSetting = {
     value,
@@ -23,7 +31,6 @@ function settingsObject(
     tooltip,
     defaultValue,
     type: widgetType,
-    ...other,
     loaded: false,
     // TODO save some cached value on the renderer side
   };
@@ -39,13 +46,13 @@ function settingsObject(
     return option.cached;
   };
   option.readFromBackEnd = async function readFromBackEnd() {
-    option.cached = await window.nodeIpc.getOptionValue(value, defaultValue);
+    option.cached = await getter(value, defaultValue);
     option.loaded = true;
     return option.cached;
   };
   option.write = async function write(newValue:any) {
     option.cached = newValue;
-    return window.nodeIpc.setOptionValue(value, newValue);
+    return setter(value, newValue);
   };
   return option;
 }
@@ -55,7 +62,6 @@ function checkBox(
   label:string,
   tooltip:string,
   defaultValue:any,
-  other?:any,
 ) {
   return settingsObject(
     value,
@@ -63,7 +69,8 @@ function checkBox(
     tooltip,
     defaultValue,
     SettingsCheckbox,
-    other,
+    GetUserSettingBool,
+    SetUserSettingBool,
   );
 }
 
@@ -72,7 +79,6 @@ function textBox(
   label:string,
   tooltip:string,
   defaultValue:any,
-  other?:any,
 ) {
   return settingsObject(
     value,
@@ -80,7 +86,8 @@ function textBox(
     tooltip,
     defaultValue,
     SettingsTextbox,
-    other,
+    GetUserSetting,
+    SetUserSetting,
   );
 }
 
@@ -89,7 +96,6 @@ function slider(
   label:string,
   tooltip:string,
   defaultValue:any,
-  other?:any,
 ) {
   return settingsObject(
     value,
@@ -97,13 +103,13 @@ function slider(
     tooltip,
     defaultValue,
     SettingsSlider,
-    other,
+    GetUserSettingInt,
+    SetUserSettingInt,
+
   );
 }
 
 export async function generateUserSettings() :Promise<UserSettingsType> {
-  const fromGo = await GetGroupSettings('CardCreation');
-  console.log(fromGo);
   const CardCreation = {
     AutoAdvanceSentence: checkBox(
       'AutoAdvanceSentence',

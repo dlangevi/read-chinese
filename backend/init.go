@@ -23,7 +23,7 @@ func StartBackend(ctx *context.Context) *Backend {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = LoadMetadata("/home/dlangevi/.config/read-chinese/newmetadata.json")
+	userSettings, err = LoadMetadata("/home/dlangevi/.config/read-chinese/newmetadata.json")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,6 +36,6 @@ func StartBackend(ctx *context.Context) *Backend {
 		RuntimeContext: ctx,
 		BookLibrary:    &BookLibrary{},
 		KnownWords:     NewKnownWords(),
-		UserSettings:   &UserSettings{},
+		UserSettings:   userSettings,
 	}
 }

@@ -72,7 +72,6 @@ export type UserSetting = {
   tooltip?:string;
   defaultValue:any;
   type:any
-  other?:any;
   read?: any;
   write?:any;
   readFromBackEnd?:any;

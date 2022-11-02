@@ -9,6 +9,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/mattn/go-sqlite3 v1.14.16
+	github.com/oleiade/reflections v1.0.1
 	github.com/wailsapp/wails/v2 v2.1.0
 )
 

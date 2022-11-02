@@ -1,17 +1,5 @@
 export namespace backend {
 	
-	export class UserSetting {
-	
-	
-	    static createFrom(source: any = {}) {
-	        return new UserSetting(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	
-	    }
-	}
 	export class WordOccuranceRow {
 	    word: string;
 	    occurance: number;
