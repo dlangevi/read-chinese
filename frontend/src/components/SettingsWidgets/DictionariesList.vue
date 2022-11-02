@@ -57,7 +57,7 @@ import {
   NModal, NButton, NList, NListItem, NInput, NSelect,
 } from 'naive-ui';
 import { onBeforeMount, ref } from 'vue';
-import type { DictionaryInfo, DictionaryType } from '@/shared/types';
+import type { DictionaryInfo, DictionaryType } from '@/lib/types';
 
 const addDictModal = ref(false);
 

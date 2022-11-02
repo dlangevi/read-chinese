@@ -106,7 +106,7 @@ import EditImages from
 import EditDefinition from
   '@/components/CardCreatorSteps/EditDefinition.vue';
 import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
-import { getUserSettings } from '@/UserSettings';
+import { getUserSettings } from '@/lib/userSettings';
 
 import { AddWord } from '@wailsjs/backend/KnownWords';
 

@@ -35,7 +35,7 @@ import AddToCardQueue from '@/components/AddToCardQueue.vue';
 import MarkLearned from '@/components/MarkLearned.vue';
 import type { GetRowIdParams, GridReadyEvent, ColDef } from 'ag-grid-community';
 
-import type { UnknownWordEntry } from '@/shared/types';
+import type { UnknownWordEntry } from '@/lib/types';
 
 const rowData = ref<UnknownWordEntry[]>([]);
 let currentSearch:string = '';

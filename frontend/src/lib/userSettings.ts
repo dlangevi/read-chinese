@@ -1,3 +1,4 @@
+import { inject } from 'vue';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
 import SettingsTextbox
@@ -14,7 +15,7 @@ import {
   GetUserSettingInt,
   SetUserSettingInt,
 } from '@wailsjs/backend/UserSettings';
-import { UserSetting, UserSettingsType } from './types';
+import { UserSettingsKey, UserSetting, UserSettingsType } from './types';
 
 function settingsObject(
   value:string,
@@ -227,4 +228,8 @@ export async function generateUserSettings() :Promise<UserSettingsType> {
     Dictionaries,
     BookLibrary,
   };
+}
+
+export function getUserSettings():UserSettingsType {
+  return inject(UserSettingsKey) as UserSettingsType;
 }

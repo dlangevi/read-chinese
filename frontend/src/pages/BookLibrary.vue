@@ -26,8 +26,8 @@ import { NGrid, NGi, NButton } from 'naive-ui';
 import BookCard from '@/components/BookCard.vue';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
-import { getUserSettings } from '@/UserSettings';
-import type { Book } from '@/shared/types';
+import { getUserSettings } from '@/lib/userSettings';
+import type { Book } from '@/lib/types';
 
 function syncCalibre() {
   window.nodeIpc.importCalibreBooks();

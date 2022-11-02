@@ -80,7 +80,7 @@ import {
   NStatistic, NTable,
 } from 'naive-ui';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
-import type { Book } from '@/shared/types';
+import type { Book } from '@/lib/types';
 
 const props = defineProps({
   bookId: {

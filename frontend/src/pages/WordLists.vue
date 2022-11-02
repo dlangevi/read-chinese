@@ -38,7 +38,7 @@ import type { CascaderOption } from 'naive-ui';
 import { ref, onBeforeMount } from 'vue';
 import type {
   UnknownWordEntry, HskLevel, HskVersion,
-} from '@/shared/types';
+} from '@/lib/types';
 import { LearningTarget } from '@wailsjs/backend/BookLibrary';
 import UnknownWords from '../components/UnknownWords.vue';
 

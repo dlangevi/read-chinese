@@ -18,9 +18,9 @@ import {
 import { AgGridVue } from 'ag-grid-vue3';
 import MarkLearned from '@/components/MarkLearned.vue';
 import AddToCardQueue from '@/components/AddToCardQueue.vue';
-import { getUserSettings } from '@/UserSettings';
+import { getUserSettings } from '@/lib/userSettings';
 import type { GetRowIdParams, GridReadyEvent, ColDef } from 'ag-grid-community';
-import type { UnknownWordEntry } from '@/shared/types';
+import type { UnknownWordEntry } from '@/lib/types';
 
 const UserSettings = getUserSettings();
 
