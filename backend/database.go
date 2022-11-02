@@ -25,7 +25,6 @@ func NewDB(dbPath string) error {
 
 	} else if errors.Is(err, os.ErrNotExist) {
 		// path/to/whatever does *not* exist
-		// os.MkdirAll("./data/1234", 0755)
 		os.Create(dbPath)
 
 	} else {

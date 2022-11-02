@@ -10,7 +10,7 @@ func TestDefault(t *testing.T) {
 	tmpMetaData := path.Join(os.TempDir(), "metadata.json")
 	LoadMetadata(tmpMetaData)
 	settingName := "EnableChinese"
-	setting, ok := userSettings.UserSettings.Settings[settingName]
+	setting, ok := userSettings.UserSettings[settingName]
 	if !ok {
 		t.Errorf("Failed to load basic setting %v", settingName)
 	}
@@ -53,9 +53,9 @@ func TestLoadTwice(t *testing.T) {
 	tmpMetaData := path.Join(os.TempDir(), "metadatatwice.json")
 	LoadMetadata(tmpMetaData)
 	settingName := "EnableChinese"
-	settingA, _ := userSettings.UserSettings.Settings[settingName]
+	settingA, _ := userSettings.UserSettings[settingName]
 	LoadMetadata(tmpMetaData)
-	settingB, _ := userSettings.UserSettings.Settings[settingName]
+	settingB, _ := userSettings.UserSettings[settingName]
 	if settingA != settingB {
 		t.Errorf("Load twice %v, %v", settingA, settingB)
 	}
