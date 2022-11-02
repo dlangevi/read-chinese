@@ -67,16 +67,12 @@ export type Book = {
 };
 
 export type UserSetting = {
-  value:string;
+  name:string;
   label:string;
   tooltip?:string;
-  defaultValue:any;
   type:any
   read?: any;
   write?:any;
-  readFromBackEnd?:any;
-  loaded?:boolean;
-  cached?:any;
 };
 
 export type UserSettingsType = {

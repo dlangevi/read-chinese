@@ -65,7 +65,7 @@ export type Book = {
 };
 
 export type UserSetting = {
-  value:string;
+  name:string;
   label:string;
   tooltip?:string;
   defaultValue:any;
