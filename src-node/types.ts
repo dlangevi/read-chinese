@@ -1,43 +1,9 @@
-export type DictionaryInfo = {
-  path: string,
-  type: DictionaryType,
-};
-
-export type DictionaryType = 'english' | 'chinese';
-
-export type DictionaryEntry = {
-  definition: string;
-  pronunciation: string;
-};
-
 export type KnownWords = {
   [key:string]: {
     interval:number;
   };
 };
-
-export type UnknownWordEntry = {
-  word: string,
-  occurance?: number,
-  definition?: string,
-  pinyin?: string,
-};
-
-export type HskVersion = '2.0' | '3.0';
-export type HskLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7;
-
 export type SegmentedSentence = [token:string, type:number][];
-
-export type BookStats = {
-  probablyKnownWords: number;
-  knownCharacters: number;
-  totalCharacters: number;
-  totalWords: number;
-  totalKnownWords: number;
-  targets: number[];
-  targetOccurances: number[];
-  needToKnow: number[];
-};
 
 export function initBookStats():BookStats {
   return {
@@ -52,6 +18,42 @@ export function initBookStats():BookStats {
   };
 }
 
+/// //////////////////////////////////////////////////////// ///
+//  Shared Types! Keep in sync with frontend/src/lib/types.ts //
+/// //////////////////////////////////////////////////////// ///
+export type DictionaryInfo = {
+  path: string,
+  type: DictionaryType,
+};
+
+export type DictionaryType = 'english' | 'chinese';
+
+export type DictionaryEntry = {
+  definition: string;
+  pronunciation: string;
+};
+
+export type UnknownWordEntry = {
+  word: string,
+  occurance?: number,
+  definition?: string,
+  pinyin?: string,
+};
+
+export type HskVersion = '2.0' | '3.0';
+export type HskLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
+export type BookStats = {
+  probablyKnownWords: number;
+  knownCharacters: number;
+  totalCharacters: number;
+  totalWords: number;
+  totalKnownWords: number;
+  targets: number[];
+  targetOccurances: number[];
+  needToKnow: number[];
+};
+
 export type Book = {
   author: string;
   title: string;
@@ -62,24 +64,4 @@ export type Book = {
   segmentedFile: string;
   hasRead: boolean;
   stats: BookStats;
-};
-
-export type UserSetting = {
-  name:string;
-  label:string;
-  tooltip?:string;
-  defaultValue:any;
-  type:any
-  other?:any;
-  read?: any;
-  write?:any;
-  readFromBackEnd?:any;
-  loaded?:boolean;
-  cached?:any;
-};
-
-export type UserSettingsType = {
-  [section:string]: {
-    [label:string]: UserSetting;
-  }
 };
