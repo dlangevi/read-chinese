@@ -24,6 +24,7 @@ import {
   NSpace, NCheckboxGroup, NCheckbox,
 } from 'naive-ui';
 import { getUserSettings } from '@/lib/userSettings';
+import { SearchImages } from '@wailsjs/backend/ImageClient';
 
 const UserSettings = getUserSettings();
 
@@ -45,7 +46,7 @@ const props = defineProps({
 });
 
 onBeforeMount(async () => {
-  images.value = await window.nodeIpc.getImagesForWord(props.word);
+  images.value = await SearchImages(props.word);
   loaded.value = true;
 });
 

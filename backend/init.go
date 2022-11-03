@@ -11,6 +11,7 @@ type Backend struct {
 	BookLibrary    *BookLibrary
 	KnownWords     *KnownWords
 	UserSettings   *UserSettings
+	ImageClient    *ImageClient
 }
 
 func StartBackend(ctx *context.Context) *Backend {
@@ -37,5 +38,6 @@ func StartBackend(ctx *context.Context) *Backend {
 		BookLibrary:    &BookLibrary{},
 		KnownWords:     NewKnownWords(),
 		UserSettings:   userSettings,
+		ImageClient:    &ImageClient{},
 	}
 }

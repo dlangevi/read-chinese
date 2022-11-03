@@ -82,6 +82,7 @@ func main() {
 			backend.BookLibrary,
 			backend.KnownWords,
 			backend.UserSettings,
+			backend.ImageClient,
 		},
 		// Windows platform specific options
 		// Windows平台特定选项
