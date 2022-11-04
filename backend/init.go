@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"read-chinese/backend/segmentation"
 )
 
 type Backend struct {
@@ -13,7 +14,10 @@ type Backend struct {
 	UserSettings   *UserSettings
 	ImageClient    *ImageClient
 	Dictionaries   *Dictionaries
+	Segmentation   *segmentation.Segmentation
 }
+
+var runtime *Backend
 
 func StartBackend(ctx *context.Context) *Backend {
 
@@ -34,12 +38,20 @@ func StartBackend(ctx *context.Context) *Backend {
 	ran := GetTimesRan()
 	fmt.Println("Ran {} times", ran)
 
-	return &Backend{
+	s, err := segmentation.NewSegmentation()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	runtime = &Backend{
 		RuntimeContext: ctx,
 		BookLibrary:    &BookLibrary{},
 		KnownWords:     NewKnownWords(),
 		UserSettings:   userSettings,
 		ImageClient:    &ImageClient{},
 		Dictionaries:   NewDictionaries(),
+		Segmentation:   s,
 	}
+
+	return runtime
 }

@@ -11,6 +11,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/oleiade/reflections v1.0.1
 	github.com/wailsapp/wails/v2 v2.1.0
+	github.com/yanyiwu/gojieba v1.2.0
 )
 
 require (

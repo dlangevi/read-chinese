@@ -69,7 +69,7 @@ func (known *KnownWords) AddWord(word string, age int) {
 
 func (known *KnownWords) isWellKnown(word string) bool {
 	interval, ok := known.words[word]
-	return ok && interval >= 100
+	return ok && interval >= userSettings.KnownInterval
 }
 
 func (known *KnownWords) isKnown(word string) bool {

@@ -1,11 +1,16 @@
 package backend
 
 import (
+	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
+	"os"
+	"path"
 
-	"database/sql"
+	"read-chinese/backend/segmentation"
+
 	"github.com/jmoiron/sqlx"
 )
 
@@ -31,6 +36,20 @@ type BookStats struct {
 	Targets            []int
 	TargetOccurances   []int
 	NeedToKnow         []int
+}
+
+func NewBookStats() BookStats {
+	return BookStats{
+		ProbablyKnownWords: 0,
+		KnownCharacters:    0,
+		TotalCharacters:    0,
+		TotalWords:         0,
+		TotalKnownWords:    0,
+		Targets:            []int{},
+		TargetOccurances:   []int{},
+		NeedToKnow:         []int{},
+	}
+
 }
 
 type WordTableRow struct {
@@ -82,6 +101,27 @@ func bookExists(author string, title string) (bool, error) {
 		return false, err
 	}
 	return exists, nil
+}
+
+func (BookLibrary) GetBooks(bookIds ...int64) ([]Book, error) {
+	books, _ := getBooks(bookIds...)
+	for index := range books {
+		book := &books[index]
+		book.Stats = NewBookStats()
+		// Compute totalKnownWords
+		// Compute totalWords
+		// if detailed {
+		//    Compute probablyKnownWords
+		//    Compute knownCharacters
+		//    Compute totalCharacters
+		//    Compute WordTargets
+		//    Compute targets
+		//    Compute targetOccurances
+		//    Compute needToKnow
+		// }
+	}
+
+	return books, nil
 }
 
 func getBook(bookId int64) (Book, error) {
@@ -139,8 +179,59 @@ func addBook(author string, title string, cover string, filepath string) (int64,
 	return res.LastInsertId()
 }
 
+func AddBook(author string, title string, cover string, filepath string) error {
+	bookId, err := addBook(author, title, cover, filepath)
+	if err != nil {
+		return err
+	}
+	sentences, wordTable, err := runtime.Segmentation.SegmentFullText(filepath)
+	if err != nil {
+		return err
+	}
+	// Compute WordTable and Save it
+	fileName := fmt.Sprintf("%v-%v.json", title, author)
+	cacheLocation := path.Join(
+		"/home/dlangevi/.config/read-chinese/",
+		"segmentationCache",
+		fileName)
+
+	err = saveCacheFile(int(bookId), sentences, cacheLocation)
+	if err != nil {
+		return err
+	}
+	_, err = saveWordTable(int(bookId), wordTable)
+	// This can be nil
+	return err
+}
+
+func saveCacheFile(bookId int, sentences []string, filepath string) error {
+	bytes, err := json.Marshal(sentences)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(filepath, bytes, 0666)
+	if err != nil {
+		return err
+	}
+	_, err = Conn.Exec(`
+  UPDATE books 
+  SET segmented_file = ?1 
+  WHERE bookId = ?2`, filepath, bookId)
+	return err
+
+}
+
 // dbSaveWordTable, // TODO once segmentation is done we can test this
-func saveWordTable(wordTable WordTable) (sql.Result, error) {
+func saveWordTable(bookId int, frequencyTable segmentation.FrequencyTable) (sql.Result, error) {
+
+	wordTable := WordTable{}
+	for word, count := range frequencyTable {
+		wordTable = append(wordTable, WordTableRow{
+			BookId: bookId,
+			Word:   word,
+			Count:  count,
+		})
+	}
 	return Conn.NamedExec(`INSERT INTO frequency (book, word, count)
   VALUES (:book, :word, :count)`, wordTable)
 }
@@ -160,3 +251,5 @@ func saveWordTable(wordTable WordTable) (sql.Result, error) {
 //   hskWords, // Move this somewhere else
 //   learningTarget, doneish (tests?)
 // };
+
+//  segmentation.preloadWords ?

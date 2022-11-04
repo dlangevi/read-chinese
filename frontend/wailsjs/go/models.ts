@@ -1,5 +1,6 @@
 export namespace backend {
 	
+	
 	export class DictionaryEntry {
 	    definition: string;
 	    pronunciation: string;
