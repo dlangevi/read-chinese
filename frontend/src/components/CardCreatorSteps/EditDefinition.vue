@@ -27,6 +27,8 @@ import {
 import { getUserSettings } from '@/lib/userSettings';
 import type { DictionaryType, DictionaryEntry } from '@/lib/types';
 
+import { GetDefinitionsForWord } from '@wailsjs/backend/Dictionaries';
+
 const UserSettings = getUserSettings();
 
 const emit = defineEmits(['updateDefinition']);
@@ -52,7 +54,7 @@ const props = defineProps<{
 }>();
 
 onBeforeMount(async () => {
-  definitions.value = await window.nodeIpc.getDefinitionsForWord(
+  definitions.value = await GetDefinitionsForWord(
     props.word,
     props.type,
   );

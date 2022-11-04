@@ -83,6 +83,7 @@ func main() {
 			backend.KnownWords,
 			backend.UserSettings,
 			backend.ImageClient,
+			backend.Dictionaries,
 		},
 		// Windows platform specific options
 		// Windows平台特定选项

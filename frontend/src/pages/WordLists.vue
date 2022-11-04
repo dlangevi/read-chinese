@@ -37,8 +37,9 @@ import { NButton, NSpace, NCascader } from 'naive-ui';
 import type { CascaderOption } from 'naive-ui';
 import { ref, onBeforeMount } from 'vue';
 import type {
-  UnknownWordEntry, HskLevel, HskVersion,
+  HskLevel, HskVersion,
 } from '@/lib/types';
+import { backend } from '@wailsjs/models';
 import { LearningTarget } from '@wailsjs/backend/BookLibrary';
 import UnknownWords from '../components/UnknownWords.vue';
 
@@ -57,7 +58,7 @@ const options:CascaderOption[] = ['2.0', '3.0'].map((version) => ({
   })),
 }));
 
-const words = ref<UnknownWordEntry[]>([]);
+const words = ref<backend.UnknownWordEntry[]>([]);
 onBeforeMount(async () => {
   words.value = await LearningTarget();
 });

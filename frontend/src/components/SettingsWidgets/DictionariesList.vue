@@ -59,14 +59,21 @@ import {
 import { onBeforeMount, ref } from 'vue';
 import type { DictionaryInfo, DictionaryType } from '@/lib/types';
 
+import {
+  GetDictionaryInfo,
+  SetPrimaryDict,
+  DeleteDictionary,
+  AddDictionary,
+} from '@wailsjs/backend/Dictionaries';
+
 const addDictModal = ref(false);
 
 function makePrimary(name:string) {
-  window.nodeIpc.setPrimaryDict(name);
+  SetPrimaryDict(name);
 }
 
 function deleteDict(name:string) {
-  window.nodeIpc.deleteDictionary(name);
+  DeleteDictionary(name);
 }
 
 const newDictFile = ref('');
@@ -96,7 +103,7 @@ function addDictionary() {
 
 function submit() {
   // TODO verify
-  window.nodeIpc.addDictionary(
+  AddDictionary(
     newDictName.value,
     newDictFile.value,
     newDictType.value,
@@ -105,8 +112,7 @@ function submit() {
 
 const dicts = ref<{ [name:string]: DictionaryInfo }>({});
 onBeforeMount(async () => {
-  dicts.value = await window.nodeIpc.dictionaryInfo();
-  console.log(dicts.value);
+  dicts.value = await GetDictionaryInfo();
 });
 
 </script>

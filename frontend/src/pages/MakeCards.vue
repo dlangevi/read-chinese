@@ -35,9 +35,11 @@ import AddToCardQueue from '@/components/AddToCardQueue.vue';
 import MarkLearned from '@/components/MarkLearned.vue';
 import type { GetRowIdParams, GridReadyEvent, ColDef } from 'ag-grid-community';
 
-import type { UnknownWordEntry } from '@/lib/types';
+import { backend } from '@wailsjs/models';
 
-const rowData = ref<UnknownWordEntry[]>([]);
+import { GetPossibleWords } from '@wailsjs/backend/Dictionaries';
+
+const rowData = ref<backend.UnknownWordEntry[]>([]);
 let currentSearch:string = '';
 const getRowId = (params:GetRowIdParams) => params.data.word;
 
@@ -114,7 +116,7 @@ async function onUpdateSearchBox(newSearch:string) {
   if (newSearch.length === 0) {
     rowData.value = [];
   } else {
-    rowData.value = await window.nodeIpc.getPossibleWords(newSearch);
+    rowData.value = await GetPossibleWords(newSearch);
   }
 }
 </script>

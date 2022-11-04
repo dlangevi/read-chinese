@@ -12,6 +12,7 @@ type Backend struct {
 	KnownWords     *KnownWords
 	UserSettings   *UserSettings
 	ImageClient    *ImageClient
+	Dictionaries   *Dictionaries
 }
 
 func StartBackend(ctx *context.Context) *Backend {
@@ -39,5 +40,6 @@ func StartBackend(ctx *context.Context) *Backend {
 		KnownWords:     NewKnownWords(),
 		UserSettings:   userSettings,
 		ImageClient:    &ImageClient{},
+		Dictionaries:   NewDictionaries(),
 	}
 }

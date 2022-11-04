@@ -20,12 +20,13 @@ import MarkLearned from '@/components/MarkLearned.vue';
 import AddToCardQueue from '@/components/AddToCardQueue.vue';
 import { getUserSettings } from '@/lib/userSettings';
 import type { GetRowIdParams, GridReadyEvent, ColDef } from 'ag-grid-community';
-import type { UnknownWordEntry } from '@/lib/types';
+import { backend } from '@wailsjs/models';
+import { GetDefinitions } from '@wailsjs/backend/Dictionaries';
 
 const UserSettings = getUserSettings();
 
 const props = defineProps<{
-  words: UnknownWordEntry[],
+  words: backend.UnknownWordEntry[],
   bookFilter?: number,
 }>();
 
@@ -97,7 +98,7 @@ columnDefs.push(
 
 const rowData = ref<any[]>([]);
 watch(() => props.words, async (newWords) => {
-  rowData.value = await window.nodeIpc.getDefinitions(toRaw(newWords));
+  rowData.value = await GetDefinitions(toRaw(newWords));
   console.log('new Words', rowData.value);
 });
 
@@ -119,7 +120,7 @@ onUnmounted(() => {
 
 onBeforeMount(async () => {
   const rawWords = toRaw(props.words);
-  rowData.value = await window.nodeIpc.getDefinitions(rawWords);
+  rowData.value = await GetDefinitions(rawWords);
   console.log(rowData);
 });
 

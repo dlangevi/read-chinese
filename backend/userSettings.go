@@ -158,16 +158,8 @@ func DeleteDict(name string) {
 	saveMetadata()
 }
 
-func LoadDicts() map[string]Dict {
-	return userSettings.Dicts
-}
-
 func SetPrimaryDict(dictName string) {
 	// TODO Make sure its a real dict
 	userSettings.PrimaryDict = dictName
 	saveMetadata()
-}
-
-func GetPrimaryDict() string {
-	return userSettings.PrimaryDict
 }

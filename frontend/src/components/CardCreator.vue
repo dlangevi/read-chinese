@@ -109,6 +109,7 @@ import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
 import { getUserSettings } from '@/lib/userSettings';
 
 import { AddWord } from '@wailsjs/backend/KnownWords';
+import { GetDefinitionsForWord } from '@wailsjs/backend/Dictionaries';
 
 const UserSettings = getUserSettings();
 
@@ -260,7 +261,7 @@ store.$subscribe(async (mutation, state) => {
       const autoFill = await UserSettings.CardCreation.PopulateEnglish.read();
       if (autoFill) {
         // TODO base this on default dict
-        const definitions = await window.nodeIpc.getDefinitionsForWord(
+        const definitions = await GetDefinitionsForWord(
           word,
           'english',
         );
@@ -276,7 +277,7 @@ store.$subscribe(async (mutation, state) => {
       const autoFill = await UserSettings.CardCreation.PopulateChinese.read();
       if (autoFill) {
         // TODO base this on default dict
-        const definitions = await window.nodeIpc.getDefinitionsForWord(
+        const definitions = await GetDefinitionsForWord(
           word,
           'chinese',
         );
