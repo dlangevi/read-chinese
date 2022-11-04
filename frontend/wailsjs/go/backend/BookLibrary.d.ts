@@ -3,5 +3,3 @@
 import {backend} from '../models';
 
 export function LearningTarget():Promise<Array<backend.WordOccuranceRow>>;
-
-export function Testing():Promise<void>;

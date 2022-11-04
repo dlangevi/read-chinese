@@ -20,7 +20,7 @@ func TestDefault(t *testing.T) {
 	}
 	// TODO have a test where the dictionary does not exist
 	SetPrimaryDict("foo")
-	if GetPrimaryDict() != "foo" {
+	if m.PrimaryDict != "foo" {
 		t.Errorf("PrimaryDict was not updated")
 	}
 	if m.GetUserSettingBool(settingName) != true {
