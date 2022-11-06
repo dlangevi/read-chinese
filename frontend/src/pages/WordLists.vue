@@ -41,6 +41,7 @@ import type {
 } from '@/lib/types';
 import { backend } from '@wailsjs/models';
 import { LearningTarget } from '@wailsjs/backend/BookLibrary';
+import { GetUnknownHskWords } from '@wailsjs/backend/KnownWords';
 import UnknownWords from '../components/UnknownWords.vue';
 
 interface HskCascaderOption extends CascaderOption {
@@ -72,7 +73,7 @@ function importAnki() {
 }
 
 async function loadHsk(_: string, option: HskCascaderOption) {
-  words.value = await window.nodeIpc.hskWords(option.version, option.level);
+  words.value = await GetUnknownHskWords(option.version, option.level);
 }
 
 </script>

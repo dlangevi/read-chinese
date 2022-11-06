@@ -6,6 +6,10 @@ export function AddWord(arg1, arg2) {
   return window['go']['backend']['KnownWords']['AddWord'](arg1, arg2);
 }
 
+export function GetUnknownHskWords(arg1, arg2) {
+  return window['go']['backend']['KnownWords']['GetUnknownHskWords'](arg1, arg2);
+}
+
 export function GetWordStats() {
   return window['go']['backend']['KnownWords']['GetWordStats']();
 }

@@ -1,7 +1,11 @@
 package backend
 
 import (
+	"embed"
+	"fmt"
 	"log"
+	"path"
+	"strings"
 )
 
 var known *KnownWords
@@ -80,4 +84,39 @@ func (known *KnownWords) isKnown(word string) bool {
 func (known *KnownWords) isKnownChar(char rune) bool {
 	_, ok := known.characters[char]
 	return ok
+}
+
+//go:embed assets/HSK
+var hskWords embed.FS
+
+func (known *KnownWords) GetUnknownHskWords(version string, level int) ([]UnknownWordEntry, error) {
+	// ensure string == 2.0 or 3.0
+	// ensure level == 1 - 6
+	hskPath := path.Join(
+		"assets",
+		"HSK",
+		version,
+		fmt.Sprintf(`L%v.txt`, level),
+	)
+	rows := []UnknownWordEntry{}
+
+	fileBytes, err := hskWords.ReadFile(hskPath)
+	if err != nil {
+		return rows, err
+	}
+	fileString := string(fileBytes)
+
+	words := strings.Split(fileString, "\n")
+	for _, word := range words {
+		trimmed := strings.TrimSpace(word)
+		trimmed = strings.Trim(trimmed, "\uFEFF")
+		log.Println(trimmed, len(trimmed), word, len(word))
+
+		if !known.isKnown(trimmed) && len(trimmed) > 0 {
+			rows = append(rows, UnknownWordEntry{
+				Word: trimmed,
+			})
+		}
+	}
+	return rows, nil
 }

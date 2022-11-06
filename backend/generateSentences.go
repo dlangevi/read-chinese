@@ -11,7 +11,6 @@ func isT1Candidate(sentence []segmentation.Token, word string) bool {
 		}
 	}
 	return true
-
 }
 
 func GetSentencesForWord(word string, bookIds ...int64) {

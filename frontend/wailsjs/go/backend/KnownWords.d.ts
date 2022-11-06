@@ -4,4 +4,6 @@ import {backend} from '../models';
 
 export function AddWord(arg1:string,arg2:number):Promise<void>;
 
+export function GetUnknownHskWords(arg1:string,arg2:number):Promise<Array<backend.UnknownWordEntry>>;
+
 export function GetWordStats():Promise<backend.WordStats>;
