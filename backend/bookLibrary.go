@@ -88,6 +88,51 @@ func (BookLibrary) LearningTarget() []WordOccuranceRow {
 	return words
 }
 
+func (BookLibrary) LearningTargetBook(bookId int) []WordOccuranceRow {
+	words := []WordOccuranceRow{}
+	err := Conn.Select(&words, `
+    SELECT word, sum(count) as occurance FROM frequency 
+    WHERE NOT EXISTS (
+        SELECT word
+        FROM words
+        WHERE words.word==frequency.word
+    ) 
+    AND book = $1
+    GROUP BY word
+    ORDER BY occurance DESC
+    LIMIT 200
+    `, bookId)
+	if err != nil {
+		log.Println(err)
+		return words
+	}
+
+	return words
+}
+
+func (BookLibrary) TopUnknownWords(bookId int, numWords int) []string {
+	words := []string{}
+	err := Conn.Select(&words, `
+    SELECT word
+    FROM frequency
+    WHERE NOT EXISTS (
+        SELECT word
+        FROM words
+        WHERE words.word==frequency.word
+    ) 
+    AND book = $1
+    ORDER BY count DESC
+    LIMIT $2
+  `, bookId, numWords)
+	if err != nil {
+		log.Println(err)
+		return words
+	}
+
+	return words
+
+}
+
 // dbBookExists,
 func bookExists(author string, title string) (bool, error) {
 	var exists bool

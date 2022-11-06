@@ -5,3 +5,7 @@ import {backend} from '../models';
 export function GetBooks(arg1:Array<number>):Promise<Array<backend.Book>>;
 
 export function LearningTarget():Promise<Array<backend.WordOccuranceRow>>;
+
+export function LearningTargetBook(arg1:number):Promise<Array<backend.WordOccuranceRow>>;
+
+export function TopUnknownWords(arg1:number,arg2:number):Promise<Array<string>>;

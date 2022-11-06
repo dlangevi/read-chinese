@@ -82,6 +82,11 @@ import {
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import type { Book } from '@/lib/types';
 
+import {
+  TopUnknownWords,
+  LearningTargetBook,
+} from '@wailsjs/backend/BookLibrary';
+
 const props = defineProps({
   bookId: {
     required: true,
@@ -92,7 +97,7 @@ const props = defineProps({
 provide('preferBook', props.bookId);
 
 const book:Book = await window.nodeIpc.loadBook(props.bookId);
-const words = await window.nodeIpc.learningTarget([book.bookId]);
+const words = await LearningTargetBook(book.bookId);
 const { stats } = book;
 
 const known = (
@@ -111,9 +116,7 @@ const targetPairs = targets.map((e, i) => (
 
 const store = useCardQueue();
 async function makeFlashCards() {
-  const topWords: string[] = (
-    await window.nodeIpc.topUnknownWords(props.bookId, 50)
-  );
+  const topWords: string[] = await TopUnknownWords(props.bookId, 50);
   topWords.forEach((word) => {
     store.addWord(word, ActionsEnum.CREATE, { preferBook: props.bookId });
   });

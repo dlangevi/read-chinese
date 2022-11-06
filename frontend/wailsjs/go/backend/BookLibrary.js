@@ -9,3 +9,11 @@ export function GetBooks(arg1) {
 export function LearningTarget() {
   return window['go']['backend']['BookLibrary']['LearningTarget']();
 }
+
+export function LearningTargetBook(arg1) {
+  return window['go']['backend']['BookLibrary']['LearningTargetBook'](arg1);
+}
+
+export function TopUnknownWords(arg1, arg2) {
+  return window['go']['backend']['BookLibrary']['TopUnknownWords'](arg1, arg2);
+}
