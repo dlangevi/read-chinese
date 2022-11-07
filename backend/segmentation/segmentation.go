@@ -92,7 +92,7 @@ func (s *Segmentation) SegmentFullText(path string) ([]string, FrequencyTable, e
 		}
 
 		// 15. 14. etc can be tokens. These used to break storage?
-		if len(word) > 1 && strings.Index(word, ".") != -1 {
+		if len(word) > 1 && strings.Contains(word, ".") {
 			word = strings.ReplaceAll(word, ".", "")
 		}
 		if word == "\n" {

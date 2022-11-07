@@ -28,7 +28,7 @@ export function deleteDictionary(name:string) {
 
 function setPrimaryDict(dictName:string) {
   console.log('setting primary dict to ', dictName);
-  defaultDict = dictName;
+  defaultDict = dictName
   dbSetPrimaryDict(dictName);
 }
 

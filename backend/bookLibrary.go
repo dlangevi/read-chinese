@@ -233,13 +233,9 @@ func AddBook(author string, title string, cover string, filepath string) error {
 	if err != nil {
 		return err
 	}
-	// Compute WordTable and Save it
-	fileName := fmt.Sprintf("%v-%v.json", title, author)
-	cacheLocation := path.Join(
-		"/home/dlangevi/.config/read-chinese/",
-		"segmentationCache",
-		fileName)
 
+	// Compute WordTable and Save it
+	cacheLocation := getSegmentationPath(title, author)
 	err = saveCacheFile(int(bookId), sentences, cacheLocation)
 	if err != nil {
 		return err
@@ -266,6 +262,31 @@ func saveCacheFile(bookId int, sentences []string, filepath string) error {
 
 }
 
+func getSegmentationPath(title string, author string) string {
+	fileName := fmt.Sprintf("%v-%v.json", title, author)
+	cacheLocation := path.Join(
+		"/home/dlangevi/.config/read-chinese/",
+		"segmentationCache",
+		fileName)
+	return cacheLocation
+}
+
+func GetSegmentedText(book Book) ([]string, error) {
+	if !book.SegmentedFile.Valid {
+		return nil, errors.New("Book has not been segmented yet")
+	}
+	cacheLocation := getSegmentationPath(book.Title, book.Author)
+
+	segBytes, err := os.ReadFile(cacheLocation)
+	if err != nil {
+		return nil, err
+	}
+	sentences := []string{}
+	err = json.Unmarshal(segBytes, &sentences)
+	return sentences, err
+
+}
+
 // dbSaveWordTable, // TODO once segmentation is done we can test this
 func saveWordTable(bookId int, frequencyTable segmentation.FrequencyTable) (sql.Result, error) {
 
@@ -287,14 +308,11 @@ func saveWordTable(bookId int, frequencyTable segmentation.FrequencyTable) (sql.
 // initBookStats
 // computeBookData
 
-//   topUnknownWords, straigt sql
 //   deleteBook, straigt sql
 //   setFavorite, straight sql
 //   setRead, straigt sql
 //   totalRead, straight sql
 
-//   hskWords, // Move this somewhere else
-//   learningTarget, doneish (tests?)
 // };
 
 //  segmentation.preloadWords ?

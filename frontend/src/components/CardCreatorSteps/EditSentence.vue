@@ -39,6 +39,7 @@ import {
   NSpace, NRadioGroup, NRadio,
 } from 'naive-ui';
 import { getUserSettings } from '@/lib/userSettings';
+import { GetSentencesForWord } from '@wailsjs/backend/Generator';
 
 const UserSettings = getUserSettings();
 
@@ -69,15 +70,13 @@ const props = defineProps({
 const singleBook = !!props.preferBook;
 onBeforeMount(async () => {
   if (props.preferBook) {
-    sentences.value = await window.nodeIpc.getSentencesForWord(
+    sentences.value = await GetSentencesForWord(
       props.word,
-      { bookIds: [props.preferBook] },
+      [props.preferBook],
     );
   }
   // TODO filter out repeats
-  allSentences.value = await window.nodeIpc.getSentencesForWord(
-    props.word,
-  );
+  allSentences.value = await GetSentencesForWord(props.word, []);
   loaded.value = true;
 });
 

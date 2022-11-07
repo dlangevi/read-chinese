@@ -15,6 +15,7 @@ type Backend struct {
 	ImageClient    *ImageClient
 	Dictionaries   *Dictionaries
 	Segmentation   *segmentation.Segmentation
+	Generator      *Generator
 }
 
 var runtime *Backend
@@ -51,6 +52,7 @@ func StartBackend(ctx *context.Context) *Backend {
 		ImageClient:    &ImageClient{},
 		Dictionaries:   NewDictionaries(),
 		Segmentation:   s,
+		Generator:      &Generator{},
 	}
 
 	return runtime

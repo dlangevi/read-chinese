@@ -84,6 +84,7 @@ func main() {
 			backend.UserSettings,
 			backend.ImageClient,
 			backend.Dictionaries,
+			backend.Generator,
 		},
 		// Windows platform specific options
 		// Windows平台特定选项

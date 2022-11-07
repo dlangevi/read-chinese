@@ -190,7 +190,7 @@ func (d *Dictionaries) GetPossibleWords(partial string) []UnknownWordEntry {
 	words := []UnknownWordEntry{}
 
 	for word := range d.PrimaryDict.Definitions {
-		if strings.Index(word, partial) != -1 && !known.isKnown(word) {
+		if strings.Contains(word, partial) && !known.isKnown(word) {
 			words = append(words, UnknownWordEntry{
 				Word: word,
 			})
