@@ -59,7 +59,7 @@ export type Book = {
   filepath: string;
   bookId: number;
   favorite: boolean;
-  segmentedFile: string;
+  segmentedFile?: string;
   hasRead: boolean;
   stats: BookStats;
 };

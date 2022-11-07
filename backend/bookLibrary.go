@@ -15,27 +15,26 @@ import (
 )
 
 type Book struct {
-	Author   string `db:"author"`
-	Title    string `db:"title"`
-	Cover    string `db:"cover"`
-	Filepath string `db:"filepath"`
-	BookId   int    `db:"bookId"`
-	Favorite bool   `db:"favorite"`
-	// TODO mabey get rid of this by making a default exist?
+	Author        string         `db:"author" json:"author"`
+	Title         string         `db:"title" json:"title"`
+	Cover         string         `db:"cover" json:"cover"`
+	Filepath      string         `db:"filepath" json:"filepath"`
+	BookId        int64          `db:"bookId" json:"bookId"`
+	Favorite      bool           `db:"favorite" json:"favorite"`
 	SegmentedFile sql.NullString `db:"segmented_file"`
-	HasRead       bool           `db:"has_read"`
-	Stats         BookStats
+	HasRead       bool           `db:"has_read" json:"hasRead"`
+	Stats         BookStats      `json:"stats"`
 }
 
 type BookStats struct {
-	ProbablyKnownWords int
-	KnownCharacters    int
-	TotalCharacters    int
-	TotalWords         int
-	TotalKnownWords    int
-	Targets            []int
-	TargetOccurances   []int
-	NeedToKnow         []int
+	ProbablyKnownWords int   `json:"probablyKnownWords"`
+	KnownCharacters    int   `json:"knownCharacters"`
+	TotalCharacters    int   `json:"totalCharacters"`
+	TotalWords         int   `json:"totalWords"`
+	TotalKnownWords    int   `json:"totalKnownWords"`
+	Targets            []int `json:"targets"`
+	TargetOccurances   []int `json:"targetOccurances"`
+	NeedToKnow         []int `json:"needToKnow"`
 }
 
 func NewBookStats() BookStats {
@@ -142,31 +141,159 @@ func bookExists(author string, title string) (bool, error) {
     WHERE author = $1
     AND title = $2
   )`, author, title).Scan(&exists)
-	if err != nil {
-		return false, err
-	}
-	return exists, nil
+	return exists, err
 }
 
-func (BookLibrary) GetBooks(bookIds ...int64) ([]Book, error) {
-	books, _ := getBooks(bookIds...)
+// Returns summary of all book
+func (BookLibrary) GetBooks() ([]Book, error) {
+	books, _ := getBooks()
 	for index := range books {
 		book := &books[index]
 		book.Stats = NewBookStats()
-		// Compute totalKnownWords
-		// Compute totalWords
-		// if detailed {
-		//    Compute probablyKnownWords
-		//    Compute knownCharacters
-		//    Compute totalCharacters
-		//    Compute WordTargets
-		//    Compute targets
-		//    Compute targetOccurances
-		//    Compute needToKnow
-		// }
+		// For now, only these are needed by BookCard
+		book.Stats.TotalKnownWords, _ = getKnownWords(book.BookId)
+		book.Stats.TotalWords, _ = getTotalWords(book.BookId)
 	}
 
 	return books, nil
+}
+
+func getKnownWords(bookId int64) (int, error) {
+	var known int
+	err := Conn.QueryRow(`
+    SELECT SUM(count) as known 
+    FROM frequency
+    WHERE book = $1
+    AND EXISTS (
+        SELECT word
+        FROM words
+        WHERE words.word==frequency.word
+    )`, bookId).Scan(&known)
+	if err != nil {
+		log.Println("Error with getKnownWords", err)
+	}
+	return known, err
+}
+
+func getTotalWords(bookId int64) (int, error) {
+	var total int
+	err := Conn.QueryRow(`
+    SELECT SUM(count) as known 
+    FROM frequency
+    WHERE book = $1
+    `, bookId).Scan(&total)
+	if err != nil {
+		log.Println("Error with totalWords", err)
+	}
+	return total, err
+}
+
+// Returns details for single book, with extra stats
+func (BookLibrary) GetBook(bookId int64) (Book, error) {
+	book, err := getBook(bookId)
+	if err != nil {
+		return book, err
+	}
+	book.Stats = NewBookStats()
+	book.Stats.TotalKnownWords, _ = getKnownWords(bookId)
+	book.Stats.TotalWords, _ = getTotalWords(bookId)
+	_ = computeKnownCharacters(&book)
+	_ = computeWordTargets(&book)
+	// if detailed {
+	//    Compute WordTargets
+	//    Compute targets
+	//    Compute targetOccurances
+	//    Compute needToKnow
+	// }
+
+	return book, nil
+}
+
+func computeKnownCharacters(book *Book) error {
+	words := []struct {
+		Word  string
+		Count int
+	}{}
+
+	err := Conn.Select(&words, `
+    SELECT word, count 
+    FROM frequency 
+    WHERE book = $1
+    `, book.BookId)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	var probablyKnownWords = 0
+	var knownCharacters = 0
+	var totalCharacters = 0
+	for _, row := range words {
+		totalCharacters += len([]rune(row.Word)) * row.Count
+		allKnown := true
+		for _, char := range row.Word {
+			if known.isKnownChar(char) {
+				knownCharacters += row.Count
+			} else {
+				allKnown = false
+			}
+		}
+		if known.isKnown(row.Word) || allKnown {
+			probablyKnownWords += row.Count
+		}
+	}
+	book.Stats.ProbablyKnownWords = probablyKnownWords
+	book.Stats.KnownCharacters = knownCharacters
+	book.Stats.TotalCharacters = totalCharacters
+	return nil
+}
+
+func computeWordTargets(book *Book) error {
+	words := []struct {
+		Word  string
+		Count int
+	}{}
+
+	err := Conn.Select(&words, `
+    SELECT word, count 
+    FROM frequency 
+    WHERE book = $1
+    AND NOT EXISTS (
+      SELECT word
+      FROM words
+      WHERE words.word==frequency.word
+    )
+    ORDER BY count DESC
+    `, book.BookId)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	targets := [...]int{
+		80, 84, 86, 90, 92, 94, 96, 98, 100,
+	}
+	targetOccurances := []int{}
+	needToKnow := []int{}
+	for _, target := range targets {
+		targetOccurance := int(float64(target*book.Stats.TotalWords) / 100)
+		targetOccurances = append(targetOccurances, int(targetOccurance))
+
+		soFar := book.Stats.TotalKnownWords
+		needToLearn := 0
+		for _, row := range words {
+			if soFar > targetOccurance {
+				break
+			}
+			soFar += row.Count
+			needToLearn += 1
+		}
+		needToKnow = append(needToKnow, needToLearn)
+	}
+	book.Stats.Targets = targets[:]
+	book.Stats.TargetOccurances = targetOccurances
+	book.Stats.NeedToKnow = needToKnow
+
+	return nil
 }
 
 func getBook(bookId int64) (Book, error) {
@@ -302,17 +429,8 @@ func saveWordTable(bookId int, frequencyTable segmentation.FrequencyTable) (sql.
   VALUES (:book, :word, :count)`, wordTable)
 }
 
-// export const bookLibraryIpc = {
-//   loadBooks,
-//   loadBook,
-// initBookStats
-// computeBookData
-
 //   deleteBook, straigt sql
 //   setFavorite, straight sql
 //   setRead, straigt sql
 //   totalRead, straight sql
-
-// };
-
 //  segmentation.preloadWords ?

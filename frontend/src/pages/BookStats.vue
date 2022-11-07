@@ -85,6 +85,7 @@ import type { Book } from '@/lib/types';
 import {
   TopUnknownWords,
   LearningTargetBook,
+  GetBook,
 } from '@wailsjs/backend/BookLibrary';
 
 const props = defineProps({
@@ -96,7 +97,8 @@ const props = defineProps({
 
 provide('preferBook', props.bookId);
 
-const book:Book = await window.nodeIpc.loadBook(props.bookId);
+const book:Book = await GetBook(props.bookId);
+console.log(book);
 const words = await LearningTargetBook(book.bookId);
 const { stats } = book;
 

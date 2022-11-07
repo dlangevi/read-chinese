@@ -28,6 +28,7 @@ import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
 import { getUserSettings } from '@/lib/userSettings';
 import type { Book } from '@/lib/types';
+import { GetBooks } from '@wailsjs/backend/BookLibrary';
 
 function syncCalibre() {
   window.nodeIpc.importCalibreBooks();
@@ -54,6 +55,7 @@ const favoriteFilter = computed(
     }),
 );
 onBeforeMount(async () => {
-  books.value = await window.nodeIpc.loadBooks();
+  books.value = await GetBooks();
+  console.log(books.value);
 });
 </script>

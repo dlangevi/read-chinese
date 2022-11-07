@@ -111,6 +111,10 @@ import { getUserSettings } from '@/lib/userSettings';
 import { AddWord } from '@wailsjs/backend/KnownWords';
 import { GetDefinitionsForWord } from '@wailsjs/backend/Dictionaries';
 
+import {
+  GetBook,
+} from '@wailsjs/backend/BookLibrary';
+
 const UserSettings = getUserSettings();
 
 const store = useCardQueue();
@@ -309,7 +313,7 @@ async function submit() {
     const cardValues = toRaw(card.value.fields);
     const tags = [];
     if (preferBookRef.value !== undefined) {
-      const book = await window.nodeIpc.loadBook(preferBookRef.value);
+      const book = await GetBook(preferBookRef.value);
       tags.push(book.title);
     }
     window.nodeIpc.createAnkiCard(cardValues, tags).then((res) => {
