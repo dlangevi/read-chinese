@@ -145,17 +145,20 @@ func (a *AnkiInterface) UpdateNoteFields(noteID int64, fields Fields) string {
 }
 
 func (a *AnkiInterface) ImportAnkiKeywords() error {
-	notes, restErr := a.anki.Notes.Get("deck:Reading")
+	cards, restErr := a.anki.Cards.Get("deck:Reading")
 	if restErr != nil {
 		return toError(restErr)
 	}
-	for _, note := range *notes {
-		word, _ := note.Fields["Hanzi"]
-		// TODO batch this?
-		known.AddWord(word.Value, int(note.Interval))
 
+	words := []WordEntry{}
+	for _, card := range *cards {
+		word, _ := card.Fields["Hanzi"]
+		words = append(words, WordEntry{
+			Word:     word.Value,
+			Interval: card.Interval,
+		})
 	}
-	return nil
+	return known.AddWords(words)
 }
 
 // TODO in client

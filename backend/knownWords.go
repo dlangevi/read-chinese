@@ -62,14 +62,50 @@ func (known *KnownWords) GetWordStats() WordStats {
 func (known *KnownWords) AddWord(word string, age int) {
 	known.words[word] = age
 	Conn.MustExec(`
-  INSERT INTO words (word, interval) VALUES ($1, $2)
-    ON CONFLICT(word) DO UPDATE SET 
-      interval=excluded.interval
+  INSERT OR IGNORE INTO words (word, interval) VALUES ($1, $2);
+  UPDATE words 
+  SET interval=$2, 
+      updated_at = CURRENT_TIMESTAMP 
+  WHERE word="$1"
   `, word, age)
 }
 
+type WordEntry struct {
+	Word     string
+	Interval int64
+}
+
+// TODO make this faster if possible
+func (known *KnownWords) AddWords(words []WordEntry) error {
+	tx, err := Conn.Beginx()
+	if err != nil {
+		return err
+	}
+	_, err = tx.NamedExec(`
+  INSERT OR IGNORE INTO words (word, interval) 
+  VALUES (:word, :interval)`, words)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.NamedExec(`
+  UPDATE words 
+  SET interval=:interval, 
+      updated_at=CURRENT_TIMESTAMP 
+  WHERE word=":word"
+  AND interval!=:interval`, words)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	for _, word := range words {
+		known.words[word.Word] = int(word.Interval)
+	}
+	return tx.Commit()
+}
+
 // TODO importCSVWords
-// TODO updateInterval?
 
 func (known *KnownWords) isWellKnown(word string) bool {
 	interval, ok := known.words[word]

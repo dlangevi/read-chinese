@@ -14,6 +14,10 @@ export function GetAnkiNoteSkeleton(arg1) {
   return window['go']['backend']['AnkiInterface']['GetAnkiNoteSkeleton'](arg1);
 }
 
+export function ImportAnkiKeywords() {
+  return window['go']['backend']['AnkiInterface']['ImportAnkiKeywords']();
+}
+
 export function UpdateNoteFields(arg1, arg2) {
   return window['go']['backend']['AnkiInterface']['UpdateNoteFields'](arg1, arg2);
 }

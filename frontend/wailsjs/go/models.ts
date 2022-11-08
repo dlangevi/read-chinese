@@ -169,6 +169,7 @@ export namespace backend {
 	        this.pinyin = source["pinyin"];
 	    }
 	}
+	
 	export class WordOccuranceRow {
 	    word: string;
 	    occurance: number;
