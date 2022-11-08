@@ -9,6 +9,7 @@ import (
 func TestMain(m *testing.M) {
 
 	tempDb := path.Join(os.TempDir(), "testdb.db")
+	os.Remove(tempDb)
 	err := NewDB(tempDb)
 	if err != nil {
 		os.Exit(1)
@@ -50,6 +51,43 @@ func TestAddBook(t *testing.T) {
 	_, err = addBook("foot", "bar", "cover", "location")
 	if err == nil {
 		t.Errorf("Managed to double insert foot book")
+	}
+}
+
+func TestModifyBook(t *testing.T) {
+	books := &BookLibrary{}
+	bookId, err := addBook("fish", "is", "pretty", "tasty")
+	if err != nil {
+		t.Errorf("Failed to call addBook: %v", err)
+	}
+	book, _ := getBook(bookId)
+	if book.Favorite != false {
+		t.Errorf("Book started as favorited")
+	}
+	books.SetFavorite(book.BookId, true)
+	book, _ = getBook(bookId)
+	if book.Favorite != true {
+		t.Errorf("Book favorite not changed")
+	}
+	books.SetFavorite(book.BookId, false)
+	book, _ = getBook(bookId)
+	if book.Favorite != false {
+		t.Errorf("Book favorite not changed")
+	}
+	books.SetRead(book.BookId, true)
+	book, _ = getBook(bookId)
+	if book.HasRead != true {
+		t.Errorf("Book read not changed")
+	}
+	books.SetRead(book.BookId, false)
+	book, _ = getBook(bookId)
+	if book.HasRead != false {
+		t.Errorf("Book read not changed")
+	}
+	books.DeleteBook(bookId)
+	_, err = getBook(bookId)
+	if err == nil {
+		t.Errorf("Book was not deleted")
 	}
 }
 

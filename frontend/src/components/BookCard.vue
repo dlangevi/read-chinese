@@ -32,6 +32,8 @@ import { useRouter } from 'vue-router';
 import { NSpace, NCard, NButton } from 'naive-ui';
 import { ref } from 'vue';
 
+import { DeleteBook, SetFavorite, SetRead } from '@wailsjs/backend/BookLibrary';
+
 const router = useRouter();
 const props = defineProps({
   book: {
@@ -43,16 +45,16 @@ const props = defineProps({
 const isRead = ref(props.book.hasRead);
 const isFavorite = ref(props.book.favorite);
 function favorite(setTo:boolean) {
-  window.nodeIpc.setFavorite(props.book.bookId, setTo);
+  SetFavorite(props.book.bookId, setTo);
   isFavorite.value = setTo;
 }
 function markRead(setTo:boolean) {
-  window.nodeIpc.setRead(props.book.bookId, setTo);
+  SetRead(props.book.bookId, setTo);
   isRead.value = setTo;
 }
 
 function deleteBook() {
-  window.nodeIpc.deleteBook(props.book.bookId);
+  DeleteBook(props.book.bookId);
 }
 
 const known = (

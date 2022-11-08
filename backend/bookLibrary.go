@@ -301,6 +301,9 @@ func getBook(bookId int64) (Book, error) {
 	if err != nil {
 		return Book{}, err
 	}
+	if len(books) != 1 {
+		return Book{}, errors.New("Book did not exist")
+	}
 	return books[0], nil
 }
 
@@ -349,6 +352,44 @@ func addBook(author string, title string, cover string, filepath string) (int64,
 		return 0, err
 	}
 	return res.LastInsertId()
+}
+
+func deleteBook(bookId int64) error {
+	tx, err := Conn.Begin()
+	if err != nil {
+		return err
+	}
+	if _, err = tx.Exec(
+		`DELETE FROM books WHERE bookId = $1`, bookId); err != nil {
+		tx.Rollback()
+		return err
+	}
+	if _, err = tx.Exec(
+		`DELETE FROM frequency WHERE book = $1`, bookId); err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit()
+}
+
+func (BookLibrary) DeleteBook(bookId int64) error {
+	return deleteBook(bookId)
+}
+
+func (BookLibrary) SetFavorite(bookId int64, isFavorite bool) error {
+	_, err := Conn.Exec(`
+  UPDATE books 
+  SET favorite = ?1 
+  WHERE bookId = ?2`, isFavorite, bookId)
+	return err
+}
+
+func (BookLibrary) SetRead(bookId int64, isRead bool) error {
+	_, err := Conn.Exec(`
+  UPDATE books 
+  SET has_read = ?1 
+  WHERE bookId = ?2`, isRead, bookId)
+	return err
 }
 
 func AddBook(author string, title string, cover string, filepath string) error {
@@ -429,8 +470,5 @@ func saveWordTable(bookId int, frequencyTable segmentation.FrequencyTable) (sql.
   VALUES (:book, :word, :count)`, wordTable)
 }
 
-//   deleteBook, straigt sql
-//   setFavorite, straight sql
-//   setRead, straigt sql
 //   totalRead, straight sql
-//  segmentation.preloadWords ?
+//   segmentation.preloadWords ?
