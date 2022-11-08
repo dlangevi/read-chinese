@@ -392,6 +392,21 @@ func (BookLibrary) SetRead(bookId int64, isRead bool) error {
 	return err
 }
 
+func (BookLibrary) TotalRead() (int, error) {
+	var total int
+	err := Conn.QueryRow(`
+    SELECT SUM(count) as total 
+    FROM frequency 
+    WHERE EXISTS (
+      SELECT bookId
+      FROM books
+      WHERE has_read = true
+      AND books.bookId == frequency.book
+    )`).Scan(&total)
+	return total, err
+
+}
+
 func AddBook(author string, title string, cover string, filepath string) error {
 	bookId, err := addBook(author, title, cover, filepath)
 	if err != nil {
@@ -470,5 +485,5 @@ func saveWordTable(bookId int, frequencyTable segmentation.FrequencyTable) (sql.
   VALUES (:book, :word, :count)`, wordTable)
 }
 
-//   totalRead, straight sql
-//   segmentation.preloadWords ?
+// TODO might want to run the segementation preloadWords on
+// bookLibrary initialization

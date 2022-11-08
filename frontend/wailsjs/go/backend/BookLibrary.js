@@ -33,3 +33,7 @@ export function SetRead(arg1, arg2) {
 export function TopUnknownWords(arg1, arg2) {
   return window['go']['backend']['BookLibrary']['TopUnknownWords'](arg1, arg2);
 }
+
+export function TotalRead() {
+  return window['go']['backend']['BookLibrary']['TotalRead']();
+}

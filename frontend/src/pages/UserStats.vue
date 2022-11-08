@@ -21,10 +21,10 @@
 <script setup lang="ts">
 import { NStatistic } from 'naive-ui';
 import { GetWordStats } from '@wailsjs/backend/KnownWords';
+import { TotalRead } from '@wailsjs/backend/BookLibrary';
 
-const readWords = await window.nodeIpc.totalRead();
+const totalWords = await TotalRead();
 const wordStats = await GetWordStats();
-const { totalWords } = readWords;
 const {
   words,
   characters,
