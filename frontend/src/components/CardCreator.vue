@@ -111,7 +111,9 @@ import { getUserSettings } from '@/lib/userSettings';
 import { AddWord } from '@wailsjs/backend/KnownWords';
 import { GetDefinitionsForWord } from '@wailsjs/backend/Dictionaries';
 import {
-  CreateAnkiCard,
+  CreateAnkiNote,
+  UpdateNoteFields,
+  GetAnkiNote,
   GetAnkiNoteSkeleton,
 } from '@wailsjs/backend/AnkiInterface';
 
@@ -254,7 +256,7 @@ store.$subscribe(async (mutation, state) => {
       }
     } else {
       // Right now for EDIT we only edit the sentence so start there
-      ankiCard = await window.nodeIpc.getAnkiNote(word);
+      ankiCard = await GetAnkiNote(word);
       steps.value = [
         StepsEnum.SENTENCE,
       ];
@@ -321,7 +323,7 @@ async function submit() {
       const book = await GetBook(preferBookRef.value);
       tags.push(book.title);
     }
-    CreateAnkiCard(cardValues, tags).then((res) => {
+    CreateAnkiNote(cardValues, tags).then((res) => {
       messageReactive.content = JSON.stringify(res);
       if (res !== 'success') {
         console.log(res);
@@ -347,7 +349,7 @@ async function submit() {
       newData.SentenceAudio = '';
     }
     console.log(toRaw(newData));
-    const res = await window.nodeIpc.updateAnkiCard(card.value.noteId, newData);
+    const res = await UpdateNoteFields(card.value.noteId, newData);
     messageReactive.content = JSON.stringify(res);
     messageReactive.type = 'success';
     setTimeout(() => {

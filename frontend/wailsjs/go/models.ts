@@ -86,12 +86,12 @@ export namespace backend {
 	    }
 	}
 	export class Fields {
-	    word: string;
-	    sentence: string;
-	    englishDefn: string;
-	    chineseDefn: string;
-	    pinyin: string;
-	    imageUrls: string[];
+	    word?: string;
+	    sentence?: string;
+	    englishDefn?: string;
+	    chineseDefn?: string;
+	    pinyin?: string;
+	    imageUrls?: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new Fields(source);
@@ -120,7 +120,7 @@ export namespace backend {
 	    }
 	}
 	export class RawAnkiNote {
-	    noteId: string;
+	    noteId: number;
 	    fields: Fields;
 	
 	    static createFrom(source: any = {}) {

@@ -11,6 +11,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/oleiade/reflections v1.0.1
+	github.com/privatesquare/bkst-go-utils v1.5.4
 	github.com/wailsapp/wails/v2 v2.1.0
 	github.com/yanyiwu/gojieba v1.2.0
 )
@@ -44,7 +45,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/privatesquare/bkst-go-utils v1.5.4 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/tkrajina/go-reflector v0.5.5 // indirect
 	github.com/ugorji/go/codec v1.1.7 // indirect

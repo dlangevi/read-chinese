@@ -1,21 +1,23 @@
 package backend
 
 import (
+	"fmt"
 	// "encoding/json"
-	// "errors"
+	"errors"
 	// "net/http"
 	// "net/url"
 	//
 	"github.com/atselvan/ankiconnect"
+	restError "github.com/privatesquare/bkst-go-utils/utils/errors"
 )
 
 type Fields struct {
-	Word        string   `json:"word"`
-	Sentence    string   `json:"sentence"`
-	EnglishDefn string   `json:"englishDefn"`
-	ChineseDefn string   `json:"chineseDefn"`
-	Pinyin      string   `json:"pinyin"`
-	ImageUrls   []string `json:"imageUrls"`
+	Word        string   `json:"word,omitempty"`
+	Sentence    string   `json:"sentence,omitempty"`
+	EnglishDefn string   `json:"englishDefn,omitempty"`
+	ChineseDefn string   `json:"chineseDefn,omitempty"`
+	Pinyin      string   `json:"pinyin,omitempty"`
+	ImageUrls   []string `json:"imageUrls,omitempty"`
 }
 
 const (
@@ -23,14 +25,21 @@ const (
 )
 
 type AnkiInterface struct {
+	anki *ankiconnect.Client
+}
+
+func NewAnkiInterface() *AnkiInterface {
+	return &AnkiInterface{
+		ankiconnect.NewClient(),
+	}
 }
 
 type RawAnkiNote struct {
-	NoteId string `json:"noteId"`
+	NoteId int64  `json:"noteId"`
 	Fields Fields `json:"fields"`
 }
 
-func (AnkiInterface) GetAnkiNoteSkeleton(word string) RawAnkiNote {
+func (a *AnkiInterface) GetAnkiNoteSkeleton(word string) RawAnkiNote {
 	return RawAnkiNote{
 		Fields: Fields{
 			Word: word,
@@ -38,9 +47,8 @@ func (AnkiInterface) GetAnkiNoteSkeleton(word string) RawAnkiNote {
 	}
 }
 
-func (AnkiInterface) CreateAnkiCard(fields Fields, tags []string) string {
-	client := ankiconnect.NewClient()
-	restErr := client.Ping()
+func (a *AnkiInterface) CreateAnkiNote(fields Fields, tags []string) string {
+	restErr := a.anki.Ping()
 	if restErr != nil {
 		return restErr.Error
 	}
@@ -61,7 +69,7 @@ func (AnkiInterface) CreateAnkiCard(fields Fields, tags []string) string {
 		// audio
 		// picture
 	}
-	restErr = client.Notes.Add(note)
+	restErr = a.anki.Notes.Add(note)
 	if restErr != nil {
 		return restErr.Error
 	}
@@ -69,14 +77,92 @@ func (AnkiInterface) CreateAnkiCard(fields Fields, tags []string) string {
 	return "success"
 }
 
+func toError(restErr *restError.RestErr) error {
+	return errors.New(fmt.Sprintf("%v, %v", restErr.Error, restErr.Message))
+}
+
+func (a *AnkiInterface) GetAnkiNote(word string) (RawAnkiNote, error) {
+	notes, restErr := a.anki.Notes.Get(fmt.Sprintf("Hanzi:%v", word))
+	if restErr != nil {
+		return RawAnkiNote{}, toError(restErr)
+	}
+	if len(*notes) == 0 {
+		return RawAnkiNote{}, errors.New("No note exists")
+	}
+	if len(*notes) > 1 {
+		return RawAnkiNote{}, errors.New("Duplicate notes exists")
+	}
+
+	note := (*notes)[0]
+	extract := func(field string) string {
+		value, _ := note.Fields[field]
+		return value.Value
+	}
+
+	rawNote := RawAnkiNote{
+		NoteId: note.NoteId,
+		Fields: Fields{
+			Word:        extract("Hanzi"),
+			Sentence:    extract("ExampleSentence"),
+			EnglishDefn: extract("EnglishDefinition"),
+			ChineseDefn: extract("ChineseDefinition"),
+			Pinyin:      extract("Pinyin"),
+			// TODO how to load the image from a card which already exists?
+			// use retrieveMediaFile to get base64 encoded image
+			// ImageUrls: [],
+		},
+		// rawNote,
+	}
+	return rawNote, nil
+}
+
+func (a *AnkiInterface) UpdateNoteFields(noteID int64, fields Fields) string {
+	ankiFields := ankiconnect.Fields{}
+	if fields.Word != "" {
+		ankiFields["Hanzi"] = fields.Word
+	}
+	if fields.Sentence != "" {
+		ankiFields["ExampleSentence"] = fields.Sentence
+	}
+	if fields.EnglishDefn != "" {
+		ankiFields["EnglishDefinition"] = fields.EnglishDefn
+	}
+	if fields.ChineseDefn != "" {
+		ankiFields["ChineseDefinition"] = fields.ChineseDefn
+	}
+	if fields.Pinyin != "" {
+		ankiFields["Pinyin"] = fields.Pinyin
+	}
+	update := ankiconnect.UpdateNote{
+		Id:     noteID,
+		Fields: ankiFields,
+	}
+	restErr := a.anki.Notes.Update(update)
+	if restErr != nil {
+		return restErr.Error
+	}
+	return "success"
+}
+
+func (a *AnkiInterface) ImportAnkiKeywords() error {
+	notes, restErr := a.anki.Notes.Get("deck:Reading")
+	if restErr != nil {
+		return toError(restErr)
+	}
+	for _, note := range *notes {
+		word, _ := note.Fields["Hanzi"]
+		// TODO batch this?
+		known.AddWord(word.Value, int(note.Interval))
+
+	}
+	return nil
+}
+
 // TODO in client
 // findCards
 // cardsInfo
-// updateNoteFields
 // setSpecificValueOfCard
 
 // TODO ipc calls
-// getAnkiNote,
-// updateAnkiCard,
 // loadFlaggedCards,
 // importAnkiKeywords,

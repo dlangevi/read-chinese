@@ -54,7 +54,7 @@ func StartBackend(ctx *context.Context) *Backend {
 		Dictionaries:   NewDictionaries(),
 		Segmentation:   s,
 		Generator:      &Generator{},
-		AnkiInterface:  &AnkiInterface{},
+		AnkiInterface:  NewAnkiInterface(),
 	}
 
 	return runtime
