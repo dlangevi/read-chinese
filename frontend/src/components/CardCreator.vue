@@ -110,6 +110,10 @@ import { getUserSettings } from '@/lib/userSettings';
 
 import { AddWord } from '@wailsjs/backend/KnownWords';
 import { GetDefinitionsForWord } from '@wailsjs/backend/Dictionaries';
+import {
+  CreateAnkiCard,
+  GetAnkiNoteSkeleton,
+} from '@wailsjs/backend/AnkiInterface';
 
 import {
   GetBook,
@@ -230,7 +234,8 @@ store.$subscribe(async (mutation, state) => {
 
     let ankiCard;
     if (action === ActionsEnum.CREATE) {
-      ankiCard = await window.nodeIpc.createAnkiNoteSkeleton(word);
+      // ankiCard = await window.nodeIpc.createAnkiNoteSkeleton(word);
+      ankiCard = await GetAnkiNoteSkeleton(word);
 
       const enableChinese = UserSettings.Dictionaries.EnableChinese.read();
       if (enableChinese) {
@@ -316,7 +321,7 @@ async function submit() {
       const book = await GetBook(preferBookRef.value);
       tags.push(book.title);
     }
-    window.nodeIpc.createAnkiCard(cardValues, tags).then((res) => {
+    CreateAnkiCard(cardValues, tags).then((res) => {
       messageReactive.content = JSON.stringify(res);
       if (res !== 'success') {
         console.log(res);

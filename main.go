@@ -85,6 +85,7 @@ func main() {
 			backend.ImageClient,
 			backend.Dictionaries,
 			backend.Generator,
+			backend.AnkiInterface,
 		},
 		// Windows platform specific options
 		// Windows平台特定选项
