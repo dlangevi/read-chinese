@@ -66,6 +66,8 @@ import {
   AddDictionary,
 } from '@wailsjs/backend/Dictionaries';
 
+import { FilePicker } from '@wailsjs/main/App';
+
 const addDictModal = ref(false);
 
 function makePrimary(name:string) {
@@ -91,7 +93,7 @@ const options = [
 ];
 
 async function pickFile() {
-  newDictFile.value = await window.nodeIpc.filePicker('json');
+  newDictFile.value = await FilePicker('json');
 }
 function addDictionary() {
   // Reset whatever state

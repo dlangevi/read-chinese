@@ -391,7 +391,7 @@ func (BookLibrary) SetRead(bookId int64, isRead bool) error {
 }
 
 func (BookLibrary) TotalRead() (int, error) {
-	var total int
+	var total sql.NullInt64
 	err := Conn.QueryRow(`
     SELECT SUM(count) as total 
     FROM frequency 
@@ -401,7 +401,11 @@ func (BookLibrary) TotalRead() (int, error) {
       WHERE has_read = true
       AND books.bookId == frequency.book
     )`).Scan(&total)
-	return total, err
+	if total.Valid {
+		return int(total.Int64), err
+	} else {
+		return 0, err
+	}
 
 }
 

@@ -17,6 +17,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"read-chinese/backend"
 )
 
@@ -95,6 +96,19 @@ func (a *App) NodeIpc(function string, argsJson string) string {
 	}
 	sb := string(body)
 	return sb
+}
+
+func (a *App) FilePicker(extension string) (string, error) {
+	log.Println("requesting file")
+	selectedFile, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
+		Filters: []runtime.FileFilter{
+			{
+				DisplayName: "Sometime",
+				Pattern:     fmt.Sprintf("*.%v", extension),
+			},
+		},
+	})
+	return selectedFile, err
 }
 
 func (a *App) Greet(name string) string {
