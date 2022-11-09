@@ -1,62 +1,18 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
 	"context"
-	_ "embed"
-	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"log"
-	"net/http"
-	"os"
 	"os/exec"
-	"path"
-
-	"github.com/jmoiron/sqlx"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-	"read-chinese/backend"
 )
-
-//go:embed src-node/build/read-chinese.node
-var program []byte
-
-func startNode() *exec.Cmd {
-
-	userConfigDir := backend.ConfigDir()
-	userProgram := path.Join(userConfigDir, "read-chinese.node")
-	err := os.WriteFile(userProgram, program, 0777)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	cmd := exec.Command(userProgram, userConfigDir)
-	pipe, _ := cmd.StdoutPipe()
-	if err := cmd.Start(); err != nil {
-		log.Fatal(err)
-	}
-
-	go func(p io.ReadCloser) {
-		reader := bufio.NewReader(pipe)
-		line, err := reader.ReadString('\n')
-		for err == nil {
-			fmt.Println(line)
-			line, err = reader.ReadString('\n')
-		}
-	}(pipe)
-
-	return cmd
-
-}
 
 // App struct
 type App struct {
 	ctx context.Context
 	cmd *exec.Cmd
-	db  *sqlx.DB
 }
 
 // NewApp creates a new App application struct
@@ -71,31 +27,6 @@ func (a *App) startup(ctx context.Context) {
 	// Perform your setup here
 	// 在这里执行初始化设置
 	a.ctx = ctx
-
-	// While doing dev I will just run the node server myself,
-	// No need for launching a bundle
-	// a.cmd = startNode()
-
-}
-
-func (a *App) NodeIpc(function string, argsJson string) string {
-	postBody, _ := json.Marshal(map[string]string{
-		"function": function,
-		"args":     argsJson,
-	})
-	responseBody := bytes.NewBuffer(postBody)
-	resp, err := http.Post("http://localhost:3451/ipc", "application/json", responseBody)
-	if err != nil {
-		log.Fatalf("An Error Occured %v", err)
-	}
-	defer resp.Body.Close()
-	//Read the response body
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	sb := string(body)
-	return sb
 }
 
 func (a *App) FilePicker(extension string) (string, error) {

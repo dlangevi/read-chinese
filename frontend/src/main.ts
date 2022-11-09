@@ -12,7 +12,6 @@ import WordLists from '@/pages/WordLists.vue';
 import FlashCards from '@/pages/FlashCards.vue';
 import MakeCards from '@/pages/MakeCards.vue';
 import BookStats from '@/pages/BookStats.vue';
-import { NodeIpc } from '@wailsjs/main/App';
 
 import App from './App.vue';
 
@@ -79,23 +78,6 @@ const router = createRouter({
 async function init() {
   const pinia = createPinia();
   const app = createApp(App);
-
-  const handler = {
-    get(_:any, functionName:string) {
-      return new Proxy((() => {}), {
-        async apply(__, ___, argumentsList) {
-          console.log('from vue:', functionName, argumentsList);
-          const resp:string = await NodeIpc(
-            functionName,
-            JSON.stringify(argumentsList),
-          );
-          return JSON.parse(resp);
-        },
-      });
-    },
-  };
-
-  window.nodeIpc = new Proxy({}, handler);
   const userSettings = await generateUserSettings();
   app.provide(UserSettingsKey, userSettings);
   app.use(router);

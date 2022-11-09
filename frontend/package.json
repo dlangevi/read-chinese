@@ -9,8 +9,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit",
-    "build": "run-p type-check bundle build-only",
-    "bundle": "yarn --cwd ../src-node bundle"
+    "build": "run-p type-check build-only"
   },
   "dependencies": {
     "@azure/cognitiveservices-imagesearch": "^3.0.1",
