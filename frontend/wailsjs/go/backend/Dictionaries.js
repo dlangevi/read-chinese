@@ -26,6 +26,10 @@ export function GetPossibleWords(arg1) {
   return window['go']['backend']['Dictionaries']['GetPossibleWords'](arg1);
 }
 
+export function IsInDictionary(arg1) {
+  return window['go']['backend']['Dictionaries']['IsInDictionary'](arg1);
+}
+
 export function SetPrimaryDict(arg1) {
   return window['go']['backend']['Dictionaries']['SetPrimaryDict'](arg1);
 }

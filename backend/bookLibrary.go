@@ -9,8 +9,6 @@ import (
 	"os"
 	"path"
 
-	"read-chinese/backend/segmentation"
-
 	"github.com/jmoiron/sqlx"
 )
 
@@ -471,7 +469,7 @@ func GetSegmentedText(book Book) ([]string, error) {
 }
 
 // dbSaveWordTable, // TODO once segmentation is done we can test this
-func saveWordTable(bookId int, frequencyTable segmentation.FrequencyTable) (sql.Result, error) {
+func saveWordTable(bookId int, frequencyTable FrequencyTable) (sql.Result, error) {
 
 	wordTable := WordTable{}
 	for word, count := range frequencyTable {

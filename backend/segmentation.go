@@ -1,6 +1,8 @@
-package segmentation
+package backend 
 
 import (
+	"bufio"
+	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -132,12 +134,38 @@ func (s *Segmentation) SegmentFullText(path string) ([]string, FrequencyTable, e
 
 }
 
+func pruneDict(d *Dictionaries, jieba *gojieba.Jieba) error {
+  dict, err := os.Open(gojieba.DICT_PATH)
+  if err != nil {
+    return err
+  }
+  defer dict.Close()
+
+  sc := bufio.NewScanner(dict)
+  totalWords := 0
+  validWords := 0
+  for sc.Scan() {
+    line := sc.Text()
+    parts := strings.Split(line, " ")
+    word := parts[0]
+    totalWords += 1
+    if !d.IsInDictionary(word) {
+      validWords += 1
+      jieba.RemoveWord(word)
+    }
+  }
+  log.Println("totalWords", totalWords, "validWords", validWords)
+  return nil
+
+}
+
 // todo
 // computeDict (modify the default dict to only use words from user dicts)
 // loadJieba
-func NewSegmentation() (*Segmentation, error) {
+func NewSegmentation(d *Dictionaries) (*Segmentation, error) {
 	s := &Segmentation{}
 	jieba = gojieba.NewJieba()
+  pruneDict(d, jieba)
 	var err error
 	punctuation, err = regexp.Compile(`\p{P}`)
 	if err != nil {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"read-chinese/backend/segmentation"
 )
 
 type Backend struct {
@@ -14,7 +13,7 @@ type Backend struct {
 	UserSettings   *UserSettings
 	ImageClient    *ImageClient
 	Dictionaries   *Dictionaries
-	Segmentation   *segmentation.Segmentation
+	Segmentation   *Segmentation
 	Generator      *Generator
 	AnkiInterface  *AnkiInterface
 }
@@ -40,7 +39,8 @@ func StartBackend(ctx *context.Context) *Backend {
 	ran := GetTimesRan()
 	fmt.Println("Ran {} times", ran)
 
-	s, err := segmentation.NewSegmentation()
+	d := NewDictionaries()
+	s, err := NewSegmentation(d)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,7 +51,7 @@ func StartBackend(ctx *context.Context) *Backend {
 		KnownWords:     NewKnownWords(),
 		UserSettings:   userSettings,
 		ImageClient:    &ImageClient{},
-		Dictionaries:   NewDictionaries(),
+		Dictionaries:   d,
 		Segmentation:   s,
 		Generator:      &Generator{},
 		AnkiInterface:  NewAnkiInterface(),

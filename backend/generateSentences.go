@@ -2,7 +2,6 @@ package backend
 
 import (
 	"math"
-	"read-chinese/backend/segmentation"
 	"sort"
 	"strings"
 )
@@ -10,7 +9,7 @@ import (
 type Generator struct {
 }
 
-func isT1Candidate(sentence []segmentation.Token, word string) bool {
+func isT1Candidate(sentence []Token, word string) bool {
 	for _, token := range sentence {
 		if token.IsWord && word != token.Data && !known.isWellKnown(token.Data) {
 			return false
@@ -19,7 +18,7 @@ func isT1Candidate(sentence []segmentation.Token, word string) bool {
 	return true
 }
 
-func tokensContains(sentence []segmentation.Token, word string) bool {
+func tokensContains(sentence []Token, word string) bool {
 	for _, token := range sentence {
 		if word == token.Data {
 			return true

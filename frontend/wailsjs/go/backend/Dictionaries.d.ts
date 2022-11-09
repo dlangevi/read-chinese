@@ -14,4 +14,6 @@ export function GetDictionaryInfo():Promise<backend.DictionaryInfoMap>;
 
 export function GetPossibleWords(arg1:string):Promise<Array<backend.UnknownWordEntry>>;
 
+export function IsInDictionary(arg1:string):Promise<boolean>;
+
 export function SetPrimaryDict(arg1:string):Promise<void>;

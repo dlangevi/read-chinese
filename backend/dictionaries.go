@@ -199,3 +199,13 @@ func (d *Dictionaries) GetPossibleWords(partial string) []UnknownWordEntry {
 
 	return d.GetDefinitions(words)
 }
+
+func (d *Dictionaries) IsInDictionary(word string) bool {
+	for _, dict := range d.Dictionaries {
+		_, ok := dict.Definitions[word]
+		if ok {
+			return true
+		}
+	}
+	return false
+}
