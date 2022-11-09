@@ -197,12 +197,6 @@ func (BookLibrary) GetBook(bookId int64) (Book, error) {
 	book.Stats.TotalWords, _ = getTotalWords(bookId)
 	_ = computeKnownCharacters(&book)
 	_ = computeWordTargets(&book)
-	// if detailed {
-	//    Compute WordTargets
-	//    Compute targets
-	//    Compute targetOccurances
-	//    Compute needToKnow
-	// }
 
 	return book, nil
 }

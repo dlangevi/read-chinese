@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os/exec"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -12,7 +11,6 @@ import (
 // App struct
 type App struct {
 	ctx context.Context
-	cmd *exec.Cmd
 }
 
 // NewApp creates a new App application struct
@@ -68,8 +66,4 @@ func (a *App) beforeClose(ctx context.Context) (prevent bool) {
 func (a *App) shutdown(ctx context.Context) {
 	// Perform your teardown here
 	// 在此处做一些资源释放的操作
-	// Kill it:
-	// if err := a.cmd.Process.Kill(); err != nil {
-	// 	log.Fatal("failed to kill process: ", err)
-	// }
 }
