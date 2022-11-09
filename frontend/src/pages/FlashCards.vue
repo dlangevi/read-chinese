@@ -19,6 +19,8 @@ import { onBeforeMount, ref, onUnmounted } from 'vue';
 import { useMessage } from 'naive-ui';
 import AddToCardQueue from '@/components/AddToCardQueue.vue';
 import type { GetRowIdParams, GridReadyEvent, ColDef } from 'ag-grid-community';
+import { LoadFlaggedCards } from '@wailsjs/backend/AnkiInterface';
+import { backend } from '@wailsjs/models';
 
 const message = useMessage();
 const getRowId = (params:GetRowIdParams) => params.data.word;
@@ -63,13 +65,13 @@ onUnmounted(() => {
   window.removeEventListener('resize', resizeCallback);
 });
 
-const rowData = ref([]);
+const rowData = ref<backend.FlaggedCard[]>([]);
 onBeforeMount(async () => {
   // TODO is there some way we can have the message be sent from
   // background, so we can just error at the source and not have
   // to do error handleing in all of the different vue files?
   try {
-    rowData.value = await window.nodeIpc.loadFlaggedCards();
+    rowData.value = await LoadFlaggedCards();
   } catch (e) {
     message.error('Please open Anki');
   }

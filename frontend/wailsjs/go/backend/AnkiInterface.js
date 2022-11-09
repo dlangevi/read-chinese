@@ -18,6 +18,10 @@ export function ImportAnkiKeywords() {
   return window['go']['backend']['AnkiInterface']['ImportAnkiKeywords']();
 }
 
+export function LoadFlaggedCards() {
+  return window['go']['backend']['AnkiInterface']['LoadFlaggedCards']();
+}
+
 export function UpdateNoteFields(arg1, arg2) {
   return window['go']['backend']['AnkiInterface']['UpdateNoteFields'](arg1, arg2);
 }

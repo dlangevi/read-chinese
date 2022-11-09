@@ -10,4 +10,6 @@ export function GetAnkiNoteSkeleton(arg1:string):Promise<backend.RawAnkiNote>;
 
 export function ImportAnkiKeywords():Promise<Error>;
 
+export function LoadFlaggedCards():Promise<Array<backend.FlaggedCard>>;
+
 export function UpdateNoteFields(arg1:number,arg2:backend.Fields):Promise<string>;

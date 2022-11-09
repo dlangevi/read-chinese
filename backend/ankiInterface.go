@@ -161,11 +161,28 @@ func (a *AnkiInterface) ImportAnkiKeywords() error {
 	return known.AddWords(words)
 }
 
-// TODO in client
-// findCards
-// cardsInfo
-// setSpecificValueOfCard
+type FlaggedCard struct {
+	Word     string `json:"word"`
+	Sentence string `json:"sentence"`
+}
 
-// TODO ipc calls
-// loadFlaggedCards,
-// importAnkiKeywords,
+func (a *AnkiInterface) LoadFlaggedCards() ([]FlaggedCard, error) {
+	flaggedCards := []FlaggedCard{}
+	cards, restErr := a.anki.Cards.Get("flag:1")
+	if restErr != nil {
+		return flaggedCards, toError(restErr)
+	}
+	for _, card := range *cards {
+		word, _ := card.Fields["Hanzi"]
+		sentence, _ := card.Fields["ExampleSentence"]
+		flaggedCards = append(flaggedCards, FlaggedCard{
+			Word:     word.Value,
+			Sentence: sentence.Value,
+		})
+	}
+	return flaggedCards, nil
+}
+
+// TODO in client
+// setSpecificValueOfCard
+// and use that to unflag stuff when updated

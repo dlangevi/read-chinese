@@ -107,6 +107,20 @@ export namespace backend {
 	        this.imageUrls = source["imageUrls"];
 	    }
 	}
+	export class FlaggedCard {
+	    word: string;
+	    sentence: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new FlaggedCard(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.word = source["word"];
+	        this.sentence = source["sentence"];
+	    }
+	}
 	export class ImageInfo {
 	    thumbnailUrl: string;
 	

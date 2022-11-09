@@ -236,7 +236,6 @@ store.$subscribe(async (mutation, state) => {
 
     let ankiCard;
     if (action === ActionsEnum.CREATE) {
-      // ankiCard = await window.nodeIpc.createAnkiNoteSkeleton(word);
       ankiCard = await GetAnkiNoteSkeleton(word);
 
       const enableChinese = UserSettings.Dictionaries.EnableChinese.read();

@@ -2,9 +2,6 @@
   <div class="flex h-full">
     <div class="flex-shrink-0 m-4">
       <n-space vertical>
-        <n-button type="primary" @click="importCSV">
-          Import CSV file
-        </n-button>
         <n-button type="primary" @click="importAnki">
           Sync from Anki
         </n-button>
@@ -64,10 +61,6 @@ const words = ref<backend.UnknownWordEntry[]>([]);
 onBeforeMount(async () => {
   words.value = await LearningTarget();
 });
-
-function importCSV() {
-  window.nodeIpc.importCSVWords();
-}
 
 function importAnki() {
   ImportAnkiKeywords();
