@@ -20,8 +20,7 @@ import (
 //go:embed frontend/dist
 var assets embed.FS
 
-//go:embed build/appicon.png
-var icon []byte
+// var icon []byte
 
 type FileLoader struct {
 	http.Handler
@@ -137,11 +136,11 @@ func main() {
 			About: &mac.AboutInfo{
 				Title:   "Wails Template Vue",
 				Message: "A Wails template based on Vue and Vue-Router",
-				Icon:    icon,
+				// Icon:    icon,
 			},
 		},
 		Linux: &linux.Options{
-			Icon: icon,
+			// Icon: icon,
 		},
 	})
 
