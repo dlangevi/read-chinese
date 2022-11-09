@@ -89,6 +89,13 @@ func TestModifyBook(t *testing.T) {
 	if err == nil {
 		t.Errorf("Book was not deleted")
 	}
+	exists, err := bookExists("fish", "is")
+	if err != nil {
+		t.Errorf("Problem with exists")
+	}
+	if exists {
+		t.Errorf("Books claims to exist")
+	}
 }
 
 func TestSelectBooks(t *testing.T) {

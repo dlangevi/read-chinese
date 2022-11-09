@@ -86,6 +86,7 @@ func main() {
 			backend.Dictionaries,
 			backend.Generator,
 			backend.AnkiInterface,
+			backend.Calibre,
 		},
 		// Windows platform specific options
 		// Windows平台特定选项

@@ -12,12 +12,12 @@ import (
 )
 
 type Fields struct {
-	Word        string   `json:"word,omitempty"`
-	Sentence    string   `json:"sentence,omitempty"`
-	EnglishDefn string   `json:"englishDefn,omitempty"`
-	ChineseDefn string   `json:"chineseDefn,omitempty"`
-	Pinyin      string   `json:"pinyin,omitempty"`
-	ImageUrls   []string `json:"imageUrls,omitempty"`
+	Word        string   `json:"word"`
+	Sentence    string   `json:"sentence"`
+	EnglishDefn string   `json:"englishDefn"`
+	ChineseDefn string   `json:"chineseDefn"`
+	Pinyin      string   `json:"pinyin"`
+	ImageUrls   []string `json:"imageUrls"`
 }
 
 const (
@@ -52,6 +52,7 @@ func (a *AnkiInterface) CreateAnkiNote(fields Fields, tags []string) string {
 	if restErr != nil {
 		return restErr.Error
 	}
+	// TODO include audio and images
 	note := ankiconnect.Note{
 		DeckName:  "Reading",
 		ModelName: "Reading Card",
@@ -133,6 +134,7 @@ func (a *AnkiInterface) UpdateNoteFields(noteID int64, fields Fields) string {
 	if fields.Pinyin != "" {
 		ankiFields["Pinyin"] = fields.Pinyin
 	}
+	// TODO include new audio
 	update := ankiconnect.UpdateNote{
 		Id:     noteID,
 		Fields: ankiFields,

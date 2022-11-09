@@ -1,9 +1,10 @@
-package backend 
+package backend
 
 import (
 	"bufio"
 	"log"
 	"os"
+	"path"
 	"regexp"
 	"strings"
 
@@ -135,38 +136,73 @@ func (s *Segmentation) SegmentFullText(path string) ([]string, FrequencyTable, e
 }
 
 func pruneDict(d *Dictionaries, jieba *gojieba.Jieba) error {
-  dict, err := os.Open(gojieba.DICT_PATH)
-  if err != nil {
-    return err
-  }
-  defer dict.Close()
+	dict, err := os.Open(gojieba.DICT_PATH)
+	if err != nil {
+		return err
+	}
+	defer dict.Close()
 
-  sc := bufio.NewScanner(dict)
-  totalWords := 0
-  validWords := 0
-  for sc.Scan() {
-    line := sc.Text()
-    parts := strings.Split(line, " ")
-    word := parts[0]
-    totalWords += 1
-    if !d.IsInDictionary(word) {
-      validWords += 1
-      jieba.RemoveWord(word)
-    }
-  }
-  log.Println("totalWords", totalWords, "validWords", validWords)
-  return nil
+	sc := bufio.NewScanner(dict)
+	totalWords := 0
+	validWords := 0
+	for sc.Scan() {
+		line := sc.Text()
+		parts := strings.Split(line, " ")
+		word := parts[0]
+		totalWords += 1
+		if !d.IsInDictionary(word) {
+			jieba.RemoveWord(word)
+		} else {
+			log.Println(word, "is a word")
+			validWords += 1
+		}
+	}
+	log.Println("totalWords", totalWords, "validWords", validWords)
+	return nil
 
 }
 
-// todo
-// computeDict (modify the default dict to only use words from user dicts)
-// loadJieba
+func constructDict(d *Dictionaries) error {
+	dict, err := os.Open(gojieba.DICT_PATH)
+	if err != nil {
+		return err
+	}
+	defer dict.Close()
+	defer dict.Close()
+	replacementPath := path.Join(os.TempDir(), "replacement.dict.utf8")
+	userDict, err := os.Create(replacementPath)
+	if err != nil {
+		return err
+	}
+
+	sc := bufio.NewScanner(dict)
+	wr := bufio.NewWriter(userDict)
+	totalWords := 0
+	validWords := 0
+	for sc.Scan() {
+		line := sc.Text()
+		parts := strings.Split(line, " ")
+		word := parts[0]
+		totalWords += 1
+		if d.IsInDictionary(word) {
+			validWords += 1
+			wr.WriteString(line)
+			wr.WriteRune('\n')
+		}
+	}
+	wr.Flush()
+	userDict.Close()
+	jieba = gojieba.NewJieba(replacementPath)
+	log.Println("totalWords", totalWords, "validWords", validWords)
+	return nil
+}
+
 func NewSegmentation(d *Dictionaries) (*Segmentation, error) {
 	s := &Segmentation{}
-	jieba = gojieba.NewJieba()
-  pruneDict(d, jieba)
-	var err error
+	err := constructDict(d)
+	if err != nil {
+		return s, err
+	}
 	punctuation, err = regexp.Compile(`\p{P}`)
 	if err != nil {
 		return s, err

@@ -29,9 +29,11 @@ import SettingsCheckbox
 import { getUserSettings } from '@/lib/userSettings';
 import type { Book } from '@/lib/types';
 import { GetBooks } from '@wailsjs/backend/BookLibrary';
+import { ImportCalibreBooks } from '@wailsjs/backend/Calibre';
 
-function syncCalibre() {
-  window.nodeIpc.importCalibreBooks();
+async function syncCalibre() {
+  const err = await ImportCalibreBooks();
+  console.log(err);
 }
 
 const UserSettings = getUserSettings();

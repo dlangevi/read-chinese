@@ -470,7 +470,6 @@ func GetSegmentedText(book Book) ([]string, error) {
 
 // dbSaveWordTable, // TODO once segmentation is done we can test this
 func saveWordTable(bookId int, frequencyTable FrequencyTable) (sql.Result, error) {
-
 	wordTable := WordTable{}
 	for word, count := range frequencyTable {
 		wordTable = append(wordTable, WordTableRow{
@@ -479,8 +478,27 @@ func saveWordTable(bookId int, frequencyTable FrequencyTable) (sql.Result, error
 			Count:  count,
 		})
 	}
-	return Conn.NamedExec(`INSERT INTO frequency (book, word, count)
-  VALUES (:book, :word, :count)`, wordTable)
+	tx, err := Conn.Beginx()
+	if err != nil {
+		return nil, err
+	}
+	var res sql.Result
+	for rows := 0; rows < len(wordTable); rows += 5000 {
+		upperLimit := rows + 5000
+		if upperLimit > len(wordTable) {
+			upperLimit = len(wordTable)
+		}
+		currentBatch := wordTable[rows:upperLimit]
+		res, err = tx.NamedExec(`
+    INSERT INTO frequency (book, word, count)
+    VALUES (:book, :word, :count)`, currentBatch)
+		if err != nil {
+			return nil, err
+		}
+
+	}
+	err = tx.Commit()
+	return res, err
 }
 
 // TODO might want to run the segementation preloadWords on

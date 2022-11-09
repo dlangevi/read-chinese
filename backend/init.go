@@ -16,6 +16,7 @@ type Backend struct {
 	Segmentation   *Segmentation
 	Generator      *Generator
 	AnkiInterface  *AnkiInterface
+	Calibre        *Calibre
 }
 
 var runtime *Backend
@@ -55,6 +56,7 @@ func StartBackend(ctx *context.Context) *Backend {
 		Segmentation:   s,
 		Generator:      &Generator{},
 		AnkiInterface:  NewAnkiInterface(),
+		Calibre:        &Calibre{},
 	}
 
 	return runtime
