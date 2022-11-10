@@ -14,7 +14,7 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"],
-      "@wailsjs/*": ["wailsjs/go/*"],
+      "@wailsjs/*": ["wailsjs/go/*"]
     },
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true
@@ -25,7 +25,10 @@
     "src/**/*.d.ts", 
     "src/**/*.tsx", 
     "src/**/*.vue",
-    "vite.config.ts"
+    "vite.config.ts",
+    "windi.config.js",
+    "lint-staged.config.js",
+    "env.d.ts"
   ],
   "references": [
   ]

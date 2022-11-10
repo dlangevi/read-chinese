@@ -2,6 +2,6 @@ module.exports = {
   mode: 'jit',
   important: true,
   purge: [
-    './src/**/*.{js,vue}',
+    './src/**/*.{ts,js,vue}',
   ],
 };

@@ -186,6 +186,9 @@ func (a *AnkiInterface) UpdateNoteFields(noteID int64, fields Fields) string {
 	if restErr != nil {
 		return restErr.Error
 	}
+
+	// TODO clear flag if needed
+
 	return "success"
 }
 
