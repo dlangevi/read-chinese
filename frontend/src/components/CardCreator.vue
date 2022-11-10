@@ -322,18 +322,22 @@ async function submit() {
       const book = await GetBook(preferBookRef.value);
       tags.push(book.title);
     }
-    CreateAnkiNote(cardValues, tags).then((res) => {
-      messageReactive.content = JSON.stringify(res);
-      if (res !== 'success') {
-        console.log(res);
-        messageReactive.type = 'error';
-      } else {
+    // TODO do this kind of catching elsewhere
+    CreateAnkiNote(cardValues, tags)
+      .then(() => {
+        messageReactive.content = 'success';
         messageReactive.type = 'success';
-      }
-      setTimeout(() => {
-        messageReactive.destroy();
-      }, 1000);
-    });
+        setTimeout(() => {
+          messageReactive.destroy();
+        }, 1000);
+      })
+      .catch((err) => {
+        messageReactive.content = err;
+        messageReactive.type = 'error';
+        setTimeout(() => {
+          messageReactive.destroy();
+        }, 1000);
+      });
   } else {
     const newData = {};
     const cardValues = toRaw(card.value.fields);

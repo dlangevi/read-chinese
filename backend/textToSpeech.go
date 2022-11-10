@@ -2,6 +2,7 @@ package backend
 
 import (
 	"bytes"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"io"
@@ -28,7 +29,7 @@ const (
 // }());
 
 // We will use the rest api because I do not want to setup all the cgo sdk
-func Synthesize(text string) ([]byte, error) {
+func Synthesize(text string) (string, error) {
 	client := &http.Client{}
 
 	voice := "zh-CN-YunxiNeural"
@@ -40,7 +41,7 @@ func Synthesize(text string) ([]byte, error) {
 
 	req, err := http.NewRequest("POST", URI, bytes.NewBufferString(requestText))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	req.Header.Set("Content-Type", "application/ssml+xml")
@@ -49,20 +50,16 @@ func Synthesize(text string) ([]byte, error) {
 	req.Header.Set("X-Microsoft-OutputFormat", "riff-16khz-16bit-mono-pcm")
 	rsp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	defer rsp.Body.Close()
 
 	if rsp.StatusCode == http.StatusOK {
 		body, err := io.ReadAll(rsp.Body)
-		if err != nil {
-			return nil, err
-		}
-		// TODO base64 encode the body which can then be sent directly
-		// to anki connect?
-		return body, nil
+		enc := base64.StdEncoding.EncodeToString(body)
+		return enc, err
 	} else {
-		return nil, errors.New("cannot convert text to speech")
+		return "", errors.New("cannot convert text to speech")
 	}
 }

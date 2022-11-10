@@ -3,6 +3,7 @@ package backend
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/atselvan/ankiconnect"
 	restError "github.com/privatesquare/bkst-go-utils/utils/errors"
@@ -44,12 +45,55 @@ func (a *AnkiInterface) GetAnkiNoteSkeleton(word string) RawAnkiNote {
 	}
 }
 
-func (a *AnkiInterface) CreateAnkiNote(fields Fields, tags []string) string {
+func (a *AnkiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 	restErr := a.anki.Ping()
 	if restErr != nil {
-		return restErr.Error
+		return toError(restErr)
 	}
-	// TODO include audio and images
+
+	audio := []ankiconnect.Audio{}
+	pictures := []ankiconnect.Picture{}
+
+	addAudio := func(field string, dest string) error {
+		audio64, err := Synthesize(field)
+		if err != nil {
+			return err
+		}
+		audio = append(audio, ankiconnect.Audio{
+			Data: audio64,
+			Filename: fmt.Sprintf("read-chinese-%v-%v.wav",
+				dest,
+				time.Now().UnixMilli()),
+			Fields: []string{
+				dest,
+			},
+		})
+		return nil
+	}
+	if userSettings.GenerateTermAudio {
+		err := addAudio(fields.Word, "HanziAudio")
+		if err != nil {
+			return err
+		}
+	}
+	if userSettings.GenerateSentenceAudio {
+		err := addAudio(fields.Sentence, "SentenceAudio")
+		if err != nil {
+			return err
+		}
+	}
+	for i, image := range fields.ImageUrls {
+		milli := time.Now().UnixMilli()
+		pictures = append(pictures, ankiconnect.Picture{
+			URL: image,
+			// TODO dont guess the encoding format
+			Filename: fmt.Sprintf("read-chinese-image-%v-%v.jpg", milli, i),
+			Fields: []string{
+				"Images",
+			},
+		})
+	}
+
 	note := ankiconnect.Note{
 		DeckName:  "Reading",
 		ModelName: "Reading Card",
@@ -64,15 +108,17 @@ func (a *AnkiInterface) CreateAnkiNote(fields Fields, tags []string) string {
 		Options: &ankiconnect.Options{
 			AllowDuplicate: true,
 		},
-		// audio
-		// picture
+		Audio:   audio,
+		Picture: pictures,
 	}
 	restErr = a.anki.Notes.Add(note)
 	if restErr != nil {
-		return restErr.Error
+		return toError(restErr)
 	}
 
-	return "success"
+	known.AddWord(fields.Word, 0)
+
+	return nil
 }
 
 func toError(restErr *restError.RestErr) error {
