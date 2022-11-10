@@ -46,6 +46,7 @@ func (h *FileLoader) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 func main() {
 	// Create an instance of the app structure
 	// 创建一个App结构体实例
+	log.SetFlags(log.Ltime | log.Lshortfile)
 
 	app := NewApp()
 	backend := backend.StartBackend(&app.ctx)

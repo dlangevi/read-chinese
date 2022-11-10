@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -443,10 +442,7 @@ func saveCacheFile(bookId int, sentences []string, filepath string) error {
 
 func getSegmentationPath(title string, author string) string {
 	fileName := fmt.Sprintf("%v-%v.json", title, author)
-	cacheLocation := path.Join(
-		"/home/dlangevi/.config/read-chinese/",
-		"segmentationCache",
-		fileName)
+	cacheLocation := ConfigDir("segmentationCache", fileName)
 	return cacheLocation
 }
 

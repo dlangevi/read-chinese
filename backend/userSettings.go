@@ -96,7 +96,6 @@ func saveMetadata() error {
 }
 
 func UpdateTimesRan() {
-	log.Println(userSettings)
 	userSettings.Ran += 1
 	saveMetadata()
 }

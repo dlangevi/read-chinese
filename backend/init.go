@@ -2,7 +2,6 @@ package backend
 
 import (
 	"context"
-	"fmt"
 	"log"
 )
 
@@ -23,7 +22,7 @@ var runtime *Backend
 
 func StartBackend(ctx *context.Context) *Backend {
 
-	err := NewDB("/home/dlangevi/.config/read-chinese/db.sqlite3")
+	err := NewDB(ConfigDir("db.sqlite3"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,14 +30,14 @@ func StartBackend(ctx *context.Context) *Backend {
 	if err != nil {
 		log.Fatal(err)
 	}
-	userSettings, err = LoadMetadata("/home/dlangevi/.config/read-chinese/newmetadata.json")
+	userSettings, err = LoadMetadata(ConfigDir("newmetadata.json"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	UpdateTimesRan()
 	ran := GetTimesRan()
-	fmt.Println("Ran {} times", ran)
+	log.Printf("Ran %v times", ran)
 
 	d := NewDictionaries()
 	s, err := NewSegmentation(d)

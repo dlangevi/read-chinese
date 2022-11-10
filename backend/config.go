@@ -1,13 +1,16 @@
-package backend 
+package backend
 
 import (
-  "log"
+	"log"
+	"path"
 
 	"github.com/adrg/xdg"
 )
 
-func ConfigDir() string {
-	configDirPath, err := xdg.ConfigFile("read-chinese/")
+func ConfigDir(file ...string) string {
+	file = append([]string{"read-chinese"}, file...)
+	local := path.Join(file...)
+	configDirPath, err := xdg.ConfigFile(local)
 	if err != nil {
 		log.Fatal(err)
 	}
