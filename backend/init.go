@@ -30,7 +30,7 @@ func StartBackend(ctx *context.Context) *Backend {
 	if err != nil {
 		log.Fatal(err)
 	}
-	userSettings, err = LoadMetadata(ConfigDir("newmetadata.json"))
+	userSettings, err = LoadMetadata(ConfigDir("metadata.json"))
 	if err != nil {
 		log.Fatal(err)
 	}
