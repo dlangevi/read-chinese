@@ -14,6 +14,5 @@ func ConfigDir(file ...string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Config Dir at:", configDirPath)
 	return configDirPath
 }
