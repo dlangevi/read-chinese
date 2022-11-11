@@ -18,7 +18,6 @@ import { NMessageProvider } from 'naive-ui';
 import TopNav from '@/components/TopNav.vue';
 import CardCreator from '@/components/CardCreator.vue';
 
-// eslint-disable-next-line import/no-unresolved
 import 'virtual:windi.css';
 
 const route = useRoute();

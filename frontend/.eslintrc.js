@@ -35,25 +35,8 @@ module.exports = {
       ignoreUrls: true,
     }],
     'linebreak-style': 'off',
-    'import/prefer-default-export': 'off',
     // TODO turn these back on once I actually want to release this to people
     'vuejs-accessibility/click-events-have-key-events': 'off',
-    'import/extensions': [
-      'error',
-      'never',
-      {
-        ignorePackages: true,
-        pattern: {
-          json: 'always',
-          js: 'never',
-          jsx: 'never',
-          ts: 'never',
-          tsx: 'never',
-        },
-      },
-    ],
-    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
-    'import/no-unresolved': 'off',
   },
 
   overrides: [
@@ -69,15 +52,8 @@ module.exports = {
   ],
 
   extends: [
-    'plugin:vue/vue3-essential',
-    '@vue/typescript',
-    '@vue/airbnb',
-    '@vue/eslint-config-airbnb-with-typescript',
-    'plugin:import/errors',
-    'plugin:import/warnings',
-    'plugin:import/typescript',
-    'plugin:vue/vue3-essential',
     'eslint:recommended',
+    'plugin:vue/vue3-essential',
     '@vue/eslint-config-typescript',
   ],
   parserOptions: {
