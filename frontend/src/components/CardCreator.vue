@@ -181,7 +181,8 @@ const updateEnglishDefinition = (newDefinitions, updateStep = false) => {
     ).join('<br>');
     const pinyin = new Set(card.value.fields.pinyin.split(', '));
     newDefinitions.forEach((def) => {
-      pinyin.add(def.pronunciation);
+      const pronunciation = def.pronunciation.replace(/\s/g, '');
+      pinyin.add(pronunciation);
     });
     pinyin.delete('');
     card.value.fields.pinyin = [...pinyin].join(', ');
@@ -199,7 +200,9 @@ const updateChineseDefinition = (newDefinitions, updateStep = false) => {
     const pinyin = new Set(card.value.fields.pinyin.split(', '));
     pinyin.delete('');
     newDefinitions.forEach((def) => {
-      pinyin.add(def.pronunciation);
+      // TODO normalize pinyin across dictionaries
+      const pronunciation = def.pronunciation.replace(/\s/g, '');
+      pinyin.add(pronunciation);
     });
     card.value.fields.pinyin = [...pinyin].join(', ');
     if (updateStep) {
