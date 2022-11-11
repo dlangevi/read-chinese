@@ -172,8 +172,8 @@ export async function generateUserSettings() :Promise<UserSettingsType> {
     checkBox(
       'EnableChinese',
       'Use Chinese definitions',
-      'Allow flashcards to use chinese '
-      + 'definitions instead of just english ones',
+      'Allow flashcards to use chinese ' +
+      'definitions instead of just english ones',
     ),
     textBox(
       'AzureApiKey',
@@ -188,8 +188,8 @@ export async function generateUserSettings() :Promise<UserSettingsType> {
     slider(
       'KnownInterval',
       'Time before a word is considered "known"',
-      'How long of an interval in anki before a word is '
-      + ' included in generated sentences',
+      'How long of an interval in anki before a word is ' +
+      ' included in generated sentences',
     ),
   ]);
 

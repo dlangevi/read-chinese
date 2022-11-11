@@ -21,6 +21,13 @@ module.exports = {
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    semi: ['error', 'always'],
+    'comma-dangle': ['error', 'always-multiline'],
+    'space-before-function-paren': ['error', {
+      anonymous: 'always',
+      named: 'never',
+      asyncArrow: 'always',
+    }],
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars':
       ['error', { argsIgnorePattern: '_', vars: 'local' }],
@@ -33,7 +40,7 @@ module.exports = {
         ignorePackages: true,
         pattern: {
           json: 'always',
-          js:'never',
+          js: 'never',
           ts: 'never',
         },
       },
@@ -68,6 +75,7 @@ module.exports = {
 
   extends: [
     'eslint:recommended',
+    'standard',
     'plugin:vue/vue3-essential',
     'plugin:import/errors',
     'plugin:import/warnings',
