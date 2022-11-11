@@ -1,20 +1,22 @@
 <template>
-  <div class="text-3xl m-4">Pick a definition</div>
-  <n-checkbox-group v-model:value="definition" name="definitions">
-    <n-space vertical>
-      <n-checkbox
-        class="text-3xl"
-        v-for="(definition, i) in definitions"
-        :key="i"
-        :value="definition.definition"
-      >
-        <span
-          v-html="'[' + definition.pronunciation + '] '
-            + definition.definition"
-        />
-      </n-checkbox>
-    </n-space>
-  </n-checkbox-group>
+  <div>
+    <div class="text-3xl m-4">Pick a definition</div>
+    <n-checkbox-group v-model:value="definition" name="definitions">
+      <n-space vertical>
+        <n-checkbox
+          class="text-3xl"
+          v-for="(definition, i) in definitions"
+          :key="i"
+          :value="definition.definition"
+        >
+          <span
+            v-html="'[' + definition.pronunciation + '] '
+              + definition.definition"
+          />
+        </n-checkbox>
+      </n-space>
+    </n-checkbox-group>
+  </div>
 </template>
 
 <script lang="ts" setup>

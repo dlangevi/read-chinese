@@ -214,7 +214,7 @@ const updateChineseDefinition = (newDefinitions, updateStep = false) => {
 const updateImages = (newImages, updateStep = false) => {
   if (newImages) {
     // TODO support multiple
-    card.value.fields.imageUrls = newImages.map((image) => image.thumbnailUrl);
+    card.value.fields.imageUrls = newImages.map((image) => image);
     if (updateStep) {
       nextStep();
     }

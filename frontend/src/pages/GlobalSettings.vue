@@ -10,9 +10,8 @@
         {{section}}
       </div>
       <div
-        class="col-span-3 grid gap-4 grid-cols-3 justify-start">
+        class="col-span-3 grid gap-6 grid-cols-3 grid-flow-row justify-start">
         <component
-          class="h-12"
           v-for="content in contents"
           :key="content"
           :is="content.type"

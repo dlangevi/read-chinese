@@ -143,6 +143,11 @@ export async function generateUserSettings() :Promise<UserSettingsType> {
 
   ]);
   const Dictionaries = await loadSettings([
+    (async () => ({
+      name: 'Dictionaries',
+      label: 'Dictionaries',
+      type: DictionariesList,
+    } as UserSetting))(),
     checkBox(
       'ShowDefinitions',
       'Show Definitions',
@@ -171,12 +176,6 @@ export async function generateUserSettings() :Promise<UserSettingsType> {
       + ' included in generated sentences',
     ),
   ]);
-
-  Dictionaries.Dictionaries = {
-    name: 'Dictionaries',
-    label: 'Dictionaries',
-    type: DictionariesList,
-  };
 
   const BookLibrary = await loadSettings([
     checkBox(
