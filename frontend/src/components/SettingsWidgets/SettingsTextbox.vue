@@ -30,7 +30,7 @@
   </n-space>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 // TODO have some kind of hover popup with more info
 import { ref } from 'vue';
 import {
@@ -38,7 +38,7 @@ import {
 } from 'naive-ui';
 import { InformationCircle } from '@vicons/ionicons5';
 
-const type = ref('password');
+const type = ref<'password' | 'text'>('password');
 const readonly = ref(true);
 const props = defineProps({
   setting: {
@@ -50,7 +50,7 @@ const props = defineProps({
 const initialValue = await props.setting.read();
 const currentValue = ref(initialValue);
 
-function updateValue(newValue) {
+function updateValue(newValue: string) {
   currentValue.value = newValue;
 }
 function startEdit() {

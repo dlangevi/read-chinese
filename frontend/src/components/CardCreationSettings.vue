@@ -25,7 +25,7 @@
       <n-grid :y-gap="8" :cols="2">
         <n-gi
           v-for="content in UserSettings.CardCreation"
-          :key="content"
+          :key="content.name"
         >
           <settings-checkbox :setting="content" />
         </n-gi>
@@ -35,7 +35,7 @@
   </n-modal>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref } from 'vue';
 import {
   NIcon, NButton, NModal, NGrid, NGi,

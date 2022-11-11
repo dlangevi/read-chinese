@@ -18,7 +18,6 @@ module.exports = {
     node: true,
   },
 
-
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
@@ -35,7 +34,6 @@ module.exports = {
       ignoreRegExpLiterals: true,
       ignoreUrls: true,
     }],
-    // 'arrow-body-style': ['error', 'always'],
     'linebreak-style': 'off',
     'import/prefer-default-export': 'off',
     // TODO turn these back on once I actually want to release this to people
@@ -87,4 +85,3 @@ module.exports = {
     parser: '@typescript-eslint/parser',
   },
 };
-

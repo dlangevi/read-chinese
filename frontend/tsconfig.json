@@ -27,6 +27,7 @@
     "src/**/*.vue",
     "vite.config.ts",
     "windi.config.js",
+    ".eslintrc.js",
     "lint-staged.config.js",
     "env.d.ts"
   ],

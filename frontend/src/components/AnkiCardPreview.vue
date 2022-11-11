@@ -52,7 +52,7 @@
   </n-card>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { NCard, NButton } from 'naive-ui';
 import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
 import { getUserSettings } from '@/lib/userSettings';

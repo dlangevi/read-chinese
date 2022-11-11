@@ -33,7 +33,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import {
   watch, onBeforeMount, ref,
 } from 'vue';
@@ -46,8 +46,8 @@ import { GetSentencesForWord } from '@wailsjs/backend/Generator';
 const UserSettings = getUserSettings();
 
 const emit = defineEmits(['updateSentence']);
-const sentences = ref([]);
-const allSentences = ref([]);
+const sentences = ref<string[]>([]);
+const allSentences = ref<string[]>([]);
 const sentence = ref(null);
 const loaded = ref(false);
 
@@ -58,16 +58,10 @@ watch(sentence, async () => {
   emit('updateSentence', sentence.value, autoAdvance);
 });
 
-const props = defineProps({
-  word: {
-    type: String,
-    required: true,
-  },
-  preferBook: {
-    type: String,
-    default: undefined,
-  },
-});
+const props = defineProps<{
+  word: string
+  preferBook?: number
+}>();
 
 const singleBook = !!props.preferBook;
 onBeforeMount(async () => {

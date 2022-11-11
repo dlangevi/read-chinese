@@ -18,7 +18,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 // TODO have some kind of hover popup with more info
 import {
   NCheckbox, NTooltip, NIcon,
@@ -36,7 +36,7 @@ const props = defineProps({
 
 const isChecked = await props.setting.read();
 
-function submitChange(checked) {
+function submitChange(checked: boolean) {
   props.setting.write(checked);
   emit('update', checked);
 }
