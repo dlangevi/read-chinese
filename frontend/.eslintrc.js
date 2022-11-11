@@ -19,8 +19,7 @@ module.exports = {
   },
 
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'no-console': 'off',
     semi: ['error', 'always'],
     'comma-dangle': ['error', 'always-multiline'],
     'space-before-function-paren': ['error', {
@@ -28,23 +27,10 @@ module.exports = {
       named: 'never',
       asyncArrow: 'always',
     }],
-    'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars':
       ['error', { argsIgnorePattern: '_', vars: 'local' }],
     'no-param-reassign': 'off',
     'no-await-in-loop': 'off',
-    'import/extensions': [
-      'error',
-      'never',
-      {
-        ignorePackages: true,
-        pattern: {
-          json: 'always',
-          js: 'never',
-          ts: 'never',
-        },
-      },
-    ],
     // TODO get this to work
     'import/no-unresolved': 'off',
     '@typescript-eslint/no-use-before-define': ['error', {
@@ -56,22 +42,9 @@ module.exports = {
       ignoreUrls: true,
     }],
     'linebreak-style': 'off',
-    // 'import/prefer-default-export': 'off',
     // TODO turn these back on once I actually want to release this to people
     'vuejs-accessibility/click-events-have-key-events': 'off',
   },
-
-  overrides: [
-    {
-      files: [
-        '**/__tests__/*.{j,t}s?(x)',
-        '**/tests/unit/**/*.spec.{j,t}s?(x)',
-      ],
-      env: {
-        jest: true,
-      },
-    },
-  ],
 
   extends: [
     'eslint:recommended',
