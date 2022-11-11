@@ -80,7 +80,7 @@ import {
   NStatistic, NTable,
 } from 'naive-ui';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
-import type { Book } from '@/lib/types';
+import type { backend } from '@wailsjs/models';
 
 import {
   TopUnknownWords,
@@ -97,7 +97,7 @@ const props = defineProps({
 
 provide('preferBook', props.bookId);
 
-const book:Book = await GetBook(props.bookId);
+const book:backend.Book = await GetBook(props.bookId);
 console.log(book);
 const words = await LearningTargetBook(book.bookId);
 const { stats } = book;

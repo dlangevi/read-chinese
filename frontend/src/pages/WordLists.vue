@@ -33,14 +33,14 @@
 import { NButton, NSpace, NCascader } from 'naive-ui';
 import type { CascaderOption } from 'naive-ui';
 import { ref, onBeforeMount } from 'vue';
-import type {
-  HskLevel, HskVersion,
-} from '@/lib/types';
 import { backend } from '@wailsjs/models';
 import { LearningTarget } from '@wailsjs/backend/BookLibrary';
 import { GetUnknownHskWords } from '@wailsjs/backend/KnownWords';
 import { ImportAnkiKeywords } from '@wailsjs/backend/AnkiInterface';
 import UnknownWords from '../components/UnknownWords.vue';
+
+type HskVersion = '2.0' | '3.0';
+type HskLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 interface HskCascaderOption extends CascaderOption {
   level: HskLevel,

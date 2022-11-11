@@ -27,14 +27,14 @@ import {
   NSpace, NCheckboxGroup, NCheckbox,
 } from 'naive-ui';
 import { getUserSettings } from '@/lib/userSettings';
-import type { DictionaryType, DictionaryEntry } from '@/lib/types';
+import type { backend } from '@wailsjs/models';
 
 import { GetDefinitionsForWord } from '@wailsjs/backend/Dictionaries';
 
 const UserSettings = getUserSettings();
 
 const emit = defineEmits(['updateDefinition']);
-const definitions = ref<DictionaryEntry[]>([]);
+const definitions = ref<backend.DictionaryEntry[]>([]);
 const definition = ref<string[]>([]);
 
 watch(definition, async () => {
@@ -52,7 +52,7 @@ watch(definition, async () => {
 
 const props = defineProps<{
   word: string
-  type: DictionaryType
+  type: string
 }>();
 
 onBeforeMount(async () => {

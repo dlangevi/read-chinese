@@ -18,10 +18,6 @@ type Fields struct {
 	ImageUrls   []string `json:"imageUrls"`
 }
 
-const (
-	ankiConnectUrl = "http://localhost:8765"
-)
-
 type AnkiInterface struct {
 	anki *ankiconnect.Client
 }

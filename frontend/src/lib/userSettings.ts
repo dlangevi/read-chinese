@@ -1,4 +1,5 @@
 import { inject } from 'vue';
+import type { InjectionKey } from 'vue';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
 import SettingsTextbox
@@ -15,7 +16,22 @@ import {
   GetUserSettingInt,
   SetUserSettingInt,
 } from '@wailsjs/backend/UserSettings';
-import { UserSettingsKey, UserSetting, UserSettingsType } from './types';
+
+type UserSetting = {
+  name:string;
+  label:string;
+  tooltip?:string;
+  type:any
+  read?: any;
+  write?:any;
+};
+
+type UserSettingsType = {
+  [section:string]: {
+    [label:string]: UserSetting;
+  }
+};
+export const UserSettingsKey = Symbol('u') as InjectionKey<UserSettingsType>;
 
 async function settingsObject(
   name:string,

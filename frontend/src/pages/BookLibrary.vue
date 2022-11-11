@@ -27,7 +27,7 @@ import BookCard from '@/components/BookCard.vue';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
 import { getUserSettings } from '@/lib/userSettings';
-import type { Book } from '@/lib/types';
+import { backend } from '@wailsjs/models';
 import { GetBooks } from '@wailsjs/backend/BookLibrary';
 import { ImportCalibreBooks } from '@wailsjs/backend/Calibre';
 
@@ -43,11 +43,11 @@ const onlyFavorites = ref(UserSettings.BookLibrary.OnlyFavorites.read());
 function updateFilter() {
   onlyFavorites.value = UserSettings.BookLibrary.OnlyFavorites.read();
 }
-const books: Ref<Book[]> = ref([]);
+const books: Ref<backend.Book[]> = ref([]);
 
 const favoriteFilter = computed(
   () => books.value
-    .filter((book:Book) => {
+    .filter((book:backend.Book) => {
       if (!onlyFavorites.value) return true;
       return book.favorite;
     }).sort((bookA, bookB) => {

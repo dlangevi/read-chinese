@@ -59,7 +59,6 @@ import {
   NModal, NButton, NList, NListItem, NInput, NSelect,
 } from 'naive-ui';
 import { onBeforeMount, ref } from 'vue';
-import type { DictionaryInfo, DictionaryType } from '@/lib/types';
 
 import {
   GetDictionaryInfo,
@@ -69,6 +68,9 @@ import {
 } from '@wailsjs/backend/Dictionaries';
 
 import { FilePicker } from '@wailsjs/main/App';
+
+// TODO see if the go type system can represent these
+export type DictionaryType = 'english' | 'chinese';
 
 const addDictModal = ref(false);
 
@@ -114,7 +116,18 @@ function submit() {
   );
 }
 
-const dicts = ref<{ [name:string]: DictionaryInfo }>({});
+// TODO backend does not export these types
+// even though IMO it should
+type DictionaryInfo = {
+  name: string,
+  path: string,
+  type: string,
+};
+type DictionaryInfoMap = {
+  [name:string] : DictionaryInfo
+};
+
+const dicts = ref<DictionaryInfoMap>({});
 onBeforeMount(async () => {
   dicts.value = await GetDictionaryInfo();
 });

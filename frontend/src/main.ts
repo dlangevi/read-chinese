@@ -1,9 +1,7 @@
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import { createPinia } from 'pinia';
-import { generateUserSettings } from '@/lib/userSettings';
-import { UserSettingsKey } from '@/lib/types';
-//
+import { generateUserSettings, UserSettingsKey } from '@/lib/userSettings';
 import GlobalSettings from '@/pages/GlobalSettings.vue';
 import BookLibrary from '@/pages/BookLibrary.vue';
 import AboutPage from '@/pages/AboutPage.vue';
