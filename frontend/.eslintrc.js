@@ -26,6 +26,20 @@ module.exports = {
       ['error', { argsIgnorePattern: '_', vars: 'local' }],
     'no-param-reassign': 'off',
     'no-await-in-loop': 'off',
+    'import/extensions': [
+      'error',
+      'never',
+      {
+        ignorePackages: true,
+        pattern: {
+          json: 'always',
+          js:'never',
+          ts: 'never',
+        },
+      },
+    ],
+    // TODO get this to work
+    'import/no-unresolved': 'off',
     '@typescript-eslint/no-use-before-define': ['error', {
       functions: false,
     }],
@@ -35,6 +49,7 @@ module.exports = {
       ignoreUrls: true,
     }],
     'linebreak-style': 'off',
+    // 'import/prefer-default-export': 'off',
     // TODO turn these back on once I actually want to release this to people
     'vuejs-accessibility/click-events-have-key-events': 'off',
   },
@@ -54,6 +69,9 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'plugin:vue/vue3-essential',
+    'plugin:import/errors',
+    'plugin:import/warnings',
+    'plugin:import/typescript',
     '@vue/eslint-config-typescript',
   ],
   parserOptions: {
