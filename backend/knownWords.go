@@ -14,13 +14,17 @@ type KnownWords struct {
 	// For now just map word to interval
 	words      map[string]int
 	characters map[rune]bool
+	frequency  map[string]int
 }
 
 func NewKnownWords() *KnownWords {
-	known = &KnownWords{}
-	known.words = map[string]int{}
-	known.characters = map[rune]bool{}
+	known = &KnownWords{
+		words:      map[string]int{},
+		characters: map[rune]bool{},
+		frequency:  map[string]int{},
+	}
 	known.syncWords()
+	known.syncFrequency()
 	return known
 }
 
@@ -43,6 +47,25 @@ func (known *KnownWords) syncWords() {
 			known.characters[char] = true
 
 		}
+	}
+}
+
+func (known *KnownWords) syncFrequency() {
+	type WordRow struct {
+		Word  string
+		Count int
+	}
+	words := []WordRow{}
+	err := Conn.Select(&words, `
+    SELECT word, sum(count) as count
+    FROM frequency
+    GROUP BY word
+  `)
+	if err != nil {
+		log.Fatal("Failed to load frequency", err)
+	}
+	for _, word := range words {
+		known.frequency[word.Word] = word.Count
 	}
 }
 
@@ -162,11 +185,12 @@ func (known *KnownWords) GetUnknownHskWords(version string, level int) ([]Unknow
 	for _, word := range words {
 		trimmed := strings.TrimSpace(word)
 		trimmed = strings.Trim(trimmed, "\uFEFF")
-		log.Println(trimmed, len(trimmed), word, len(word))
-
 		if !known.isKnown(trimmed) && len(trimmed) > 0 {
+			// Its fine if occurance is just 0
+			occurance, _ := known.frequency[trimmed]
 			rows = append(rows, UnknownWordEntry{
-				Word: trimmed,
+				Word:      trimmed,
+				Occurance: occurance,
 			})
 		}
 	}
