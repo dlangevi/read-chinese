@@ -55,7 +55,7 @@ func (a *AnkiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 	pictures := []ankiconnect.Picture{}
 
 	addAudio := func(field string, dest string) error {
-		audio64, err := Synthesize(field)
+		audio64, err := runtime.TextToSpeech.Synthesize(field)
 		if err != nil {
 			return err
 		}

@@ -59,15 +59,31 @@ func (known *KnownWords) GetWordStats() WordStats {
 }
 
 // TODO have the updated_at automatically update
-func (known *KnownWords) AddWord(word string, age int) {
-	known.words[word] = age
-	Conn.MustExec(`
-  INSERT OR IGNORE INTO words (word, interval) VALUES ($1, $2);
+func (known *KnownWords) AddWord(word string, age int) error {
+	tx, err := Conn.Beginx()
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec(`
+  INSERT OR IGNORE INTO words (word, interval) 
+  VALUES ($1, $2)`, word, age)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	_, err = tx.Exec(`
   UPDATE words 
   SET interval=$2, 
       updated_at = CURRENT_TIMESTAMP 
   WHERE word="$1"
   `, word, age)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	known.words[word] = age
+	tx.Commit()
+	return nil
 }
 
 type WordEntry struct {

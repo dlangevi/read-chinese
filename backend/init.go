@@ -11,6 +11,7 @@ type Backend struct {
 	KnownWords     *KnownWords
 	UserSettings   *UserSettings
 	ImageClient    *ImageClient
+	TextToSpeech   *TextToSpeech
 	Dictionaries   *Dictionaries
 	Segmentation   *Segmentation
 	Generator      *Generator
@@ -50,7 +51,8 @@ func StartBackend(ctx *context.Context) *Backend {
 		BookLibrary:    &BookLibrary{},
 		KnownWords:     NewKnownWords(),
 		UserSettings:   userSettings,
-		ImageClient:    &ImageClient{},
+		TextToSpeech:   NewTextToSpeach(),
+		ImageClient:    NewImageClient(),
 		Dictionaries:   d,
 		Segmentation:   s,
 		Generator:      &Generator{},
