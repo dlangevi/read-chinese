@@ -1,78 +1,64 @@
 export namespace backend {
-
-  export class BookStats {
+	
+	export class BookStats {
 	    probablyKnownWords: number;
-
 	    knownCharacters: number;
-
 	    totalCharacters: number;
-
 	    totalWords: number;
-
 	    totalKnownWords: number;
-
 	    targets: number[];
-
 	    targetOccurances: number[];
-
 	    needToKnow: number[];
-
+	
 	    static createFrom(source: any = {}) {
 	        return new BookStats(source);
 	    }
-
+	
 	    constructor(source: any = {}) {
-	        if (typeof source === 'string') source = JSON.parse(source);
-	        this.probablyKnownWords = source.probablyKnownWords;
-	        this.knownCharacters = source.knownCharacters;
-	        this.totalCharacters = source.totalCharacters;
-	        this.totalWords = source.totalWords;
-	        this.totalKnownWords = source.totalKnownWords;
-	        this.targets = source.targets;
-	        this.targetOccurances = source.targetOccurances;
-	        this.needToKnow = source.needToKnow;
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.probablyKnownWords = source["probablyKnownWords"];
+	        this.knownCharacters = source["knownCharacters"];
+	        this.totalCharacters = source["totalCharacters"];
+	        this.totalWords = source["totalWords"];
+	        this.totalKnownWords = source["totalKnownWords"];
+	        this.targets = source["targets"];
+	        this.targetOccurances = source["targetOccurances"];
+	        this.needToKnow = source["needToKnow"];
 	    }
-  }
-  export class Book {
+	}
+	export class Book {
 	    author: string;
-
 	    title: string;
-
 	    cover: string;
-
 	    filepath: string;
-
 	    bookId: number;
-
 	    favorite: boolean;
-
 	    hasRead: boolean;
-
 	    stats: BookStats;
-
+	
 	    static createFrom(source: any = {}) {
 	        return new Book(source);
 	    }
-
+	
 	    constructor(source: any = {}) {
-	        if (typeof source === 'string') source = JSON.parse(source);
-	        this.author = source.author;
-	        this.title = source.title;
-	        this.cover = source.cover;
-	        this.filepath = source.filepath;
-	        this.bookId = source.bookId;
-	        this.favorite = source.favorite;
-	        this.hasRead = source.hasRead;
-	        this.stats = this.convertValues(source.stats, BookStats);
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.author = source["author"];
+	        this.title = source["title"];
+	        this.cover = source["cover"];
+	        this.filepath = source["filepath"];
+	        this.bookId = source["bookId"];
+	        this.favorite = source["favorite"];
+	        this.hasRead = source["hasRead"];
+	        this.stats = this.convertValues(source["stats"], BookStats);
 	    }
-
-    convertValues(a: any, classs: any, asMap: boolean = false): any {
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
 		    if (!a) {
 		        return a;
 		    }
 		    if (a.slice) {
-		        return (a as any[]).map((elem) => this.convertValues(elem, classs));
-		    } if (typeof a === 'object') {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
 		        if (asMap) {
 		            for (const key of Object.keys(a)) {
 		                a[key] = new classs(a[key]);
@@ -82,100 +68,92 @@ export namespace backend {
 		        return new classs(a);
 		    }
 		    return a;
-    }
-  }
-
-  export class DictionaryEntry {
+		}
+	}
+	
+	export class DictionaryEntry {
 	    definition: string;
-
 	    pronunciation: string;
-
+	
 	    static createFrom(source: any = {}) {
 	        return new DictionaryEntry(source);
 	    }
-
+	
 	    constructor(source: any = {}) {
-	        if (typeof source === 'string') source = JSON.parse(source);
-	        this.definition = source.definition;
-	        this.pronunciation = source.pronunciation;
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.definition = source["definition"];
+	        this.pronunciation = source["pronunciation"];
 	    }
-  }
-  export class Fields {
+	}
+	export class Fields {
 	    word: string;
-
 	    sentence: string;
-
 	    englishDefn: string;
-
 	    chineseDefn: string;
-
 	    pinyin: string;
-
 	    imageUrls: string[];
-
+	
 	    static createFrom(source: any = {}) {
 	        return new Fields(source);
 	    }
-
+	
 	    constructor(source: any = {}) {
-	        if (typeof source === 'string') source = JSON.parse(source);
-	        this.word = source.word;
-	        this.sentence = source.sentence;
-	        this.englishDefn = source.englishDefn;
-	        this.chineseDefn = source.chineseDefn;
-	        this.pinyin = source.pinyin;
-	        this.imageUrls = source.imageUrls;
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.word = source["word"];
+	        this.sentence = source["sentence"];
+	        this.englishDefn = source["englishDefn"];
+	        this.chineseDefn = source["chineseDefn"];
+	        this.pinyin = source["pinyin"];
+	        this.imageUrls = source["imageUrls"];
 	    }
-  }
-  export class FlaggedCard {
+	}
+	export class FlaggedCard {
 	    word: string;
-
 	    sentence: string;
-
+	
 	    static createFrom(source: any = {}) {
 	        return new FlaggedCard(source);
 	    }
-
+	
 	    constructor(source: any = {}) {
-	        if (typeof source === 'string') source = JSON.parse(source);
-	        this.word = source.word;
-	        this.sentence = source.sentence;
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.word = source["word"];
+	        this.sentence = source["sentence"];
 	    }
-  }
-  export class ImageInfo {
+	}
+	export class ImageInfo {
 	    thumbnailUrl: string;
-
+	
 	    static createFrom(source: any = {}) {
 	        return new ImageInfo(source);
 	    }
-
+	
 	    constructor(source: any = {}) {
-	        if (typeof source === 'string') source = JSON.parse(source);
-	        this.thumbnailUrl = source.thumbnailUrl;
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.thumbnailUrl = source["thumbnailUrl"];
 	    }
-  }
-  export class RawAnkiNote {
+	}
+	export class RawAnkiNote {
 	    noteId: number;
-
 	    fields: Fields;
-
+	
 	    static createFrom(source: any = {}) {
 	        return new RawAnkiNote(source);
 	    }
-
+	
 	    constructor(source: any = {}) {
-	        if (typeof source === 'string') source = JSON.parse(source);
-	        this.noteId = source.noteId;
-	        this.fields = this.convertValues(source.fields, Fields);
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.noteId = source["noteId"];
+	        this.fields = this.convertValues(source["fields"], Fields);
 	    }
-
-    convertValues(a: any, classs: any, asMap: boolean = false): any {
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
 		    if (!a) {
 		        return a;
 		    }
 		    if (a.slice) {
-		        return (a as any[]).map((elem) => this.convertValues(elem, classs));
-		    } if (typeof a === 'object') {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
 		        if (asMap) {
 		            for (const key of Object.keys(a)) {
 		                a[key] = new classs(a[key]);
@@ -185,59 +163,55 @@ export namespace backend {
 		        return new classs(a);
 		    }
 		    return a;
-    }
-  }
-  export class UnknownWordEntry {
+		}
+	}
+	export class UnknownWordEntry {
 	    word: string;
-
 	    occurance?: number;
-
 	    definition?: string;
-
 	    pinyin?: string;
-
+	
 	    static createFrom(source: any = {}) {
 	        return new UnknownWordEntry(source);
 	    }
-
+	
 	    constructor(source: any = {}) {
-	        if (typeof source === 'string') source = JSON.parse(source);
-	        this.word = source.word;
-	        this.occurance = source.occurance;
-	        this.definition = source.definition;
-	        this.pinyin = source.pinyin;
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.word = source["word"];
+	        this.occurance = source["occurance"];
+	        this.definition = source["definition"];
+	        this.pinyin = source["pinyin"];
 	    }
-  }
-
-  export class WordOccuranceRow {
+	}
+	
+	export class WordOccuranceRow {
 	    word: string;
-
 	    occurance: number;
-
+	
 	    static createFrom(source: any = {}) {
 	        return new WordOccuranceRow(source);
 	    }
-
+	
 	    constructor(source: any = {}) {
-	        if (typeof source === 'string') source = JSON.parse(source);
-	        this.word = source.word;
-	        this.occurance = source.occurance;
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.word = source["word"];
+	        this.occurance = source["occurance"];
 	    }
-  }
-  export class WordStats {
+	}
+	export class WordStats {
 	    words: number;
-
 	    characters: number;
-
+	
 	    static createFrom(source: any = {}) {
 	        return new WordStats(source);
 	    }
-
+	
 	    constructor(source: any = {}) {
-	        if (typeof source === 'string') source = JSON.parse(source);
-	        this.words = source.words;
-	        this.characters = source.characters;
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.words = source["words"];
+	        this.characters = source["characters"];
 	    }
-  }
+	}
 
 }
+

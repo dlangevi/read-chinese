@@ -38,7 +38,6 @@ module.exports = {
     'import/prefer-default-export': 'off',
     // TODO turn these back on once I actually want to release this to people
     'vuejs-accessibility/click-events-have-key-events': 'off',
-    'vue/block-lang': 'off',
     'import/extensions': [
       'error',
       'never',

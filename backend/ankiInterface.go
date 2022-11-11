@@ -177,7 +177,7 @@ func (a *AnkiInterface) UpdateNoteFields(noteID int64, fields Fields) string {
 	if fields.Pinyin != "" {
 		ankiFields["Pinyin"] = fields.Pinyin
 	}
-	// TODO include new audio
+	// TODO include new audio and images
 	update := ankiconnect.UpdateNote{
 		Id:     noteID,
 		Fields: ankiFields,

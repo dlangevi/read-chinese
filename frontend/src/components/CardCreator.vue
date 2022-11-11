@@ -89,7 +89,7 @@
   </n-modal>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import {
   toRaw, ref, reactive,
 } from 'vue';
@@ -120,23 +120,25 @@ import {
 import {
   GetBook,
 } from '@wailsjs/backend/BookLibrary';
+import {
+  backend,
+} from '@wailsjs/models';
 
 const UserSettings = getUserSettings();
 
 const store = useCardQueue();
 const showModal = ref(false);
-const card = ref(undefined);
-let originalValues;
-const step = ref(undefined);
-const steps = ref([]);
+const card = ref<backend.RawAnkiNote>(new backend.RawAnkiNote());
+const step = ref<StepsEnum>(StepsEnum.SENTENCE);
+const steps = ref<StepsEnum[]>([]);
 let word;
-let action;
-let callback;
-const preferBookRef = ref(undefined);
+let action: ActionsEnum;
+let callback: (() => void) | undefined;
+const preferBookRef = ref<number | undefined>(undefined);
 let preferBook;
 
 // Manually change the step from an edit button.
-const changeStep = (estep) => {
+const changeStep = (estep: StepsEnum) => {
   step.value = estep;
   // Remove any set steps progression since the user has taken control
   steps.value = [];
@@ -165,7 +167,7 @@ const nextStep = async () => {
   }
 };
 
-const updateSentence = (newSentence, updateStep = false) => {
+const updateSentence = (newSentence: string, updateStep = false) => {
   if (newSentence.length > 0) {
     card.value.fields.sentence = newSentence;
     if (updateStep) {
@@ -174,7 +176,10 @@ const updateSentence = (newSentence, updateStep = false) => {
   }
 };
 
-const updateEnglishDefinition = (newDefinitions, updateStep = false) => {
+const updateEnglishDefinition = (
+  newDefinitions: backend.DictionaryEntry[],
+  updateStep = false,
+) => {
   if (newDefinitions.length > 0) {
     card.value.fields.englishDefn = newDefinitions.map(
       (def) => `[${def.pronunciation}] ${def.definition}`,
@@ -192,7 +197,10 @@ const updateEnglishDefinition = (newDefinitions, updateStep = false) => {
   }
 };
 
-const updateChineseDefinition = (newDefinitions, updateStep = false) => {
+const updateChineseDefinition = (
+  newDefinitions: backend.DictionaryEntry[],
+  updateStep = false,
+) => {
   if (newDefinitions.length > 0) {
     card.value.fields.chineseDefn = newDefinitions.map(
       (def) => `[${def.pronunciation}] ${def.definition}`,
@@ -211,10 +219,10 @@ const updateChineseDefinition = (newDefinitions, updateStep = false) => {
   }
 };
 
-const updateImages = (newImages, updateStep = false) => {
+const updateImages = (newImages: backend.ImageInfo[], updateStep = false) => {
   if (newImages) {
     // TODO support multiple
-    card.value.fields.imageUrls = newImages.map((image) => image);
+    card.value.fields.imageUrls = newImages.map((image) => image.thumbnailUrl);
     if (updateStep) {
       nextStep();
     }
@@ -222,10 +230,9 @@ const updateImages = (newImages, updateStep = false) => {
 };
 
 const message = useMessage();
-store.$subscribe(async (mutation, state) => {
+store.$subscribe(async (_, state) => {
   // Later we can prefetch new words sentences possibly
   // if (mutation.events.type === 'add' && mutation.events.key === '0') {
-  step.value = undefined;
   // TODO this is a complete mess and needs to be refined if we are going to
   // start doing anything more complicated
   if (state.wordList.length > 0) {
@@ -264,9 +271,6 @@ store.$subscribe(async (mutation, state) => {
       ];
     }
     card.value = reactive(ankiCard);
-    originalValues = {
-      ...ankiCard.fields,
-    };
 
     // TODO this needs to be written in a more modular way
     const englishIdx = steps.value.indexOf(StepsEnum.ENGLISH);
@@ -342,20 +346,8 @@ async function submit() {
         }, 1000);
       });
   } else {
-    const newData = {};
-    const cardValues = toRaw(card.value.fields);
-    Object.entries(cardValues).forEach(([field, value]) => {
-      if (value !== originalValues[field]) {
-        newData[field] = value;
-      }
-    });
-
-    // Clear audio as sentence has changed
-    if (newData.ExampleSentence) {
-      newData.SentenceAudio = '';
-    }
-    console.log(toRaw(newData));
-    const res = await UpdateNoteFields(card.value.noteId, newData);
+    const cardValues: backend.Fields = toRaw(card.value.fields);
+    const res = await UpdateNoteFields(card.value.noteId, cardValues);
     messageReactive.content = JSON.stringify(res);
     messageReactive.type = 'success';
     setTimeout(() => {

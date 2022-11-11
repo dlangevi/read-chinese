@@ -7,8 +7,8 @@ export function GetUserSettingBool(arg1:string):Promise<boolean>;
 
 export function GetUserSettingInt(arg1:string):Promise<number>;
 
-export function SetUserSetting(arg1:string, arg2:string):Promise<void>;
+export function SetUserSetting(arg1:string,arg2:string):Promise<void>;
 
-export function SetUserSettingBool(arg1:string, arg2:boolean):Promise<void>;
+export function SetUserSettingBool(arg1:string,arg2:boolean):Promise<void>;
 
-export function SetUserSettingInt(arg1:string, arg2:number):Promise<void>;
+export function SetUserSettingInt(arg1:string,arg2:number):Promise<void>;
