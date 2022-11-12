@@ -43,7 +43,7 @@ const props = defineProps<{
 const store = useCardQueue();
 async function addToQueue() {
   const rowData = props.params.data;
-  let action = ActionsEnum.MODIFY;
+  let action: ActionsEnum = ActionsEnum.MODIFY;
   if (props.params.create) {
     action = ActionsEnum.CREATE;
   }

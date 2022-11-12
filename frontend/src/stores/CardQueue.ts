@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia';
 
-export enum ActionsEnum {
-  CREATE = 'create',
-  MODIFY = 'modify',
-}
+export const ActionsEnum = {
+  CREATE: 'create',
+  MODIFY: 'modify',
+} as const;
+
+export type ActionsEnum = typeof ActionsEnum[keyof typeof ActionsEnum]
 
 export type WordOptions = {
   preferBook?:number

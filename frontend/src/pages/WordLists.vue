@@ -14,6 +14,9 @@
           @update:value="loadHsk"
         />
         <n-button @click="makeCards">Make Cards</n-button>
+        <div class="border-2 p-2 text-center">
+          {{words.length}} remaining words
+        </div>
       </n-space>
     </div>
     <div class="flex flex-col w-full h-full">
