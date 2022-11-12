@@ -13,6 +13,7 @@
           check-strategy="child"
           @update:value="loadHsk"
         />
+        <n-button @click="makeCards">Make Cards</n-button>
       </n-space>
     </div>
     <div class="flex flex-col w-full h-full">
@@ -38,6 +39,8 @@ import { LearningTarget } from '@wailsjs/backend/BookLibrary';
 import { GetUnknownHskWords } from '@wailsjs/backend/KnownWords';
 import { ImportAnkiKeywords } from '@wailsjs/backend/AnkiInterface';
 import UnknownWords from '../components/UnknownWords.vue';
+
+import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 
 type HskVersion = '2.0' | '3.0';
 type HskLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -68,6 +71,24 @@ function importAnki() {
 
 async function loadHsk(_: string, option: HskCascaderOption) {
   words.value = await GetUnknownHskWords(option.version, option.level);
+}
+
+const store = useCardQueue();
+async function makeCards() {
+  const sorted = words.value.slice();
+  sorted.sort((a, b) => {
+    if (a.occurance === undefined || b.occurance === undefined) {
+      return 0;
+    }
+    if (a.occurance > b.occurance) {
+      return -1;
+    }
+    return 1;
+  });
+  const topWords = sorted.slice(0, 50);
+  topWords.forEach((word) => {
+    store.addWord(word.word, ActionsEnum.CREATE);
+  });
 }
 
 </script>

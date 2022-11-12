@@ -231,6 +231,8 @@ const updateImages = (newImages: backend.ImageInfo[], updateStep = false) => {
 
 const message = useMessage();
 store.$subscribe(async (_, state) => {
+  // This is needed to reset the state
+  step.value = StepsEnum.NONE;
   // Later we can prefetch new words sentences possibly
   // if (mutation.events.type === 'add' && mutation.events.key === '0') {
   // TODO this is a complete mess and needs to be refined if we are going to

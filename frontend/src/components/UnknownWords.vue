@@ -6,7 +6,6 @@
     :rowData="rowData"
     :context="gridContext"
     @grid-ready="onGridReady" />
-
 </template>
 
 <script lang="ts" setup>
