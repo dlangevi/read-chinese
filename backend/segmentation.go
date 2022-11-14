@@ -132,34 +132,6 @@ func (s *Segmentation) SegmentFullText(path string) ([]string, FrequencyTable, e
 	}
 
 	return sentences, frequency, nil
-
-}
-
-func pruneDict(d *Dictionaries, jieba *gojieba.Jieba) error {
-	dict, err := os.Open(gojieba.DICT_PATH)
-	if err != nil {
-		return err
-	}
-	defer dict.Close()
-
-	sc := bufio.NewScanner(dict)
-	totalWords := 0
-	validWords := 0
-	for sc.Scan() {
-		line := sc.Text()
-		parts := strings.Split(line, " ")
-		word := parts[0]
-		totalWords += 1
-		if !d.IsInDictionary(word) {
-			jieba.RemoveWord(word)
-		} else {
-			log.Println(word, "is a word")
-			validWords += 1
-		}
-	}
-	log.Println("totalWords", totalWords, "validWords", validWords)
-	return nil
-
 }
 
 func constructDict(d *Dictionaries) error {

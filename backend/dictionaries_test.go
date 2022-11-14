@@ -23,8 +23,18 @@ func TestDictionaryContents(t *testing.T) {
 		t.Errorf("Did not group definitions for 好")
 	}
 
+	你好, ok := dict.Definitions["你好"]
+	if !ok || len(你好) != 1 {
+		t.Errorf("Did not group definitions for 你好")
+	}
+
+	地方, ok := dict.Definitions["地方"]
+	if !ok || len(地方) != 2 {
+		t.Errorf("Did not group definitions for 地方")
+	}
+
 	的, ok := dict.Definitions["的"]
-	if len(的) != 4 {
+	if !ok || len(的) != 4 {
 		t.Errorf("Did not group definitions for 的")
 	}
 }
