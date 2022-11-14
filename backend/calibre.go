@@ -8,10 +8,10 @@ import (
 )
 
 type Calibre struct {
-	bookLibrary *BookLibrary
+	bookLibrary BookLibrary
 }
 
-func NewCalibre(b *BookLibrary) *Calibre {
+func NewCalibre(b BookLibrary) *Calibre {
 	return &Calibre{
 		bookLibrary: b,
 	}

@@ -32,7 +32,7 @@ import { useRouter } from 'vue-router';
 import { NSpace, NCard, NButton } from 'naive-ui';
 import { ref } from 'vue';
 
-import { DeleteBook, SetFavorite, SetRead } from '@wailsjs/backend/BookLibrary';
+import { DeleteBook, SetFavorite, SetRead } from '@wailsjs/backend/bookLibrary';
 
 const router = useRouter();
 const props = defineProps({

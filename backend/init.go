@@ -18,7 +18,7 @@ type Backend struct {
 	ImageClient *ImageClient
 
 	// Libraries required by other Libraries
-	BookLibrary   *BookLibrary
+	BookLibrary   BookLibrary
 	KnownWords    *KnownWords
 	Dictionaries  *Dictionaries
 	AnkiInterface *AnkiInterface

@@ -119,7 +119,7 @@ import {
 
 import {
   GetBook,
-} from '@wailsjs/backend/BookLibrary';
+} from '@wailsjs/backend/bookLibrary';
 import {
   backend,
 } from '@wailsjs/models';

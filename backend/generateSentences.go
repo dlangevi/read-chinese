@@ -8,13 +8,13 @@ import (
 
 type Generator struct {
 	segmentation *Segmentation
-	bookLibrary  *BookLibrary
+	bookLibrary  BookLibrary
 	known        *KnownWords
 }
 
 func NewGenerator(
 	s *Segmentation,
-	b *BookLibrary,
+	b BookLibrary,
 	known *KnownWords,
 ) *Generator {
 	return &Generator{

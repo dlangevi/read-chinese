@@ -28,7 +28,7 @@ import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
 import { getUserSettings } from '@/lib/userSettings';
 import { backend } from '@wailsjs/models';
-import { GetBooks } from '@wailsjs/backend/BookLibrary';
+import { GetBooks } from '@wailsjs/backend/bookLibrary';
 import { ImportCalibreBooks } from '@wailsjs/backend/Calibre';
 
 async function syncCalibre() {

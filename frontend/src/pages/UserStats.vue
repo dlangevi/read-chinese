@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import { NStatistic } from 'naive-ui';
 import { GetWordStats } from '@wailsjs/backend/KnownWords';
-import { TotalRead } from '@wailsjs/backend/BookLibrary';
+import { TotalRead } from '@wailsjs/backend/bookLibrary';
 
 const totalWords = await TotalRead();
 const wordStats = await GetWordStats();

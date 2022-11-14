@@ -38,7 +38,7 @@ import { NButton, NSpace, NCascader } from 'naive-ui';
 import type { CascaderOption } from 'naive-ui';
 import { ref, onBeforeMount } from 'vue';
 import { backend } from '@wailsjs/models';
-import { LearningTarget } from '@wailsjs/backend/BookLibrary';
+import { LearningTarget } from '@wailsjs/backend/bookLibrary';
 import { GetUnknownHskWords } from '@wailsjs/backend/KnownWords';
 import { ImportAnkiKeywords } from '@wailsjs/backend/AnkiInterface';
 import UnknownWords from '../components/UnknownWords.vue';

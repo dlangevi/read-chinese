@@ -86,7 +86,7 @@ import {
   TopUnknownWords,
   LearningTargetBook,
   GetBook,
-} from '@wailsjs/backend/BookLibrary';
+} from '@wailsjs/backend/bookLibrary';
 
 const props = defineProps({
   bookId: {
