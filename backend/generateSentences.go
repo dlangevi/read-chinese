@@ -9,18 +9,24 @@ import (
 type Generator struct {
 	segmentation *Segmentation
 	bookLibrary  *BookLibrary
+	known        *KnownWords
 }
 
-func NewGenerator(s *Segmentation, b *BookLibrary) *Generator {
+func NewGenerator(
+	s *Segmentation,
+	b *BookLibrary,
+	known *KnownWords,
+) *Generator {
 	return &Generator{
 		segmentation: s,
 		bookLibrary:  b,
+		known:        known,
 	}
 }
 
-func isT1Candidate(sentence []Token, word string) bool {
+func (g *Generator) isT1Candidate(sentence []Token, word string) bool {
 	for _, token := range sentence {
-		if token.IsWord && word != token.Data && !known.isWellKnown(token.Data) {
+		if token.IsWord && word != token.Data && !g.known.isWellKnown(token.Data) {
 			return false
 		}
 	}
@@ -47,7 +53,7 @@ func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]string,
 		for _, sentence := range fullSegmented {
 			if strings.Contains(sentence, word) {
 				segmented := g.segmentation.SegmentSentence(sentence)
-				if tokensContains(segmented, word) && isT1Candidate(segmented, word) {
+				if tokensContains(segmented, word) && g.isT1Candidate(segmented, word) {
 					sentences = append(sentences, sentence)
 				}
 			}

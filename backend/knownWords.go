@@ -10,8 +10,6 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-var known *KnownWords
-
 type KnownWords struct {
 	// For now just map word to interval
 	words        map[string]int
@@ -24,7 +22,7 @@ type KnownWords struct {
 func NewKnownWords(db *sqlx.DB,
 	userSettings *UserSettings,
 ) *KnownWords {
-	known = &KnownWords{
+	known := &KnownWords{
 		words:        map[string]int{},
 		characters:   map[rune]bool{},
 		frequency:    map[string]int{},

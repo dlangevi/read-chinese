@@ -55,20 +55,21 @@ func StartBackend(ctx *context.Context,
 		UserSettings:   userSettings,
 		DB:             db,
 
-		Dictionaries:  NewDictionaries(userSettings),
-		KnownWords:    NewKnownWords(db, userSettings),
-		ImageClient:   NewImageClient(userSettings),
-		AnkiInterface: NewAnkiInterface(userSettings),
+		KnownWords:  NewKnownWords(db, userSettings),
+		ImageClient: NewImageClient(userSettings),
 	}
+
+	runtime.Dictionaries = NewDictionaries(userSettings, runtime.KnownWords)
+	runtime.AnkiInterface = NewAnkiInterface(userSettings, runtime.KnownWords)
 
 	s, err := NewSegmentation(runtime.Dictionaries)
 	if err != nil {
 		return nil, err
 	}
 
-	runtime.BookLibrary = NewBookLibrary(db, s)
+	runtime.BookLibrary = NewBookLibrary(db, s, runtime.KnownWords)
 	runtime.Segmentation = s
-	runtime.Generator = NewGenerator(s, runtime.BookLibrary)
+	runtime.Generator = NewGenerator(s, runtime.BookLibrary, runtime.KnownWords)
 	runtime.Calibre = NewCalibre(runtime.BookLibrary)
 
 	return runtime, nil

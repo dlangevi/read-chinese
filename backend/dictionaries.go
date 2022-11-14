@@ -22,6 +22,7 @@ type Dictionaries struct {
 	PrimaryDict     *Dictionary
 	Dictionaries    map[string]*Dictionary
 	userSettings    *UserSettings
+	known           *KnownWords
 }
 
 type RawDictionaryEntry struct {
@@ -34,9 +35,13 @@ type RawDictionary struct {
 	Entries []RawDictionaryEntry
 }
 
-func NewDictionaries(userSettings *UserSettings) *Dictionaries {
+func NewDictionaries(
+	userSettings *UserSettings,
+	known *KnownWords,
+) *Dictionaries {
 	dicts := &Dictionaries{
 		userSettings: userSettings,
+		known:        known,
 	}
 	dicts.loadDictionaries()
 	primaryName := userSettings.PrimaryDict
@@ -193,7 +198,7 @@ func (d *Dictionaries) GetPossibleWords(partial string) []UnknownWordEntry {
 	words := []UnknownWordEntry{}
 
 	for word := range d.PrimaryDict.Definitions {
-		if strings.Contains(word, partial) && !known.isKnown(word) {
+		if strings.Contains(word, partial) && !d.known.isKnown(word) {
 			words = append(words, UnknownWordEntry{
 				Word: word,
 			})

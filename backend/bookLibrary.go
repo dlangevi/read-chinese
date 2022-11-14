@@ -63,12 +63,18 @@ type WordOccuranceRow struct {
 type BookLibrary struct {
 	db           *sqlx.DB
 	segmentation *Segmentation
+	known        *KnownWords
 }
 
-func NewBookLibrary(db *sqlx.DB, s *Segmentation) *BookLibrary {
+func NewBookLibrary(
+	db *sqlx.DB,
+	s *Segmentation,
+	known *KnownWords,
+) *BookLibrary {
 	return &BookLibrary{
 		db:           db,
 		segmentation: s,
+		known:        known,
 	}
 }
 
@@ -210,19 +216,19 @@ func (b *BookLibrary) GetBook(bookId int64) (Book, error) {
 	book.Stats = NewBookStats()
 	book.Stats.TotalKnownWords, _ = getKnownWords(b.db, bookId)
 	book.Stats.TotalWords, _ = getTotalWords(b.db, bookId)
-	_ = computeKnownCharacters(b.db, &book)
+	_ = b.computeKnownCharacters(&book)
 	_ = computeWordTargets(b.db, &book)
 
 	return book, nil
 }
 
-func computeKnownCharacters(db *sqlx.DB, book *Book) error {
+func (b *BookLibrary) computeKnownCharacters(book *Book) error {
 	words := []struct {
 		Word  string
 		Count int
 	}{}
 
-	err := db.Select(&words, `
+	err := b.db.Select(&words, `
     SELECT word, count 
     FROM frequency 
     WHERE book = $1
@@ -238,13 +244,13 @@ func computeKnownCharacters(db *sqlx.DB, book *Book) error {
 		totalCharacters += len([]rune(row.Word)) * row.Count
 		allKnown := true
 		for _, char := range row.Word {
-			if known.isKnownChar(char) {
+			if b.known.isKnownChar(char) {
 				knownCharacters += row.Count
 			} else {
 				allKnown = false
 			}
 		}
-		if known.isKnown(row.Word) || allKnown {
+		if b.known.isKnown(row.Word) || allKnown {
 			probablyKnownWords += row.Count
 		}
 	}

@@ -22,13 +22,15 @@ type AnkiInterface struct {
 	anki         *ankiconnect.Client
 	textToSpeech *TextToSpeech
 	userSettings *UserSettings
+	known        *KnownWords
 }
 
-func NewAnkiInterface(userSettings *UserSettings) *AnkiInterface {
+func NewAnkiInterface(userSettings *UserSettings, known *KnownWords) *AnkiInterface {
 	return &AnkiInterface{
 		anki:         ankiconnect.NewClient(),
 		textToSpeech: NewTextToSpeach(userSettings),
 		userSettings: userSettings,
+		known:        known,
 	}
 }
 
@@ -116,7 +118,7 @@ func (a *AnkiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 		return toError(restErr)
 	}
 
-	known.AddWord(fields.Word, 0)
+	a.known.AddWord(fields.Word, 0)
 
 	return nil
 }
@@ -206,7 +208,7 @@ func (a *AnkiInterface) ImportAnkiKeywords() error {
 			Interval: card.Interval,
 		})
 	}
-	return known.AddWords(words)
+	return a.known.AddWords(words)
 }
 
 type FlaggedCard struct {
