@@ -49,11 +49,16 @@ func main() {
 	log.SetFlags(log.Ltime | log.Lshortfile)
 
 	app := NewApp()
-	backend := backend.StartBackend(&app.ctx)
+	sqlDbPath := backend.ConfigDir("db.sqlite3")
+	metadataPath := backend.ConfigDir("metadata.json")
+	backend, err := backend.StartBackend(&app.ctx, sqlDbPath, metadataPath)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Create application with options
 	// 使用选项创建应用
-	err := wails.Run(&options.App{
+	err = wails.Run(&options.App{
 		Title:             "read-chinese",
 		Width:             900,
 		Height:            600,

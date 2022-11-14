@@ -1,29 +1,8 @@
 package backend
 
 import (
-	"os"
-	"path"
 	"testing"
 )
-
-func TestMain(m *testing.M) {
-
-	tempDb := path.Join(os.TempDir(), "testdb.db")
-	os.Remove(tempDb)
-	err := NewDB(tempDb)
-	if err != nil {
-		os.Exit(1)
-	}
-	err = RunMigrateScripts()
-	if err != nil {
-		os.Exit(1)
-	}
-
-	code := m.Run()
-
-	os.Remove(tempDb)
-	os.Exit(code)
-}
 
 func TestBookExists(t *testing.T) {
 	exists, err := bookExists("foo", "bar")

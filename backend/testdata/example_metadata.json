@@ -1,0 +1,24 @@
+{
+  "Ran": 1491,
+  "Dicts": {
+    "example": {
+      "Path": "./testdata/example_dict.json",
+      "Language": "english"
+    }
+  },
+  "PrimaryDict": "example",
+  "AutoAdvanceSentence": true,
+  "PopulateEnglish": true,
+  "PopulateChinese": true,
+  "AutoAdvanceEnglish": false,
+  "AutoAdvanceImage": false,
+  "GenerateTermAudio": false,
+  "GenerateSentenceAudio": true,
+  "AutoAdvanceCard": true,
+  "ShowDefinitions": true,
+  "EnableChinese": true,
+  "AzureApiKey": "f7c35d3a9d154a47b02df95db3354358",
+  "AzureImageApiKey": "079fca7e31a4480c9cc6bf10e80e2a17",
+  "KnownInterval": 10,
+  "OnlyFavorites": true
+}

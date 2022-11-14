@@ -21,19 +21,21 @@ type Backend struct {
 
 var runtime *Backend
 
-func StartBackend(ctx *context.Context) *Backend {
+func StartBackend(ctx *context.Context,
+	sqlPath string,
+	metadataPath string) (*Backend, error) {
 
-	err := NewDB(ConfigDir("db.sqlite3"))
+	err := NewDB(sqlPath)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	err = RunMigrateScripts()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	userSettings, err = LoadMetadata(ConfigDir("metadata.json"))
+	userSettings, err = LoadMetadata(metadataPath)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	UpdateTimesRan()
@@ -43,7 +45,7 @@ func StartBackend(ctx *context.Context) *Backend {
 	d := NewDictionaries()
 	s, err := NewSegmentation(d)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	runtime = &Backend{
@@ -60,5 +62,5 @@ func StartBackend(ctx *context.Context) *Backend {
 		Calibre:        &Calibre{},
 	}
 
-	return runtime
+	return runtime, nil
 }
