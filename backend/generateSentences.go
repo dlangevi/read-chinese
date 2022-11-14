@@ -8,11 +8,13 @@ import (
 
 type Generator struct {
 	segmentation *Segmentation
+	bookLibrary  *BookLibrary
 }
 
-func NewGenerator(s *Segmentation) *Generator {
+func NewGenerator(s *Segmentation, b *BookLibrary) *Generator {
 	return &Generator{
 		segmentation: s,
+		bookLibrary:  b,
 	}
 }
 
@@ -35,7 +37,7 @@ func tokensContains(sentence []Token, word string) bool {
 }
 
 func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]string, error) {
-	books, _ := getBooks(bookIds...)
+	books, _ := g.bookLibrary.GetSomeBooks(bookIds...)
 	sentences := []string{}
 	for _, book := range books {
 		fullSegmented, err := GetSegmentedText(book)

@@ -57,11 +57,10 @@ func (c *Calibre) ImportCalibreBooks() error {
 	}
 	for _, book := range books {
 		log.Println("Trying", book.Author, book.Title)
-		exists, err := bookExists(book.Author, book.Title)
+		exists, err := c.bookLibrary.BookExists(book.Author, book.Title)
 		if err != nil {
 			log.Println("error ", err)
 			return err
-
 		}
 		if !exists {
 			log.Println("Potential new book", book.Author, book.Title)

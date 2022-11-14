@@ -61,18 +61,20 @@ type WordOccuranceRow struct {
 }
 
 type BookLibrary struct {
+	db           *sqlx.DB
 	segmentation *Segmentation
 }
 
-func NewBookLibrary(s *Segmentation) *BookLibrary {
+func NewBookLibrary(db *sqlx.DB, s *Segmentation) *BookLibrary {
 	return &BookLibrary{
+		db:           db,
 		segmentation: s,
 	}
 }
 
-func (BookLibrary) LearningTarget() []WordOccuranceRow {
+func (b *BookLibrary) LearningTarget() []WordOccuranceRow {
 	words := []WordOccuranceRow{}
-	err := Conn.Select(&words, `
+	err := b.db.Select(&words, `
     SELECT word, sum(count) as occurance FROM frequency 
     WHERE NOT EXISTS (
         SELECT word
@@ -91,9 +93,9 @@ func (BookLibrary) LearningTarget() []WordOccuranceRow {
 	return words
 }
 
-func (BookLibrary) LearningTargetBook(bookId int) []WordOccuranceRow {
+func (b *BookLibrary) LearningTargetBook(bookId int) []WordOccuranceRow {
 	words := []WordOccuranceRow{}
-	err := Conn.Select(&words, `
+	err := b.db.Select(&words, `
     SELECT word, sum(count) as occurance FROM frequency 
     WHERE NOT EXISTS (
         SELECT word
@@ -113,9 +115,9 @@ func (BookLibrary) LearningTargetBook(bookId int) []WordOccuranceRow {
 	return words
 }
 
-func (BookLibrary) TopUnknownWords(bookId int, numWords int) []string {
+func (b *BookLibrary) TopUnknownWords(bookId int, numWords int) []string {
 	words := []string{}
-	err := Conn.Select(&words, `
+	err := b.db.Select(&words, `
     SELECT word
     FROM frequency
     WHERE NOT EXISTS (
@@ -136,10 +138,14 @@ func (BookLibrary) TopUnknownWords(bookId int, numWords int) []string {
 
 }
 
+func (b *BookLibrary) BookExists(author string, title string) (bool, error) {
+	return bookExists(b.db, author, title)
+}
+
 // dbBookExists,
-func bookExists(author string, title string) (bool, error) {
+func bookExists(db *sqlx.DB, author string, title string) (bool, error) {
 	var exists bool
-	err := Conn.QueryRow(`SELECT exists (
+	err := db.QueryRow(`SELECT exists (
     SELECT bookId 
     FROM books 
     WHERE author = $1
@@ -148,23 +154,26 @@ func bookExists(author string, title string) (bool, error) {
 	return exists, err
 }
 
-// Returns summary of all book
-func (BookLibrary) GetBooks() ([]Book, error) {
-	books, _ := getBooks()
+func (b *BookLibrary) GetSomeBooks(bookIds ...int64) ([]Book, error) {
+	books, _ := getBooks(b.db, bookIds...)
 	for index := range books {
 		book := &books[index]
 		book.Stats = NewBookStats()
 		// For now, only these are needed by BookCard
-		book.Stats.TotalKnownWords, _ = getKnownWords(book.BookId)
-		book.Stats.TotalWords, _ = getTotalWords(book.BookId)
+		book.Stats.TotalKnownWords, _ = getKnownWords(b.db, book.BookId)
+		book.Stats.TotalWords, _ = getTotalWords(b.db, book.BookId)
 	}
-
 	return books, nil
 }
 
-func getKnownWords(bookId int64) (int, error) {
+// Returns summary of all books
+func (b *BookLibrary) GetBooks() ([]Book, error) {
+	return b.GetSomeBooks()
+}
+
+func getKnownWords(db *sqlx.DB, bookId int64) (int, error) {
 	var known int
-	err := Conn.QueryRow(`
+	err := db.QueryRow(`
     SELECT SUM(count) as known 
     FROM frequency
     WHERE book = $1
@@ -179,9 +188,9 @@ func getKnownWords(bookId int64) (int, error) {
 	return known, err
 }
 
-func getTotalWords(bookId int64) (int, error) {
+func getTotalWords(db *sqlx.DB, bookId int64) (int, error) {
 	var total int
-	err := Conn.QueryRow(`
+	err := db.QueryRow(`
     SELECT SUM(count) as known 
     FROM frequency
     WHERE book = $1
@@ -193,27 +202,27 @@ func getTotalWords(bookId int64) (int, error) {
 }
 
 // Returns details for single book, with extra stats
-func (BookLibrary) GetBook(bookId int64) (Book, error) {
-	book, err := getBook(bookId)
+func (b *BookLibrary) GetBook(bookId int64) (Book, error) {
+	book, err := getBook(b.db, bookId)
 	if err != nil {
 		return book, err
 	}
 	book.Stats = NewBookStats()
-	book.Stats.TotalKnownWords, _ = getKnownWords(bookId)
-	book.Stats.TotalWords, _ = getTotalWords(bookId)
-	_ = computeKnownCharacters(&book)
-	_ = computeWordTargets(&book)
+	book.Stats.TotalKnownWords, _ = getKnownWords(b.db, bookId)
+	book.Stats.TotalWords, _ = getTotalWords(b.db, bookId)
+	_ = computeKnownCharacters(b.db, &book)
+	_ = computeWordTargets(b.db, &book)
 
 	return book, nil
 }
 
-func computeKnownCharacters(book *Book) error {
+func computeKnownCharacters(db *sqlx.DB, book *Book) error {
 	words := []struct {
 		Word  string
 		Count int
 	}{}
 
-	err := Conn.Select(&words, `
+	err := db.Select(&words, `
     SELECT word, count 
     FROM frequency 
     WHERE book = $1
@@ -245,13 +254,13 @@ func computeKnownCharacters(book *Book) error {
 	return nil
 }
 
-func computeWordTargets(book *Book) error {
+func computeWordTargets(db *sqlx.DB, book *Book) error {
 	words := []struct {
 		Word  string
 		Count int
 	}{}
 
-	err := Conn.Select(&words, `
+	err := db.Select(&words, `
     SELECT word, count 
     FROM frequency 
     WHERE book = $1
@@ -294,8 +303,8 @@ func computeWordTargets(book *Book) error {
 	return nil
 }
 
-func getBook(bookId int64) (Book, error) {
-	books, err := getBooks(bookId)
+func getBook(db *sqlx.DB, bookId int64) (Book, error) {
+	books, err := getBooks(db, bookId)
 	if err != nil {
 		return Book{}, err
 	}
@@ -306,7 +315,7 @@ func getBook(bookId int64) (Book, error) {
 }
 
 // dbGetBooks,
-func getBooks(bookIds ...int64) ([]Book, error) {
+func getBooks(db *sqlx.DB, bookIds ...int64) ([]Book, error) {
 	books := []Book{}
 	var args []interface{}
 	var err error
@@ -328,7 +337,7 @@ func getBooks(bookIds ...int64) ([]Book, error) {
 			return books, err
 		}
 	}
-	err = Conn.Select(&books, query, args...)
+	err = db.Select(&books, query, args...)
 	if err != nil {
 		return books, err
 	}
@@ -336,13 +345,13 @@ func getBooks(bookIds ...int64) ([]Book, error) {
 }
 
 // dbAddBook, have it return the book id
-func addBook(author string, title string, cover string, filepath string) (int64, error) {
+func addBook(db *sqlx.DB, author string, title string, cover string, filepath string) (int64, error) {
 	// TODO might want to prevent duplicates using unique constaint
-	exists, _ := bookExists(author, title)
+	exists, _ := bookExists(db, author, title)
 	if exists {
 		return 0, errors.New("Cannot not add already existing book")
 	}
-	res, err := Conn.Exec(`
+	res, err := db.Exec(`
   INSERT INTO books (author, title, cover, filepath)
   VALUES ($1, $2, $3, $4)
   `, author, title, cover, filepath)
@@ -352,8 +361,8 @@ func addBook(author string, title string, cover string, filepath string) (int64,
 	return res.LastInsertId()
 }
 
-func deleteBook(bookId int64) error {
-	tx, err := Conn.Begin()
+func deleteBook(db *sqlx.DB, bookId int64) error {
+	tx, err := db.Begin()
 	if err != nil {
 		return err
 	}
@@ -370,29 +379,29 @@ func deleteBook(bookId int64) error {
 	return tx.Commit()
 }
 
-func (BookLibrary) DeleteBook(bookId int64) error {
-	return deleteBook(bookId)
+func (b *BookLibrary) DeleteBook(bookId int64) error {
+	return deleteBook(b.db, bookId)
 }
 
-func (BookLibrary) SetFavorite(bookId int64, isFavorite bool) error {
-	_, err := Conn.Exec(`
+func (b *BookLibrary) SetFavorite(bookId int64, isFavorite bool) error {
+	_, err := b.db.Exec(`
   UPDATE books 
   SET favorite = ?1 
   WHERE bookId = ?2`, isFavorite, bookId)
 	return err
 }
 
-func (BookLibrary) SetRead(bookId int64, isRead bool) error {
-	_, err := Conn.Exec(`
+func (b *BookLibrary) SetRead(bookId int64, isRead bool) error {
+	_, err := b.db.Exec(`
   UPDATE books 
   SET has_read = ?1 
   WHERE bookId = ?2`, isRead, bookId)
 	return err
 }
 
-func (BookLibrary) TotalRead() (int, error) {
+func (b *BookLibrary) TotalRead() (int, error) {
 	var total sql.NullInt64
-	err := Conn.QueryRow(`
+	err := b.db.QueryRow(`
     SELECT SUM(count) as total 
     FROM frequency 
     WHERE EXISTS (
@@ -409,7 +418,7 @@ func (BookLibrary) TotalRead() (int, error) {
 }
 
 func (b *BookLibrary) AddBook(author string, title string, cover string, filepath string) error {
-	bookId, err := addBook(author, title, cover, filepath)
+	bookId, err := addBook(b.db, author, title, cover, filepath)
 	if err != nil {
 		return err
 	}
@@ -420,16 +429,16 @@ func (b *BookLibrary) AddBook(author string, title string, cover string, filepat
 
 	// Compute WordTable and Save it
 	cacheLocation := getSegmentationPath(title, author)
-	err = saveCacheFile(int(bookId), sentences, cacheLocation)
+	err = saveCacheFile(b.db, int(bookId), sentences, cacheLocation)
 	if err != nil {
 		return err
 	}
-	_, err = saveWordTable(int(bookId), wordTable)
+	_, err = saveWordTable(b.db, int(bookId), wordTable)
 	// This can be nil
 	return err
 }
 
-func saveCacheFile(bookId int, sentences []string, filepath string) error {
+func saveCacheFile(db *sqlx.DB, bookId int, sentences []string, filepath string) error {
 	bytes, err := json.Marshal(sentences)
 	if err != nil {
 		return err
@@ -438,7 +447,7 @@ func saveCacheFile(bookId int, sentences []string, filepath string) error {
 	if err != nil {
 		return err
 	}
-	_, err = Conn.Exec(`
+	_, err = db.Exec(`
   UPDATE books 
   SET segmented_file = ?1 
   WHERE bookId = ?2`, filepath, bookId)
@@ -469,7 +478,7 @@ func GetSegmentedText(book Book) ([]string, error) {
 }
 
 // dbSaveWordTable, // TODO once segmentation is done we can test this
-func saveWordTable(bookId int, frequencyTable FrequencyTable) (sql.Result, error) {
+func saveWordTable(db *sqlx.DB, bookId int, frequencyTable FrequencyTable) (sql.Result, error) {
 	wordTable := WordTable{}
 	for word, count := range frequencyTable {
 		wordTable = append(wordTable, WordTableRow{
@@ -478,7 +487,7 @@ func saveWordTable(bookId int, frequencyTable FrequencyTable) (sql.Result, error
 			Count:  count,
 		})
 	}
-	tx, err := Conn.Beginx()
+	tx, err := db.Beginx()
 	if err != nil {
 		return nil, err
 	}

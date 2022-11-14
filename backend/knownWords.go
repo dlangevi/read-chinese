@@ -6,6 +6,8 @@ import (
 	"log"
 	"path"
 	"strings"
+
+	"github.com/jmoiron/sqlx"
 )
 
 var known *KnownWords
@@ -15,13 +17,15 @@ type KnownWords struct {
 	words      map[string]int
 	characters map[rune]bool
 	frequency  map[string]int
+	db         *sqlx.DB
 }
 
-func NewKnownWords() *KnownWords {
+func NewKnownWords(db *sqlx.DB) *KnownWords {
 	known = &KnownWords{
 		words:      map[string]int{},
 		characters: map[rune]bool{},
 		frequency:  map[string]int{},
+		db:         db,
 	}
 	known.syncWords()
 	known.syncFrequency()
@@ -34,7 +38,7 @@ func (known *KnownWords) syncWords() {
 		Interval int
 	}
 	words := []WordRow{}
-	err := Conn.Select(&words, `
+	err := known.db.Select(&words, `
     SELECT word, interval 
     FROM words
   `)
@@ -56,7 +60,7 @@ func (known *KnownWords) syncFrequency() {
 		Count int
 	}
 	words := []WordRow{}
-	err := Conn.Select(&words, `
+	err := known.db.Select(&words, `
     SELECT word, sum(count) as count
     FROM frequency
     GROUP BY word
@@ -83,7 +87,7 @@ func (known *KnownWords) GetWordStats() WordStats {
 
 // TODO have the updated_at automatically update
 func (known *KnownWords) AddWord(word string, age int) error {
-	tx, err := Conn.Beginx()
+	tx, err := known.db.Beginx()
 	if err != nil {
 		return err
 	}
@@ -116,7 +120,7 @@ type WordEntry struct {
 
 // TODO make this faster if possible
 func (known *KnownWords) AddWords(words []WordEntry) error {
-	tx, err := Conn.Beginx()
+	tx, err := known.db.Beginx()
 	if err != nil {
 		return err
 	}

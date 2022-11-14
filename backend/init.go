@@ -3,30 +3,41 @@ package backend
 import (
 	"context"
 	"log"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type Backend struct {
 	RuntimeContext *context.Context
-	BookLibrary    *BookLibrary
-	KnownWords     *KnownWords
-	UserSettings   *UserSettings
-	Segmentation   *Segmentation
-	ImageClient    *ImageClient
-	Dictionaries   *Dictionaries
-	Generator      *Generator
-	AnkiInterface  *AnkiInterface
-	Calibre        *Calibre
+
+	// Primary data layer
+	UserSettings *UserSettings
+	DB           *sqlx.DB
+
+	// Independent Libraries
+	ImageClient *ImageClient
+
+	// Libraries required by other Libraries
+	BookLibrary   *BookLibrary
+	KnownWords    *KnownWords
+	Dictionaries  *Dictionaries
+	AnkiInterface *AnkiInterface
+
+	// Libraries that require other Libraires
+	Segmentation *Segmentation
+	Generator    *Generator
+	Calibre      *Calibre
 }
 
 func StartBackend(ctx *context.Context,
 	sqlPath string,
 	metadataPath string) (*Backend, error) {
 
-	err := NewDB(sqlPath)
+	db, err := NewDB(sqlPath)
 	if err != nil {
 		return nil, err
 	}
-	err = RunMigrateScripts()
+	err = RunMigrateScripts(db)
 	if err != nil {
 		return nil, err
 	}
@@ -39,26 +50,26 @@ func StartBackend(ctx *context.Context,
 	ran := GetTimesRan()
 	log.Printf("Ran %v times", ran)
 
-	d := NewDictionaries()
-	s, err := NewSegmentation(d)
+	runtime := &Backend{
+		RuntimeContext: ctx,
+		UserSettings:   userSettings,
+		DB:             db,
+
+		Dictionaries:  NewDictionaries(),
+		KnownWords:    NewKnownWords(db),
+		ImageClient:   NewImageClient(),
+		AnkiInterface: NewAnkiInterface(),
+	}
+
+	s, err := NewSegmentation(runtime.Dictionaries)
 	if err != nil {
 		return nil, err
 	}
 
-	b := NewBookLibrary(s)
-
-	runtime := &Backend{
-		RuntimeContext: ctx,
-		BookLibrary:    b,
-		KnownWords:     NewKnownWords(),
-		UserSettings:   userSettings,
-		Segmentation:   s,
-		ImageClient:    NewImageClient(),
-		Dictionaries:   d,
-		Generator:      NewGenerator(s),
-		AnkiInterface:  NewAnkiInterface(),
-		Calibre:        NewCalibre(b),
-	}
+	runtime.BookLibrary = NewBookLibrary(db, s)
+	runtime.Segmentation = s
+	runtime.Generator = NewGenerator(s, runtime.BookLibrary)
+	runtime.Calibre = NewCalibre(runtime.BookLibrary)
 
 	return runtime, nil
 }

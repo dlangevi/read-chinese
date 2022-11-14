@@ -17,9 +17,7 @@ import (
 //go:embed migrations
 var fs embed.FS
 
-var Conn *sqlx.DB
-
-func NewDB(dbPath string) error {
+func NewDB(dbPath string) (*sqlx.DB, error) {
 	if _, err := os.Stat(dbPath); err == nil {
 		// path/to/whatever exists
 
@@ -36,15 +34,14 @@ func NewDB(dbPath string) error {
 	// sqliteDb, err := sql.Open("sqlite3", dbPath)
 	sqliteDb, err := sqlx.Connect("sqlite3", dbPath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	Conn = sqliteDb
-	return nil
+	return sqliteDb, nil
 }
 
-func RunMigrateScripts() error {
-	driver, err := sqlite3.WithInstance(Conn.DB, &sqlite3.Config{})
+func RunMigrateScripts(db *sqlx.DB) error {
+	driver, err := sqlite3.WithInstance(db.DB, &sqlite3.Config{})
 	if err != nil {
 		return fmt.Errorf("creating sqlite3 db driver failed %s", err)
 	}
