@@ -16,9 +16,12 @@ type TextToSpeech struct {
 	httpClient   *resty.Client
 	currentVoice int
 	voices       []string
+	userSettings *UserSettings
 }
 
-func NewTextToSpeach() *TextToSpeech {
+func NewTextToSpeach(
+	userSettings *UserSettings,
+) *TextToSpeech {
 	client := &TextToSpeech{
 		httpClient:   resty.New(),
 		currentVoice: 0,
@@ -27,6 +30,7 @@ func NewTextToSpeach() *TextToSpeech {
 			"zh-CN-XiaochenNeural",
 			"zh-CN-XiaoshuangNeural", // child
 		},
+		userSettings: userSettings,
 	}
 	client.httpClient.SetBaseURL(URI)
 	return client
@@ -42,7 +46,7 @@ func (tts *TextToSpeech) Synthesize(text string) (string, error) {
     </voice>
   </speak>`, voice, text)
 
-	key := userSettings.AzureApiKey
+	key := tts.userSettings.AzureApiKey
 	rsp, err := tts.httpClient.NewRequest().
 		SetHeader("Content-Type", "application/ssml+xml").
 		SetHeader("Ocp-Apim-Subscription-Key", key).

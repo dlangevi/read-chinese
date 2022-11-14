@@ -21,12 +21,14 @@ type Fields struct {
 type AnkiInterface struct {
 	anki         *ankiconnect.Client
 	textToSpeech *TextToSpeech
+	userSettings *UserSettings
 }
 
-func NewAnkiInterface() *AnkiInterface {
+func NewAnkiInterface(userSettings *UserSettings) *AnkiInterface {
 	return &AnkiInterface{
 		anki:         ankiconnect.NewClient(),
-		textToSpeech: NewTextToSpeach(),
+		textToSpeech: NewTextToSpeach(userSettings),
+		userSettings: userSettings,
 	}
 }
 
@@ -68,13 +70,13 @@ func (a *AnkiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 		})
 		return nil
 	}
-	if userSettings.GenerateTermAudio {
+	if a.userSettings.GenerateTermAudio {
 		err := addAudio(fields.Word, "HanziAudio")
 		if err != nil {
 			return err
 		}
 	}
-	if userSettings.GenerateSentenceAudio {
+	if a.userSettings.GenerateSentenceAudio {
 		err := addAudio(fields.Sentence, "SentenceAudio")
 		if err != nil {
 			return err

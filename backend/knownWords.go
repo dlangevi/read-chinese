@@ -14,18 +14,22 @@ var known *KnownWords
 
 type KnownWords struct {
 	// For now just map word to interval
-	words      map[string]int
-	characters map[rune]bool
-	frequency  map[string]int
-	db         *sqlx.DB
+	words        map[string]int
+	characters   map[rune]bool
+	frequency    map[string]int
+	db           *sqlx.DB
+	userSettings *UserSettings
 }
 
-func NewKnownWords(db *sqlx.DB) *KnownWords {
+func NewKnownWords(db *sqlx.DB,
+	userSettings *UserSettings,
+) *KnownWords {
 	known = &KnownWords{
-		words:      map[string]int{},
-		characters: map[rune]bool{},
-		frequency:  map[string]int{},
-		db:         db,
+		words:        map[string]int{},
+		characters:   map[rune]bool{},
+		frequency:    map[string]int{},
+		db:           db,
+		userSettings: userSettings,
 	}
 	known.syncWords()
 	known.syncFrequency()
@@ -152,7 +156,7 @@ func (known *KnownWords) AddWords(words []WordEntry) error {
 
 func (known *KnownWords) isWellKnown(word string) bool {
 	interval, ok := known.words[word]
-	return ok && interval >= userSettings.KnownInterval
+	return ok && interval >= known.userSettings.KnownInterval
 }
 
 func (known *KnownWords) isKnown(word string) bool {

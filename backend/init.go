@@ -41,13 +41,13 @@ func StartBackend(ctx *context.Context,
 	if err != nil {
 		return nil, err
 	}
-	userSettings, err = LoadMetadata(metadataPath)
+	userSettings, err := LoadMetadata(metadataPath)
 	if err != nil {
 		return nil, err
 	}
 
-	UpdateTimesRan()
-	ran := GetTimesRan()
+	userSettings.UpdateTimesRan()
+	ran := userSettings.GetTimesRan()
 	log.Printf("Ran %v times", ran)
 
 	runtime := &Backend{
@@ -55,10 +55,10 @@ func StartBackend(ctx *context.Context,
 		UserSettings:   userSettings,
 		DB:             db,
 
-		Dictionaries:  NewDictionaries(),
-		KnownWords:    NewKnownWords(db),
-		ImageClient:   NewImageClient(),
-		AnkiInterface: NewAnkiInterface(),
+		Dictionaries:  NewDictionaries(userSettings),
+		KnownWords:    NewKnownWords(db, userSettings),
+		ImageClient:   NewImageClient(userSettings),
+		AnkiInterface: NewAnkiInterface(userSettings),
 	}
 
 	s, err := NewSegmentation(runtime.Dictionaries)

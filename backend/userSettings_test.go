@@ -8,7 +8,7 @@ import (
 
 func TestDefault(t *testing.T) {
 	tmpMetaData := path.Join(os.TempDir(), "metadata.json")
-	m, _ := LoadMetadata(tmpMetaData)
+	userSettings, _ := LoadMetadata(tmpMetaData)
 
 	settingName := "EnableChinese"
 	setting := userSettings.EnableChinese
@@ -19,15 +19,15 @@ func TestDefault(t *testing.T) {
 		t.Errorf("PrimaryDict had wrong default value %v", userSettings.PrimaryDict)
 	}
 	// TODO have a test where the dictionary does not exist
-	SetPrimaryDict("foo")
-	if m.PrimaryDict != "foo" {
+	userSettings.SetPrimaryDict("foo")
+	if userSettings.PrimaryDict != "foo" {
 		t.Errorf("PrimaryDict was not updated")
 	}
-	if m.GetUserSettingBool(settingName) != true {
+	if userSettings.GetUserSettingBool(settingName) != true {
 		t.Errorf("%v was not initialized correctly", settingName)
 	}
-	m.SetUserSettingBool(settingName, false)
-	if m.GetUserSettingBool(settingName) != false {
+	userSettings.SetUserSettingBool(settingName, false)
+	if userSettings.GetUserSettingBool(settingName) != false {
 		t.Errorf("%v was not updated", settingName)
 	}
 	os.Remove(tmpMetaData)

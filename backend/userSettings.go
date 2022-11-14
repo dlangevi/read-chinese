@@ -62,10 +62,8 @@ func defaultSettings(path string) *UserSettings {
 	}
 }
 
-var userSettings *UserSettings
-
 func LoadMetadata(path string) (*UserSettings, error) {
-	userSettings = defaultSettings(path)
+	userSettings := defaultSettings(path)
 
 	if _, err := os.Stat(path); err == nil {
 		// metadata already exists, read from it
@@ -75,7 +73,7 @@ func LoadMetadata(path string) (*UserSettings, error) {
 		}
 	} else if errors.Is(err, os.ErrNotExist) {
 		// metadata does *not* exist, write the default settings
-		saveMetadata()
+		userSettings.saveMetadata()
 	} else {
 		// Schrodinger: file may or may not exist. See err for details.
 		log.Fatal(err)
@@ -83,9 +81,9 @@ func LoadMetadata(path string) (*UserSettings, error) {
 	return userSettings, nil
 }
 
-func saveMetadata() error {
-	path := userSettings.path
-	str, err := json.MarshalIndent(userSettings, "", "  ")
+func (m *UserSettings) saveMetadata() error {
+	path := m.path
+	str, err := json.MarshalIndent(m, "", "  ")
 	if err != nil {
 		return err
 	}
@@ -95,13 +93,13 @@ func saveMetadata() error {
 	return nil
 }
 
-func UpdateTimesRan() {
-	userSettings.Ran += 1
-	saveMetadata()
+func (m *UserSettings) UpdateTimesRan() {
+	m.Ran += 1
+	m.saveMetadata()
 }
 
-func GetTimesRan() int {
-	return userSettings.Ran
+func (m *UserSettings) GetTimesRan() int {
+	return m.Ran
 }
 
 func (m *UserSettings) GetUserSetting(key string) string {
@@ -126,14 +124,17 @@ func getUserSetting[T int | string | bool](m *UserSettings, key string) T {
 
 func (m *UserSettings) SetUserSetting(key string, val string) {
 	setUserSetting(m, key, val)
+	m.saveMetadata()
 }
 
 func (m *UserSettings) SetUserSettingBool(key string, val bool) {
 	setUserSetting(m, key, val)
+	m.saveMetadata()
 }
 
 func (m *UserSettings) SetUserSettingInt(key string, val int) {
 	setUserSetting(m, key, val)
+	m.saveMetadata()
 }
 
 func setUserSetting[T int | string | bool](m *UserSettings, key string, val T) {
@@ -141,24 +142,23 @@ func setUserSetting[T int | string | bool](m *UserSettings, key string, val T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	saveMetadata()
 }
 
-func SaveDict(name string, dictPath string, language string) {
-	userSettings.Dicts[name] = Dict{
+func (m *UserSettings) SaveDict(name string, dictPath string, language string) {
+	m.Dicts[name] = Dict{
 		Path:     dictPath,
 		Language: language,
 	}
-	saveMetadata()
+	m.saveMetadata()
 }
 
-func DeleteDict(name string) {
-	delete(userSettings.Dicts, name)
-	saveMetadata()
+func (m *UserSettings) DeleteDict(name string) {
+	delete(m.Dicts, name)
+	m.saveMetadata()
 }
 
-func SetPrimaryDict(dictName string) {
+func (m *UserSettings) SetPrimaryDict(dictName string) {
 	// TODO Make sure its a real dict
-	userSettings.PrimaryDict = dictName
-	saveMetadata()
+	m.PrimaryDict = dictName
+	m.saveMetadata()
 }

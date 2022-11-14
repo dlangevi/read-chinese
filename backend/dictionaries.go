@@ -21,6 +21,7 @@ type Dictionaries struct {
 	PrimaryDictName string
 	PrimaryDict     *Dictionary
 	Dictionaries    map[string]*Dictionary
+	userSettings    *UserSettings
 }
 
 type RawDictionaryEntry struct {
@@ -33,8 +34,10 @@ type RawDictionary struct {
 	Entries []RawDictionaryEntry
 }
 
-func NewDictionaries() *Dictionaries {
-	dicts := &Dictionaries{}
+func NewDictionaries(userSettings *UserSettings) *Dictionaries {
+	dicts := &Dictionaries{
+		userSettings: userSettings,
+	}
 	dicts.loadDictionaries()
 	primaryName := userSettings.PrimaryDict
 	dicts.PrimaryDictName = primaryName
@@ -57,7 +60,7 @@ func parseDictionaryFile(path string) (*RawDictionary, error) {
 
 func (d *Dictionaries) loadDictionaries() error {
 	d.Dictionaries = map[string]*Dictionary{}
-	return d.transformRawDictionaries(userSettings.Dicts)
+	return d.transformRawDictionaries(d.userSettings.Dicts)
 }
 
 func (d *Dictionaries) transformRawDictionaries(dicts map[string]Dict) error {
@@ -89,12 +92,12 @@ func (d *Dictionaries) transformRawDictionaries(dicts map[string]Dict) error {
 }
 
 func (d *Dictionaries) AddDictionary(name string, path string, language string) {
-	SaveDict(name, path, language)
+	d.userSettings.SaveDict(name, path, language)
 	d.loadDictionaries()
 }
 
 func (d *Dictionaries) DeleteDictionary(name string) {
-	DeleteDict(name)
+	d.userSettings.DeleteDict(name)
 	delete(d.Dictionaries, name)
 }
 
@@ -108,7 +111,7 @@ func (d *Dictionaries) SetPrimaryDict(name string) {
 	}
 
 	d.PrimaryDict = primary
-	SetPrimaryDict(name)
+	d.userSettings.SetPrimaryDict(name)
 }
 
 type DictionaryInfoMap map[string]DictionaryInfo
@@ -120,7 +123,7 @@ type DictionaryInfo struct {
 
 func (d *Dictionaries) GetDictionaryInfo() DictionaryInfoMap {
 	dictInfoMap := DictionaryInfoMap{}
-	for name, dict := range userSettings.Dicts {
+	for name, dict := range d.userSettings.Dicts {
 		dictInfoMap[name] = DictionaryInfo{
 			Name:     name,
 			Path:     dict.Path,
