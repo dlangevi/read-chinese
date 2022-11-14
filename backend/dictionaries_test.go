@@ -14,7 +14,7 @@ func TestDictionaryContents(t *testing.T) {
 	if !ok {
 		t.Errorf("Dictionary example failed to be loaded")
 	}
-	if len(dict.Definitions) != 82 {
+	if len(dict.Definitions) != 83 {
 		t.Errorf("Dict had wrong number of entries: %v", len(dict.Definitions))
 	}
 
@@ -37,4 +37,31 @@ func TestDictionaryContents(t *testing.T) {
 	if !ok || len(的) != 4 {
 		t.Errorf("Did not group definitions for 的")
 	}
+}
+
+func TestGetDictionaryInfo(t *testing.T) {
+	info := runtime.Dictionaries.GetDictionaryInfo()
+	if len(info) != 1 {
+		t.Errorf("Info doesn't provide dictionary")
+	}
+	dict, ok := info["example"]
+	if !ok {
+		t.Errorf("Example dictionary served with wrong name")
+	}
+	if dict.Language != "english" || dict.Name != "example" {
+		t.Errorf("Example dictionary served with wrong data")
+	}
+}
+
+func TestGetDefinitions(t *testing.T) {
+	defs := runtime.Dictionaries.GetDefinitionsForWord("的", "english")
+	if len(defs) != 4 {
+		t.Errorf("Not enough defs")
+	}
+
+	possible := runtime.Dictionaries.GetPossibleWords("你")
+	if len(possible) != 5 {
+		t.Errorf("Not enough options %v", possible)
+	}
+
 }
