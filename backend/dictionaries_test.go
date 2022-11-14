@@ -8,7 +8,7 @@ import (
 // Data grouping
 func TestDictionaryContents(t *testing.T) {
 
-	dicts := runtime.Dictionaries
+	dicts := testRuntime.Dictionaries
 
 	dict, ok := dicts.Dictionaries["example"]
 	if !ok {
@@ -40,7 +40,7 @@ func TestDictionaryContents(t *testing.T) {
 }
 
 func TestGetDictionaryInfo(t *testing.T) {
-	info := runtime.Dictionaries.GetDictionaryInfo()
+	info := testRuntime.Dictionaries.GetDictionaryInfo()
 	if len(info) != 1 {
 		t.Errorf("Info doesn't provide dictionary")
 	}
@@ -54,12 +54,12 @@ func TestGetDictionaryInfo(t *testing.T) {
 }
 
 func TestGetDefinitions(t *testing.T) {
-	defs := runtime.Dictionaries.GetDefinitionsForWord("的", "english")
+	defs := testRuntime.Dictionaries.GetDefinitionsForWord("的", "english")
 	if len(defs) != 4 {
 		t.Errorf("Not enough defs")
 	}
 
-	possible := runtime.Dictionaries.GetPossibleWords("你")
+	possible := testRuntime.Dictionaries.GetPossibleWords("你")
 	if len(possible) != 5 {
 		t.Errorf("Not enough options %v", possible)
 	}

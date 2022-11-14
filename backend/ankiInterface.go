@@ -19,12 +19,14 @@ type Fields struct {
 }
 
 type AnkiInterface struct {
-	anki *ankiconnect.Client
+	anki         *ankiconnect.Client
+	textToSpeech *TextToSpeech
 }
 
 func NewAnkiInterface() *AnkiInterface {
 	return &AnkiInterface{
-		ankiconnect.NewClient(),
+		anki:         ankiconnect.NewClient(),
+		textToSpeech: NewTextToSpeach(),
 	}
 }
 
@@ -51,7 +53,7 @@ func (a *AnkiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 	pictures := []ankiconnect.Picture{}
 
 	addAudio := func(field string, dest string) error {
-		audio64, err := runtime.TextToSpeech.Synthesize(field)
+		audio64, err := a.textToSpeech.Synthesize(field)
 		if err != nil {
 			return err
 		}

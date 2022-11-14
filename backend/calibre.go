@@ -8,6 +8,13 @@ import (
 )
 
 type Calibre struct {
+	bookLibrary *BookLibrary
+}
+
+func NewCalibre(b *BookLibrary) *Calibre {
+	return &Calibre{
+		bookLibrary: b,
+	}
 }
 
 func calibreExists() bool {
@@ -41,7 +48,7 @@ func getCalibreBooks() ([]CalibreBook, error) {
 	return books, nil
 }
 
-func (Calibre) ImportCalibreBooks() error {
+func (c *Calibre) ImportCalibreBooks() error {
 	log.Println("Loading calibre")
 	books, err := getCalibreBooks()
 	if err != nil {
@@ -60,7 +67,7 @@ func (Calibre) ImportCalibreBooks() error {
 			log.Println("Potential new book", book.Author, book.Title)
 			for _, format := range book.Formats {
 				if strings.HasSuffix(format, ".txt") {
-					err := AddBook(book.Author, book.Title, book.Cover, format)
+					err := c.bookLibrary.AddBook(book.Author, book.Title, book.Cover, format)
 					if err != nil {
 						log.Println("error ", err)
 						return err

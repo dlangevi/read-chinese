@@ -61,6 +61,13 @@ type WordOccuranceRow struct {
 }
 
 type BookLibrary struct {
+	segmentation *Segmentation
+}
+
+func NewBookLibrary(s *Segmentation) *BookLibrary {
+	return &BookLibrary{
+		segmentation: s,
+	}
 }
 
 func (BookLibrary) LearningTarget() []WordOccuranceRow {
@@ -399,15 +406,14 @@ func (BookLibrary) TotalRead() (int, error) {
 	} else {
 		return 0, err
 	}
-
 }
 
-func AddBook(author string, title string, cover string, filepath string) error {
+func (b *BookLibrary) AddBook(author string, title string, cover string, filepath string) error {
 	bookId, err := addBook(author, title, cover, filepath)
 	if err != nil {
 		return err
 	}
-	sentences, wordTable, err := runtime.Segmentation.SegmentFullText(filepath)
+	sentences, wordTable, err := b.segmentation.SegmentFullText(filepath)
 	if err != nil {
 		return err
 	}

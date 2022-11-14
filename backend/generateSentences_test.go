@@ -1,6 +1,8 @@
 package backend
 
 import (
+	"os"
+	"path"
 	"testing"
 )
 
@@ -23,5 +25,11 @@ func TestRank(t *testing.T) {
 
 		t.Errorf("sentences had the wrong value %v", sentences)
 	}
+}
 
+func TestGenerate(t *testing.T) {
+	tempDb := path.Join(os.TempDir(), "generate.db")
+	_ = createBackend(tempDb)
+	// Try to load this sentence
+	// 有人  说  ，  流星  就是  这么  来  的  。
 }

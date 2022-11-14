@@ -10,16 +10,13 @@ type Backend struct {
 	BookLibrary    *BookLibrary
 	KnownWords     *KnownWords
 	UserSettings   *UserSettings
-	ImageClient    *ImageClient
-	TextToSpeech   *TextToSpeech
-	Dictionaries   *Dictionaries
 	Segmentation   *Segmentation
+	ImageClient    *ImageClient
+	Dictionaries   *Dictionaries
 	Generator      *Generator
 	AnkiInterface  *AnkiInterface
 	Calibre        *Calibre
 }
-
-var runtime *Backend
 
 func StartBackend(ctx *context.Context,
 	sqlPath string,
@@ -48,18 +45,19 @@ func StartBackend(ctx *context.Context,
 		return nil, err
 	}
 
-	runtime = &Backend{
+	b := NewBookLibrary(s)
+
+	runtime := &Backend{
 		RuntimeContext: ctx,
-		BookLibrary:    &BookLibrary{},
+		BookLibrary:    b,
 		KnownWords:     NewKnownWords(),
 		UserSettings:   userSettings,
-		TextToSpeech:   NewTextToSpeach(),
+		Segmentation:   s,
 		ImageClient:    NewImageClient(),
 		Dictionaries:   d,
-		Segmentation:   s,
-		Generator:      &Generator{},
+		Generator:      NewGenerator(s),
 		AnkiInterface:  NewAnkiInterface(),
-		Calibre:        &Calibre{},
+		Calibre:        NewCalibre(b),
 	}
 
 	return runtime, nil

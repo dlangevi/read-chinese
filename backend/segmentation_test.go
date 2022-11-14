@@ -5,7 +5,7 @@ import (
 )
 
 func TestSegment(t *testing.T) {
-	s := runtime.Segmentation
+	s := testRuntime.Segmentation
 	sentences, table, err := s.SegmentFullText("testdata/example_book.txt")
 	if err != nil {
 		t.Error("Failed to load text", err)

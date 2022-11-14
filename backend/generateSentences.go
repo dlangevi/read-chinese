@@ -7,6 +7,13 @@ import (
 )
 
 type Generator struct {
+	segmentation *Segmentation
+}
+
+func NewGenerator(s *Segmentation) *Generator {
+	return &Generator{
+		segmentation: s,
+	}
 }
 
 func isT1Candidate(sentence []Token, word string) bool {
@@ -27,7 +34,7 @@ func tokensContains(sentence []Token, word string) bool {
 	return true
 }
 
-func (Generator) GetSentencesForWord(word string, bookIds []int64) ([]string, error) {
+func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]string, error) {
 	books, _ := getBooks(bookIds...)
 	sentences := []string{}
 	for _, book := range books {
@@ -37,7 +44,7 @@ func (Generator) GetSentencesForWord(word string, bookIds []int64) ([]string, er
 		}
 		for _, sentence := range fullSegmented {
 			if strings.Contains(sentence, word) {
-				segmented := runtime.Segmentation.SegmentSentence(sentence)
+				segmented := g.segmentation.SegmentSentence(sentence)
 				if tokensContains(segmented, word) && isT1Candidate(segmented, word) {
 					sentences = append(sentences, sentence)
 				}
