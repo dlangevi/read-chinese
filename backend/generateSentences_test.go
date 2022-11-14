@@ -29,7 +29,49 @@ func TestRank(t *testing.T) {
 
 func TestGenerate(t *testing.T) {
 	tempDb := path.Join(os.TempDir(), "generate.db")
-	_ = createBackend(tempDb)
+	os.Remove(tempDb)
+	defer os.Remove(tempDb)
+	myBackend := createBackend(tempDb)
+	bookIds := []int64{1}
+	err := myBackend.BookLibrary.AddBook("张天翼", "秃秃大王", "fake.jpg", "testdata/example_book.txt")
+	if err != nil {
+		t.Error("Failed to insert book snip", err)
+	}
+	sentences, err := myBackend.Generator.GetSentencesForWord("么", bookIds)
+	if err != nil {
+		t.Error("Failed to get sentences", err)
+	}
+	if len(sentences) != 0 {
+		t.Error("Too many sentences", sentences)
+	}
 	// Try to load this sentence
-	// 有人  说  ，  流星  就是  这么  来  的  。
+	// 真  的  么  ？
+	myBackend.KnownWords.AddWord("真", 100)
+	// Not well known enough
+	myBackend.KnownWords.AddWord("的", 1)
+	sentences, _ = myBackend.Generator.GetSentencesForWord("么", bookIds)
+	if len(sentences) != 0 {
+		t.Error("Too many sentences", sentences)
+	}
+
+	// Now it is
+	myBackend.KnownWords.AddWord("的", 100)
+	sentences, _ = myBackend.Generator.GetSentencesForWord("么", bookIds)
+	if len(sentences) != 1 {
+		t.Error("Not enough sentences", sentences)
+	}
+
+	// Try to load this sentence
+	// 	有人  说  ，  流星  就是  这么  来  的  。
+	myBackend.KnownWords.AddWords([]WordEntry{
+		{"有人", 100},
+		{"说", 100},
+		{"流星", 100},
+		{"就是", 100},
+		{"来", 100},
+	})
+	sentences, _ = myBackend.Generator.GetSentencesForWord("这么", bookIds)
+	if len(sentences) != 1 {
+		t.Error("Not enough sentences", sentences)
+	}
 }
