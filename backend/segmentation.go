@@ -20,10 +20,10 @@ type Token struct {
 }
 
 var jieba *gojieba.Jieba
-var punctuation *regexp.Regexp
-var whitespace *regexp.Regexp
-var latin *regexp.Regexp
-var chinese *regexp.Regexp
+var punctuation = regexp.MustCompile(`\p{P}`)
+var whitespace = regexp.MustCompile(`\s+`)
+var latin = regexp.MustCompile(`\p{Latin}`)
+var chinese = regexp.MustCompile(`\p{Han}`)
 
 func isChineseWord(word string) bool {
 	if punctuation.MatchString(word) {
@@ -172,22 +172,6 @@ func constructDict(d *Dictionaries) error {
 func NewSegmentation(d *Dictionaries) (*Segmentation, error) {
 	s := &Segmentation{}
 	err := constructDict(d)
-	if err != nil {
-		return s, err
-	}
-	punctuation, err = regexp.Compile(`\p{P}`)
-	if err != nil {
-		return s, err
-	}
-	whitespace, err = regexp.Compile(`\s+`)
-	if err != nil {
-		return s, err
-	}
-	latin, err = regexp.Compile(`\p{Latin}`)
-	if err != nil {
-		return s, err
-	}
-	chinese, err = regexp.Compile(`\p{Han}`)
 	if err != nil {
 		return s, err
 	}
