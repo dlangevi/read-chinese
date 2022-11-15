@@ -255,21 +255,18 @@ store.$subscribe(async (_, state) => {
     if (action === ActionsEnum.CREATE) {
       ankiCard = await GetAnkiNoteSkeleton(word);
 
-      const enableChinese = UserSettings.Dictionaries.EnableChinese.read();
-      if (enableChinese) {
-        steps.value = [
-          StepsEnum.SENTENCE,
-          StepsEnum.ENGLISH,
-          StepsEnum.CHINESE,
-          StepsEnum.IMAGE,
-        ];
-      } else {
-        steps.value = [
-          StepsEnum.SENTENCE,
-          StepsEnum.ENGLISH,
-          StepsEnum.IMAGE,
-        ];
-      }
+      // Todo base this on default dict
+      steps.value = [
+        StepsEnum.SENTENCE,
+        StepsEnum.ENGLISH,
+        ...(
+          // Lol javascript is fun
+          UserSettings.Dictionaries.EnableChinese.read()
+            ? [StepsEnum.CHINESE]
+            : []
+        ),
+        StepsEnum.IMAGE,
+      ];
     } else {
       // Right now for EDIT we only edit the sentence so start there
       ankiCard = await GetAnkiNote(word);
@@ -278,7 +275,6 @@ store.$subscribe(async (_, state) => {
       ];
     }
     card.value = reactive(ankiCard);
-
     [step.value] = steps.value;
   }
   showModal.value = state.wordList.length !== 0;
@@ -338,5 +334,4 @@ function markKnown() {
   AddWord(card.value.fields.word, 10000);
   store.clearFront();
 }
-
 </script>
