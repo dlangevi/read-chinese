@@ -1,7 +1,7 @@
 <template>
   <n-modal
-    class="w-4/5 h-[80vh]"
     v-model:show="showModal"
+    class="w-4/5 h-[80vh]"
     :mask-closable="false"
     :closable="true"
     preset="card"
@@ -10,7 +10,7 @@
   >
     <template #header>
       <p class="text-xl">
-        Creating card for {{card.fields.word}}
+        Creating card for {{ card.fields.word }}
       </p>
     </template>
     <template #header-extra>
@@ -20,7 +20,8 @@
       has-sider
       sider-placement="left"
       class="flex-grow"
-      style="max-height: 60vh">
+      style="max-height: 60vh"
+    >
       <n-layout-sider
         v-if="card !== undefined"
         collapse-mode="transform"
@@ -32,38 +33,45 @@
         bordered
       >
         <Suspense>
-          <anki-card-preview :ankiCard="card" @changeStep="changeStep" />
+          <anki-card-preview
+            :anki-card="card"
+            @change-step="changeStep"
+          />
         </Suspense>
       </n-layout-sider>
       <n-layout-content
         content-style="padding: 24px;"
-        :native-scrollbar="true">
-
+        :native-scrollbar="true"
+      >
         <p class="text-4xl">
-          {{card.fields.word}}
+          {{ card.fields.word }}
         </p>
         <edit-sentence
           v-if="step == StepsEnum.SENTENCE"
-          :preferBook="preferBookRef"
+          :prefer-book="preferBookRef"
           :word="card.fields.word"
           :sentence="card.fields.sentence"
-          @updateSentence="updateSentence" />
+          @update-sentence="updateSentence"
+        />
         <edit-definition
           v-if="step == StepsEnum.ENGLISH"
           :word="card.fields.word"
           :definition="card.fields.englishDefn"
           type="english"
-          @updateDefinition="updateEnglishDefinition" />
+          @update-definition="updateEnglishDefinition"
+        />
         <edit-definition
           v-if="step == StepsEnum.CHINESE"
           :word="card.fields.word"
           :definition="card.fields.englishDefn"
           type="chinese"
-          @updateDefinition="updateChineseDefinition" />
+          @update-definition="updateChineseDefinition"
+        />
         <edit-images
           v-if="step == StepsEnum.IMAGE"
           :word="card.fields.word"
-          @updateImages="updateImages" />
+          @update-images="updateImages"
+        />
       </n-layout-content>
     </n-layout>
 
@@ -71,19 +79,29 @@
       <n-space justify="end">
         <n-button
           v-if="steps.length > 0"
-          type=info
-          @click="nextStep()">Next Step</n-button>
+          type="info"
+          @click="nextStep()"
+        >
+          Next Step
+        </n-button>
         <n-button
-          type=info
-          @click="store.clearFront()">Skip Word</n-button>
+          type="info"
+          @click="store.clearFront()"
+        >
+          Skip Word
+        </n-button>
         <n-button
-          type=info
-          @click="markKnown">
+          type="info"
+          @click="markKnown"
+        >
           Mark Known
         </n-button>
         <n-button
-          type=info
-          @click="submit()">Submit</n-button>
+          type="info"
+          @click="submit()"
+        >
+          Submit
+        </n-button>
       </n-space>
     </template>
   </n-modal>

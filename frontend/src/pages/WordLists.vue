@@ -2,7 +2,10 @@
   <div class="flex h-full">
     <div class="flex-shrink-0 m-4">
       <n-space vertical>
-        <n-button type="primary" @click="importAnki">
+        <n-button
+          type="primary"
+          @click="importAnki"
+        >
           Sync from Anki
         </n-button>
         <n-cascader
@@ -13,20 +16,24 @@
           check-strategy="child"
           @update:value="loadHsk"
         />
-        <n-button @click="makeCards">Make Cards</n-button>
+        <n-button @click="makeCards">
+          Make Cards
+        </n-button>
         <div class="border-2 p-2 text-center">
-          {{words.length}} remaining words
+          {{ words.length }} remaining words
         </div>
       </n-space>
     </div>
     <div class="flex flex-col w-full h-full">
       <div class="text-center flex-shrink-0">
-        <h1 class="text-center text-xl mt-5">Maybe you know these words?</h1>
+        <h1 class="text-center text-xl mt-5">
+          Maybe you know these words?
+        </h1>
         <p>For now lets just mark learned words you already know 好不好?</p>
       </div>
       <unknown-words
         class="w-5/6 mx-auto h-full flex-grow"
-        showDefinitions
+        show-definitions
         :words="words"
       />
     </div>

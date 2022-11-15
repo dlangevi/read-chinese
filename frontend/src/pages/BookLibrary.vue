@@ -1,19 +1,32 @@
 <template>
   <div class="text-center">
-    <h2 class="text-center text-xl mt-5">Your Library</h2>
+    <h2 class="text-center text-xl mt-5">
+      Your Library
+    </h2>
     <p>Click on a book to start making flashcards.</p>
     <settings-checkbox
       :setting="UserSettings.BookLibrary.OnlyFavorites"
       @update="updateFilter"
     />
-    <n-button @click="syncCalibre">Sync Calibre</n-button>
+    <n-button @click="syncCalibre">
+      Sync Calibre
+    </n-button>
   </div>
 
-  <n-grid x-gap="12" y-gap="12" :cols="4" v-if="books.length > 0">
+  <n-grid
+    v-if="books.length > 0"
+    x-gap="12"
+    y-gap="12"
+    :cols="4"
+  >
     <n-gi
       v-for="book in favoriteFilter"
-      :key="book.bookId">
-      <book-card class="h-[700px]" :book="book" />
+      :key="book.bookId"
+    >
+      <book-card
+        class="h-[700px]"
+        :book="book"
+      />
     </n-gi>
   </n-grid>
 </template>

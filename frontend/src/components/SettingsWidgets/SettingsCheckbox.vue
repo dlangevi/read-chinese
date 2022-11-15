@@ -3,17 +3,21 @@
     <n-checkbox
       :value="setting.value"
       :label="setting.label"
-      @update:checked="submitChange"
       :default-checked="isChecked"
       :disabled="setting.disabled"
+      @update:checked="submitChange"
     />
-    <n-tooltip v-if="setting.tooltip" placement="right" trigger="hover">
+    <n-tooltip
+      v-if="setting.tooltip"
+      placement="right"
+      trigger="hover"
+    >
       <template #trigger>
         <n-icon size="20">
           <information-circle />
         </n-icon>
       </template>
-      <span> {{setting.tooltip}}</span>
+      <span> {{ setting.tooltip }}</span>
     </n-tooltip>
   </div>
 </template>

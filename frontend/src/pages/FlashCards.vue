@@ -3,9 +3,9 @@
     <ag-grid-vue
       class="ag-theme-alpine w-5/6 mx-auto
         h-full flex-grow text-xl"
-      :getRowId="getRowId"
-      :columnDefs="columnDefs"
-      :rowData="rowData"
+      :get-row-id="getRowId"
+      :column-defs="columnDefs"
+      :row-data="rowData"
       @grid-ready="onGridReady"
     />
   </div>

@@ -1,7 +1,7 @@
 <template>
-  <n-space class=col-span-2>
+  <n-space class="col-span-2">
     <span>
-      {{setting.label}}
+      {{ setting.label }}
     </span>
     <n-input
       :type="type"
@@ -13,19 +13,29 @@
       :readonly="readonly"
       @update:value="updateValue"
     />
-    <n-button v-if="readonly" @click="startEdit">
+    <n-button
+      v-if="readonly"
+      @click="startEdit"
+    >
       edit
     </n-button>
-    <n-button v-if="!readonly" @click="submitChange">
+    <n-button
+      v-if="!readonly"
+      @click="submitChange"
+    >
       submit
     </n-button>
-    <n-tooltip v-if="setting.tooltip" placement="right" trigger="hover">
+    <n-tooltip
+      v-if="setting.tooltip"
+      placement="right"
+      trigger="hover"
+    >
       <template #trigger>
         <n-icon size="20">
           <information-circle />
         </n-icon>
       </template>
-      <span>{{setting.tooltip}}</span>
+      <span>{{ setting.tooltip }}</span>
     </n-tooltip>
   </n-space>
 </template>

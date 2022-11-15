@@ -1,37 +1,68 @@
 <template>
-  <n-layout class="m-4" has-sider>
-    <n-layout-sider width=500 bordered content-style="padding: 24px;">
+  <n-layout
+    class="m-4"
+    has-sider
+  >
+    <n-layout-sider
+      width="500"
+      bordered
+      content-style="padding: 24px;"
+    >
       <img
         class="rounded rounded-t w-auto"
         :src="book.cover"
         :alt="book.title"
-      />
+      >
     </n-layout-sider>
     <n-layout>
-      <n-layout-header class="p-4" bordered>
+      <n-layout-header
+        class="p-4"
+        bordered
+      >
         <p>{{ book.author }}</p>
       </n-layout-header>
       <n-layout-content class="p-8">
-        <n-tabs type="line" animated>
-          <n-tab-pane name="Stats" tab="Stats">
-            <n-statistic label="Known" :value="known">
+        <n-tabs
+          type="line"
+          animated
+        >
+          <n-tab-pane
+            name="Stats"
+            tab="Stats"
+          >
+            <n-statistic
+              label="Known"
+              :value="known"
+            >
               <template #suffix>
                 %
               </template>
             </n-statistic>
-            <n-statistic label="Can Read" :value="likelyKnown">
+            <n-statistic
+              label="Can Read"
+              :value="likelyKnown"
+            >
               <template #suffix>
                 %
               </template>
             </n-statistic>
-            <n-statistic label="Known Characters" :value="knownCharacters">
+            <n-statistic
+              label="Known Characters"
+              :value="knownCharacters"
+            >
               <template #suffix>
                 %
               </template>
             </n-statistic>
-            <n-statistic label="Total Words" :value="totalWords" />
+            <n-statistic
+              label="Total Words"
+              :value="totalWords"
+            />
 
-            <n-table :bordered="false" :single-line="false">
+            <n-table
+              :bordered="false"
+              :single-line="false"
+            >
               <thead>
                 <tr>
                   <th>Target</th>
@@ -43,26 +74,35 @@
                   v-for="pair in targetPairs"
                   :key="pair.target"
                   :label="pair.target"
-                  :value="pair.words">
-                  <td>{{pair.target}}</td>
-                  <td>{{pair.words}}</td>
+                  :value="pair.words"
+                >
+                  <td>{{ pair.target }}</td>
+                  <td>{{ pair.words }}</td>
                 </tr>
               </tbody>
             </n-table>
           </n-tab-pane>
-          <n-tab-pane name="UnknownWords" tab="View Unknown Words">
+          <n-tab-pane
+            name="UnknownWords"
+            tab="View Unknown Words"
+          >
             <unknown-words
               class="h-96"
               :words="words"
-              :bookFilter="bookId"
+              :book-filter="bookId"
             />
           </n-tab-pane>
         </n-tabs>
       </n-layout-content>
-      <n-layout-footer class="p-4" bordered>
+      <n-layout-footer
+        class="p-4"
+        bordered
+      >
         <n-space justify="end">
-
-          <n-button type="primary" @click="makeFlashCards">
+          <n-button
+            type="primary"
+            @click="makeFlashCards"
+          >
             Make flash cards
           </n-button>
         </n-space>

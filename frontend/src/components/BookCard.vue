@@ -1,28 +1,47 @@
 <template>
   <n-card
     :title="`${book.title} - ${book.author}`"
-    :class="(known > 90) ? 'bg-green-300 p-4' : 'p-4'">
+    :class="(known > 90) ? 'bg-green-300 p-4' : 'p-4'"
+  >
     <template #cover>
       <img
         class="rounded rounded-t max-h-full w-auto m-auto"
         :src="book.cover"
         :alt="book.title"
         @click="bookBigMode"
-      />
+      >
     </template>
     <div class="m-4 text-center">
-      Known: {{known.toFixed(2)}}%
+      Known: {{ known.toFixed(2) }}%
     </div>
     <n-space justify="end">
-      <n-button v-if="!isFavorite" @click="favorite(true)">
+      <n-button
+        v-if="!isFavorite"
+        @click="favorite(true)"
+      >
         Add To Favorites
       </n-button>
-      <n-button v-if="isFavorite" @click="favorite(false)">
+      <n-button
+        v-if="isFavorite"
+        @click="favorite(false)"
+      >
         Remove From Favorites
       </n-button>
-      <n-button v-if="!isRead" @click="markRead(true)">Mark Read</n-button>
-      <n-button v-if="isRead" @click="markRead(false)">Unmark Read</n-button>
-      <n-button @click="deleteBook">Delete</n-button>
+      <n-button
+        v-if="!isRead"
+        @click="markRead(true)"
+      >
+        Mark Read
+      </n-button>
+      <n-button
+        v-if="isRead"
+        @click="markRead(false)"
+      >
+        Unmark Read
+      </n-button>
+      <n-button @click="deleteBook">
+        Delete
+      </n-button>
     </n-space>
   </n-card>
 </template>

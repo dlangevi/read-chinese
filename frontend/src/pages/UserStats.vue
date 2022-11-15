@@ -10,10 +10,20 @@
         h-full
         w-1/2
         p-16
-        ">
-      <n-statistic label="Known Words" :value="words" />
-      <n-statistic label="Known Characters" :value="characters" />
-      <n-statistic label="Total words read" :value="totalWords" />
+        "
+    >
+      <n-statistic
+        label="Known Words"
+        :value="words"
+      />
+      <n-statistic
+        label="Known Characters"
+        :value="characters"
+      />
+      <n-statistic
+        label="Total words read"
+        :value="totalWords"
+      />
     </div>
   </div>
 </template>

@@ -18,10 +18,11 @@
     <ag-grid-vue
       class="ag-theme-alpine w-full mx-auto
         h-full flex-grow text-xl"
-      :getRowId="getRowId"
-      :columnDefs="columnDefs"
-      :rowData="rowData"
-      @grid-ready="onGridReady" />
+      :get-row-id="getRowId"
+      :column-defs="columnDefs"
+      :row-data="rowData"
+      @grid-ready="onGridReady"
+    />
   </div>
 </template>
 

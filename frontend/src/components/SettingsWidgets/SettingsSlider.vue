@@ -1,26 +1,29 @@
 <template>
   <div class="col-span-2 flex gap-2">
     <span>
-      {{setting.label}}
+      {{ setting.label }}
     </span>
     <n-slider
-      @update:value="submitChange"
       v-model:value="value"
-      :step="1" />
+      :step="1"
+      @update:value="submitChange"
+    />
     <n-input-number
-      @update:value="submitChange"
       v-model:value="value"
-      size="small" />
+      size="small"
+      @update:value="submitChange"
+    />
     <n-tooltip
       v-if="setting.tooltip"
       placement="right"
-      trigger="hover">
+      trigger="hover"
+    >
       <template #trigger>
         <n-icon size="20">
           <information-circle />
         </n-icon>
       </template>
-      <span> {{setting.tooltip}}</span>
+      <span> {{ setting.tooltip }}</span>
     </n-tooltip>
   </div>
 </template>

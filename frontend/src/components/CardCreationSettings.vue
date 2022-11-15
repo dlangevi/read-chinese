@@ -1,8 +1,9 @@
 <template>
   <n-button
-    @click="openSettings"
     text
-    type="info">
+    type="info"
+    @click="openSettings"
+  >
     <template #icon>
       <n-icon size="20">
         <settings-sharp />
@@ -22,7 +23,10 @@
     </template>
 
     <Suspense>
-      <n-grid :y-gap="8" :cols="2">
+      <n-grid
+        :y-gap="8"
+        :cols="2"
+      >
         <n-gi
           v-for="content in UserSettings.CardCreation"
           :key="content.name"
@@ -31,7 +35,6 @@
         </n-gi>
       </n-grid>
     </Suspense>
-
   </n-modal>
 </template>
 

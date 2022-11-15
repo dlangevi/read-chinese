@@ -14,9 +14,7 @@ module.exports = {
     },
   },
 
-  env: {
-    node: true,
-  },
+  env: { node: true },
 
   rules: {
     'no-console': 'off',
@@ -49,7 +47,7 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'standard',
-    'plugin:vue/vue3-essential',
+    'plugin:vue/vue3-recommended',
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/typescript',

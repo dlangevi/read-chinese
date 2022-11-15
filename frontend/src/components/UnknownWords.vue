@@ -1,11 +1,12 @@
 <template>
   <ag-grid-vue
     class="ag-theme-alpine text-xl"
-    :getRowId="getRowId"
-    :columnDefs="columnDefs"
-    :rowData="rowData"
+    :get-row-id="getRowId"
+    :column-defs="columnDefs"
+    :row-data="rowData"
     :context="gridContext"
-    @grid-ready="onGridReady" />
+    @grid-ready="onGridReady"
+  />
 </template>
 
 <script lang="ts" setup>

@@ -8,7 +8,8 @@
            px-1
            rounded-lg
            text-sm"
-    @click="markKnown">
+    @click="markKnown"
+  >
     Mark Known
   </button>
 </template>

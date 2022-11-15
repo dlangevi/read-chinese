@@ -8,8 +8,9 @@
            px-1
            rounded-lg
            text-sm"
-    @click="addToQueue">
-    {{params.text}}
+    @click="addToQueue"
+  >
+    {{ params.text }}
   </button>
 </template>
 

@@ -4,10 +4,12 @@
       <img
         class="block h-32 w-auto"
         src="../assets/logo_transparent.png"
-        alt="Read More" />
+        alt="Read More"
+      >
       <div
         class="flex-1 flex items-center justify-center
-          sm:items-stretch sm:justify-start">
+          sm:items-stretch sm:justify-start"
+      >
         <div class="hidden sm:block sm:ml-6">
           <div class="flex space-x-4">
             <router-link
@@ -18,7 +20,8 @@
                          ? 'bg-gray-900 text-white'
                          : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                        'px-3 py-2 rounded-md text-sm font-medium']"
-              :aria-current="item.current ? 'page' : undefined">
+              :aria-current="item.current ? 'page' : undefined"
+            >
               {{ item.name }}
             </router-link>
           </div>

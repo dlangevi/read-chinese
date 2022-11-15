@@ -13,12 +13,13 @@
         <n-input
           v-model:value="newDictName"
           type="text"
-          placeholder="Dictionary Name" />
+          placeholder="Dictionary Name"
+        />
         <div>
           <n-button @click="pickFile">
             Select File
           </n-button>
-          {{newDictFile}}
+          {{ newDictFile }}
         </div>
         <n-select
           v-model:value="newDictType"
@@ -34,8 +35,9 @@
     <n-list class="col-span-3 row-span-2">
       <n-list-item
         v-for="(dict, name) in dicts"
-        :key="name">
-        {{dict}}
+        :key="name"
+      >
+        {{ dict }}
         <template #suffix>
           <n-button @click="makePrimary(name as string)">
             Make Primary

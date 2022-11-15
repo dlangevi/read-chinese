@@ -1,17 +1,22 @@
 <template>
   <div>
-    <div class="text-3xl m-4">Pick a definition</div>
-    <n-checkbox-group v-model:value="definition" name="definitions">
+    <div class="text-3xl m-4">
+      Pick a definition
+    </div>
+    <n-checkbox-group
+      v-model:value="definition"
+      name="definitions"
+    >
       <n-space vertical>
         <n-checkbox
-          class="text-3xl"
-          v-for="(definition, i) in definitions"
+          v-for="(def, i) in definitions"
           :key="i"
-          :value="definition.definition"
+          class="text-3xl"
+          :value="def.definition"
         >
+          <!-- Definitions can have html formatting in them -->
           <span
-            v-html="'[' + definition.pronunciation + '] '
-              + definition.definition"
+            v-html="'[' + def.pronunciation + '] ' + def.definition"
           />
         </n-checkbox>
       </n-space>
@@ -33,7 +38,7 @@ import { GetDefinitionsForWord } from '@wailsjs/backend/Dictionaries';
 
 const UserSettings = getUserSettings();
 
-const emit = defineEmits(['updateDefinition']);
+const emit = defineEmits(['update-definition']);
 const definitions = ref<backend.DictionaryEntry[]>([]);
 const definition = ref<string[]>([]);
 
@@ -47,7 +52,7 @@ watch(definition, async () => {
     UserSettings.CardCreation.AutoAdvanceEnglish.read()
   );
   console.log('update definition');
-  emit('updateDefinition', selectedDefinitions, autoAdvance);
+  emit('update-definition', selectedDefinitions, autoAdvance);
 });
 
 const props = defineProps<{
