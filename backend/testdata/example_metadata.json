@@ -17,8 +17,8 @@
   "AutoAdvanceCard": true,
   "ShowDefinitions": true,
   "EnableChinese": true,
-  "AzureApiKey": "f7c35d3a9d154a47b02df95db3354358",
-  "AzureImageApiKey": "079fca7e31a4480c9cc6bf10e80e2a17",
+  "AzureApiKey": "these are not real",
+  "AzureImageApiKey": "even the ones in the history are now invalid",
   "KnownInterval": 10,
   "OnlyFavorites": true
 }
