@@ -25,6 +25,8 @@ module.exports = {
       named: 'never',
       asyncArrow: 'always',
     }],
+    indent: 'off',
+    '@typescript-eslint/indent': ['error', 2],
     '@typescript-eslint/no-unused-vars':
       ['error', { argsIgnorePattern: '_', vars: 'local' }],
     'no-param-reassign': 'off',

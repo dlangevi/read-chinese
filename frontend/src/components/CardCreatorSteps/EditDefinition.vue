@@ -60,6 +60,26 @@ const props = defineProps<{
   type: string
 }>();
 
+async function calculateDefault() {
+  const definitions = await GetDefinitionsForWord(
+    props.word,
+    props.type,
+  );
+  if (definitions.length === 1) {
+    emit('update-definition', definitions, false);
+  }
+}
+
+let autoFill : boolean;
+if (props.type === 'english') {
+  autoFill = UserSettings.CardCreation.PopulateEnglish.read();
+} else {
+  autoFill = UserSettings.CardCreation.PopulateChinese.read();
+}
+if (autoFill) {
+  calculateDefault();
+}
+
 onBeforeMount(async () => {
   definitions.value = await GetDefinitionsForWord(
     props.word,

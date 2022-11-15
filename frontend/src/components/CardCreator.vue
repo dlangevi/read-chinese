@@ -47,28 +47,32 @@
           {{ card.fields.word }}
         </p>
         <edit-sentence
-          v-if="step == StepsEnum.SENTENCE"
+          v-show="step === StepsEnum.SENTENCE"
+          v-if="steps.includes(StepsEnum.SENTENCE)"
           :prefer-book="preferBookRef"
           :word="card.fields.word"
           :sentence="card.fields.sentence"
           @update-sentence="updateSentence"
         />
         <edit-definition
-          v-if="step == StepsEnum.ENGLISH"
+          v-show="step === StepsEnum.ENGLISH"
+          v-if="steps.includes(StepsEnum.ENGLISH)"
           :word="card.fields.word"
           :definition="card.fields.englishDefn"
           type="english"
           @update-definition="updateEnglishDefinition"
         />
         <edit-definition
-          v-if="step == StepsEnum.CHINESE"
+          v-show="step === StepsEnum.CHINESE"
+          v-if="steps.includes(StepsEnum.CHINESE)"
           :word="card.fields.word"
           :definition="card.fields.englishDefn"
           type="chinese"
           @update-definition="updateChineseDefinition"
         />
         <edit-images
-          v-if="step == StepsEnum.IMAGE"
+          v-show="step === StepsEnum.IMAGE"
+          v-if="steps.includes(StepsEnum.IMAGE)"
           :word="card.fields.word"
           @update-images="updateImages"
         />
@@ -127,7 +131,6 @@ import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
 import { getUserSettings } from '@/lib/userSettings';
 
 import { AddWord } from '@wailsjs/backend/KnownWords';
-import { GetDefinitionsForWord } from '@wailsjs/backend/Dictionaries';
 import {
   CreateAnkiNote,
   UpdateNoteFields,
@@ -158,31 +161,20 @@ let preferBook;
 // Manually change the step from an edit button.
 const changeStep = (estep: StepsEnum) => {
   step.value = estep;
-  // Remove any set steps progression since the user has taken control
-  steps.value = [];
 };
 
 const nextStep = async () => {
-  if (steps.value.length === 0) {
-    return;
-  }
-
   const idx = steps.value.indexOf(step.value);
   if (idx === -1) {
     return;
   }
   if (idx + 1 === steps.value.length) {
     // We were on the last step
-    const autoAdvanceCard = await (
-      UserSettings.CardCreation.AutoAdvanceCard.read()
-    );
-    if (autoAdvanceCard) {
+    if (UserSettings.CardCreation.AutoAdvanceCard.read()) {
       submit();
     }
   }
-  if (idx + 1 <= steps.value.length) {
-    step.value = steps.value[idx + 1];
-  }
+  step.value = steps.value[idx + 1];
 };
 
 const updateSentence = (newSentence: string, updateStep = false) => {
@@ -194,52 +186,47 @@ const updateSentence = (newSentence: string, updateStep = false) => {
   }
 };
 
+const updateDefinition = (
+  newDefinitions: backend.DictionaryEntry[],
+  updateStep: boolean,
+  setter: (arg0: string) => void,
+) => {
+  const definitions = newDefinitions.map(
+    (def) => `[${def.pronunciation}] ${def.definition}`,
+  ).join('<br>');
+  setter(definitions);
+  const pinyin = new Set(card.value.fields.pinyin.split(', '));
+  newDefinitions.forEach((def) => {
+    const pronunciation = def.pronunciation.replace(/\s/g, '');
+    pinyin.add(pronunciation);
+  });
+  pinyin.delete('');
+  card.value.fields.pinyin = [...pinyin].join(', ');
+  if (updateStep) {
+    nextStep();
+  }
+};
+
 const updateEnglishDefinition = (
   newDefinitions: backend.DictionaryEntry[],
   updateStep = false,
 ) => {
-  if (newDefinitions.length > 0) {
-    card.value.fields.englishDefn = newDefinitions.map(
-      (def) => `[${def.pronunciation}] ${def.definition}`,
-    ).join('<br>');
-    const pinyin = new Set(card.value.fields.pinyin.split(', '));
-    newDefinitions.forEach((def) => {
-      const pronunciation = def.pronunciation.replace(/\s/g, '');
-      pinyin.add(pronunciation);
-    });
-    pinyin.delete('');
-    card.value.fields.pinyin = [...pinyin].join(', ');
-    if (updateStep) {
-      nextStep();
-    }
-  }
+  updateDefinition(newDefinitions, updateStep, function (newDefs: string) {
+    card.value.fields.englishDefn = newDefs;
+  });
 };
 
 const updateChineseDefinition = (
   newDefinitions: backend.DictionaryEntry[],
   updateStep = false,
 ) => {
-  if (newDefinitions.length > 0) {
-    card.value.fields.chineseDefn = newDefinitions.map(
-      (def) => `[${def.pronunciation}] ${def.definition}`,
-    ).join('<br>');
-    const pinyin = new Set(card.value.fields.pinyin.split(', '));
-    pinyin.delete('');
-    newDefinitions.forEach((def) => {
-      // TODO normalize pinyin across dictionaries
-      const pronunciation = def.pronunciation.replace(/\s/g, '');
-      pinyin.add(pronunciation);
-    });
-    card.value.fields.pinyin = [...pinyin].join(', ');
-    if (updateStep) {
-      nextStep();
-    }
-  }
+  updateDefinition(newDefinitions, updateStep, function (newDefs: string) {
+    card.value.fields.chineseDefn = newDefs;
+  });
 };
 
 const updateImages = (newImages: backend.ImageInfo[], updateStep = false) => {
   if (newImages) {
-    // TODO support multiple
     card.value.fields.imageUrls = newImages.map((image) => image.thumbnailUrl);
     if (updateStep) {
       nextStep();
@@ -291,39 +278,6 @@ store.$subscribe(async (_, state) => {
       ];
     }
     card.value = reactive(ankiCard);
-
-    // TODO this needs to be written in a more modular way
-    const englishIdx = steps.value.indexOf(StepsEnum.ENGLISH);
-    if (englishIdx !== -1) {
-      const autoFill = await UserSettings.CardCreation.PopulateEnglish.read();
-      if (autoFill) {
-        // TODO base this on default dict
-        const definitions = await GetDefinitionsForWord(
-          word,
-          'english',
-        );
-        if (definitions.length === 1) {
-          updateEnglishDefinition(definitions);
-          steps.value.splice(englishIdx, 1);
-        }
-      }
-    }
-
-    const chineseIdx = steps.value.indexOf(StepsEnum.CHINESE);
-    if (chineseIdx !== -1) {
-      const autoFill = await UserSettings.CardCreation.PopulateChinese.read();
-      if (autoFill) {
-        // TODO base this on default dict
-        const definitions = await GetDefinitionsForWord(
-          word,
-          'chinese',
-        );
-        if (definitions.length === 1) {
-          updateChineseDefinition(definitions);
-          steps.value.splice(chineseIdx, 1);
-        }
-      }
-    }
 
     [step.value] = steps.value;
   }
