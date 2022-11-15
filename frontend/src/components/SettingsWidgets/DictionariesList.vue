@@ -33,11 +33,31 @@
       </template>
     </n-modal>
     <n-list class="col-span-3 row-span-2">
+      <template #header>
+        <div class="text-2xl grid grid-cols-2">
+          <div>
+            Dictionaries
+          </div>
+          <n-button @click="addDictionary">
+            Add Dictionary
+          </n-button>
+        </div>
+      </template>
       <n-list-item
         v-for="(dict, name) in dicts"
         :key="name"
       >
-        {{ dict }}
+        <n-descriptions label-placement="left">
+          <n-descriptions-item label="Name">
+            {{ dict.name }}
+          </n-descriptions-item>
+          <n-descriptions-item label="Type">
+            {{ dict.type }}
+          </n-descriptions-item>
+          <n-descriptions-item label="Path">
+            {{ dict.path }}
+          </n-descriptions-item>
+        </n-descriptions>
         <template #suffix>
           <n-button @click="makePrimary(name as string)">
             Make Primary
@@ -47,11 +67,6 @@
           </n-button>
         </template>
       </n-list-item>
-      <template #footer>
-        <n-button @click="addDictionary">
-          Add Dictionary
-        </n-button>
-      </template>
     </n-list>
   </div>
 </template>
@@ -59,6 +74,7 @@
 <script lang="ts" setup>
 import {
   NModal, NButton, NList, NListItem, NInput, NSelect,
+  NDescriptions, NDescriptionsItem,
 } from 'naive-ui';
 import { onBeforeMount, ref } from 'vue';
 
