@@ -16,9 +16,9 @@
           placeholder="Dictionary Name"
         />
         <div>
-          <n-button @click="pickFile">
+          <button class="btn btn-secondary" @click="pickFile">
             Select File
-          </n-button>
+          </button>
           {{ newDictFile }}
         </div>
         <n-select
@@ -27,9 +27,9 @@
         />
       </div>
       <template #action>
-        <n-button @click="submit">
+        <button class="btn btn-secondary" @click="submit">
           Add Dictionary
-        </n-button>
+        </button>
       </template>
     </n-modal>
     <n-list class="col-span-3 row-span-2">
@@ -38,9 +38,9 @@
           <div>
             Dictionaries
           </div>
-          <n-button @click="addDictionary">
+          <button class="btn btn-secondary" @click="addDictionary">
             Add Dictionary
-          </n-button>
+          </button>
         </div>
       </template>
       <n-list-item
@@ -59,12 +59,20 @@
           </n-descriptions-item>
         </n-descriptions>
         <template #suffix>
-          <n-button @click="makePrimary(name as string)">
-            Make Primary
-          </n-button>
-          <n-button @click="deleteDict(name as string)">
-            Delete
-          </n-button>
+          <div class="grid gap-4">
+            <button
+              class="btn btn-secondary"
+              @click="makePrimary(name as string)"
+            >
+              Make Primary
+            </button>
+            <button
+              class="btn btn-secondary"
+              @click="deleteDict(name as string)"
+            >
+              Delete
+            </button>
+          </div>
         </template>
       </n-list-item>
     </n-list>
@@ -73,7 +81,7 @@
 
 <script lang="ts" setup>
 import {
-  NModal, NButton, NList, NListItem, NInput, NSelect,
+  NModal, NList, NListItem, NInput, NSelect,
   NDescriptions, NDescriptionsItem,
 } from 'naive-ui';
 import { onBeforeMount, ref } from 'vue';

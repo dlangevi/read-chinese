@@ -13,18 +13,20 @@
       :readonly="readonly"
       @update:value="updateValue"
     />
-    <n-button
+    <button
       v-if="readonly"
+      class="btn btn-primary btn-sm"
       @click="startEdit"
     >
       edit
-    </n-button>
-    <n-button
+    </button>
+    <button
       v-if="!readonly"
+      class="btn btn-primary btn-sm"
       @click="submitChange"
     >
       submit
-    </n-button>
+    </button>
     <n-tooltip
       v-if="setting.tooltip"
       placement="right"
@@ -44,7 +46,7 @@
 // TODO have some kind of hover popup with more info
 import { ref } from 'vue';
 import {
-  NTooltip, NIcon, NInput, NButton, NSpace,
+  NTooltip, NIcon, NInput, NSpace,
 } from 'naive-ui';
 import { InformationCircle } from '@vicons/ionicons5';
 

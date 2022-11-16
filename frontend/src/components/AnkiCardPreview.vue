@@ -4,28 +4,24 @@
       Hanzi: {{ ankiCard.fields.word }}
     </h2>
     <div>
-      <n-button
-        type="info"
-        size="tiny"
-        class="m-2 inline"
+      <button
+        class="btn btn-primary btn-xs m-2 inline"
         @click="$emit('change-step', StepsEnum.SENTENCE)"
       >
         Edit
-      </n-button>
+      </button>
       <h2 class="text-l inline font-bold">
         Sentence:
       </h2>
       <span> {{ ankiCard.fields.sentence }}</span>
     </div>
     <div>
-      <n-button
-        type="info"
-        size="tiny"
-        class="m-2"
+      <button
+        class="btn btn-primary btn-xs m-2"
         @click="$emit('change-step', StepsEnum.ENGLISH)"
       >
         Edit
-      </n-button>
+      </button>
       <h2 class="text-l inline font-bold">
         Definition:
       </h2>
@@ -35,14 +31,12 @@
       </p>
     </div>
     <div v-if="enableChinese">
-      <n-button
-        type="info"
-        size="tiny"
-        class="m-2"
+      <button
+        class="btn btn-primary btn-xs m-2"
         @click="$emit('change-step', StepsEnum.CHINESE)"
       >
         Edit
-      </n-button>
+      </button>
       <h2 class="text-l inline font-bold">
         ChineseDefinition:
       </h2>
@@ -52,14 +46,12 @@
       </p>
     </div>
     <div>
-      <n-button
-        type="info"
-        size="tiny"
-        class="m-2"
+      <button
+        class="btn btn-primary btn-xs m-2"
         @click="$emit('change-step', StepsEnum.IMAGE)"
       >
         Edit
-      </n-button>
+      </button>
       <h2 class="text-l inline font-bold">
         Images:
       </h2>
@@ -77,7 +69,7 @@
 </template>
 
 <script lang="ts" setup>
-import { NCard, NButton } from 'naive-ui';
+import { NCard } from 'naive-ui';
 import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
 import { getUserSettings } from '@/lib/userSettings';
 

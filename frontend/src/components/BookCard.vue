@@ -15,40 +15,47 @@
       Known: {{ known.toFixed(2) }}%
     </div>
     <n-space justify="end">
-      <n-button
+      <button
         v-if="!isFavorite"
+        class="btn btn-xs btn-accent"
         @click="favorite(true)"
       >
         Add To Favorites
-      </n-button>
-      <n-button
+      </button>
+      <button
         v-if="isFavorite"
+        class="btn btn-xs btn-accent"
         @click="favorite(false)"
       >
         Remove From Favorites
-      </n-button>
-      <n-button
+      </button>
+      <button
         v-if="!isRead"
+        class="btn btn-xs btn-accent"
         @click="markRead(true)"
       >
         Mark Read
-      </n-button>
-      <n-button
+      </button>
+      <button
         v-if="isRead"
+        class="btn btn-xs btn-accent"
         @click="markRead(false)"
       >
         Unmark Read
-      </n-button>
-      <n-button @click="deleteBook">
+      </button>
+      <button
+        class="btn btn-xs btn-accent"
+        @click="deleteBook"
+      >
         Delete
-      </n-button>
+      </button>
     </n-space>
   </n-card>
 </template>
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
-import { NSpace, NCard, NButton } from 'naive-ui';
+import { NSpace, NCard } from 'naive-ui';
 import { ref } from 'vue';
 
 import { DeleteBook, SetFavorite, SetRead } from '@wailsjs/backend/bookLibrary';

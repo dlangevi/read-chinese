@@ -2,9 +2,9 @@
   <div class="flex h-full">
     <div class="m-4 shrink-0">
       <n-space vertical>
-        <n-button type="primary" @click="importAnki">
+        <button class="btn btn-primary" @click="importAnki">
           Sync from Anki
-        </n-button>
+        </button>
         <n-cascader
           :options="options"
           placeholder="Load HSK Words"
@@ -13,7 +13,7 @@
           check-strategy="child"
           @update:value="loadHsk"
         />
-        <button class="btn" @click="makeCards">
+        <button class="btn btn-primary" @click="makeCards">
           Make Cards
         </button>
         <div class="border-2 p-2 text-center">
@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { NButton, NSpace, NCascader } from 'naive-ui';
+import { NSpace, NCascader } from 'naive-ui';
 import type { CascaderOption } from 'naive-ui';
 import { ref, onBeforeMount } from 'vue';
 import { backend } from '@wailsjs/models';

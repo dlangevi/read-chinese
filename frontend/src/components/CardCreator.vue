@@ -81,31 +81,31 @@
 
     <template #action>
       <n-space justify="end">
-        <n-button
+        <button
           v-if="steps.length > 0"
-          type="info"
+          class="btn btn-primary btn-sm"
           @click="nextStep()"
         >
           Next Step
-        </n-button>
-        <n-button
-          type="info"
+        </button>
+        <button
+          class="btn btn-primary btn-sm"
           @click="store.clearFront()"
         >
           Skip Word
-        </n-button>
-        <n-button
-          type="info"
+        </button>
+        <button
+          class="btn btn-primary btn-sm"
           @click="markKnown"
         >
           Mark Known
-        </n-button>
-        <n-button
-          type="info"
+        </button>
+        <button
+          class="btn btn-primary btn-sm"
           @click="submit()"
         >
           Submit
-        </n-button>
+        </button>
       </n-space>
     </template>
   </n-modal>
@@ -119,7 +119,7 @@ import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import AnkiCardPreview from '@/components/AnkiCardPreview.vue';
 import CardCreationSettings from '@/components/CardCreationSettings.vue';
 import {
-  useMessage, NSpace, NButton, NModal,
+  useMessage, NSpace, NModal,
   NLayoutSider, NLayout, NLayoutContent,
 } from 'naive-ui';
 import EditSentence from '@/components/CardCreatorSteps/EditSentence.vue';

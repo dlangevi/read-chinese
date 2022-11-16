@@ -99,12 +99,12 @@
         bordered
       >
         <n-space justify="end">
-          <n-button
-            type="primary"
+          <button
+            class="btn btn-primary"
             @click="makeFlashCards"
           >
             Make flash cards
-          </n-button>
+          </button>
         </n-space>
       </n-layout-footer>
     </n-layout>
@@ -116,7 +116,7 @@ import UnknownWords from '@/components/UnknownWords.vue';
 import { provide } from 'vue';
 import {
   NLayout, NLayoutSider, NLayoutHeader, NLayoutContent,
-  NLayoutFooter, NButton, NSpace, NTabs, NTabPane,
+  NLayoutFooter, NSpace, NTabs, NTabPane,
   NStatistic, NTable,
 } from 'naive-ui';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
