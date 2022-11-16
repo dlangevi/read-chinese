@@ -1,5 +1,5 @@
 <template>
-  <div data-theme="dark" class="text-base-content">
+  <div class="text-base-content">
     <n-message-provider>
       <div
         id="app"
@@ -18,12 +18,20 @@
 </template>
 
 <script lang="ts" setup>
+import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { NMessageProvider } from 'naive-ui';
 import TopNav from '@/components/TopNav.vue';
 import CardCreator from '@/components/CardCreator.vue';
 
 import './App.css';
+
+onMounted(() => {
+  const theme = localStorage.getItem('theme');
+  if (theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+});
 
 const route = useRoute();
 </script>

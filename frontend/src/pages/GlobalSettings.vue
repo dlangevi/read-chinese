@@ -4,6 +4,23 @@
       Settings
     </h2>
     <p>Lets go</p>
+    <div>
+      <div class="m-5">
+        <h2 class="mb-4 text-2xl font-bold text-green-700">Select Theme</h2>
+        <select
+          data-choose-theme
+          class="select-primary select"
+        >
+          <option
+            v-for="theme in themes"
+            :key="theme"
+            :value="theme"
+          >
+            {{ theme }}
+          </option>
+        </select>
+      </div>
+    </div>
     <div
       v-for="(contents, section, index) in sections"
       :key="index"
@@ -33,8 +50,24 @@
 
 <script lang="ts" setup>
 import { getUserSettings } from '@/lib/userSettings';
+import { onMounted } from 'vue';
+import { themeChange } from 'theme-change';
+onMounted(() => {
+  themeChange(false);
+});
 
 const UserSettings = getUserSettings();
+const themes = [
+  'light', 'dark', 'cupcake',
+  'bumblebee', 'emerald', 'corporate',
+  'synthwave', 'retro', 'cyberpunk',
+  'valentine', 'halloween', 'garden',
+  'forest', 'aqua', 'lofi', 'pastel',
+  'fantasy', 'wireframe', 'black',
+  'luxury', 'dracula', 'cmyk',
+  'autumn', 'business', 'acid',
+  'lemonade', 'night', 'coffee', 'winter',
+];
 
 const sections = {
   CardCreationSettings:
