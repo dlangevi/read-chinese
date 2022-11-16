@@ -1,30 +1,21 @@
 <template>
-  <div>
-    Look at these stats!
-    <div
-      class="
-
-        stats shadow
-        "
-    >
-      <n-statistic
-        label="Known Words"
-        :value="words"
-      />
-      <n-statistic
-        label="Known Characters"
-        :value="characters"
-      />
-      <n-statistic
-        label="Total words read"
-        :value="totalWords"
-      />
+  <div class="stats shadow">
+    <div class="stat place-items-center">
+      <div class="stat-title"> Known Words </div>
+      <div class="stat-value"> {{ words }} </div>
+    </div>
+    <div class="stat place-items-center">
+      <div class="stat-title"> Known Characters </div>
+      <div class="stat-value"> {{ characters }} </div>
+    </div>
+    <div class="stat place-items-center">
+      <div class="stat-title"> Total Words Read </div>
+      <div class="stat-value"> {{ totalWords }} </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { NStatistic } from 'naive-ui';
 import { GetWordStats } from '@wailsjs/backend/KnownWords';
 import { TotalRead } from '@wailsjs/backend/bookLibrary';
 

@@ -45,6 +45,8 @@ module.exports = {
     // TODO turn these back on once I actually want to release this to people
     'vuejs-accessibility/click-events-have-key-events': 'off',
     'tailwindcss/no-custom-classname': 'off',
+    'vue/singleline-html-element-content-newline': 'off',
+    'vue/multiline-html-element-content-newline': 'error',
   },
 
   extends: [
