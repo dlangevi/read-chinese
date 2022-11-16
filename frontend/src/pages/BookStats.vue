@@ -59,10 +59,7 @@
               :value="totalWords"
             />
 
-            <n-table
-              :bordered="false"
-              :single-line="false"
-            >
+            <table class="table w-full">
               <thead>
                 <tr>
                   <th>Target</th>
@@ -80,7 +77,7 @@
                   <td>{{ pair.words }}</td>
                 </tr>
               </tbody>
-            </n-table>
+            </table>
           </n-tab-pane>
           <n-tab-pane
             name="UnknownWords"
@@ -117,7 +114,7 @@ import { provide } from 'vue';
 import {
   NLayout, NLayoutSider, NLayoutHeader, NLayoutContent,
   NLayoutFooter, NSpace, NTabs, NTabPane,
-  NStatistic, NTable,
+  NStatistic,
 } from 'naive-ui';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import type { backend } from '@wailsjs/models';
