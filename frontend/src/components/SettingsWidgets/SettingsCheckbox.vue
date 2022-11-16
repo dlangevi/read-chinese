@@ -18,7 +18,7 @@
       {{ setting.label }}
     </label>
     <div
-      class="tooltip"
+      class="tooltip tooltip-right"
       :data-tip="setting.tooltip"
     >
       <information-circle class="h-6 w-6" />

@@ -15,30 +15,25 @@
     />
     <button
       v-if="readonly"
-      class="btn btn-primary btn-sm"
+      class="btn-primary btn-sm btn"
       @click="startEdit"
     >
       edit
     </button>
     <button
       v-if="!readonly"
-      class="btn btn-primary btn-sm"
+      class="btn-primary btn-sm btn"
       @click="submitChange"
     >
       submit
     </button>
-    <n-tooltip
-      v-if="setting.tooltip"
-      placement="right"
-      trigger="hover"
+
+    <div
+      class="tooltip tooltip-right"
+      :data-tip="setting.tooltip"
     >
-      <template #trigger>
-        <n-icon size="20">
-          <information-circle />
-        </n-icon>
-      </template>
-      <span>{{ setting.tooltip }}</span>
-    </n-tooltip>
+      <information-circle class="h-6 w-6" />
+    </div>
   </n-space>
 </template>
 
@@ -46,7 +41,7 @@
 // TODO have some kind of hover popup with more info
 import { ref } from 'vue';
 import {
-  NTooltip, NIcon, NInput, NSpace,
+  NInput, NSpace,
 } from 'naive-ui';
 import { InformationCircle } from '@vicons/ionicons5';
 

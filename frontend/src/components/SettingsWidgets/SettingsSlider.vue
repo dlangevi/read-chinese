@@ -13,24 +13,18 @@
       size="small"
       @update:value="submitChange"
     />
-    <n-tooltip
-      v-if="setting.tooltip"
-      placement="right"
-      trigger="hover"
+    <div
+      class="tooltip tooltip-right"
+      :data-tip="setting.tooltip"
     >
-      <template #trigger>
-        <n-icon size="20">
-          <information-circle />
-        </n-icon>
-      </template>
-      <span> {{ setting.tooltip }}</span>
-    </n-tooltip>
+      <information-circle class="h-6 w-6" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import {
-  NTooltip, NIcon, NSlider, NInputNumber,
+  NSlider, NInputNumber,
 } from 'naive-ui';
 import { ref } from 'vue';
 import { InformationCircle } from '@vicons/ionicons5';
