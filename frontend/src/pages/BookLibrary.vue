@@ -13,7 +13,7 @@
         @update="updateFilter"
       />
       <button
-        class="btn-primary btn"
+        class="btn-primary btn-sm btn"
         @click="syncCalibre"
       >
         Sync Calibre
@@ -22,7 +22,7 @@
   </div>
   <div
     v-if="books.length > 0"
-    class="grid grid-cols-4 gap-12"
+    class="m-8 grid grid-cols-4 gap-12"
   >
     <div
       v-for="book in favoriteFilter"

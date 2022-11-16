@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto flex h-full flex-col px-4">
+  <div class="container m-4 mx-auto flex h-full flex-col px-4">
     <ag-grid-vue
       class="ag-theme-alpine mx-auto h-full
         w-5/6 grow text-xl"
