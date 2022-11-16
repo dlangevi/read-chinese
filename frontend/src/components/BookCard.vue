@@ -5,7 +5,7 @@
   >
     <template #cover>
       <img
-        class="rounded rounded-t max-h-full w-auto m-auto"
+        class="m-auto max-h-full w-auto rounded"
         :src="book.cover"
         :alt="book.title"
         @click="bookBigMode"

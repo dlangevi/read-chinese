@@ -1,13 +1,13 @@
 <template>
   <button
     type="button"
-    class="bg-purple-700
+    class="rounded-lg
+           bg-purple-700
+           px-1
+           text-sm
            text-white
            hover:bg-purple-500
-           hover:text-white
-           px-1
-           rounded-lg
-           text-sm"
+           hover:text-white"
     @click="markKnown"
   >
     Mark Known

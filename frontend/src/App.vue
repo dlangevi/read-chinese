@@ -1,18 +1,20 @@
 <template>
-  <n-message-provider>
-    <div
-      id="app"
-      class="bg-white max-h-screen max-w-screen"
-    >
-      <TopNav class="w-screen h-16" />
-      <CardCreator />
-      <div class="w-screen h-[calc(100vh-4rem)] overflow-scroll">
-        <Suspense>
-          <router-view :key="route.fullPath" />
-        </Suspense>
+  <div data-theme="light">
+    <n-message-provider>
+      <div
+        id="app"
+        class="bg-base-100 max-w-screen max-h-screen"
+      >
+        <TopNav class="h-16 w-screen" />
+        <CardCreator />
+        <div class="h-[calc(100vh-4rem)] w-screen overflow-scroll">
+          <Suspense>
+            <router-view :key="route.fullPath" />
+          </Suspense>
+        </div>
       </div>
-    </div>
-  </n-message-provider>
+    </n-message-provider>
+  </div>
 </template>
 
 <script lang="ts" setup>

@@ -9,7 +9,7 @@
       content-style="padding: 24px;"
     >
       <img
-        class="rounded rounded-t w-auto"
+        class="w-auto rounded"
         :src="book.cover"
         :alt="book.title"
       >

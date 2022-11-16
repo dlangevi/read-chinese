@@ -3,13 +3,8 @@
     Look at these stats!
     <div
       class="
-        grid
-        grid-cols-2
-        gap-4
-        place-content-center
-        h-full
-        w-1/2
-        p-16
+
+        stats shadow
         "
     >
       <n-statistic

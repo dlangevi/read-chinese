@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto px-4">
     <div class="text-center">
-      <h2 class="text-center mt-5">
+      <h2 class="mt-5 text-center">
         About
       </h2>
       <p>

@@ -15,8 +15,11 @@
     "@vicons/ionicons5": "^0.12.0",
     "ag-grid-community": "^28.1.1",
     "ag-grid-vue3": "^28.1.1",
+    "daisyui": "^2.40.1",
+    "eslint-plugin-tailwindcss": "^3.7.0",
     "naive-ui": "^2.33.5",
     "pinia": "^2.0.23",
+    "theme-change": "^2.2.0",
     "vue": "^3.2.37",
     "vue-router": "^4.1.5",
     "windicss": "^3.5.6"

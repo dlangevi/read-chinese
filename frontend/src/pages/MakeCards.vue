@@ -1,23 +1,23 @@
 <template>
   <div
-    class="flex
-           flex-col
+    class="h-7/8
            container
-           mx-auto
            m-4
-           gap-2
-           px-4
+           mx-auto
+           flex
            h-full
            w-3/4
-           h-7/8"
+           flex-col
+           gap-2
+           px-4"
   >
     <n-input
       placeholder="Input here (using 汉字 for now)"
       @input="onUpdateSearchBox"
     />
     <ag-grid-vue
-      class="ag-theme-alpine w-full mx-auto
-        h-full flex-grow text-xl"
+      class="ag-theme-alpine mx-auto h-full
+        w-full grow text-xl"
       :get-row-id="getRowId"
       :column-defs="columnDefs"
       :row-data="rowData"

@@ -1,7 +1,7 @@
 <template>
   <n-modal
     v-model:show="showModal"
-    class="w-4/5 h-[80vh]"
+    class="h-[80vh] w-4/5"
     :mask-closable="false"
     :closable="true"
     preset="card"
@@ -19,7 +19,7 @@
     <n-layout
       has-sider
       sider-placement="left"
-      class="flex-grow"
+      class="grow"
       style="max-height: 60vh"
     >
       <n-layout-sider

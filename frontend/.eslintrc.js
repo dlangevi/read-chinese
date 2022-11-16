@@ -44,6 +44,7 @@ module.exports = {
     'linebreak-style': 'off',
     // TODO turn these back on once I actually want to release this to people
     'vuejs-accessibility/click-events-have-key-events': 'off',
+    'tailwindcss/no-custom-classname': 'off',
   },
 
   extends: [
@@ -53,6 +54,7 @@ module.exports = {
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/typescript',
+    'plugin:tailwindcss/recommended',
     '@vue/eslint-config-typescript',
   ],
   parserOptions: {

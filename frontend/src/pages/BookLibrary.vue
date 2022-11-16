@@ -1,6 +1,6 @@
 <template>
   <div class="text-center">
-    <h2 class="text-center text-xl mt-5">
+    <h2 class="mt-5 text-center text-xl">
       Your Library
     </h2>
     <p>Click on a book to start making flashcards.</p>
@@ -8,18 +8,18 @@
       :setting="UserSettings.BookLibrary.OnlyFavorites"
       @update="updateFilter"
     />
-    <n-button @click="syncCalibre">
+    <button
+      class="btn btn-primary"
+      @click="syncCalibre"
+    >
       Sync Calibre
-    </n-button>
+    </button>
   </div>
-
-  <n-grid
+  <div
     v-if="books.length > 0"
-    x-gap="12"
-    y-gap="12"
-    :cols="4"
+    class="grid grid-cols-4 gap-12"
   >
-    <n-gi
+    <div
       v-for="book in favoriteFilter"
       :key="book.bookId"
     >
@@ -27,15 +27,14 @@
         class="h-[700px]"
         :book="book"
       />
-    </n-gi>
-  </n-grid>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import {
   onBeforeMount, ref, computed, Ref,
 } from 'vue';
-import { NGrid, NGi, NButton } from 'naive-ui';
 import BookCard from '@/components/BookCard.vue';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';

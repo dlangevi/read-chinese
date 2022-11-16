@@ -1,13 +1,7 @@
 <template>
   <button
     type="button"
-    class="bg-purple-700
-           text-white
-           hover:bg-purple-500
-           hover:text-white
-           px-1
-           rounded-lg
-           text-sm"
+    class="btn text-sm"
     @click="addToQueue"
   >
     {{ params.text }}
@@ -17,6 +11,13 @@
 <script lang="ts" setup>
 /*
 import { NButton } from 'naive-ui';
+    class="bg-purple-700
+           text-white
+           hover:bg-purple-500
+           hover:text-white
+           px-1
+           rounded-lg
+           text-sm"
   <n-button
     type="default"
     size="tiny"

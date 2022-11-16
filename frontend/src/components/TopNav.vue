@@ -1,16 +1,16 @@
 <template>
-  <div class="bg-gray-800 mx-auto px-8">
-    <div class="block flex items-center justify-between h-16">
+  <div class="mx-auto bg-gray-800 px-8">
+    <div class="flex h-16 items-center justify-between">
       <img
         class="block h-32 w-auto"
         src="../assets/logo_transparent.png"
         alt="Read More"
       >
       <div
-        class="flex-1 flex items-center justify-center
+        class="flex flex-1 items-center justify-center
           sm:items-stretch sm:justify-start"
       >
-        <div class="hidden sm:block sm:ml-6">
+        <div class="hidden sm:ml-6 sm:block">
           <div class="flex space-x-4">
             <router-link
               v-for="item in navigation"

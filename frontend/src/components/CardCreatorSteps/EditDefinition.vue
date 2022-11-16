@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-3xl m-4">
+    <div class="m-4 text-3xl">
       Pick a definition
     </div>
     <n-checkbox-group

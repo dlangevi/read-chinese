@@ -1,6 +1,6 @@
 <template>
   <div class="flex h-full">
-    <div class="flex-shrink-0 m-4">
+    <div class="m-4 shrink-0">
       <n-space vertical>
         <n-button
           type="primary"
@@ -24,15 +24,15 @@
         </div>
       </n-space>
     </div>
-    <div class="flex flex-col w-full h-full">
-      <div class="text-center flex-shrink-0">
-        <h1 class="text-center text-xl mt-5">
+    <div class="flex h-full w-full flex-col">
+      <div class="shrink-0 text-center">
+        <h1 class="mt-5 text-center text-xl">
           Maybe you know these words?
         </h1>
         <p>For now lets just mark learned words you already know 好不好?</p>
       </div>
       <unknown-words
-        class="w-5/6 mx-auto h-full flex-grow"
+        class="mx-auto h-full w-5/6 grow"
         show-definitions
         :words="words"
       />

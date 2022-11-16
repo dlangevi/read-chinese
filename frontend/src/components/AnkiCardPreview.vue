@@ -7,12 +7,12 @@
       <n-button
         type="info"
         size="tiny"
-        class="inline m-2"
+        class="m-2 inline"
         @click="$emit('change-step', StepsEnum.SENTENCE)"
       >
         Edit
       </n-button>
-      <h2 class="inline text-l font-bold">
+      <h2 class="text-l inline font-bold">
         Sentence:
       </h2>
       <span> {{ ankiCard.fields.sentence }}</span>
@@ -26,7 +26,7 @@
       >
         Edit
       </n-button>
-      <h2 class="inline text-l font-bold">
+      <h2 class="text-l inline font-bold">
         Definition:
       </h2>
       <p>
@@ -43,7 +43,7 @@
       >
         Edit
       </n-button>
-      <h2 class="inline text-l font-bold">
+      <h2 class="text-l inline font-bold">
         ChineseDefinition:
       </h2>
       <p>
@@ -60,7 +60,7 @@
       >
         Edit
       </n-button>
-      <h2 class="inline text-l font-bold">
+      <h2 class="text-l inline font-bold">
         Images:
       </h2>
       <div class="flex gap-1">

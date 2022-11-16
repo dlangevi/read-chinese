@@ -7,13 +7,13 @@
     <div
       v-for="(contents, section, index) in sections"
       :key="index"
-      class="grid gap-4 grid-cols-4 m-4 p-4 border-2 justify-start"
+      class="m-4 grid grid-cols-4 justify-start gap-4 border-2 p-4"
     >
       <div class="border-4">
         {{ section }}
       </div>
       <div
-        class="col-span-3 grid gap-6 grid-cols-3 grid-flow-row justify-start"
+        class="col-span-3 grid grid-flow-row grid-cols-3 justify-start gap-6"
       >
         <component
           :is="content.type"

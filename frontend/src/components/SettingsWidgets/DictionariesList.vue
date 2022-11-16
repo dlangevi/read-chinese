@@ -9,7 +9,7 @@
       <template #header>
         Add a dicitonary in Yomichan Json Format
       </template>
-      <div class="w-3/4 m-auto flex flex-col gap-1">
+      <div class="m-auto flex w-3/4 flex-col gap-1">
         <n-input
           v-model:value="newDictName"
           type="text"
@@ -34,7 +34,7 @@
     </n-modal>
     <n-list class="col-span-3 row-span-2">
       <template #header>
-        <div class="text-2xl grid grid-cols-2">
+        <div class="grid grid-cols-2 text-2xl">
           <div>
             Dictionaries
           </div>

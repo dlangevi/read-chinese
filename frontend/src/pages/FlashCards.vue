@@ -1,8 +1,8 @@
 <template>
-  <div class="flex flex-col container mx-auto px-4 h-full">
+  <div class="container mx-auto flex h-full flex-col px-4">
     <ag-grid-vue
-      class="ag-theme-alpine w-5/6 mx-auto
-        h-full flex-grow text-xl"
+      class="ag-theme-alpine mx-auto h-full
+        w-5/6 grow text-xl"
       :get-row-id="getRowId"
       :column-defs="columnDefs"
       :row-data="rowData"
