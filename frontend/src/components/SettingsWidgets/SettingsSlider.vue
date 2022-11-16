@@ -3,16 +3,16 @@
     <span>
       {{ setting.label }}
     </span>
-    <n-slider
-      v-model:value="value"
-      :step="1"
-      @update:value="submitChange"
-    />
-    <n-input-number
-      v-model:value="value"
-      size="small"
-      @update:value="submitChange"
-    />
+    <input
+      v-model="value"
+      class="range range-primary"
+      type="range"
+      min="0"
+      max="110"
+      step="1"
+      @input="submitChange"
+    >
+    <div> {{ value }} </div>
     <div
       class="tooltip tooltip-right"
       :data-tip="setting.tooltip"
@@ -23,9 +23,6 @@
 </template>
 
 <script setup lang="ts">
-import {
-  NSlider, NInputNumber,
-} from 'naive-ui';
 import { ref } from 'vue';
 import { InformationCircle } from '@vicons/ionicons5';
 
@@ -40,9 +37,11 @@ const props = defineProps({
 
 const value = ref(props.setting.read());
 
-function submitChange(newValue:number | null) {
-  props.setting.write(newValue);
-  emit('update', newValue);
+function submitChange(event : Event) {
+  const number = parseInt((event.target as HTMLInputElement).value);
+  console.log('new number', number);
+  props.setting.write(number);
+  emit('update', number);
 }
 
 </script>
