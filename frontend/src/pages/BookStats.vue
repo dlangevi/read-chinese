@@ -30,34 +30,24 @@
             name="Stats"
             tab="Stats"
           >
-            <n-statistic
-              label="Known"
-              :value="known"
-            >
-              <template #suffix>
-                %
-              </template>
-            </n-statistic>
-            <n-statistic
-              label="Can Read"
-              :value="likelyKnown"
-            >
-              <template #suffix>
-                %
-              </template>
-            </n-statistic>
-            <n-statistic
-              label="Known Characters"
-              :value="knownCharacters"
-            >
-              <template #suffix>
-                %
-              </template>
-            </n-statistic>
-            <n-statistic
-              label="Total Words"
-              :value="totalWords"
-            />
+            <div class="stats shadow">
+              <div class="stat place-items-center">
+                <div class="stat-title"> Known </div>
+                <div class="stat-value"> {{ known }}% </div>
+              </div>
+              <div class="stat place-items-center">
+                <div class="stat-title"> Can Read </div>
+                <div class="stat-value"> {{ likelyKnown }}% </div>
+              </div>
+              <div class="stat place-items-center">
+                <div class="stat-title"> Known Characters </div>
+                <div class="stat-value"> {{ knownCharacters }}% </div>
+              </div>
+              <div class="stat place-items-center">
+                <div class="stat-title"> Total Words </div>
+                <div class="stat-value"> {{ totalWords }} </div>
+              </div>
+            </div>
 
             <table class="table w-full">
               <thead>
@@ -97,7 +87,7 @@
       >
         <n-space justify="end">
           <button
-            class="btn btn-primary"
+            class="btn-primary btn"
             @click="makeFlashCards"
           >
             Make flash cards
@@ -114,7 +104,6 @@ import { provide } from 'vue';
 import {
   NLayout, NLayoutSider, NLayoutHeader, NLayoutContent,
   NLayoutFooter, NSpace, NTabs, NTabPane,
-  NStatistic,
 } from 'naive-ui';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import type { backend } from '@wailsjs/models';

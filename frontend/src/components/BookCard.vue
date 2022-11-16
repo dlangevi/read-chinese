@@ -1,61 +1,67 @@
 <template>
-  <n-card
-    :title="`${book.title} - ${book.author}`"
-    :class="(known > 90) ? 'bg-green-300 p-4' : 'p-4'"
+  <div
+    :class="[
+      'card shadow-xl p-4',
+      (known > 90) ? 'bg-green-300' : '',
+    ]"
   >
-    <template #cover>
+    <figure>
       <img
         class="m-auto max-h-full w-auto rounded"
         :src="book.cover"
         :alt="book.title"
         @click="bookBigMode"
       >
-    </template>
-    <div class="m-4 text-center">
-      Known: {{ known.toFixed(2) }}%
+    </figure>
+    <div class="card-body">
+      <h2 class="card-title">
+        {{ `${book.title} - ${book.author}` }}
+      </h2>
+      <div class="m-4 text-center">
+        Known: {{ known.toFixed(2) }}%
+      </div>
+      <div class="flex place-content-end gap-2">
+        <button
+          v-if="!isFavorite"
+          class="btn-accent btn-xs btn"
+          @click="favorite(true)"
+        >
+          Add To Favorites
+        </button>
+        <button
+          v-if="isFavorite"
+          class="btn-accent btn-xs btn"
+          @click="favorite(false)"
+        >
+          Remove From Favorites
+        </button>
+        <button
+          v-if="!isRead"
+          class="btn-accent btn-xs btn"
+          @click="markRead(true)"
+        >
+          Mark Read
+        </button>
+        <button
+          v-if="isRead"
+          class="btn-accent btn-xs btn"
+          @click="markRead(false)"
+        >
+          Unmark Read
+        </button>
+        <button
+          class="btn-accent btn-xs btn"
+          @click="deleteBook"
+        >
+          Delete
+        </button>
+      </div>
     </div>
-    <n-space justify="end">
-      <button
-        v-if="!isFavorite"
-        class="btn btn-xs btn-accent"
-        @click="favorite(true)"
-      >
-        Add To Favorites
-      </button>
-      <button
-        v-if="isFavorite"
-        class="btn btn-xs btn-accent"
-        @click="favorite(false)"
-      >
-        Remove From Favorites
-      </button>
-      <button
-        v-if="!isRead"
-        class="btn btn-xs btn-accent"
-        @click="markRead(true)"
-      >
-        Mark Read
-      </button>
-      <button
-        v-if="isRead"
-        class="btn btn-xs btn-accent"
-        @click="markRead(false)"
-      >
-        Unmark Read
-      </button>
-      <button
-        class="btn btn-xs btn-accent"
-        @click="deleteBook"
-      >
-        Delete
-      </button>
-    </n-space>
-  </n-card>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
-import { NSpace, NCard } from 'naive-ui';
 import { ref } from 'vue';
 
 import { DeleteBook, SetFavorite, SetRead } from '@wailsjs/backend/bookLibrary';

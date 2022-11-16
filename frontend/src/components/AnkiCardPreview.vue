@@ -1,11 +1,11 @@
 <template>
-  <n-card>
+  <div class="card">
     <h2 class="text-xl font-bold">
       Hanzi: {{ ankiCard.fields.word }}
     </h2>
     <div>
       <button
-        class="btn btn-primary btn-xs m-2 inline"
+        class="btn-primary btn-xs btn m-2 inline"
         @click="$emit('change-step', StepsEnum.SENTENCE)"
       >
         Edit
@@ -17,7 +17,7 @@
     </div>
     <div>
       <button
-        class="btn btn-primary btn-xs m-2"
+        class="btn-primary btn-xs btn m-2"
         @click="$emit('change-step', StepsEnum.ENGLISH)"
       >
         Edit
@@ -32,7 +32,7 @@
     </div>
     <div v-if="enableChinese">
       <button
-        class="btn btn-primary btn-xs m-2"
+        class="btn-primary btn-xs btn m-2"
         @click="$emit('change-step', StepsEnum.CHINESE)"
       >
         Edit
@@ -47,7 +47,7 @@
     </div>
     <div>
       <button
-        class="btn btn-primary btn-xs m-2"
+        class="btn-primary btn-xs btn m-2"
         @click="$emit('change-step', StepsEnum.IMAGE)"
       >
         Edit
@@ -65,11 +65,10 @@
         >
       </div>
     </div>
-  </n-card>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { NCard } from 'naive-ui';
 import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
 import { getUserSettings } from '@/lib/userSettings';
 
