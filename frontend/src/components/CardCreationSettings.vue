@@ -23,17 +23,13 @@
     </template>
 
     <Suspense>
-      <n-grid
-        :y-gap="8"
-        :cols="2"
-      >
-        <n-gi
+      <div class="grid grid-cols-2 gap-8">
+        <settings-checkbox
           v-for="content in UserSettings.CardCreation"
           :key="content.name"
-        >
-          <settings-checkbox :setting="content" />
-        </n-gi>
-      </n-grid>
+          :setting="content"
+        />
+      </div>
     </Suspense>
   </n-modal>
 </template>
@@ -41,7 +37,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import {
-  NIcon, NButton, NModal, NGrid, NGi,
+  NIcon, NButton, NModal,
 } from 'naive-ui';
 import { SettingsSharp } from '@vicons/ionicons5';
 import SettingsCheckbox
