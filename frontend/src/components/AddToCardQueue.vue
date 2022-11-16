@@ -1,6 +1,5 @@
 <template>
   <button
-    type="button"
     class="btn btn-xs btn-secondary"
     @click="addToQueue"
   >

@@ -1,15 +1,7 @@
 <template>
-  <n-button
-    text
-    type="info"
-    @click="openSettings"
-  >
-    <template #icon>
-      <n-icon size="20">
-        <settings-sharp />
-      </n-icon>
-    </template>
-  </n-button>
+  <button @click="openSettings">
+    <settings-sharp class="h-6 w-6" />
+  </button>
   <n-modal
     v-model:show="showSettings"
     :closable="true"
@@ -37,7 +29,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import {
-  NIcon, NButton, NModal,
+  NModal,
 } from 'naive-ui';
 import { SettingsSharp } from '@vicons/ionicons5';
 import SettingsCheckbox

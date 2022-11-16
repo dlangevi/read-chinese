@@ -2,10 +2,7 @@
   <div class="flex h-full">
     <div class="m-4 shrink-0">
       <n-space vertical>
-        <n-button
-          type="primary"
-          @click="importAnki"
-        >
+        <n-button type="primary" @click="importAnki">
           Sync from Anki
         </n-button>
         <n-cascader
@@ -16,9 +13,9 @@
           check-strategy="child"
           @update:value="loadHsk"
         />
-        <n-button @click="makeCards">
+        <button class="btn" @click="makeCards">
           Make Cards
-        </n-button>
+        </button>
         <div class="border-2 p-2 text-center">
           {{ words.length }} remaining words
         </div>

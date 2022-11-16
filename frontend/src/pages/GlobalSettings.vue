@@ -13,7 +13,12 @@
         {{ section }}
       </div>
       <div
-        class="col-span-3 grid grid-flow-row grid-cols-3 justify-start gap-6"
+        class="col-span-3
+               grid
+               grid-flow-row
+               grid-cols-3
+               justify-start
+               gap-6"
       >
         <component
           :is="content.type"

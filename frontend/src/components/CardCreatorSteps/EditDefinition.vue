@@ -15,9 +15,7 @@
           :value="def.definition"
         >
           <!-- Definitions can have html formatting in them -->
-          <span
-            v-html="'[' + def.pronunciation + '] ' + def.definition"
-          />
+          <span v-html="'[' + def.pronunciation + '] ' + def.definition" />
         </n-checkbox>
       </n-space>
     </n-checkbox-group>

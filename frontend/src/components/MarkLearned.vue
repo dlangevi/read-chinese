@@ -1,6 +1,5 @@
 <template>
   <button
-    type="button"
     class="btn btn-xs btn-secondary"
     @click="markKnown"
   >
@@ -17,7 +16,6 @@ const props = defineProps<{ params:ICellRendererParams }>();
 function markKnown() {
   const rowData = props.params.data;
   // Keep with the convention of 10000 == user has claimed to known a word
-  console.log('adding with go');
   AddWord(rowData.word, 10000);
   props.params.api.applyTransaction({
     remove: [rowData],

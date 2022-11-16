@@ -24,6 +24,7 @@ import TopNav from '@/components/TopNav.vue';
 import CardCreator from '@/components/CardCreator.vue';
 
 import 'virtual:windi.css';
+import './App.css';
 
 const route = useRoute();
 </script>
