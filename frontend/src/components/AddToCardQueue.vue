@@ -1,7 +1,7 @@
 <template>
   <button
     type="button"
-    class="btn text-sm"
+    class="btn btn-xs btn-secondary"
     @click="addToQueue"
   >
     {{ params.text }}
@@ -9,26 +9,6 @@
 </template>
 
 <script lang="ts" setup>
-/*
-import { NButton } from 'naive-ui';
-    class="bg-purple-700
-           text-white
-           hover:bg-purple-500
-           hover:text-white
-           px-1
-           rounded-lg
-           text-sm"
-  <n-button
-    type="default"
-    size="tiny"
-    round
-    color="#8a2be2"
-    class="w-28"
-    @click="addToQueue">
-    {{params.text}}
-  </n-button>
-
-*/
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import type { ICellRendererParams } from 'ag-grid-community';
 import type { WordOptions } from '@/stores/CardQueue';
