@@ -1,6 +1,6 @@
 <template>
   <button
-    class="btn btn-xs btn-secondary"
+    class="btn-secondary btn-xs btn"
     @click="markKnown"
   >
     Mark Known

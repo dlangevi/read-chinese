@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-auto bg-gray-800 px-8">
+  <div class="mx-auto bg-accent px-8">
     <div class="flex h-16 items-center justify-between">
       <img
         class="block h-32 w-auto"
@@ -17,9 +17,10 @@
               :key="item.name"
               :to="item.href"
               :class="[item.current
-                         ? 'bg-gray-900 text-white'
-                         : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                       'px-3 py-2 rounded-md text-sm font-medium']"
+                         ? 'bg-accent-focus '
+                         : 'hover:bg-accent-focus',
+                       'px-3 py-2 rounded-md text-accent-content',
+                       'text-sm font-medium']"
               :aria-current="item.current ? 'page' : undefined"
             >
               {{ item.name }}

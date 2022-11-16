@@ -16,7 +16,7 @@
           placeholder="Dictionary Name"
         />
         <div>
-          <button class="btn btn-secondary" @click="pickFile">
+          <button class="btn-secondary btn" @click="pickFile">
             Select File
           </button>
           {{ newDictFile }}
@@ -27,7 +27,7 @@
         />
       </div>
       <template #action>
-        <button class="btn btn-secondary" @click="submit">
+        <button class="btn-secondary btn" @click="submit">
           Add Dictionary
         </button>
       </template>
@@ -38,7 +38,7 @@
           <div>
             Dictionaries
           </div>
-          <button class="btn btn-secondary" @click="addDictionary">
+          <button class="btn-secondary btn" @click="addDictionary">
             Add Dictionary
           </button>
         </div>
@@ -61,13 +61,13 @@
         <template #suffix>
           <div class="grid gap-4">
             <button
-              class="btn btn-secondary"
+              class="btn-secondary btn"
               @click="makePrimary(name as string)"
             >
               Make Primary
             </button>
             <button
-              class="btn btn-secondary"
+              class="btn-secondary btn"
               @click="deleteDict(name as string)"
             >
               Delete

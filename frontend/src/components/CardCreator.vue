@@ -83,25 +83,25 @@
       <n-space justify="end">
         <button
           v-if="steps.length > 0"
-          class="btn btn-primary btn-sm"
+          class="btn-primary btn-sm btn"
           @click="nextStep()"
         >
           Next Step
         </button>
         <button
-          class="btn btn-primary btn-sm"
+          class="btn-primary btn-sm btn"
           @click="store.clearFront()"
         >
           Skip Word
         </button>
         <button
-          class="btn btn-primary btn-sm"
+          class="btn-primary btn-sm btn"
           @click="markKnown"
         >
           Mark Known
         </button>
         <button
-          class="btn btn-primary btn-sm"
+          class="btn-primary btn-sm btn"
           @click="submit()"
         >
           Submit

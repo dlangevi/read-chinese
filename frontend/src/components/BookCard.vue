@@ -2,7 +2,7 @@
   <div
     :class="[
       'card shadow-xl p-4',
-      (known > 90) ? 'bg-green-300' : '',
+      (known > 90) ? 'bg-success' : '',
     ]"
   >
     <figure>

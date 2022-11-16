@@ -1,5 +1,5 @@
 <template>
-  <div data-theme="emerald" class="text-base-content">
+  <div data-theme="dark" class="text-base-content">
     <n-message-provider>
       <div
         id="app"
