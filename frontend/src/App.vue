@@ -3,7 +3,7 @@
     <n-message-provider>
       <div
         id="app"
-        class="bg-base-100 max-w-screen max-h-screen"
+        class="max-w-screen max-h-screen bg-base-100"
       >
         <TopNav class="h-16 w-screen" />
         <CardCreator />
@@ -23,7 +23,6 @@ import { NMessageProvider } from 'naive-ui';
 import TopNav from '@/components/TopNav.vue';
 import CardCreator from '@/components/CardCreator.vue';
 
-import 'virtual:windi.css';
 import './App.css';
 
 const route = useRoute();

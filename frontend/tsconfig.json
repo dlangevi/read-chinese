@@ -26,7 +26,8 @@
     "src/**/*.tsx", 
     "src/**/*.vue",
     "vite.config.ts",
-    "windi.config.js",
+    "tailwind.config.js",
+    "postcss.config.js",
     ".eslintrc.js",
     "lint-staged.config.js",
     "env.d.ts"
