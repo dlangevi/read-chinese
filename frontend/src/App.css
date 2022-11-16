@@ -4,3 +4,12 @@
 .btn {
   @apply rounded;
 }
+
+.ag-theme-alpine {
+    --ag-foreground-color: hsl(var(--bc));
+    --ag-background-color: hsl(var(--b1));
+    --ag-header-foreground-color: hsl(var(--ac));
+    --ag-header-background-color:  hsl(var(--a));
+    --ag-odd-row-background-color: hsl(var(--b2));
+    --ag-header-column-resize-handle-color: hsl(var(--a));
+}

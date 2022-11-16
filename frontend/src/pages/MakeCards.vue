@@ -11,10 +11,12 @@
            gap-2
            px-4"
   >
-    <n-input
+    <input
+      type="text"
       placeholder="Input here (using 汉字 for now)"
+      class="input-primary input w-full"
       @input="onUpdateSearchBox"
-    />
+    >
     <ag-grid-vue
       class="ag-theme-alpine mx-auto h-full
         w-full grow text-xl"
@@ -31,7 +33,6 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
 import { ref, onUnmounted } from 'vue';
-import { NInput } from 'naive-ui';
 import AddToCardQueue from '@/components/AddToCardQueue.vue';
 import MarkLearned from '@/components/MarkLearned.vue';
 import type { GetRowIdParams, GridReadyEvent, ColDef } from 'ag-grid-community';
@@ -112,7 +113,8 @@ onUnmounted(() => {
   window.removeEventListener('resize', resizeCallback);
 });
 
-async function onUpdateSearchBox(newSearch:string) {
+async function onUpdateSearchBox(event: Event) {
+  const newSearch = (event.target as HTMLInputElement).value;
   currentSearch = newSearch;
   if (newSearch.length === 0) {
     rowData.value = [];
@@ -121,14 +123,3 @@ async function onUpdateSearchBox(newSearch:string) {
   }
 }
 </script>
-
-<style scoped>
-.ag-theme-alpine {
-    --ag-foreground-color: rgb(126, 46, 132);
-    --ag-background-color: rgb(249, 245, 227);
-    --ag-header-foreground-color: rgb(204, 245, 172);
-    --ag-header-background-color: rgb(209, 64, 129);
-    --ag-odd-row-background-color: rgb(0, 0, 0, 0.03);
-    --ag-header-column-resize-handle-color: rgb(126, 46, 132);
-}
-</style>

@@ -1,19 +1,24 @@
 <template>
-  <div class="text-center">
-    <h2 class="mt-5 text-center text-xl">
-      Your Library
-    </h2>
-    <p>Click on a book to start making flashcards.</p>
-    <settings-checkbox
-      :setting="UserSettings.BookLibrary.OnlyFavorites"
-      @update="updateFilter"
-    />
-    <button
-      class="btn btn-primary"
-      @click="syncCalibre"
-    >
-      Sync Calibre
-    </button>
+  <div class="flex place-content-evenly">
+    <div />
+    <div class="justify-self-center">
+      <h2 class="mt-5 flex-1 text-center text-xl">
+        Your Library
+      </h2>
+      <p>Click on a book to start making flashcards.</p>
+    </div>
+    <div class="flex gap-2 place-self-end">
+      <settings-checkbox
+        :setting="UserSettings.BookLibrary.OnlyFavorites"
+        @update="updateFilter"
+      />
+      <button
+        class="btn-primary btn"
+        @click="syncCalibre"
+      >
+        Sync Calibre
+      </button>
+    </div>
   </div>
   <div
     v-if="books.length > 0"

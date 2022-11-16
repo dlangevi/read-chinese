@@ -2,7 +2,7 @@
   <div class="flex h-full">
     <div class="m-4 shrink-0">
       <n-space vertical>
-        <button class="btn btn-primary" @click="importAnki">
+        <button class="btn-primary btn" @click="importAnki">
           Sync from Anki
         </button>
         <n-cascader
@@ -13,7 +13,7 @@
           check-strategy="child"
           @update:value="loadHsk"
         />
-        <button class="btn btn-primary" @click="makeCards">
+        <button class="btn-primary btn" @click="makeCards">
           Make Cards
         </button>
         <div class="border-2 p-2 text-center">
@@ -99,14 +99,3 @@ async function makeCards() {
 }
 
 </script>
-
-<style scoped>
-.ag-theme-alpine {
-    --ag-foreground-color: rgb(126, 46, 132);
-    --ag-background-color: rgb(249, 245, 227);
-    --ag-header-foreground-color: rgb(204, 245, 172);
-    --ag-header-background-color: rgb(209, 64, 129);
-    --ag-odd-row-background-color: rgb(0, 0, 0, 0.03);
-    --ag-header-column-resize-handle-color: rgb(126, 46, 132);
-}
-</style>

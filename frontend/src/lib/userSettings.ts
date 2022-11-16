@@ -197,7 +197,7 @@ export async function generateUserSettings() :Promise<UserSettingsType> {
     checkBox(
       'OnlyFavorites',
       'Only show favorited books',
-      '',
+      'Obv',
     ),
   ]);
 
