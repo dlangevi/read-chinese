@@ -46,6 +46,7 @@ require (
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
+	github.com/samber/lo v1.27.1 // indirect
 	github.com/tkrajina/go-reflector v0.5.5 // indirect
 	github.com/ugorji/go/codec v1.1.7 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
@@ -55,6 +56,7 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.17.0 // indirect
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
+	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
 	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
 	golang.org/x/text v0.3.7 // indirect
