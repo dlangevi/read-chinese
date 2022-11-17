@@ -1,5 +1,6 @@
 package main
 
+// #cgo LDFLAGS: -static-libstdc++ -static-libgcc
 import (
 	"embed"
 	"fmt"
