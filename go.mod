@@ -63,4 +63,4 @@ require (
 )
 
 // Clone dlangevi/ankiconnect
-replace github.com/atselvan/ankiconnect => ../ankiconnect
+replace github.com/atselvan/ankiconnect => github.com/dlangevi/ankiconnect v0.0.0-20221110233653-998152c73fba
