@@ -25,7 +25,7 @@ jobs:
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
       - name: Build Wails app
         run: |
-          wails build -v 2 -skipbindings -ldflags '-extldflags "-static-libstdc++ -static-libgcc"'
+          wails build -v 2 -skipbindings -ldflags "-extldflags \"-static-libstdc++ -static-libgcc\""
       - name: upload artifacts windows
         if: matrix.platform == 'windows-latest'
         uses: actions/upload-artifact@v2
