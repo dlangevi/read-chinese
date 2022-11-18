@@ -152,6 +152,7 @@ const showModal = ref(false);
 const card = ref<backend.RawAnkiNote>(new backend.RawAnkiNote());
 const step = ref<StepsEnum>(StepsEnum.SENTENCE);
 const steps = ref<StepsEnum[]>([]);
+let stepsFilled : { [s:string]: boolean } = {};
 let word;
 let action: ActionsEnum;
 let callback: (() => void) | undefined;
@@ -175,11 +176,15 @@ const nextStep = async () => {
     }
   }
   step.value = steps.value[idx + 1];
+  if (stepsFilled[step.value]) {
+    nextStep();
+  }
 };
 
 const updateSentence = (newSentence: string, updateStep = false) => {
   if (newSentence.length > 0) {
     card.value.fields.sentence = newSentence;
+    stepsFilled[StepsEnum.SENTENCE] = true;
     if (updateStep) {
       nextStep();
     }
@@ -214,6 +219,7 @@ const updateEnglishDefinition = (
   updateDefinition(newDefinitions, updateStep, function (newDefs: string) {
     card.value.fields.englishDefn = newDefs;
   });
+  stepsFilled[StepsEnum.ENGLISH] = true;
 };
 
 const updateChineseDefinition = (
@@ -223,6 +229,7 @@ const updateChineseDefinition = (
   updateDefinition(newDefinitions, updateStep, function (newDefs: string) {
     card.value.fields.chineseDefn = newDefs;
   });
+  stepsFilled[StepsEnum.CHINESE] = true;
 };
 
 const updateImages = (newImages: backend.ImageInfo[], updateStep = false) => {
@@ -232,12 +239,16 @@ const updateImages = (newImages: backend.ImageInfo[], updateStep = false) => {
       nextStep();
     }
   }
+  stepsFilled[StepsEnum.IMAGE] = true;
 };
 
 const message = useMessage();
 store.$subscribe(async (_, state) => {
   // This is needed to reset the state
   step.value = StepsEnum.NONE;
+  // Also needed to reset the state since it flips the v-if statements
+  // TODO this is hacky and needs a better solution
+  steps.value = [];
   // Later we can prefetch new words sentences possibly
   // if (mutation.events.type === 'add' && mutation.events.key === '0') {
   // TODO this is a complete mess and needs to be refined if we are going to
@@ -274,6 +285,10 @@ store.$subscribe(async (_, state) => {
         StepsEnum.SENTENCE,
       ];
     }
+    stepsFilled = { };
+    steps.value.forEach(step => {
+      stepsFilled[step] = false;
+    });
     card.value = reactive(ankiCard);
     [step.value] = steps.value;
   }
