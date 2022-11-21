@@ -1,5 +1,5 @@
 <template>
-  <div class="flex grow gap-2">
+  <div class="flex gap-2">
     <input
       :id="setting.value"
       v-model="isChecked"

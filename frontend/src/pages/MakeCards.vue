@@ -1,8 +1,7 @@
 <template>
   <div
-    class="h-7/8
+    class="
            container
-           m-4
            mx-auto
            flex
            h-full
@@ -14,12 +13,12 @@
     <input
       type="text"
       placeholder="Input here (using 汉字 for now)"
-      class="input-primary input w-full"
+      class="input-primary input mt-4 w-full"
       @input="onUpdateSearchBox"
     >
     <ag-grid-vue
-      class="ag-theme-alpine mx-auto h-full
-        w-full grow text-xl"
+      class="ag-theme-alpine mx-auto mt-2 mb-4
+        h-full w-full grow text-xl"
       :get-row-id="getRowId"
       :column-defs="columnDefs"
       :row-data="rowData"

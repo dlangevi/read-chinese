@@ -1,13 +1,6 @@
 <template>
-  <div class="flex place-content-evenly">
-    <div />
-    <div class="justify-self-center">
-      <h2 class="mt-5 flex-1 text-center text-xl">
-        Your Library
-      </h2>
-      <p>Click on a book to start making flashcards.</p>
-    </div>
-    <div class="flex gap-2 place-self-end">
+  <with-sidebar>
+    <template #sidebar>
       <settings-checkbox
         :setting="UserSettings.BookLibrary.OnlyFavorites"
         @update="updateFilter"
@@ -18,22 +11,28 @@
       >
         Sync Calibre
       </button>
+    </template>
+    <div class="text-center">
+      <h2 class="mt-5 text-xl">
+        Your Library
+      </h2>
+      <p>Click on a book to start making flashcards.</p>
     </div>
-  </div>
-  <div
-    v-if="books.length > 0"
-    class="m-8 grid grid-cols-4 gap-12"
-  >
     <div
-      v-for="book in favoriteFilter"
-      :key="book.bookId"
+      v-if="books.length > 0"
+      class="m-8 grid grid-cols-4 gap-12"
     >
-      <book-card
-        class="h-[700px]"
-        :book="book"
-      />
+      <div
+        v-for="book in favoriteFilter"
+        :key="book.bookId"
+      >
+        <book-card
+          class="h-[700px]"
+          :book="book"
+        />
+      </div>
     </div>
-  </div>
+  </with-sidebar>
 </template>
 
 <script lang="ts" setup>
@@ -47,6 +46,7 @@ import { getUserSettings } from '@/lib/userSettings';
 import { backend } from '@wailsjs/models';
 import { GetBooks } from '@wailsjs/backend/bookLibrary';
 import { ImportCalibreBooks } from '@wailsjs/backend/Calibre';
+import WithSidebar from '@/layouts/WithSidebar.vue';
 
 async function syncCalibre() {
   const err = await ImportCalibreBooks();

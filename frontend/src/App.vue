@@ -1,13 +1,10 @@
 <template>
-  <div class="text-base-content">
+  <div id="app" class="text-base-content">
     <n-message-provider>
-      <div
-        id="app"
-        class="max-w-screen max-h-screen bg-base-100"
-      >
-        <TopNav class="h-16 w-screen" />
-        <CardCreator />
-        <div class="h-[calc(100vh-4rem)] w-screen overflow-scroll">
+      <CardCreator />
+      <div class="flex h-screen w-screen flex-col bg-base-100">
+        <TopNav class="w-screen basis-16" />
+        <div class="w-screen grow basis-auto overflow-scroll">
           <Suspense>
             <router-view :key="route.fullPath" />
           </Suspense>

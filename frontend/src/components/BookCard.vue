@@ -20,7 +20,7 @@
       <div class="m-4 text-center">
         Known: {{ known.toFixed(2) }}%
       </div>
-      <div class="flex place-content-end gap-2">
+      <div class="flex flex-wrap place-content-end gap-2">
         <button
           v-if="!isFavorite"
           class="btn-accent btn-xs btn"
