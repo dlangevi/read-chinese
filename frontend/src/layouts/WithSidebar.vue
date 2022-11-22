@@ -1,16 +1,14 @@
 <template>
-  <div class="flex h-full w-full flex-wrap">
-    <div
-      id="sidebar"
-      class="flex shrink grow basis-1/6 flex-col gap-4 p-4"
-    >
-      <slot name="sidebar" />
-    </div>
-    <div
-      id="content"
-      class="shrink grow basis-5/6"
-    >
+  <div class="drawer drawer-end">
+    <input id="my-drawer" type="checkbox" class="drawer-toggle">
+    <div class="drawer-content">
       <slot />
+    </div>
+    <div class="drawer-side">
+      <label for="my-drawer" class="drawer-overlay" />
+      <ul class="menu w-80 gap-4 bg-base-100 p-4 text-base-content">
+        <slot name="sidebar" />
+      </ul>
     </div>
   </div>
 </template>
