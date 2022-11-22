@@ -3,24 +3,26 @@
     <div class="m-4 text-3xl">
       Pick an image
     </div>
-    <n-checkbox-group
-      v-model:value="image"
-      name="images"
+    <div
+      v-for="(imageData, i) in images"
+      :key="i"
     >
-      <n-space :size="40">
-        <n-checkbox
-          v-for="(imageData, i) in images"
-          :key="i"
+      <label class="label cursor-pointer" :for="i.toString()">
+        <input
+          :id="i.toString()"
+          v-model="image"
+          class="checkbox"
           :value="i"
+          type="checkbox"
+          name="images"
         >
-          <img
-            class="h-48 w-auto"
-            :src="imageData.thumbnailUrl"
-            alt="image for word"
-          >
-        </n-checkbox>
-      </n-space>
-    </n-checkbox-group>
+        <img
+          class="h-48 w-auto"
+          :src="imageData.thumbnailUrl"
+          alt="image for word"
+        >
+      </label>
+    </div>
   </div>
 </template>
 
@@ -28,9 +30,6 @@
 import {
   watch, onBeforeMount, ref,
 } from 'vue';
-import {
-  NSpace, NCheckboxGroup, NCheckbox,
-} from 'naive-ui';
 import { getUserSettings } from '@/lib/userSettings';
 import { SearchImages } from '@wailsjs/backend/ImageClient';
 import { backend } from '@wailsjs/models';

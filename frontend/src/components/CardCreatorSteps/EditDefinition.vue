@@ -3,22 +3,26 @@
     <div class="m-4 text-3xl">
       Pick a definition
     </div>
-    <n-checkbox-group
-      v-model:value="definition"
-      name="definitions"
+    <div
+      v-for="(def, i) in definitions"
+      :key="i"
+      class="text-3xl"
     >
-      <n-space vertical>
-        <n-checkbox
-          v-for="(def, i) in definitions"
-          :key="i"
-          class="text-3xl"
+      <label class="label cursor-pointer" :for="def.definition">
+        <input
+          :id="def.definition"
+          v-model="definition"
+          class="checkbox"
           :value="def.definition"
+          type="checkbox"
+          name="definitions"
         >
-          <!-- Definitions can have html formatting in them -->
-          <span v-html="'[' + def.pronunciation + '] ' + def.definition" />
-        </n-checkbox>
-      </n-space>
-    </n-checkbox-group>
+        <span
+          class="label-text"
+          v-html="'[' + def.pronunciation + '] ' + def.definition"
+        />
+      </label>
+    </div>
   </div>
 </template>
 
@@ -26,9 +30,6 @@
 import {
   watch, onBeforeMount, ref,
 } from 'vue';
-import {
-  NSpace, NCheckboxGroup, NCheckbox,
-} from 'naive-ui';
 import { getUserSettings } from '@/lib/userSettings';
 import type { backend } from '@wailsjs/models';
 

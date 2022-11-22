@@ -6,45 +6,51 @@
     <div v-if="loaded && (allSentences.length + sentences.length) == 0">
       No sentences found, please skip for now
     </div>
-    <n-radio-group
-      v-model:value="sentence"
-      name="sentences"
-    >
-      <div v-if="singleBook">
-        <n-space
-          vertical
-          :size="40"
-        >
-          <p class="text-4xl">
-            From Current Book
-          </p>
-          <n-radio
-            v-for="(sen, i) in sentences"
-            :key="i"
-            class="text-3xl"
+    <div v-if="singleBook">
+      <p class="text-4xl">
+        From Current Book
+      </p>
+      <div
+        v-for="(sen, i) in sentences"
+        :key="i"
+        class="text-3xl"
+      >
+        <label class="label cursor-pointer" :for="sen">
+          <input
+            :id="sen"
+            v-model="sentence"
+            class="radio"
             :value="sen"
-            :label="sen"
-          />
-        </n-space>
+            type="radio"
+            name="sentences"
+          >
+          <span class="label-text">{{ sen }}</span>
+        </label>
       </div>
-      <div>
-        <n-space
-          vertical
-          :size="40"
-        >
-          <p class="text-4xl">
-            From All Books
-          </p>
-          <n-radio
-            v-for="(sen, i) in allSentences"
-            :key="i"
-            class="text-3xl"
+    </div>
+    <div>
+      <p class="text-4xl">
+        From All Books
+      </p>
+
+      <div
+        v-for="(sen, i) in allSentences"
+        :key="i"
+        class="text-3xl"
+      >
+        <label class="label cursor-pointer" :for="sen">
+          <input
+            :id="sen"
+            v-model="sentence"
+            class="radio"
             :value="sen"
-            :label="sen"
-          />
-        </n-space>
+            type="radio"
+            name="sentences"
+          >
+          <span class="label-text">{{ sen }}</span>
+        </label>
       </div>
-    </n-radio-group>
+    </div>
   </div>
 </template>
 
@@ -52,9 +58,6 @@
 import {
   watch, onBeforeMount, ref,
 } from 'vue';
-import {
-  NSpace, NRadioGroup, NRadio,
-} from 'naive-ui';
 import { getUserSettings } from '@/lib/userSettings';
 import { GetSentencesForWord } from '@wailsjs/backend/Generator';
 
@@ -86,8 +89,11 @@ onBeforeMount(async () => {
       [props.preferBook],
     );
   }
-  // TODO filter out repeats
-  allSentences.value = await GetSentencesForWord(props.word, []);
+  // filter out repeats
+  allSentences.value = (await GetSentencesForWord(props.word, []))
+    .filter((sen) => {
+      return sentences.value.indexOf(sen) === -1;
+    });
   loaded.value = true;
 });
 
