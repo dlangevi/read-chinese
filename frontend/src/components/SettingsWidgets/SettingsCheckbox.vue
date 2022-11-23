@@ -39,7 +39,7 @@ const props = defineProps({
   },
 });
 
-const isChecked = await props.setting.read();
+const isChecked = props.setting.read();
 
 function submitChange(event: Event) {
   const checked = (event.target as HTMLInputElement).checked;

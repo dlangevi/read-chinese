@@ -1,46 +1,44 @@
 <template>
   <div class="col-span-3 row-span-2">
-    <n-modal
-      v-model:show="addDictModal"
-      :closable="true"
-      class="w-1/2"
-      preset="card"
+    <div
+      :class="['modal', addDictModal ? 'modal-open' : '']"
+      @click="() => addDictModal = false"
     >
-      <template #header>
-        Add a dicitonary in Yomichan Json Format
-      </template>
-      <div class="m-auto flex w-3/4 flex-col gap-1">
-        <input
-          v-model="newDictName"
-          class="input-bordered input"
-          type="text"
-          placeholder="Dictionary Name"
-        >
+      <div class="modal-box relative w-1/2 max-w-5xl">
         <div>
-          <button class="btn-secondary btn" @click="pickFile">
-            Select File
-          </button>
-          {{ newDictFile }}
+          Add a dicitonary in Yomichan Json Format
         </div>
-        <select
-          v-model="newDictType"
-          class="select-bordered select"
-        >
-          <option
-            v-for="(option, i) in options"
-            :key="i"
-            :value="option.value"
+        <div class="m-auto flex w-3/4 flex-col gap-1">
+          <input
+            v-model="newDictName"
+            class="input-bordered input"
+            type="text"
+            placeholder="Dictionary Name"
           >
-            {{ option.label }}
-          </option>
-        </select>
+          <div>
+            <button class="btn-secondary btn" @click="pickFile">
+              Select File
+            </button>
+            {{ newDictFile }}
+          </div>
+          <select
+            v-model="newDictType"
+            class="select-bordered select"
+          >
+            <option
+              v-for="(option, i) in options"
+              :key="i"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </option>
+          </select>
+          <button class="btn-secondary btn" @click="submit">
+            Add Dictionary
+          </button>
+        </div>
       </div>
-      <template #action>
-        <button class="btn-secondary btn" @click="submit">
-          Add Dictionary
-        </button>
-      </template>
-    </n-modal>
+    </div>
     <div class="grid grid-cols-2 text-2xl">
       <div>
         Dictionaries
@@ -82,9 +80,6 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  NModal,
-} from 'naive-ui';
 import { onBeforeMount, ref } from 'vue';
 
 import {
@@ -141,6 +136,7 @@ function submit() {
     newDictFile.value,
     newDictType.value,
   );
+  addDictModal.value = false;
 }
 
 // TODO backend does not export these types
