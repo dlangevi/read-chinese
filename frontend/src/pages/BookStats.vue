@@ -82,14 +82,14 @@
         class="p-4"
         bordered
       >
-        <n-space justify="end">
+        <div class="flex place-content-end">
           <button
             class="btn-primary btn"
             @click="makeFlashCards"
           >
             Make flash cards
           </button>
-        </n-space>
+        </div>
       </n-layout-footer>
     </n-layout>
   </n-layout>
@@ -102,7 +102,7 @@ import UnknownWords from '@/components/UnknownWords.vue';
 import { provide } from 'vue';
 import {
   NLayout, NLayoutSider, NLayoutHeader, NLayoutContent,
-  NLayoutFooter, NSpace,
+  NLayoutFooter,
 } from 'naive-ui';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import type { backend } from '@wailsjs/models';

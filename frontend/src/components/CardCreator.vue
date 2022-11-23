@@ -80,7 +80,7 @@
     </n-layout>
 
     <template #action>
-      <n-space justify="end">
+      <div class="flex place-content-end gap-2">
         <button
           v-if="steps.length > 0"
           class="btn-primary btn-sm btn"
@@ -106,7 +106,7 @@
         >
           Submit
         </button>
-      </n-space>
+      </div>
     </template>
   </n-modal>
 </template>
@@ -119,7 +119,7 @@ import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import AnkiCardPreview from '@/components/AnkiCardPreview.vue';
 import CardCreationSettings from '@/components/CardCreationSettings.vue';
 import {
-  useMessage, NSpace, NModal,
+  useMessage, NModal,
   NLayoutSider, NLayout, NLayoutContent,
 } from 'naive-ui';
 import EditSentence from '@/components/CardCreatorSteps/EditSentence.vue';
