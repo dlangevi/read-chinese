@@ -8,6 +8,7 @@
         <div>
           Add a dicitonary in Yomichan Json Format
         </div>
+        <div class="divider" />
         <div class="m-auto flex w-3/4 flex-col gap-1">
           <input
             v-model="newDictName"
@@ -33,6 +34,8 @@
               {{ option.label }}
             </option>
           </select>
+        </div>
+        <div class="modal-action">
           <button class="btn-secondary btn" @click="submit">
             Add Dictionary
           </button>
