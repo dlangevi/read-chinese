@@ -41,33 +41,26 @@
         </button>
       </template>
     </n-modal>
-    <n-list class="col-span-3 row-span-2">
-      <template #header>
-        <div class="grid grid-cols-2 text-2xl">
-          <div>
-            Dictionaries
-          </div>
-          <button class="btn-secondary btn" @click="addDictionary">
-            Add Dictionary
-          </button>
-        </div>
-      </template>
-      <n-list-item
+    <div class="grid grid-cols-2 text-2xl">
+      <div>
+        Dictionaries
+      </div>
+      <button class="btn-secondary btn" @click="addDictionary">
+        Add Dictionary
+      </button>
+    </div>
+    <div class="col-span-3 row-span-2">
+      <div
         v-for="(dict, name) in dicts"
         :key="name"
       >
-        <n-descriptions label-placement="left">
-          <n-descriptions-item label="Name">
-            {{ dict.name }}
-          </n-descriptions-item>
-          <n-descriptions-item label="Type">
-            {{ dict.type }}
-          </n-descriptions-item>
-          <n-descriptions-item label="Path">
-            {{ dict.path }}
-          </n-descriptions-item>
-        </n-descriptions>
-        <template #suffix>
+        <div class="divider" />
+        <div class="grid grid-cols-4">
+          <div class="col-span-3 flex gap-3">
+            <div> Name: {{ dict.name }} </div>
+            <div> Type: {{ dict.type }} </div>
+            <div> Path: {{ dict.path }} </div>
+          </div>
           <div class="grid gap-4">
             <button
               class="btn-secondary btn"
@@ -82,16 +75,15 @@
               Delete
             </button>
           </div>
-        </template>
-      </n-list-item>
-    </n-list>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import {
-  NModal, NList, NListItem,
-  NDescriptions, NDescriptionsItem,
+  NModal,
 } from 'naive-ui';
 import { onBeforeMount, ref } from 'vue';
 
