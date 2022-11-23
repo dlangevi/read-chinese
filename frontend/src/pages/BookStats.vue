@@ -22,13 +22,10 @@
         <p>{{ book.author }}</p>
       </n-layout-header>
       <n-layout-content class="p-8">
-        <n-tabs
-          type="line"
-          animated
-        >
-          <n-tab-pane
+        <tabbed-pane>
+          <tabbed-pane-tab
             name="Stats"
-            tab="Stats"
+            title="Stats"
           >
             <div class="stats shadow">
               <div class="stat place-items-center">
@@ -68,18 +65,18 @@
                 </tr>
               </tbody>
             </table>
-          </n-tab-pane>
-          <n-tab-pane
+          </tabbed-pane-tab>
+          <tabbed-pane-tab
             name="UnknownWords"
-            tab="View Unknown Words"
+            title="View Unknown Words"
           >
             <unknown-words
               class="h-96"
               :words="words"
               :book-filter="bookId"
             />
-          </n-tab-pane>
-        </n-tabs>
+          </tabbed-pane-tab>
+        </tabbed-pane>
       </n-layout-content>
       <n-layout-footer
         class="p-4"
@@ -99,11 +96,13 @@
 </template>
 
 <script lang="ts" setup>
+import TabbedPane from '@/layouts/TabbedPane.vue';
+import TabbedPaneTab from '@/components/TabbedPaneTab.vue';
 import UnknownWords from '@/components/UnknownWords.vue';
 import { provide } from 'vue';
 import {
   NLayout, NLayoutSider, NLayoutHeader, NLayoutContent,
-  NLayoutFooter, NSpace, NTabs, NTabPane,
+  NLayoutFooter, NSpace,
 } from 'naive-ui';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import type { backend } from '@wailsjs/models';

@@ -10,21 +10,30 @@
         Add a dicitonary in Yomichan Json Format
       </template>
       <div class="m-auto flex w-3/4 flex-col gap-1">
-        <n-input
-          v-model:value="newDictName"
+        <input
+          v-model="newDictName"
+          class="input-bordered input"
           type="text"
           placeholder="Dictionary Name"
-        />
+        >
         <div>
           <button class="btn-secondary btn" @click="pickFile">
             Select File
           </button>
           {{ newDictFile }}
         </div>
-        <n-select
-          v-model:value="newDictType"
-          :options="options"
-        />
+        <select
+          v-model="newDictType"
+          class="select-bordered select"
+        >
+          <option
+            v-for="(option, i) in options"
+            :key="i"
+            :value="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
       </div>
       <template #action>
         <button class="btn-secondary btn" @click="submit">
@@ -81,7 +90,7 @@
 
 <script lang="ts" setup>
 import {
-  NModal, NList, NListItem, NInput, NSelect,
+  NModal, NList, NListItem,
   NDescriptions, NDescriptionsItem,
 } from 'naive-ui';
 import { onBeforeMount, ref } from 'vue';
