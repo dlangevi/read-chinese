@@ -4,7 +4,7 @@
       <a
         v-for="(tab, i) in tabs"
         :key="tab.title"
-        :class="['tab', i == selected ? 'tab-active' : '']"
+        :class="['tab', {'tab-active': i == selected}]"
         @click="selectTab(i)"
       >
         {{ tab.title }}

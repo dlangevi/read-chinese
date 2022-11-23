@@ -1,7 +1,7 @@
 <template>
   <div class="col-span-3 row-span-2">
     <div
-      :class="['modal', addDictModal ? 'modal-open' : '']"
+      :class="['modal', {'modal-open': addDictModal}]"
       @click="() => addDictModal = false"
     >
       <div class="modal-box relative w-1/2 max-w-5xl">
