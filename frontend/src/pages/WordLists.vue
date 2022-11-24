@@ -4,14 +4,28 @@
       <button class="btn-primary btn" @click="importAnki">
         Sync from Anki
       </button>
-      <n-cascader
-        :options="options"
-        placeholder="Load HSK Words"
-        :show-path="true"
-        expand-trigger="click"
-        check-strategy="child"
-        @update:value="loadHsk"
-      />
+      <div class="flex place-content-between">
+        <span>Hsk 2.0</span>
+        <input
+          v-model="selectedVersion"
+          type="checkbox"
+          class="toggle-primary toggle toggle-lg"
+        >
+        <span>Hsk 3.0</span>
+      </div>
+      <select
+        v-model="selectedLevel"
+        class="select-primary select"
+        @change="loadHsk"
+      >
+        <option
+          v-for="level in levels"
+          :key="level"
+          :value="level"
+        >
+          {{ level }}
+        </option>
+      </select>
       <button class="btn-primary btn" @click="makeCards">
         Make Cards
       </button>
@@ -37,9 +51,7 @@
 
 <script lang="ts" setup>
 import WithSidebar from '@/layouts/WithSidebar.vue';
-import { NCascader } from 'naive-ui';
-import type { CascaderOption } from 'naive-ui';
-import { ref, onBeforeMount } from 'vue';
+import { watch, ref, onBeforeMount } from 'vue';
 import { backend } from '@wailsjs/models';
 import { LearningTarget } from '@wailsjs/backend/bookLibrary';
 import { GetUnknownHskWords } from '@wailsjs/backend/KnownWords';
@@ -51,22 +63,23 @@ import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 type HskVersion = '2.0' | '3.0';
 type HskLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
-interface HskCascaderOption extends CascaderOption {
-  level: HskLevel,
-  version: HskVersion,
-}
-const options:CascaderOption[] = ['2.0', '3.0'].map((version) => ({
-  label: `HSK ${version}`,
-  value: version,
-  children: (version === '2.0'
-    ? [1, 2, 3, 4, 5, 6]
-    : [1, 2, 3, 4, 5, 6, 7]).map((level) => ({
-    value: `${version}-${level}`,
-    version,
-    level,
-    label: `Level ${level}`,
-  })),
-}));
+const version = ref<HskVersion>('2.0');
+const levels = ref<HskLevel[]>([1, 2, 3, 4, 5, 6]);
+const selectedLevel = ref<HskLevel>(1);
+const selectedVersion = ref(false);
+const active = ref(false);
+watch(selectedVersion, () => {
+  if (selectedVersion.value) {
+    version.value = '3.0';
+    levels.value = [1, 2, 3, 4, 5, 6, 7];
+  } else {
+    version.value = '2.0';
+    levels.value = [1, 2, 3, 4, 5, 6];
+  }
+  if (active.value) {
+    loadHsk();
+  }
+});
 
 const words = ref<backend.UnknownWordEntry[]>([]);
 onBeforeMount(async () => {
@@ -77,8 +90,15 @@ function importAnki() {
   ImportAnkiKeywords();
 }
 
-async function loadHsk(_: string, option: HskCascaderOption) {
-  words.value = await GetUnknownHskWords(option.version, option.level);
+async function loadHsk() {
+  active.value = true;
+
+  const ver = version.value;
+  let lvl = selectedLevel.value;
+  if (ver === '2.0' && lvl === 7) {
+    lvl = 6;
+  }
+  words.value = await GetUnknownHskWords(ver, lvl);
 }
 
 const store = useCardQueue();
