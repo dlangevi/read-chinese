@@ -4,6 +4,7 @@
     @click="onClose"
   >
     <div
+      v-if="card.fields != undefined"
       class="modal-box flex h-[80vh] w-4/5 max-w-full flex-col"
       @click.stop
     >
