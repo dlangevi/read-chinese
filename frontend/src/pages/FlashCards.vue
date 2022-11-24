@@ -16,7 +16,7 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
 import { onBeforeMount, ref, onUnmounted } from 'vue';
-import { useMessage } from 'naive-ui';
+import { useMessage } from '@/lib/messages';
 import AddToCardQueue from '@/components/AddToCardQueue.vue';
 import type { GetRowIdParams, GridReadyEvent, ColDef } from 'ag-grid-community';
 import { LoadFlaggedCards } from '@wailsjs/backend/AnkiInterface';

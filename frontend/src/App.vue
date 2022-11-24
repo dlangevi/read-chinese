@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="text-base-content">
-    <n-message-provider>
+    <message-provider>
       <CardCreator />
       <div class="flex h-screen w-screen flex-col bg-base-100">
         <TopNav class="w-screen basis-16" />
@@ -10,14 +10,14 @@
           </Suspense>
         </div>
       </div>
-    </n-message-provider>
+    </message-provider>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { NMessageProvider } from 'naive-ui';
+import MessageProvider from '@/components/MessageProvider.vue';
 import TopNav from '@/components/TopNav.vue';
 import CardCreator from '@/components/CardCreator.vue';
 

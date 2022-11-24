@@ -108,7 +108,7 @@ import {
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import AnkiCardPreview from '@/components/AnkiCardPreview.vue';
 import CardCreationSettings from '@/components/CardCreationSettings.vue';
-import { useMessage } from 'naive-ui';
+import { useMessage } from '@/lib/messages';
 import EditSentence from '@/components/CardCreatorSteps/EditSentence.vue';
 import EditImages from
   '@/components/CardCreatorSteps/EditImages.vue';
@@ -229,6 +229,8 @@ const updateImages = (newImages: backend.ImageInfo[], updateStep = false) => {
   stepsFilled[StepsEnum.IMAGE] = true;
 };
 
+// TODO I am leaving the commented out old message code with the plan
+// of eventually having that sort of api avaliable
 const message = useMessage();
 store.$subscribe(async (_, state) => {
   // This is needed to reset the state
@@ -289,10 +291,11 @@ function onClose() {
 
 async function submit() {
   // Todo track changes to the card and submit those for update
-  const messageReactive = message.create('Card submited', {
-    type: 'loading',
-    duration: 1e4,
-  });
+  // const messageReactive = message.create('Card submited', {
+  //   type: 'loading',
+  //   duration: 1e4,
+  // });
+  message.info('Card submited');
   // TODO figure out the logic for determining changes better
   if (action === ActionsEnum.CREATE) {
     const cardValues = toRaw(card.value.fields);
@@ -304,27 +307,30 @@ async function submit() {
     // TODO do this kind of catching elsewhere
     CreateAnkiNote(cardValues, tags)
       .then(() => {
-        messageReactive.content = 'success';
-        messageReactive.type = 'success';
-        setTimeout(() => {
-          messageReactive.destroy();
-        }, 1000);
+        message.success('success');
+        // messageReactive.content = 'success';
+        // messageReactive.type = 'success';
+        // setTimeout(() => {
+        //   messageReactive.destroy();
+        // }, 1000);
       })
       .catch((err) => {
-        messageReactive.content = err;
-        messageReactive.type = 'error';
-        setTimeout(() => {
-          messageReactive.destroy();
-        }, 1000);
+        message.error(err);
+        // messageReactive.content = err;
+        // messageReactive.type = 'error';
+        // setTimeout(() => {
+        //   messageReactive.destroy();
+        // }, 1000);
       });
   } else {
     const cardValues: backend.Fields = toRaw(card.value.fields);
     const res = await UpdateNoteFields(card.value.noteId, cardValues);
-    messageReactive.content = JSON.stringify(res);
-    messageReactive.type = 'success';
-    setTimeout(() => {
-      messageReactive.destroy();
-    }, 1000);
+    message.success(res);
+    // messageReactive.content = JSON.stringify(res);
+    // messageReactive.type = 'success';
+    // setTimeout(() => {
+    //   messageReactive.destroy();
+    // }, 1000);
   }
   if (callback) {
     callback();
