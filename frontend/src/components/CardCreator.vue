@@ -1,114 +1,103 @@
 <template>
-  <n-modal
-    v-model:show="showModal"
-    class="h-[80vh] w-4/5"
-    :mask-closable="false"
-    :closable="true"
-    preset="card"
-    :on-close="onClose"
-    content-style="display:flex; flex-direction: column;"
+  <div
+    :class="['modal', {'modal-open': showModal}]"
+    @click="onClose"
   >
-    <template #header>
+    <div
+      class="modal-box flex h-[80vh] w-4/5 max-w-full flex-col"
+      @click.stop
+    >
+      <!-- TODO dont use absolute positions. Do like a flex on the right -->
+      <div class="absolute right-4 top-4 flex gap-2">
+        <card-creation-settings class="" />
+        <button
+          class="btn-sm btn-circle btn"
+          @click="onClose"
+        >
+          ✕
+        </button>
+      </div>
       <p class="text-xl">
         Creating card for {{ card.fields.word }}
       </p>
-    </template>
-    <template #header-extra>
-      <card-creation-settings />
-    </template>
-    <n-layout
-      has-sider
-      sider-placement="left"
-      class="grow"
-      style="max-height: 60vh"
-    >
-      <n-layout-sider
-        v-if="card !== undefined"
-        collapse-mode="transform"
-        :collapsed-width="50"
-        :show-collapsed-content="false"
-        :width="500"
-        show-trigger="arrow-circle"
-        content-style="padding: 24px;"
-        bordered
-      >
-        <Suspense>
+      <div class="flex">
+        <div
+          v-if="card !== undefined"
+          class="w-1/3"
+        >
           <anki-card-preview
             :anki-card="card"
             @change-step="changeStep"
           />
-        </Suspense>
-      </n-layout-sider>
-      <n-layout-content
-        content-style="padding: 24px;"
-        :native-scrollbar="true"
-      >
-        <p class="text-4xl">
-          {{ card.fields.word }}
-        </p>
-        <edit-sentence
-          v-show="step === StepsEnum.SENTENCE"
-          v-if="steps.includes(StepsEnum.SENTENCE)"
-          :prefer-book="preferBookRef"
-          :word="card.fields.word"
-          :sentence="card.fields.sentence"
-          @update-sentence="updateSentence"
-        />
-        <edit-definition
-          v-show="step === StepsEnum.ENGLISH"
-          v-if="steps.includes(StepsEnum.ENGLISH)"
-          :word="card.fields.word"
-          :definition="card.fields.englishDefn"
-          type="english"
-          @update-definition="updateEnglishDefinition"
-        />
-        <edit-definition
-          v-show="step === StepsEnum.CHINESE"
-          v-if="steps.includes(StepsEnum.CHINESE)"
-          :word="card.fields.word"
-          :definition="card.fields.englishDefn"
-          type="chinese"
-          @update-definition="updateChineseDefinition"
-        />
-        <edit-images
-          v-show="step === StepsEnum.IMAGE"
-          v-if="steps.includes(StepsEnum.IMAGE)"
-          :word="card.fields.word"
-          @update-images="updateImages"
-        />
-      </n-layout-content>
-    </n-layout>
-
-    <template #action>
-      <div class="flex place-content-end gap-2">
-        <button
-          v-if="steps.length > 0"
-          class="btn-primary btn-sm btn"
-          @click="nextStep()"
-        >
-          Next Step
-        </button>
-        <button
-          class="btn-primary btn-sm btn"
-          @click="store.clearFront()"
-        >
-          Skip Word
-        </button>
-        <button
-          class="btn-primary btn-sm btn"
-          @click="markKnown"
-        >
-          Mark Known
-        </button>
-        <button
-          class="btn-primary btn-sm btn"
-          @click="submit()"
-        >
-          Submit
-        </button>
+        </div>
+        <div class="h-[60vh] w-full overflow-scroll p-4">
+          <p class="text-4xl">
+            {{ card.fields.word }}
+          </p>
+          <edit-sentence
+            v-show="step === StepsEnum.SENTENCE"
+            v-if="steps.includes(StepsEnum.SENTENCE)"
+            :prefer-book="preferBookRef"
+            :word="card.fields.word"
+            :sentence="card.fields.sentence"
+            @update-sentence="updateSentence"
+          />
+          <edit-definition
+            v-show="step === StepsEnum.ENGLISH"
+            v-if="steps.includes(StepsEnum.ENGLISH)"
+            :word="card.fields.word"
+            :definition="card.fields.englishDefn"
+            type="english"
+            @update-definition="updateEnglishDefinition"
+          />
+          <edit-definition
+            v-show="step === StepsEnum.CHINESE"
+            v-if="steps.includes(StepsEnum.CHINESE)"
+            :word="card.fields.word"
+            :definition="card.fields.englishDefn"
+            type="chinese"
+            @update-definition="updateChineseDefinition"
+          />
+          <edit-images
+            v-show="step === StepsEnum.IMAGE"
+            v-if="steps.includes(StepsEnum.IMAGE)"
+            :word="card.fields.word"
+            @update-images="updateImages"
+          />
+        </div>
       </div>
-    </template>
-  </n-modal>
+
+      <div class="modal-action">
+        <div class="flex place-content-end gap-2">
+          <button
+            v-if="steps.length > 0"
+            class="btn-primary btn-sm btn"
+            @click="nextStep()"
+          >
+            Next Step
+          </button>
+          <button
+            class="btn-primary btn-sm btn"
+            @click="store.clearFront()"
+          >
+            Skip Word
+          </button>
+          <button
+            class="btn-primary btn-sm btn"
+            @click="markKnown"
+          >
+            Mark Known
+          </button>
+          <button
+            class="btn-primary btn-sm btn"
+            @click="submit()"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -118,10 +107,7 @@ import {
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import AnkiCardPreview from '@/components/AnkiCardPreview.vue';
 import CardCreationSettings from '@/components/CardCreationSettings.vue';
-import {
-  useMessage, NModal,
-  NLayoutSider, NLayout, NLayoutContent,
-} from 'naive-ui';
+import { useMessage } from 'naive-ui';
 import EditSentence from '@/components/CardCreatorSteps/EditSentence.vue';
 import EditImages from
   '@/components/CardCreatorSteps/EditImages.vue';

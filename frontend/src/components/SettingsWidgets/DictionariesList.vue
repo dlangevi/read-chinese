@@ -4,7 +4,10 @@
       :class="['modal', {'modal-open': addDictModal}]"
       @click="() => addDictModal = false"
     >
-      <div class="modal-box relative w-1/2 max-w-5xl">
+      <div
+        class="modal-box relative w-1/2 max-w-5xl"
+        @click.stop
+      >
         <div>
           Add a dicitonary in Yomichan Json Format
         </div>
