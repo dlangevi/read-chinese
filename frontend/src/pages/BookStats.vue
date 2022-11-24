@@ -1,10 +1,10 @@
 <template>
-  <n-layout
-    class="m-4"
+  <div
+    class="m-4 flex"
     has-sider
   >
-    <n-layout-sider
-      width="500"
+    <div
+      class="basis-1/4"
       bordered
       content-style="padding: 24px;"
     >
@@ -13,15 +13,15 @@
         :src="book.cover"
         :alt="book.title"
       >
-    </n-layout-sider>
-    <n-layout>
-      <n-layout-header
+    </div>
+    <div class="grow basis-3/4">
+      <div
         class="p-4"
         bordered
       >
-        <p>{{ book.author }}</p>
-      </n-layout-header>
-      <n-layout-content class="p-8">
+        <p class="text-3xl">{{ book.author }} - {{ book.title }}</p>
+      </div>
+      <div class="p-8">
         <tabbed-pane>
           <tabbed-pane-tab
             name="Stats"
@@ -77,8 +77,8 @@
             />
           </tabbed-pane-tab>
         </tabbed-pane>
-      </n-layout-content>
-      <n-layout-footer
+      </div>
+      <div
         class="p-4"
         bordered
       >
@@ -90,9 +90,9 @@
             Make flash cards
           </button>
         </div>
-      </n-layout-footer>
-    </n-layout>
-  </n-layout>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -100,10 +100,6 @@ import TabbedPane from '@/layouts/TabbedPane.vue';
 import TabbedPaneTab from '@/components/TabbedPaneTab.vue';
 import UnknownWords from '@/components/UnknownWords.vue';
 import { provide } from 'vue';
-import {
-  NLayout, NLayoutSider, NLayoutHeader, NLayoutContent,
-  NLayoutFooter,
-} from 'naive-ui';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import type { backend } from '@wailsjs/models';
 
