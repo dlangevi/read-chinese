@@ -2,6 +2,7 @@ package backend
 
 import (
 	"bufio"
+	"embed"
 	"log"
 	"os"
 	"path"
@@ -12,6 +13,28 @@ import (
 )
 
 type Segmentation struct {
+}
+
+//go:embed assets/dict
+var jiebaDicts embed.FS
+var jiebaFiles = map[string]string{
+	"DICT_PATH":       "jieba.dict.utf8",
+	"HMM_PATH":        "hmm_model.utf8",
+	"USER_DICT_PATH":  "user.dict.utf8",
+	"IDF_PATH":        "idf.utf8",
+	"STOP_WORDS_PATH": "stop_words.utf8",
+}
+
+func UnloadJiebaDicts() error {
+	for _, filename := range jiebaFiles {
+		data, _ := jiebaDicts.ReadFile(path.Join("assets", "dict", filename))
+		dest := ConfigDir("jiebaDicts", filename)
+		err := os.WriteFile(dest, data, 0666)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 type Token struct {
@@ -167,9 +190,21 @@ func constructDict(d *Dictionaries) error {
 	// If the user has not installed dictionaries we just use the
 	// default segmentation
 	if validWords != 0 {
-		jieba = gojieba.NewJieba(replacementPath)
+		jieba = gojieba.NewJieba(
+			replacementPath,
+			ConfigDir("jiebaDicts", jiebaFiles["HMM_PATH"]),
+			ConfigDir("jiebaDicts", jiebaFiles["USER_DICT_PATH"]),
+			ConfigDir("jiebaDicts", jiebaFiles["IDF_PATH"]),
+			ConfigDir("jiebaDicts", jiebaFiles["STOP_WORDS_PATH"]),
+		)
 	} else {
-		jieba = gojieba.NewJieba()
+		jieba = gojieba.NewJieba(
+			ConfigDir("jiebaDicts", jiebaFiles["DICT_PATH"]),
+			ConfigDir("jiebaDicts", jiebaFiles["HMM_PATH"]),
+			ConfigDir("jiebaDicts", jiebaFiles["USER_DICT_PATH"]),
+			ConfigDir("jiebaDicts", jiebaFiles["IDF_PATH"]),
+			ConfigDir("jiebaDicts", jiebaFiles["STOP_WORDS_PATH"]),
+		)
 	}
 	log.Println("totalWords", totalWords, "validWords", validWords)
 	return nil

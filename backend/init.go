@@ -62,6 +62,10 @@ func StartBackend(ctx *context.Context,
 	runtime.Dictionaries = NewDictionaries(userSettings, runtime.KnownWords)
 	runtime.AnkiInterface = NewAnkiInterface(userSettings, runtime.KnownWords)
 
+	err = UnloadJiebaDicts()
+	if err != nil {
+		return nil, err
+	}
 	s, err := NewSegmentation(runtime.Dictionaries)
 	if err != nil {
 		return nil, err
