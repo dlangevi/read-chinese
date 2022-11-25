@@ -164,7 +164,13 @@ func constructDict(d *Dictionaries) error {
 	}
 	wr.Flush()
 	userDict.Close()
-	jieba = gojieba.NewJieba(replacementPath)
+	// If the user has not installed dictionaries we just use the
+	// default segmentation
+	if validWords != 0 {
+		jieba = gojieba.NewJieba(replacementPath)
+	} else {
+		jieba = gojieba.NewJieba()
+	}
 	log.Println("totalWords", totalWords, "validWords", validWords)
 	return nil
 }
