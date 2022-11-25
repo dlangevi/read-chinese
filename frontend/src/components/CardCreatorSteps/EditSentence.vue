@@ -15,7 +15,7 @@
         :key="i"
         class="text-3xl"
       >
-        <label class="label cursor-pointer" :for="sen">
+        <label class="label cursor-pointer justify-start gap-2" :for="sen">
           <input
             :id="sen"
             v-model="sentence"
@@ -24,7 +24,7 @@
             type="radio"
             name="sentences"
           >
-          <span class="label-text">{{ sen }}</span>
+          <span>{{ sen }}</span>
         </label>
       </div>
     </div>
@@ -38,7 +38,7 @@
         :key="i"
         class="text-3xl"
       >
-        <label class="label cursor-pointer" :for="sen">
+        <label class="label cursor-pointer justify-start gap-2" :for="sen">
           <input
             :id="sen"
             v-model="sentence"
@@ -47,7 +47,7 @@
             type="radio"
             name="sentences"
           >
-          <span class="label-text">{{ sen }}</span>
+          <span>{{ sen }}</span>
         </label>
       </div>
     </div>

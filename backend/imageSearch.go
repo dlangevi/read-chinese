@@ -42,14 +42,14 @@ func (i *ImageClient) SearchImages(query string) ([]ImageInfo, error) {
 		SetHeader("Ocp-Apim-Subscription-Key", i.userSettings.AzureImageApiKey).
 		SetQueryParams(map[string]string{
 			"q":          query,
-			"count":      "5",
+			"count":      "6",
 			"imageType":  "Photo",
 			"safeSearch": "Strict",
 		}).
 		SetResult(result).
 		Get("/v7.0/images/search")
 	// TODO need some better way of error detection
-	if len(result.Value) != 5 {
+	if len(result.Value) != 6 {
 		err = errors.New(fmt.Sprintf("Something failed with imageSearch %v", rsp))
 	}
 	return result.Value, err

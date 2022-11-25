@@ -3,25 +3,35 @@
     <div class="m-4 text-3xl">
       Pick an image
     </div>
-    <div
-      v-for="(imageData, i) in images"
-      :key="i"
-    >
-      <label class="label cursor-pointer" :for="i.toString()">
-        <input
-          :id="i.toString()"
-          v-model="image"
-          class="checkbox"
-          :value="i"
-          type="checkbox"
-          name="images"
+    <div class="flex flex-wrap">
+      <div
+        v-for="(imageData, i) in images"
+        :key="i"
+        class="max-w-[33%]"
+      >
+        <label
+          class="
+          label
+          m-4
+          cursor-pointer gap-2"
+          :for="i.toString()"
         >
-        <img
-          class="h-48 w-auto"
-          :src="imageData.thumbnailUrl"
-          alt="image for word"
-        >
-      </label>
+
+          <input
+            :id="i.toString()"
+            v-model="image"
+            class="checkbox"
+            :value="i"
+            type="checkbox"
+            name="images"
+          >
+          <img
+            class="h-auto w-auto"
+            :src="imageData.thumbnailUrl"
+            alt="image for word"
+          >
+        </label>
+      </div>
     </div>
   </div>
 </template>

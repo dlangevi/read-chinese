@@ -8,7 +8,10 @@
       :key="i"
       class="text-3xl"
     >
-      <label class="label cursor-pointer" :for="def.definition">
+      <label
+        class="label cursor-pointer justify-start gap-2"
+        :for="def.definition"
+      >
         <input
           :id="def.definition"
           v-model="definition"
@@ -17,10 +20,7 @@
           type="checkbox"
           name="definitions"
         >
-        <span
-          class="label-text"
-          v-html="'[' + def.pronunciation + '] ' + def.definition"
-        />
+        <span v-html="'[' + def.pronunciation + '] ' + def.definition" />
       </label>
     </div>
   </div>
