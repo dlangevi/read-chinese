@@ -158,11 +158,11 @@ func (s *Segmentation) SegmentFullText(path string) ([]string, FrequencyTable, e
 }
 
 func constructDict(d *Dictionaries) error {
-	dict, err := os.Open(gojieba.DICT_PATH)
+	dict, err := jiebaDicts.Open(path.Join(
+		"assets", "dict", jiebaFiles["DICT_PATH"]))
 	if err != nil {
 		return err
 	}
-	defer dict.Close()
 	defer dict.Close()
 	replacementPath := path.Join(os.TempDir(), "replacement.dict.utf8")
 	userDict, err := os.Create(replacementPath)
