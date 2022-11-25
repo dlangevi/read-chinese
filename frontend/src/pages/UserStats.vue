@@ -1,6 +1,6 @@
 <template>
-  <div class="m-auto flex h-full w-1/4">
-    <div class="stats my-auto bg-primary text-primary-content shadow">
+  <div class="flex h-full">
+    <div class="stats m-auto bg-primary text-primary-content shadow">
       <div class="stat place-items-center">
         <div class="stat-title"> Known Words </div>
         <div class="stat-value"> {{ words }} </div>
