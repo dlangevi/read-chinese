@@ -11,5 +11,12 @@
   "author": {
     "name": "David Langevin",
     "email": "dlangevi@uwaterloo.ca"
+  },
+  "Info": {
+    "companyName": "dlangevi",
+    "productName": "Read Chinese",
+    "productVersion": "0.0.1",
+    "copyright": "Copyright?",
+    "comments": "Built using Wails (https://wails.io)"
   }
 }

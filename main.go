@@ -3,6 +3,7 @@ package main
 // #cgo LDFLAGS: -static-libstdc++ -static-libgcc
 import (
 	"embed"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -45,6 +46,17 @@ func (h *FileLoader) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	logFile := flag.String("log", "", "log file")
+	flag.Parse()
+
+	if *logFile != "" {
+		f, err := os.OpenFile(*logFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+		if err != nil {
+			log.Fatalf("error opening file: %v", err)
+		}
+		defer f.Close()
+		log.SetOutput(f)
+	}
 	// Create an instance of the app structure
 	// 创建一个App结构体实例
 	log.SetFlags(log.Ltime | log.Lshortfile)
