@@ -73,12 +73,12 @@ func main() {
 	// 使用选项创建应用
 	err = wails.Run(&options.App{
 		Title:             "read-chinese",
-		Width:             900,
-		Height:            600,
-		MinWidth:          900,
-		MinHeight:         600,
-		MaxWidth:          1200,
-		MaxHeight:         800,
+		Width:             1200,
+		Height:            800,
+		MinWidth:          1200,
+		MinHeight:         800,
+		MaxWidth:          1920,
+		MaxHeight:         1080,
 		DisableResize:     false,
 		Fullscreen:        false,
 		Frameless:         false,
