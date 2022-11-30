@@ -6,13 +6,13 @@ export function AddDictionary(arg1:string,arg2:string,arg3:string):Promise<void>
 
 export function DeleteDictionary(arg1:string):Promise<void>;
 
-export function GetDefinitions(arg1:Array<backend.UnknownWordEntry>):Promise<Array<backend.UnknownWordEntry>>;
+export function GetDefinitions(arg1:Array<string>):Promise<backend.WordDefinitions>;
 
-export function GetDefinitionsForWord(arg1:string,arg2:string):Promise<Array<backend.DictionaryEntry>>;
+export function GetDefinitionsForWord(arg1:string,arg2:string):Promise<Array<backend.DictionaryDefinition>>;
 
 export function GetDictionaryInfo():Promise<backend.DictionaryInfoMap>;
 
-export function GetPossibleWords(arg1:string):Promise<Array<backend.UnknownWordEntry>>;
+export function GetPossibleWords(arg1:string):Promise<backend.WordDefinitions>;
 
 export function IsInDictionary(arg1:string):Promise<boolean>;
 

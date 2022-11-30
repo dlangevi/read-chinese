@@ -13,7 +13,7 @@
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import {
-  watch, onBeforeMount, ref, toRaw, onUnmounted,
+  watch, onBeforeMount, ref, onUnmounted,
 } from 'vue';
 import { AgGridVue } from 'ag-grid-vue3';
 import MarkLearned from '@/components/MarkLearned.vue';
@@ -22,6 +22,7 @@ import { getUserSettings } from '@/lib/userSettings';
 import type { GetRowIdParams, GridReadyEvent, ColDef } from 'ag-grid-community';
 import { backend } from '@wailsjs/models';
 import { GetDefinitions } from '@wailsjs/backend/Dictionaries';
+import type { WordDefinitions } from '@/lib/brokenTypes';
 
 const UserSettings = getUserSettings();
 
@@ -97,9 +98,18 @@ columnDefs.push(
 );
 
 const rowData = ref<any[]>([]);
-watch(() => props.words, async (newWords) => {
-  rowData.value = await GetDefinitions(toRaw(newWords));
-  console.log('new Words', rowData.value);
+watch(() => props.words, async () => {
+  const justWords = props.words.map((word) => word.word);
+  const definitions : WordDefinitions = await GetDefinitions(justWords);
+  props.words.forEach((row) => {
+    const word = row.word;
+    const definition = definitions[word];
+    if (definition) {
+      row.definition = definition.definition;
+      row.pinyin = definition.pronunciation;
+    }
+  });
+  rowData.value = props.words;
 });
 
 let resizeCallback: () => void;
@@ -119,9 +129,17 @@ onUnmounted(() => {
 });
 
 onBeforeMount(async () => {
-  const rawWords = toRaw(props.words);
-  rowData.value = await GetDefinitions(rawWords);
-  console.log(rowData);
+  const justWords = props.words.map((word) => word.word);
+  const definitions : WordDefinitions = await GetDefinitions(justWords);
+  props.words.forEach((row) => {
+    const word = row.word;
+    const definition = definitions[word];
+    if (definition) {
+      row.definition = definition.definition;
+      row.pinyin = definition.pronunciation;
+    }
+  });
+  rowData.value = props.words;
 });
 
 </script>

@@ -71,12 +71,12 @@ export namespace backend {
 		}
 	}
 	
-	export class DictionaryEntry {
+	export class DictionaryDefinition {
 	    definition: string;
 	    pronunciation: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new DictionaryEntry(source);
+	        return new DictionaryDefinition(source);
 	    }
 	
 	    constructor(source: any = {}) {

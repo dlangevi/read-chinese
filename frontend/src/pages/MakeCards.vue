@@ -37,6 +37,7 @@ import MarkLearned from '@/components/MarkLearned.vue';
 import type { GetRowIdParams, GridReadyEvent, ColDef } from 'ag-grid-community';
 
 import { backend } from '@wailsjs/models';
+import type { WordDefinitions } from '@/lib/brokenTypes';
 
 import { GetPossibleWords } from '@wailsjs/backend/Dictionaries';
 
@@ -118,7 +119,16 @@ async function onUpdateSearchBox(event: Event) {
   if (newSearch.length === 0) {
     rowData.value = [];
   } else {
-    rowData.value = await GetPossibleWords(newSearch);
+    const words : WordDefinitions = await GetPossibleWords(newSearch);
+    const rows : backend.UnknownWordEntry[] = [];
+    Object.entries(words).forEach(([word, def]) => {
+      rows.push({
+        word,
+        definition: def.definition,
+        pinyin: def.pronunciation,
+      });
+    });
+    rowData.value = rows;
   }
 }
 </script>

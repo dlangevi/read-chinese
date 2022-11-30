@@ -17,10 +17,6 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 - [ ] track book progress (eg 15% read)
 - [ ] update image / audio when editing card
 - [ ] write dev instal guide 
-- [ ] allow cc-cedict to be installed on first start
-- [ ] import user word list from various sources
-- [ ] add new book (without needing calibre)
-- [ ] interactive workflow for importing from calibre (control which books to import etc)
 - [ ] use calibre (if possible) to convert from epub etc to txt file
 - [ ] store our own copy of image cover, book text, etc
 - [ ] more compact library table view
@@ -28,6 +24,13 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 
 
 ### In Progress
+
+These will definitely be implemented and have priority
+
+- [ ] allow cc-cedict to be installed on first start
+- [ ] interactive workflow for importing from calibre (control which books to import etc)
+- [ ] import user word list from various sources
+- [ ] add new book (without needing calibre)
 
 
 ### DONE

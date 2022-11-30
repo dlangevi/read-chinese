@@ -1,38 +1,21 @@
 package backend
 
 import (
-	"encoding/json"
 	"log"
-	"os"
 	"strings"
 )
 
-type DictionaryEntry struct {
-	Definition    string `json:"definition"`
-	Pronunciation string `json:"pronunciation"`
-}
-
-type Dictionary struct {
-	Definitions map[string][]DictionaryEntry
-	Language    string
-}
-
 type Dictionaries struct {
 	PrimaryDictName string
-	PrimaryDict     *Dictionary
-	Dictionaries    map[string]*Dictionary
+	PrimaryDict     Dictionary
+	Dictionaries    map[string]UserDictionary
 	userSettings    *UserSettings
 	known           *KnownWords
 }
 
-type RawDictionaryEntry struct {
-	Term          string
-	Pronunciation string
-	Definition    string
-}
-
-type RawDictionary struct {
-	Entries []RawDictionaryEntry
+type UserDictionary struct {
+	Dictionary Dictionary
+	Language   string
 }
 
 func NewDictionaries(
@@ -47,51 +30,22 @@ func NewDictionaries(
 	primaryName := userSettings.PrimaryDict
 	dicts.PrimaryDictName = primaryName
 	// TODO this could fail
-	dicts.PrimaryDict, _ = dicts.Dictionaries[primaryName]
+	dicts.PrimaryDict = dicts.Dictionaries[primaryName].Dictionary
 
 	return dicts
 }
 
-func parseDictionaryFile(path string) (*RawDictionary, error) {
-	rawDict := &RawDictionary{}
-	rawDictBytes, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	json.Unmarshal(rawDictBytes, &rawDict.Entries)
-
-	return rawDict, nil
-}
-
 func (d *Dictionaries) loadDictionaries() error {
-	d.Dictionaries = map[string]*Dictionary{}
-	return d.transformRawDictionaries(d.userSettings.Dicts)
-}
-
-func (d *Dictionaries) transformRawDictionaries(dicts map[string]Dict) error {
-	for name, dict := range dicts {
-		newDict := Dictionary{
-			Definitions: map[string][]DictionaryEntry{},
-			Language:    dict.Language,
-		}
-		rawDict, err := parseDictionaryFile(dict.Path)
+	d.Dictionaries = map[string]UserDictionary{}
+	for name, dict := range d.userSettings.Dicts {
+		newDict, err := FromMikaguJsonFormat(dict.Path)
 		if err != nil {
 			return err
 		}
-
-		for _, entry := range rawDict.Entries {
-			terms, ok := newDict.Definitions[entry.Term]
-			if !ok {
-				terms = []DictionaryEntry{}
-			}
-			terms = append(terms, DictionaryEntry{
-				Definition:    entry.Definition,
-				Pronunciation: entry.Pronunciation,
-			})
-			newDict.Definitions[entry.Term] = terms
+		d.Dictionaries[name] = UserDictionary{
+			newDict,
+			dict.Language,
 		}
-		d.Dictionaries[name] = &newDict
-
 	}
 	return nil
 }
@@ -115,7 +69,7 @@ func (d *Dictionaries) SetPrimaryDict(name string) {
 
 	}
 
-	d.PrimaryDict = primary
+	d.PrimaryDict = primary.Dictionary
 	d.userSettings.SetPrimaryDict(name)
 }
 
@@ -138,17 +92,14 @@ func (d *Dictionaries) GetDictionaryInfo() DictionaryInfoMap {
 	return dictInfoMap
 }
 
-func (d *Dictionaries) GetDefinitionsForWord(word string, language string) []DictionaryEntry {
-	answers := []DictionaryEntry{}
+func (d *Dictionaries) GetDefinitionsForWord(word string, language string) []DictionaryDefinition {
+	answers := []DictionaryDefinition{}
 
 	for _, dict := range d.Dictionaries {
 		if dict.Language != language {
 			continue
 		}
-		terms, ok := dict.Definitions[word]
-		if !ok {
-			continue
-		}
+		terms := dict.Dictionary.GetEntries(word)
 		answers = append(answers, terms...)
 	}
 	return answers
@@ -162,55 +113,47 @@ type UnknownWordEntry struct {
 }
 
 func (d *Dictionaries) getDefaultDefinition(word string) string {
-	term, ok := d.PrimaryDict.Definitions[word]
-	if !ok {
+	terms := d.PrimaryDict.GetDefinitions(word)
+	if len(terms) == 0 {
 		return ""
 	}
-	first := term[0]
-	return first.Definition
+	return terms[0]
 }
 
 func (d *Dictionaries) getPinyin(word string) string {
-	term, ok := d.PrimaryDict.Definitions[word]
-	if !ok {
-		return ""
-	}
+	proniciations := d.PrimaryDict.GetPronuciations(word)
 	// TODO look into go-funk if more occasion for this stuff arrises
 	pinyin := []string{}
-	for _, item := range term {
-		pinyin = append(pinyin, item.Pronunciation)
+	for _, pronuciation := range proniciations {
+		pinyin = append(pinyin, pronuciation)
 	}
 
 	return strings.Join(pinyin, ", ")
 }
 
 // TODO this passing back and forth of UnknownWordEntry feels clunky
-func (d *Dictionaries) GetDefinitions(words []UnknownWordEntry) []UnknownWordEntry {
-	for index := range words {
-		word := &words[index]
-		word.Definition = d.getDefaultDefinition(word.Word)
-		word.Pinyin = d.getPinyin(word.Word)
-	}
-	return words
-}
+type WordDefinitions map[string]DictionaryDefinition
 
-func (d *Dictionaries) GetPossibleWords(partial string) []UnknownWordEntry {
-	words := []UnknownWordEntry{}
-
-	for word := range d.PrimaryDict.Definitions {
-		if strings.Contains(word, partial) && !d.known.isKnown(word) {
-			words = append(words, UnknownWordEntry{
-				Word: word,
-			})
+func (d *Dictionaries) GetDefinitions(words []string) WordDefinitions {
+	entries := WordDefinitions{}
+	for _, word := range words {
+		entries[word] = DictionaryDefinition{
+			Definition:    d.getDefaultDefinition(word),
+			Pronunciation: d.getPinyin(word),
 		}
 	}
+	return entries
+}
 
+func (d *Dictionaries) GetPossibleWords(partial string) WordDefinitions {
+	words := d.PrimaryDict.GetPartialMatches(partial)
+	// TODO filter out known
 	return d.GetDefinitions(words)
 }
 
 func (d *Dictionaries) IsInDictionary(word string) bool {
 	for _, dict := range d.Dictionaries {
-		_, ok := dict.Definitions[word]
+		ok := dict.Dictionary.Contains(word)
 		if ok {
 			return true
 		}

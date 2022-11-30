@@ -38,7 +38,7 @@ import { GetDefinitionsForWord } from '@wailsjs/backend/Dictionaries';
 const UserSettings = getUserSettings();
 
 const emit = defineEmits(['update-definition']);
-const definitions = ref<backend.DictionaryEntry[]>([]);
+const definitions = ref<backend.DictionaryDefinition[]>([]);
 const definition = ref<string[]>([]);
 
 watch(definition, async () => {

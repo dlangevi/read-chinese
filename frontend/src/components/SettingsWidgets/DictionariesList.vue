@@ -9,7 +9,7 @@
         @click.stop
       >
         <div>
-          Add a dicitonary in Yomichan Json Format
+          Add a dictionary in Migaku Json Format
         </div>
         <div class="divider" />
         <div class="m-auto flex w-3/4 flex-col gap-1">

@@ -179,7 +179,7 @@ const updateSentence = (newSentence: string, updateStep = false) => {
 };
 
 const updateDefinition = (
-  newDefinitions: backend.DictionaryEntry[],
+  newDefinitions: backend.DictionaryDefinition[],
   updateStep: boolean,
   setter: (arg0: string) => void,
 ) => {
@@ -200,7 +200,7 @@ const updateDefinition = (
 };
 
 const updateEnglishDefinition = (
-  newDefinitions: backend.DictionaryEntry[],
+  newDefinitions: backend.DictionaryDefinition[],
   updateStep = false,
 ) => {
   updateDefinition(newDefinitions, updateStep, function (newDefs: string) {
@@ -210,7 +210,7 @@ const updateEnglishDefinition = (
 };
 
 const updateChineseDefinition = (
-  newDefinitions: backend.DictionaryEntry[],
+  newDefinitions: backend.DictionaryDefinition[],
   updateStep = false,
 ) => {
   updateDefinition(newDefinitions, updateStep, function (newDefs: string) {
