@@ -40,17 +40,20 @@
         </div>
         <div class="modal-action">
           <button class="btn-secondary btn" @click="submit">
-            Add Dictionary
+            Add Custom Dictionary
           </button>
         </div>
       </div>
     </div>
-    <div class="grid grid-cols-2 text-2xl">
+    <div class="grid grid-cols-3 gap-2 text-2xl">
       <div>
         Dictionaries
       </div>
+      <button class="btn-secondary btn" @click="addCedict">
+        Add CC-CEDICT
+      </button>
       <button class="btn-secondary btn" @click="addDictionary">
-        Add Dictionary
+        Add Custom Dictionary
       </button>
     </div>
     <div class="col-span-3 row-span-2">
@@ -92,7 +95,8 @@ import {
   GetDictionaryInfo,
   SetPrimaryDict,
   DeleteDictionary,
-  AddDictionary,
+  AddCedict,
+  AddMigakuDictionary,
 } from '@wailsjs/backend/Dictionaries';
 
 import { FilePicker } from '@wailsjs/main/App';
@@ -127,6 +131,11 @@ const options = [
 async function pickFile() {
   newDictFile.value = await FilePicker('json');
 }
+
+function addCedict() {
+  AddCedict();
+}
+
 function addDictionary() {
   // Reset whatever state
   newDictFile.value = '';
@@ -137,7 +146,7 @@ function addDictionary() {
 
 function submit() {
   // TODO verify
-  AddDictionary(
+  AddMigakuDictionary(
     newDictName.value,
     newDictFile.value,
     newDictType.value,

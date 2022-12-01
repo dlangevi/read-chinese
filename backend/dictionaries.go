@@ -38,7 +38,7 @@ func NewDictionaries(
 func (d *Dictionaries) loadDictionaries() error {
 	d.Dictionaries = map[string]UserDictionary{}
 	for name, dict := range d.userSettings.Dicts {
-		newDict, err := FromMikaguJsonFormat(dict.Path)
+		newDict, err := FromSavedDictionary(dict.Path)
 		if err != nil {
 			return err
 		}
@@ -47,11 +47,31 @@ func (d *Dictionaries) loadDictionaries() error {
 			dict.Language,
 		}
 	}
+	primaryName := d.userSettings.PrimaryDict
+	d.PrimaryDictName = primaryName
+	// TODO this could fail
+	d.PrimaryDict = d.Dictionaries[primaryName].Dictionary
 	return nil
 }
 
-func (d *Dictionaries) AddDictionary(name string, path string, language string) {
-	d.userSettings.SaveDict(name, path, language)
+func (d *Dictionaries) AddCedict() {
+	// Parse it into a *dictionary
+	dictionary, err := FromCedictFormat()
+	if err != nil {
+		log.Println(err)
+	}
+	savedPath := ConfigDir("userDicts", "cc-cedict")
+	SaveDictionary(dictionary, savedPath)
+	d.userSettings.SaveDict("cc-cedict", savedPath, "english")
+	d.loadDictionaries()
+}
+
+func (d *Dictionaries) AddMigakuDictionary(name string, path string, language string) {
+	// TODO error handle
+	dictionary, _ := FromMigakuJsonFormat(path)
+	savedPath := ConfigDir("userDicts", name)
+	SaveDictionary(dictionary, savedPath)
+	d.userSettings.SaveDict(name, savedPath, language)
 	d.loadDictionaries()
 }
 

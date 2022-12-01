@@ -1,11 +1,19 @@
 package backend
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	// "log"
+	"bufio"
+	"fmt"
+	"io"
+	"net/http"
 	"os"
+	"regexp"
 	"strings"
 )
+
+const URL = "https://www.mdbg.net/chinese/export/cedict/cedict_1_0_ts_utf-8_mdbg.txt.gz"
 
 type (
 	Dictionary interface {
@@ -17,7 +25,7 @@ type (
 	}
 
 	dictionary struct {
-		definitions map[string][]dictionaryEntry
+		Definitions map[string][]dictionaryEntry
 	}
 
 	dictionaryEntry struct {
@@ -34,11 +42,92 @@ type (
 
 func newDictionary() *dictionary {
 	return &dictionary{
-		definitions: map[string][]dictionaryEntry{},
+		Definitions: map[string][]dictionaryEntry{},
 	}
 }
 
-func FromMikaguJsonFormat(path string) (*dictionary, error) {
+func SaveDictionary(d *dictionary, path string) error {
+	rawDictBytes, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(path, rawDictBytes, 0666)
+	return err
+}
+
+var entryRegexp = regexp.MustCompile(`^(.*) (.*) \[(.*)\] /(?:(.*)/)+`)
+
+func downloadCedict() (io.ReadCloser, error) {
+	resp, err := http.Get(URL)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("bad status: %s", resp.Status)
+	}
+
+	gz, err := gzip.NewReader(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return gz, nil
+}
+
+func FromCedictFormat() (*dictionary, error) {
+	dictionary := newDictionary()
+	ccdict, err := downloadCedict()
+	if err != nil {
+		return dictionary, err
+	}
+	sc := bufio.NewScanner(ccdict)
+	for sc.Scan() {
+		line := sc.Text()
+		if strings.HasPrefix(line, "#") { // Ignore comments
+			continue
+		}
+		matches := entryRegexp.FindStringSubmatch(line)
+		if matches == nil {
+			return nil, fmt.Errorf("Entry doesn't match regular expression")
+		}
+		// e.Traditional = matches[1]
+		simplified := matches[2]
+		pinyin := strings.ToLower(matches[3])
+		defs := matches[4]
+		// defs := strings.Split(matches[4], "/")
+		// if len(defs) == 0 {
+		// 	return nil, fmt.Errorf("No definitions found")
+		// }
+		terms, ok := dictionary.Definitions[simplified]
+		if !ok {
+			terms = []dictionaryEntry{}
+		}
+		terms = append(terms, dictionaryEntry{
+			Definition:    defs,
+			Pronunciation: pinyin,
+		})
+		dictionary.Definitions[simplified] = terms
+	}
+
+	return dictionary, nil
+}
+
+func FromSavedDictionary(path string) (*dictionary, error) {
+	dictionary := newDictionary()
+	rawDictBytes, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(rawDictBytes, dictionary)
+	if err != nil {
+		return nil, err
+	}
+
+	return dictionary, nil
+}
+
+func FromMigakuJsonFormat(path string) (*dictionary, error) {
 	type MigakuDictionaryEntry struct {
 		Term          string
 		Pronunciation string
@@ -60,7 +149,7 @@ func FromMikaguJsonFormat(path string) (*dictionary, error) {
 	}
 
 	for _, entry := range rawDict.Entries {
-		terms, ok := dictionary.definitions[entry.Term]
+		terms, ok := dictionary.Definitions[entry.Term]
 		if !ok {
 			terms = []dictionaryEntry{}
 		}
@@ -68,7 +157,7 @@ func FromMikaguJsonFormat(path string) (*dictionary, error) {
 			Definition:    entry.Definition,
 			Pronunciation: entry.Pronunciation,
 		})
-		dictionary.definitions[entry.Term] = terms
+		dictionary.Definitions[entry.Term] = terms
 	}
 
 	return dictionary, nil
@@ -76,7 +165,7 @@ func FromMikaguJsonFormat(path string) (*dictionary, error) {
 
 func (d *dictionary) GetDefinitions(word string) []string {
 	definitions := []string{}
-	entries, ok := d.definitions[word]
+	entries, ok := d.Definitions[word]
 	if !ok {
 		return definitions
 	}
@@ -89,7 +178,7 @@ func (d *dictionary) GetDefinitions(word string) []string {
 func (d *dictionary) GetEntries(word string) []DictionaryDefinition {
 	definitions := []DictionaryDefinition{}
 
-	entries, ok := d.definitions[word]
+	entries, ok := d.Definitions[word]
 	if !ok {
 		return definitions
 	}
@@ -106,7 +195,7 @@ func (d *dictionary) GetEntries(word string) []DictionaryDefinition {
 
 func (d *dictionary) GetPronuciations(word string) []string {
 	pronuciation := []string{}
-	entries, ok := d.definitions[word]
+	entries, ok := d.Definitions[word]
 	if !ok {
 		return pronuciation
 	}
@@ -118,7 +207,7 @@ func (d *dictionary) GetPronuciations(word string) []string {
 
 func (d *dictionary) GetPartialMatches(partial string) []string {
 	words := []string{}
-	for word := range d.definitions {
+	for word := range d.Definitions {
 		if strings.Contains(word, partial) {
 			words = append(words, word)
 		}
@@ -127,6 +216,6 @@ func (d *dictionary) GetPartialMatches(partial string) []string {
 }
 
 func (d *dictionary) Contains(word string) bool {
-	_, ok := d.definitions[word]
+	_, ok := d.Definitions[word]
 	return ok
 }
