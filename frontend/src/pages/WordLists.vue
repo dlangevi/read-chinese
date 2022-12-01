@@ -4,6 +4,7 @@
       <button class="btn-primary btn" @click="importAnki">
         Sync from Anki
       </button>
+      <import-csv />
       <div class="flex place-content-between">
         <span>Hsk 2.0</span>
         <input
@@ -51,10 +52,13 @@
 
 <script lang="ts" setup>
 import WithSidebar from '@/layouts/WithSidebar.vue';
+import ImportCsv from '@/components/ImportCsv.vue';
 import { watch, ref, onBeforeMount } from 'vue';
 import { backend } from '@wailsjs/models';
 import { LearningTarget } from '@wailsjs/backend/bookLibrary';
-import { GetUnknownHskWords } from '@wailsjs/backend/KnownWords';
+import {
+  GetUnknownHskWords,
+} from '@wailsjs/backend/KnownWords';
 import { ImportAnkiKeywords } from '@wailsjs/backend/AnkiInterface';
 import UnknownWords from '../components/UnknownWords.vue';
 

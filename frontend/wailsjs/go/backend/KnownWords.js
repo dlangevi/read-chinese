@@ -17,3 +17,7 @@ export function GetUnknownHskWords(arg1, arg2) {
 export function GetWordStats() {
   return window['go']['backend']['KnownWords']['GetWordStats']();
 }
+
+export function ImportCSVWords(arg1) {
+  return window['go']['backend']['KnownWords']['ImportCSVWords'](arg1);
+}

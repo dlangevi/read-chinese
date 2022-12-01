@@ -9,3 +9,5 @@ export function AddWords(arg1:Array<backend.WordEntry>):Promise<Error>;
 export function GetUnknownHskWords(arg1:string,arg2:number):Promise<Array<backend.UnknownWordEntry>>;
 
 export function GetWordStats():Promise<backend.WordStats>;
+
+export function ImportCSVWords(arg1:string):Promise<Error>;

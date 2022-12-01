@@ -2,9 +2,13 @@ package backend
 
 import (
 	"embed"
+	"encoding/csv"
 	"fmt"
+	"io"
 	"log"
+	"os"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
@@ -121,6 +125,7 @@ type WordEntry struct {
 }
 
 // TODO make this faster if possible
+// TODO chunk in batches of 5000 words
 func (known *KnownWords) AddWords(words []WordEntry) error {
 	tx, err := known.db.Beginx()
 	if err != nil {
@@ -150,7 +155,51 @@ func (known *KnownWords) AddWords(words []WordEntry) error {
 	return tx.Commit()
 }
 
-// TODO importCSVWords
+func (known *KnownWords) ImportCSVWords(path string) error {
+	csvFile, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	r := csv.NewReader(csvFile)
+	r.FieldsPerRecord = -1
+	words := []WordEntry{}
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		if len(record) == 0 {
+			return fmt.Errorf("Record had 0 elements")
+		}
+
+		if len(record) == 1 {
+			words = append(words, WordEntry{
+				Word:     record[0],
+				Interval: 10000,
+			})
+		} else {
+			// record also has additional data
+			interval, err := strconv.ParseInt(record[1], 10, 64)
+			if err != nil {
+				log.Println("Error: failed to parse int from", record[1])
+				// fall back to interval of 10000
+				words = append(words, WordEntry{
+					Word:     record[0],
+					Interval: 10000,
+				})
+			}
+
+			words = append(words, WordEntry{
+				Word:     record[0],
+				Interval: interval,
+			})
+		}
+	}
+	return known.AddWords(words)
+}
 
 func (known *KnownWords) isWellKnown(word string) bool {
 	interval, ok := known.words[word]
