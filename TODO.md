@@ -21,19 +21,20 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 - [ ] store our own copy of image cover, book text, etc
 - [ ] more compact library table view
 - [ ] manage known words list
+- [ ] create bootstrap flow which installs free dicts and books
 
 
 ### In Progress
 
 These will definitely be implemented and have priority
 
-- [ ] allow cc-cedict to be installed on first start
 - [ ] interactive workflow for importing from calibre (control which books to import etc)
 - [ ] import user word list from various sources
 - [ ] add new book (without needing calibre)
 
 
 ### DONE
+- [x] allow cc-cedict to be installed from internet 
 - [x] Move from naive-ui to daisyui
 - [x] Rewrite using golang / wails.io
 - [x] Segment text only using words in user dictionary
