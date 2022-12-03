@@ -56,7 +56,7 @@ func TestGetDictionaryInfo(t *testing.T) {
 func TestGetDefinitions(t *testing.T) {
 	defs := testRuntime.Dictionaries.GetDefinitionsForWord("的", "english")
 	if len(defs) != 4 {
-		t.Errorf("Not enough defs")
+		t.Errorf("Not enough defs, %v", defs)
 	}
 
 	possible := testRuntime.Dictionaries.GetPossibleWords("你")

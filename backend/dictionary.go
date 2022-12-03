@@ -186,7 +186,7 @@ func (d *dictionary) GetEntries(word string) []DictionaryDefinition {
 	for _, entry := range entries {
 		definitions = append(definitions, DictionaryDefinition{
 			Definition:    entry.Definition,
-			Pronunciation: entry.Pronunciation,
+			Pronunciation: ToStandardPinyin(entry.Pronunciation),
 		})
 	}
 
@@ -200,7 +200,7 @@ func (d *dictionary) GetPronuciations(word string) []string {
 		return pronuciation
 	}
 	for _, entry := range entries {
-		pronuciation = append(pronuciation, entry.Pronunciation)
+		pronuciation = append(pronuciation, ToStandardPinyin(entry.Pronunciation))
 	}
 	return pronuciation
 }

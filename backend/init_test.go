@@ -20,6 +20,7 @@ func TestMain(m *testing.M) {
 	tempDb := path.Join(os.TempDir(), "testdb.db")
 	os.Remove(tempDb)
 
+	log.SetFlags(log.Ltime | log.Lshortfile)
 	testRuntime = createBackend(tempDb)
 	// This will be the first book added, so tests can query its data with
 	// BookdId = 1
@@ -38,6 +39,9 @@ func TestMain(m *testing.M) {
 func createBackend(dbPath string) *Backend {
 	ctx := context.Background()
 	runtime, err := StartBackend(&ctx, dbPath, "./testdata/example_metadata.json")
+	// TODO lol this saves an actual dictionary in my user config
+	runtime.Dictionaries.AddMigakuDictionary("example",
+		"./testdata/example_dict.json", "english")
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)

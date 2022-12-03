@@ -1,8 +1,8 @@
 {
-  "Ran": 1553,
+  "Ran": 1569,
   "Dicts": {
     "example": {
-      "Path": "./testdata/example_dict.json",
+      "Path": "/home/dlangevi/.config/read-chinese/userDicts/example",
       "Language": "english"
     }
   },

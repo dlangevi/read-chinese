@@ -8,7 +8,6 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 - [ ] allow mapping output to arbitrary anki note format
 - [ ] free edit of card fields
 - [ ] card maintenance (search for missing image, audio, etc)
-- [ ] unified pinyin generation
 - [ ] use forvo for term audio [unclear if possible]
 - [ ] get example sentences from some online service [if free ones exist] 
 - [ ] support frequency lists
@@ -34,6 +33,7 @@ These will definitely be implemented and have priority
 
 
 ### DONE
+- [x] unified pinyin generation (or at least fixed cc-cedicts ugly format)
 - [x] allow cc-cedict to be installed from internet 
 - [x] Move from naive-ui to daisyui
 - [x] Rewrite using golang / wails.io
