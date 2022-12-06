@@ -12,6 +12,7 @@ func TestPinyin(t *testing.T) {
 		{"dong1", "dōng"},
 		{"bao4 dao4", "bàodào"},
 		{"xiang4 zheng1", "xiàngzhēng"},
+		{"xiàng", "xiàng"},
 		{"ban4 zhi2 min2 di4", "bànzhímíndì"},
 		{"xiao4 lu:4", "xiàolǜ"},
 	} {

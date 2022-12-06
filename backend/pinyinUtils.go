@@ -24,12 +24,12 @@ func convertToTone(word string) (string, error) {
 	lastByte := word[len(word)-1]
 	// Simple ascii to int conversion
 	tone := int(lastByte) - 48
-	// Slice off number
-	word = word[0 : len(word)-1]
 	// Only works for bytes with 1,2,3,4,5
 	if tone < 1 || tone > 5 {
 		return word, nil
 	}
+	// We have a number so slice it off
+	word = word[0 : len(word)-1]
 
 	// From wikipedia:
 	// If there is an a or an e, it will take the tone mark
