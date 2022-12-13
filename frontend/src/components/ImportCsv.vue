@@ -16,7 +16,12 @@
           class="modal-box w-1/2 max-w-5xl"
           @click.stop
         >
-          Hello
+          <div>
+            Requires a csv file without a header and each line a new word.
+
+            The second column (if exists) will be parsed the size of the
+            anki interval for this word (in days)
+          </div>
           <button class="btn-secondary btn" @click="importCsv">
             Import
           </button>
@@ -30,11 +35,20 @@
 import {
   ImportCSVWords,
 } from '@wailsjs/backend/KnownWords';
+import { FilePicker } from '@wailsjs/main/App';
 import { ref } from 'vue';
 
 const importCsvModal = ref(false);
 
 function importCsv() {
-  ImportCSVWords('');
+  FilePicker('csv')
+    .then((csvPath) => {
+      ImportCSVWords(csvPath).catch((err) => {
+        console.log('Failed to parse file', err);
+      });
+    })
+    .catch((err) => {
+      console.log('Failed to open file', err);
+    });
 }
 </script>
