@@ -433,6 +433,24 @@ func (b *bookLibrary) TotalRead() (int, error) {
 	}
 }
 
+func (b *bookLibrary) TotalReadChars() (int, error) {
+	var total sql.NullInt64
+	err := b.db.QueryRow(`
+    SELECT SUM(LENGTH(word) * count) total 
+    FROM frequency 
+    WHERE EXISTS (
+      SELECT bookId
+      FROM books
+      WHERE has_read = true
+      AND books.bookId == frequency.book
+    )`).Scan(&total)
+	if total.Valid {
+		return int(total.Int64), err
+	} else {
+		return 0, err
+	}
+}
+
 func (b *bookLibrary) SetFavorite(bookId int64, isFavorite bool) error {
 	_, err := b.db.Exec(`
   UPDATE books 

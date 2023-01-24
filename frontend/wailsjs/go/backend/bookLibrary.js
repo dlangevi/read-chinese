@@ -49,3 +49,7 @@ export function TopUnknownWords(arg1, arg2) {
 export function TotalRead() {
   return window['go']['backend']['bookLibrary']['TotalRead']();
 }
+
+export function TotalReadChars() {
+  return window['go']['backend']['bookLibrary']['TotalReadChars']();
+}

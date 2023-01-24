@@ -32,7 +32,7 @@ func (a *App) FilePicker(extension string) (string, error) {
 	selectedFile, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
 		Filters: []runtime.FileFilter{
 			{
-				DisplayName: "Sometime",
+				DisplayName: extension,
 				Pattern:     fmt.Sprintf("*.%v", extension),
 			},
 		},

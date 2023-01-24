@@ -21,6 +21,10 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 - [ ] more compact library table view
 - [ ] manage known words list
 - [ ] create bootstrap flow which installs free dicts and books
+- [ ] Support more variable sources for user word list 
+- [ ] Export user data somehow
+- [ ] View and edit known words
+
 
 
 ### In Progress
@@ -28,11 +32,11 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 These will definitely be implemented and have priority
 
 - [ ] interactive workflow for importing from calibre (control which books to import etc)
-- [ ] import user word list from various sources
 - [ ] add new book (without needing calibre)
 
 
 ### DONE
+- [x] Import wordlist from csv
 - [x] unified pinyin generation (or at least fixed cc-cedicts ugly format)
 - [x] allow cc-cedict to be installed from internet 
 - [x] Move from naive-ui to daisyui
