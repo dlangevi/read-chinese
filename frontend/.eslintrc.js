@@ -59,6 +59,7 @@ module.exports = {
         max: 1,
       },
     }],
+    'vue/multi-word-component-names': 'off',
   },
 
   extends: [

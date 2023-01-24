@@ -1,11 +1,13 @@
 <template>
   <div class="mx-auto bg-accent px-8">
     <div class="flex h-16 items-center justify-between">
-      <img
-        class="block h-32 w-auto"
-        src="../assets/logo_transparent.png"
-        alt="Read More"
-      >
+      <router-link to="/Welcome">
+        <img
+          class="block h-32 w-auto"
+          src="../assets/logo_transparent.png"
+          alt="Read More"
+        >
+      </router-link>
       <div
         class="flex flex-1 items-center justify-center
           sm:items-stretch sm:justify-start"

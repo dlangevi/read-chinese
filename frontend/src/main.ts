@@ -2,14 +2,15 @@ import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import { createPinia } from 'pinia';
 import { generateUserSettings, UserSettingsKey } from '@/lib/userSettings';
-import GlobalSettings from '@/pages/GlobalSettings.vue';
-import BookLibrary from '@/pages/BookLibrary.vue';
-import AboutPage from '@/pages/AboutPage.vue';
-import UserStats from '@/pages/UserStats.vue';
-import WordLists from '@/pages/WordLists.vue';
-import FlashCards from '@/pages/FlashCards.vue';
-import MakeCards from '@/pages/MakeCards.vue';
-import BookStats from '@/pages/BookStats.vue';
+import GlobalSettings from '@/views/GlobalSettings.vue';
+import Welcome from '@/views/Welcome.vue';
+import BookLibrary from '@/views/BookLibrary.vue';
+import AboutPage from '@/views/AboutPage.vue';
+import UserStats from '@/views/UserStats.vue';
+import WordLists from '@/views/WordLists.vue';
+import FlashCards from '@/views/FlashCards.vue';
+import MakeCards from '@/views/MakeCards.vue';
+import BookStats from '@/views/BookStats.vue';
 
 import App from './App.vue';
 
@@ -19,6 +20,11 @@ const router = createRouter({
     {
       path: '/',
       redirect: '/About',
+    },
+    {
+      path: '/Welcome',
+      name: 'Welcome',
+      component: Welcome,
     },
     {
       path: '/BookLibrary',
