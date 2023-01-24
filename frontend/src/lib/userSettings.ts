@@ -191,6 +191,11 @@ export async function generateUserSettings() :Promise<UserSettingsType> {
       'How long of an interval in anki before a word is ' +
       ' included in generated sentences',
     ),
+    slider(
+      'IdealSentenceLength',
+      'Ideal Sentence Length"',
+      'What the ideal sentence length you want to be selected from books',
+    ),
   ]);
 
   const BookLibrary = await loadSettings([

@@ -7,17 +7,20 @@ import (
 )
 
 type Generator struct {
+	userSettings *UserSettings
 	segmentation *Segmentation
 	bookLibrary  BookLibrary
 	known        *KnownWords
 }
 
 func NewGenerator(
+	userSettings *UserSettings,
 	s *Segmentation,
 	b BookLibrary,
 	known *KnownWords,
 ) *Generator {
 	return &Generator{
+		userSettings: userSettings,
 		segmentation: s,
 		bookLibrary:  b,
 		known:        known,
@@ -59,19 +62,20 @@ func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]string,
 			}
 		}
 	}
-	rankSentences(&sentences)
-	min := math.Min(float64(len(sentences)), 20)
+	idealLength := g.userSettings.IdealSentenceLength
+	rankSentences(&sentences, idealLength)
+	min := math.Min(float64(len(sentences)), float64(idealLength))
 	sentences = sentences[0:int(min)]
 
 	return sentences, nil
 }
 
-func rankSentences(sentences *[]string) {
+func rankSentences(sentences *[]string, idealLength int) {
 	// Is a less than b?
 	sort.Slice(*sentences, func(a int, b int) bool {
 		// Which ever score is closer to 0 is better
-		aScore := math.Abs(float64(len([]rune((*sentences)[a])) - 20))
-		bScore := math.Abs(float64(len([]rune((*sentences)[b])) - 20))
+		aScore := math.Abs(float64(len([]rune((*sentences)[a])) - idealLength))
+		bScore := math.Abs(float64(len([]rune((*sentences)[b])) - idealLength))
 		return (aScore <= bScore)
 	})
 }

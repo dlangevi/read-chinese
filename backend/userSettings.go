@@ -30,11 +30,12 @@ type UserSettings struct {
 	GenerateSentenceAudio bool
 	AutoAdvanceCard       bool
 
-	ShowDefinitions  bool
-	EnableChinese    bool
-	AzureApiKey      string
-	AzureImageApiKey string
-	KnownInterval    int
+	ShowDefinitions     bool
+	EnableChinese       bool
+	AzureApiKey         string
+	AzureImageApiKey    string
+	KnownInterval       int
+	IdealSentenceLength int
 
 	OnlyFavorites bool
 }
@@ -58,6 +59,7 @@ func defaultSettings(path string) *UserSettings {
 		AzureApiKey:           "",
 		AzureImageApiKey:      "",
 		KnownInterval:         10,
+		IdealSentenceLength:   20,
 		OnlyFavorites:         false,
 	}
 }
