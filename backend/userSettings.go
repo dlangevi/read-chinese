@@ -38,6 +38,13 @@ type UserSettings struct {
 	IdealSentenceLength int
 
 	OnlyFavorites bool
+
+	ProblemFlagged              bool
+	ProblemMissingImage         bool
+	ProblemMissingSentence      bool
+	ProblemMissingSentenceAudio bool
+	ProblemMissingWordAudio     bool
+	ProblemMissingPinyin        bool
 }
 
 func defaultSettings(path string) *UserSettings {
@@ -61,6 +68,13 @@ func defaultSettings(path string) *UserSettings {
 		KnownInterval:         10,
 		IdealSentenceLength:   20,
 		OnlyFavorites:         false,
+
+		ProblemFlagged:              true,
+		ProblemMissingImage:         true,
+		ProblemMissingSentence:      true,
+		ProblemMissingSentenceAudio: true,
+		ProblemMissingWordAudio:     true,
+		ProblemMissingPinyin:        true,
 	}
 }
 

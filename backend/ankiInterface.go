@@ -216,6 +216,97 @@ type FlaggedCard struct {
 	Sentence string `json:"sentence"`
 }
 
+// Worry about using an enum or something later. I know this will work
+// into Wails
+type Problems struct {
+	Flagged              bool `json:"Flagged"`
+	MissingImage         bool `json:"MissingImage"`
+	MissingSentence      bool `json:"MissingSentence"`
+	MissingSentenceAudio bool `json:"MissingSentenceAudio"`
+	MissingWordAudio     bool `json:"MissingWordAudio"`
+	MissingPinyin        bool `json:"MissingPinyin"`
+}
+
+type ProblemCard struct {
+	Word     string   `json:"Word"`
+	Problems Problems `json:"Problems"`
+}
+
+func (a *AnkiInterface) LoadProblemCards() ([]ProblemCard, error) {
+	problemCardsMap := map[int64]ProblemCard{}
+
+	// For each query, get the noteIds. Add them all to the map
+	// with problems
+
+	type ProblemCase struct {
+		Query  string
+		Setter func(*Problems)
+	}
+
+	checks := []ProblemCase{
+		{ // Cards Flagged by the user
+			Query:  "-flag:0",
+			Setter: func(p *Problems) { p.Flagged = true },
+		},
+		{ // Missing Example Sentence
+			Query:  "ExampleSentence:",
+			Setter: func(p *Problems) { p.MissingSentence = true },
+		},
+		{ // Has Sentence, but missing Sentence Audio
+			Query:  "-ExampleSentence: SentenceAudio:",
+			Setter: func(p *Problems) { p.MissingSentenceAudio = true },
+		},
+		{ // Missing Image
+			Query:  "Images:",
+			Setter: func(p *Problems) { p.MissingImage = true },
+		},
+		{ // Missing HanziAudio
+			Query:  "HanziAudio:",
+			Setter: func(p *Problems) { p.MissingWordAudio = true },
+		},
+		{ // Missing Pinyin TODO: check for ugly pinyin? eg: ni3hao3
+			Query:  "Pinyin:",
+			Setter: func(p *Problems) { p.MissingPinyin = true },
+		},
+	}
+
+	for _, check := range checks {
+		// Todo switch out Get for Search + Lookup if we want to speed it up
+		ids, restErr := a.anki.Notes.Get(check.Query)
+		if restErr != nil {
+			return nil, toError(restErr)
+		}
+
+		for _, id := range *ids {
+			word, ok := id.Fields["Hanzi"]
+			if !ok {
+				return nil, errors.New("Hanzi not found")
+			}
+			problemCard, exists := problemCardsMap[id.NoteId]
+			if !exists {
+				problemCard = ProblemCard{
+					Word:     word.Value,
+					Problems: Problems{},
+				}
+			}
+			check.Setter(&problemCard.Problems)
+			problemCardsMap[id.NoteId] = problemCard
+		}
+
+	}
+
+	// Big lookup on all selected Note ids to map to the word in the field
+	// For now just do
+
+	// Finally map to array since wails cant do the needed ts stuff
+	problemCards := []ProblemCard{}
+	for _, problemCard := range problemCardsMap {
+		problemCards = append(problemCards, problemCard)
+	}
+
+	return problemCards, nil
+}
+
 func (a *AnkiInterface) LoadFlaggedCards() ([]FlaggedCard, error) {
 	flaggedCards := []FlaggedCard{}
 	cards, restErr := a.anki.Cards.Get("flag:1")

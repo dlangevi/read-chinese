@@ -206,10 +206,44 @@ export async function generateUserSettings() :Promise<UserSettingsType> {
     ),
   ]);
 
+  const CardManagement = await loadSettings([
+    checkBox(
+      'ProblemFlagged',
+      'Flagged Cards',
+      'exe',
+    ),
+    checkBox(
+      'ProblemMissingImage',
+      'Missing Images',
+      'exe',
+    ),
+    checkBox(
+      'ProblemMissingSentence',
+      'Missing Sentence',
+      'exe',
+    ),
+    checkBox(
+      'ProblemMissingSentenceAudio',
+      'Missing Sentence Audio',
+      'eexexe',
+    ),
+    checkBox(
+      'ProblemMissingWordAudio',
+      'Missing Word Audio',
+      'exe',
+    ),
+    checkBox(
+      'ProblemMissingPinyin',
+      'Missing Pinyin',
+      'exe',
+    ),
+  ]);
+
   return {
     CardCreation,
     Dictionaries,
     BookLibrary,
+    CardManagement,
   };
 }
 

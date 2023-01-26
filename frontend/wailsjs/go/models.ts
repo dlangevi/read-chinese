@@ -133,6 +133,61 @@ export namespace backend {
 	        this.thumbnailUrl = source["thumbnailUrl"];
 	    }
 	}
+	export class Problems {
+	    Flagged: boolean;
+	    MissingImage: boolean;
+	    MissingSentence: boolean;
+	    MissingSentenceAudio: boolean;
+	    MissingWordAudio: boolean;
+	    MissingPinyin: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new Problems(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Flagged = source["Flagged"];
+	        this.MissingImage = source["MissingImage"];
+	        this.MissingSentence = source["MissingSentence"];
+	        this.MissingSentenceAudio = source["MissingSentenceAudio"];
+	        this.MissingWordAudio = source["MissingWordAudio"];
+	        this.MissingPinyin = source["MissingPinyin"];
+	    }
+	}
+	export class ProblemCard {
+	    Word: string;
+	    Problems: Problems;
+	
+	    static createFrom(source: any = {}) {
+	        return new ProblemCard(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Word = source["Word"];
+	        this.Problems = this.convertValues(source["Problems"], Problems);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
 	export class RawAnkiNote {
 	    noteId: number;
 	    fields: Fields;

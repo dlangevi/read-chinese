@@ -12,4 +12,6 @@ export function ImportAnkiKeywords():Promise<Error>;
 
 export function LoadFlaggedCards():Promise<Array<backend.FlaggedCard>>;
 
+export function LoadProblemCards():Promise<Array<backend.ProblemCard>>;
+
 export function UpdateNoteFields(arg1:number,arg2:backend.Fields):Promise<string>;

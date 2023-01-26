@@ -23,6 +23,7 @@ const props = defineProps<{
 
 const store = useCardQueue();
 async function addToQueue() {
+  console.log('called addtoqueue');
   const rowData = props.params.data;
   let action: ActionsEnum = ActionsEnum.MODIFY;
   if (props.params.create) {
@@ -39,7 +40,9 @@ async function addToQueue() {
   if (context !== undefined) {
     options.preferBook = props.params.context.bookId;
   }
-  store.addWord(rowData.word, action, options);
+  // For now while there are mixed columns
+  const word = rowData.word || rowData.Word;
+  store.addWord(word, action, options);
 }
 
 </script>

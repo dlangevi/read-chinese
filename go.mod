@@ -65,4 +65,6 @@ require (
 )
 
 // Clone dlangevi/ankiconnect
-replace github.com/atselvan/ankiconnect => github.com/dlangevi/ankiconnect v0.0.0-20221110233653-998152c73fba
+// To update uncomment and then go mod tidy to download latest
+// replace github.com/atselvan/ankiconnect => github.com/dlangevi/ankiconnect main
+replace github.com/atselvan/ankiconnect => github.com/dlangevi/ankiconnect v0.0.0-20230125183326-a1108391b457

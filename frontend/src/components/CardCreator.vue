@@ -156,6 +156,11 @@ const nextStep = async () => {
   if (idx === -1) {
     return;
   }
+  // Dont want to auto advance if we are modifying a card
+  if (action === ActionsEnum.MODIFY) {
+    step.value = steps.value[idx + 1];
+    return;
+  }
   if (idx + 1 === steps.value.length) {
     // We were on the last step
     if (UserSettings.CardCreation.AutoAdvanceCard.read()) {
@@ -269,6 +274,7 @@ store.$subscribe(async (_, state) => {
       ];
     } else {
       // Right now for EDIT we only edit the sentence so start there
+      console.log('loading', word);
       ankiCard = await GetAnkiNote(word);
       steps.value = [
         StepsEnum.SENTENCE,

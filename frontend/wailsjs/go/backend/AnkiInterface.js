@@ -22,6 +22,10 @@ export function LoadFlaggedCards() {
   return window['go']['backend']['AnkiInterface']['LoadFlaggedCards']();
 }
 
+export function LoadProblemCards() {
+  return window['go']['backend']['AnkiInterface']['LoadProblemCards']();
+}
+
 export function UpdateNoteFields(arg1, arg2) {
   return window['go']['backend']['AnkiInterface']['UpdateNoteFields'](arg1, arg2);
 }
