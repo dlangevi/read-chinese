@@ -62,7 +62,6 @@ let ProblemMissingPinyin = CardManagement.ProblemMissingPinyin.read();
 // Will be set on grid ready
 let gridApi : GridApi;
 function updateFilter() {
-  console.log('updated filter');
   ProblemFlagged = CardManagement.ProblemFlagged.read();
   ProblemMissingImage = CardManagement.ProblemMissingImage.read();
   ProblemMissingSentence = CardManagement.ProblemMissingSentence.read();
@@ -101,14 +100,22 @@ const columnDefs:ColDef[] = [
     field: 'Problems',
     sort: 'desc',
     cellClass: 'text-xl',
+    autoHeight: true,
     cellRenderer: (params:ICellRendererParams) => {
       // put the value in bold
+      console.log(params);
       const issues = Object.entries(params.value)
         .filter(([_, value]) => { return value; })
         .map(([key, _]) => {
           return key;
         });
-      return JSON.stringify(issues);
+      console.log(params.data);
+      if (params.data.Notes) {
+        issues.push(`UserNote: ${params.data.Notes}`);
+      }
+      return `<ul>
+      ${issues.map(issue => { return '<li>' + issue + '</li>'; }).join('')}
+      </ul>`;
     },
   },
   {

@@ -230,6 +230,7 @@ type Problems struct {
 type ProblemCard struct {
 	Word     string   `json:"Word"`
 	Problems Problems `json:"Problems"`
+	Notes    string   `json:"Notes"`
 }
 
 func (a *AnkiInterface) LoadProblemCards() ([]ProblemCard, error) {
@@ -287,6 +288,11 @@ func (a *AnkiInterface) LoadProblemCards() ([]ProblemCard, error) {
 				problemCard = ProblemCard{
 					Word:     word.Value,
 					Problems: Problems{},
+				}
+
+				notes, ok := id.Fields["Notes"]
+				if ok {
+					problemCard.Notes = notes.Value
 				}
 			}
 			check.Setter(&problemCard.Problems)

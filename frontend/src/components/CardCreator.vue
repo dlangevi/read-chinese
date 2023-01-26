@@ -274,7 +274,6 @@ store.$subscribe(async (_, state) => {
       ];
     } else {
       // Right now for EDIT we only edit the sentence so start there
-      console.log('loading', word);
       ankiCard = await GetAnkiNote(word);
       steps.value = [
         StepsEnum.SENTENCE,

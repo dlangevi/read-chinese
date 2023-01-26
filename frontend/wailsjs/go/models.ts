@@ -158,6 +158,7 @@ export namespace backend {
 	export class ProblemCard {
 	    Word: string;
 	    Problems: Problems;
+	    Notes: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new ProblemCard(source);
@@ -167,6 +168,7 @@ export namespace backend {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.Word = source["Word"];
 	        this.Problems = this.convertValues(source["Problems"], Problems);
+	        this.Notes = source["Notes"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
