@@ -123,7 +123,7 @@ import {
   UpdateNoteFields,
   GetAnkiNote,
   GetAnkiNoteSkeleton,
-} from '@wailsjs/backend/AnkiInterface';
+} from '@wailsjs/backend/ankiInterface';
 
 import {
   GetBook,
@@ -247,6 +247,10 @@ store.$subscribe(async (_, state) => {
   // if (mutation.events.type === 'add' && mutation.events.key === '0') {
   // TODO this is a complete mess and needs to be refined if we are going to
   // start doing anything more complicated
+  //
+  // Basic Idea. Create a which will mantain card state, two maps of initial
+  // and set values, allowing for Undoing changes, editing of values, and
+  // knowing what has actually changed when sending to backend
   if (state.wordList.length > 0) {
     [{
       word,

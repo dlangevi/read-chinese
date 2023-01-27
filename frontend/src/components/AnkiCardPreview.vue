@@ -63,6 +63,13 @@
           :src="image"
           alt="image for word"
         >
+        <img
+          v-for="imagedata in ankiCard.fields.image64"
+          :key="imagedata"
+          class="max-h-24 w-auto"
+          :src="`data:image/png;base64, ${imagedata}`"
+          alt="image for word"
+        >
       </div>
     </div>
   </div>

@@ -3,30 +3,46 @@ package backend
 import (
 	"errors"
 	"fmt"
+	"log"
+	"strings"
 	"time"
 
 	"github.com/atselvan/ankiconnect"
 	restError "github.com/privatesquare/bkst-go-utils/utils/errors"
+	"golang.org/x/net/html"
 )
 
 type Fields struct {
-	Word        string   `json:"word"`
-	Sentence    string   `json:"sentence"`
-	EnglishDefn string   `json:"englishDefn"`
-	ChineseDefn string   `json:"chineseDefn"`
-	Pinyin      string   `json:"pinyin"`
-	ImageUrls   []string `json:"imageUrls"`
+	Word        string `json:"word"`
+	Sentence    string `json:"sentence"`
+	EnglishDefn string `json:"englishDefn"`
+	ChineseDefn string `json:"chineseDefn"`
+	Pinyin      string `json:"pinyin"`
+	// TODO merge these in some nice way
+	ImageUrls []string `json:"imageUrls"`
+	Image64   []string `json:"image64"`
 }
 
-type AnkiInterface struct {
+type (
+	AnkiInterface interface {
+		GetAnkiNoteSkeleton(word string) RawAnkiNote
+		CreateAnkiNote(fields Fields, tags []string) error
+		GetAnkiNote(word string) (RawAnkiNote, error)
+		UpdateNoteFields(noteID int64, fields Fields) string
+		ImportAnkiKeywords() error
+		LoadProblemCards() ([]ProblemCard, error)
+	}
+)
+
+type ankiInterface struct {
 	anki         *ankiconnect.Client
 	textToSpeech *TextToSpeech
 	userSettings *UserSettings
 	known        *KnownWords
 }
 
-func NewAnkiInterface(userSettings *UserSettings, known *KnownWords) *AnkiInterface {
-	return &AnkiInterface{
+func NewAnkiInterface(userSettings *UserSettings, known *KnownWords) *ankiInterface {
+	return &ankiInterface{
 		anki:         ankiconnect.NewClient(),
 		textToSpeech: NewTextToSpeach(userSettings),
 		userSettings: userSettings,
@@ -39,7 +55,7 @@ type RawAnkiNote struct {
 	Fields Fields `json:"fields"`
 }
 
-func (a *AnkiInterface) GetAnkiNoteSkeleton(word string) RawAnkiNote {
+func (a *ankiInterface) GetAnkiNoteSkeleton(word string) RawAnkiNote {
 	return RawAnkiNote{
 		Fields: Fields{
 			Word: word,
@@ -47,7 +63,7 @@ func (a *AnkiInterface) GetAnkiNoteSkeleton(word string) RawAnkiNote {
 	}
 }
 
-func (a *AnkiInterface) CreateAnkiNote(fields Fields, tags []string) error {
+func (a *ankiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 	restErr := a.anki.Ping()
 	if restErr != nil {
 		return toError(restErr)
@@ -78,7 +94,8 @@ func (a *AnkiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 			return err
 		}
 	}
-	if a.userSettings.GenerateSentenceAudio {
+	// dont generate if sentence is empty
+	if a.userSettings.GenerateSentenceAudio && len(fields.Sentence) > 0 {
 		err := addAudio(fields.Sentence, "SentenceAudio")
 		if err != nil {
 			return err
@@ -127,7 +144,7 @@ func toError(restErr *restError.RestErr) error {
 	return errors.New(fmt.Sprintf("%v, %v", restErr.Error, restErr.Message))
 }
 
-func (a *AnkiInterface) GetAnkiNote(word string) (RawAnkiNote, error) {
+func (a *ankiInterface) GetAnkiNote(word string) (RawAnkiNote, error) {
 	notes, restErr := a.anki.Notes.Get(fmt.Sprintf("Hanzi:%v", word))
 	if restErr != nil {
 		return RawAnkiNote{}, toError(restErr)
@@ -145,6 +162,43 @@ func (a *AnkiInterface) GetAnkiNote(word string) (RawAnkiNote, error) {
 		return value.Value
 	}
 
+	images := []string{}
+	// Images will (hopefully) have html <img src=\"filename.jpg\">
+	imagesString := extract("Images")
+	if imagesString != "" {
+		log.Print(imagesString)
+		doc, err := html.Parse(strings.NewReader(imagesString))
+		if err != nil {
+			return RawAnkiNote{}, err
+		}
+		imageNames := []string{}
+		//
+		var f func(*html.Node)
+		// This is definitly a little overkill but hey
+		f = func(n *html.Node) {
+			if n.Type == html.ElementNode && n.Data == "img" {
+				for _, a := range n.Attr {
+					if a.Key == "src" {
+						imageNames = append(imageNames, a.Val)
+						break
+					}
+				}
+			}
+			for c := n.FirstChild; c != nil; c = c.NextSibling {
+				f(c)
+			}
+		}
+		f(doc)
+		for _, name := range imageNames {
+			image, err := a.anki.Media.RetrieveMediaFile(name)
+			if err != nil {
+				return RawAnkiNote{}, toError(err)
+			}
+			images = append(images, *image)
+		}
+
+	}
+
 	rawNote := RawAnkiNote{
 		NoteId: note.NoteId,
 		Fields: Fields{
@@ -156,13 +210,14 @@ func (a *AnkiInterface) GetAnkiNote(word string) (RawAnkiNote, error) {
 			// TODO how to load the image from a card which already exists?
 			// use retrieveMediaFile to get base64 encoded image
 			// ImageUrls: [],
+			Image64: images,
 		},
 		// rawNote,
 	}
 	return rawNote, nil
 }
 
-func (a *AnkiInterface) UpdateNoteFields(noteID int64, fields Fields) string {
+func (a *ankiInterface) UpdateNoteFields(noteID int64, fields Fields) string {
 	ankiFields := ankiconnect.Fields{}
 	if fields.Word != "" {
 		ankiFields["Hanzi"] = fields.Word
@@ -194,7 +249,7 @@ func (a *AnkiInterface) UpdateNoteFields(noteID int64, fields Fields) string {
 	return "success"
 }
 
-func (a *AnkiInterface) ImportAnkiKeywords() error {
+func (a *ankiInterface) ImportAnkiKeywords() error {
 	cards, restErr := a.anki.Cards.Get("deck:Reading")
 	if restErr != nil {
 		return toError(restErr)
@@ -233,7 +288,7 @@ type ProblemCard struct {
 	Notes    string   `json:"Notes"`
 }
 
-func (a *AnkiInterface) LoadProblemCards() ([]ProblemCard, error) {
+func (a *ankiInterface) LoadProblemCards() ([]ProblemCard, error) {
 	problemCardsMap := map[int64]ProblemCard{}
 
 	// For each query, get the noteIds. Add them all to the map
@@ -311,23 +366,6 @@ func (a *AnkiInterface) LoadProblemCards() ([]ProblemCard, error) {
 	}
 
 	return problemCards, nil
-}
-
-func (a *AnkiInterface) LoadFlaggedCards() ([]FlaggedCard, error) {
-	flaggedCards := []FlaggedCard{}
-	cards, restErr := a.anki.Cards.Get("flag:1")
-	if restErr != nil {
-		return flaggedCards, toError(restErr)
-	}
-	for _, card := range *cards {
-		word, _ := card.Fields["Hanzi"]
-		sentence, _ := card.Fields["ExampleSentence"]
-		flaggedCards = append(flaggedCards, FlaggedCard{
-			Word:     word.Value,
-			Sentence: sentence.Value,
-		})
-	}
-	return flaggedCards, nil
 }
 
 // TODO in client

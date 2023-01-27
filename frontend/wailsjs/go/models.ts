@@ -92,6 +92,7 @@ export namespace backend {
 	    chineseDefn: string;
 	    pinyin: string;
 	    imageUrls: string[];
+	    image64: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new Fields(source);
@@ -105,20 +106,7 @@ export namespace backend {
 	        this.chineseDefn = source["chineseDefn"];
 	        this.pinyin = source["pinyin"];
 	        this.imageUrls = source["imageUrls"];
-	    }
-	}
-	export class FlaggedCard {
-	    word: string;
-	    sentence: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new FlaggedCard(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.word = source["word"];
-	        this.sentence = source["sentence"];
+	        this.image64 = source["image64"];
 	    }
 	}
 	export class ImageInfo {

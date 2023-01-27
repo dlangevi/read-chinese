@@ -59,7 +59,7 @@ import { LearningTarget } from '@wailsjs/backend/bookLibrary';
 import {
   GetUnknownHskWords,
 } from '@wailsjs/backend/KnownWords';
-import { ImportAnkiKeywords } from '@wailsjs/backend/AnkiInterface';
+import { ImportAnkiKeywords } from '@wailsjs/backend/ankiInterface';
 import UnknownWords from '../components/UnknownWords.vue';
 
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';

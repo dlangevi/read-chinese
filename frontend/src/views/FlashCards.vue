@@ -42,7 +42,7 @@ import type {
   GetRowIdParams, GridApi,
   GridReadyEvent, ColDef, ICellRendererParams, RowNode,
 } from 'ag-grid-community';
-import { LoadProblemCards } from '@wailsjs/backend/AnkiInterface';
+import { LoadProblemCards } from '@wailsjs/backend/ankiInterface';
 import { backend } from '@wailsjs/models';
 import WithSidebar from '@/layouts/WithSidebar.vue';
 
@@ -102,14 +102,11 @@ const columnDefs:ColDef[] = [
     cellClass: 'text-xl',
     autoHeight: true,
     cellRenderer: (params:ICellRendererParams) => {
-      // put the value in bold
-      console.log(params);
       const issues = Object.entries(params.value)
         .filter(([_, value]) => { return value; })
         .map(([key, _]) => {
           return key;
         });
-      console.log(params.data);
       if (params.data.Notes) {
         issues.push(`UserNote: ${params.data.Notes}`);
       }
@@ -124,7 +121,7 @@ const columnDefs:ColDef[] = [
     width: 50,
     cellRenderer: AddToCardQueue,
     cellRendererParams: {
-      text: 'Replace Sentence',
+      text: 'Fix Card',
     },
   },
 ];
