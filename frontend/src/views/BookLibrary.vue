@@ -5,6 +5,10 @@
         :setting="UserSettings.BookLibrary.OnlyFavorites"
         @update="updateFilter"
       />
+      <settings-checkbox
+        :setting="UserSettings.BookLibrary.HideRead"
+        @update="updateFilter"
+      />
       <button
         class="btn-primary btn-sm btn"
         @click="syncCalibre"
@@ -57,14 +61,19 @@ const UserSettings = getUserSettings();
 
 // TODO Would be nice if these properties them selves were reactive
 const onlyFavorites = ref(UserSettings.BookLibrary.OnlyFavorites.read());
+const hideRead = ref(UserSettings.BookLibrary.HideRead.read());
 function updateFilter() {
   onlyFavorites.value = UserSettings.BookLibrary.OnlyFavorites.read();
+  hideRead.value = UserSettings.BookLibrary.HideRead.read();
 }
 const books: Ref<backend.Book[]> = ref([]);
 
 const favoriteFilter = computed(
   () => books.value
     .filter((book:backend.Book) => {
+      if (hideRead.value && book.hasRead) {
+        return false;
+      }
       if (!onlyFavorites.value) return true;
       return book.favorite;
     }).sort((bookA, bookB) => {

@@ -38,6 +38,7 @@ type UserSettings struct {
 	IdealSentenceLength int
 
 	OnlyFavorites bool
+	HideRead      bool
 
 	ProblemFlagged              bool
 	ProblemMissingImage         bool

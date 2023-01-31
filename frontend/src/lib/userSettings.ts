@@ -204,6 +204,11 @@ export async function generateUserSettings() :Promise<UserSettingsType> {
       'Only show favorited books',
       'Obv',
     ),
+    checkBox(
+      'HideRead',
+      'Hide read books',
+      'Obv',
+    ),
   ]);
 
   const CardManagement = await loadSettings([
