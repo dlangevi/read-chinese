@@ -34,38 +34,39 @@ import { getUserSettings } from '@/lib/userSettings';
 import type { backend } from '@wailsjs/models';
 
 import { GetDefinitionsForWord } from '@wailsjs/backend/Dictionaries';
+import { useCardManager } from '@/stores/CardManager';
 
 const UserSettings = getUserSettings();
 
-const emit = defineEmits(['update-definition']);
+const cardManager = useCardManager();
+
 const definitions = ref<backend.DictionaryDefinition[]>([]);
 const definition = ref<string[]>([]);
 
 watch(definition, async () => {
-  // TODO either rename this option or have a select based on type
   const selected = new Set<string>(definition.value.values());
   const selectedDefinitions = definitions.value.filter(
     (def) => selected.has(def.definition),
   );
-  const autoAdvance = await (
-    UserSettings.CardCreation.AutoAdvanceEnglish.read()
-  );
-  console.log('update definition');
-  emit('update-definition', selectedDefinitions, autoAdvance);
+  updateDefinition(selectedDefinitions);
 });
 
 const props = defineProps<{
-  word: string
   type: string
 }>();
 
+function updateDefinition(definitions: backend.DictionaryDefinition[]) {
+  console.log('update definition');
+  cardManager.updateDefinition(definitions, props.type);
+}
+
 async function calculateDefault() {
   const definitions = await GetDefinitionsForWord(
-    props.word,
+    cardManager.word,
     props.type,
   );
   if (definitions.length === 1) {
-    emit('update-definition', definitions, false);
+    updateDefinition(definitions);
   }
 }
 
@@ -81,7 +82,7 @@ if (autoFill) {
 
 onBeforeMount(async () => {
   definitions.value = await GetDefinitionsForWord(
-    props.word,
+    cardManager.word,
     props.type,
   );
 });

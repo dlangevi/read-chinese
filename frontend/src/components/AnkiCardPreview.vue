@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <h2 class="text-xl font-bold">
-      Hanzi: {{ ankiCard.fields.word }}
+      Hanzi: {{ cardManager.word }}
     </h2>
     <div>
       <button
@@ -13,7 +13,7 @@
       <h2 class="text-l inline font-bold">
         Sentence:
       </h2>
-      <span> {{ ankiCard.fields.sentence }}</span>
+      <span> {{ cardManager.sentence }}</span>
     </div>
     <div>
       <button
@@ -27,7 +27,7 @@
       </h2>
       <p>
         <!-- Definitions can have html formatting in them -->
-        <span v-html="ankiCard.fields.englishDefn" />
+        <span v-html="cardManager.englishDefn" />
       </p>
     </div>
     <div v-if="enableChinese">
@@ -42,7 +42,7 @@
       </h2>
       <p>
         <!-- Definitions can have html formatting in them -->
-        <span v-html="ankiCard.fields.chineseDefn" />
+        <span v-html="cardManager.chineseDefn" />
       </p>
     </div>
     <div>
@@ -57,14 +57,14 @@
       </h2>
       <div class="flex gap-1">
         <img
-          v-for="image in ankiCard.fields.imageUrls"
+          v-for="image in cardManager.imageUrls"
           :key="image"
           class="max-h-24 w-auto"
           :src="image"
           alt="image for word"
         >
         <img
-          v-for="imagedata in ankiCard.fields.image64"
+          v-for="imagedata in cardManager.image64"
           :key="imagedata"
           class="max-h-24 w-auto"
           :src="`data:image/png;base64, ${imagedata}`"
@@ -77,18 +77,14 @@
 
 <script lang="ts" setup>
 import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
+import { useCardManager } from '@/stores/CardManager';
 import { getUserSettings } from '@/lib/userSettings';
 
 const UserSettings = getUserSettings();
 
 const enableChinese = UserSettings.Dictionaries.EnableChinese.read();
+const cardManager = useCardManager();
 
 defineEmits(['change-step']);
-defineProps({
-  ankiCard: {
-    type: Object,
-    required: true,
-  },
-});
 
 </script>

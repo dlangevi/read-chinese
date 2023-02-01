@@ -58,26 +58,21 @@
 import {
   watch, onBeforeMount, ref,
 } from 'vue';
-import { getUserSettings } from '@/lib/userSettings';
 import { GetSentencesForWord } from '@wailsjs/backend/Generator';
+import { useCardManager } from '@/stores/CardManager';
 
-const UserSettings = getUserSettings();
+const cardManager = useCardManager();
 
-const emit = defineEmits(['update-sentence']);
 const sentences = ref<string[]>([]);
 const allSentences = ref<string[]>([]);
-const sentence = ref(null);
+const sentence = ref('');
 const loaded = ref(false);
 
 watch(sentence, async () => {
-  const autoAdvance = await (
-    UserSettings.CardCreation.AutoAdvanceSentence.read()
-  );
-  emit('update-sentence', sentence.value, autoAdvance);
+  cardManager.updateSentence(sentence.value);
 });
 
 const props = defineProps<{
-  word: string
   preferBook?: number
 }>();
 
@@ -85,12 +80,12 @@ const singleBook = !!props.preferBook;
 onBeforeMount(async () => {
   if (props.preferBook) {
     sentences.value = await GetSentencesForWord(
-      props.word,
+      cardManager.word,
       [props.preferBook],
     );
   }
   // filter out repeats
-  allSentences.value = (await GetSentencesForWord(props.word, []))
+  allSentences.value = (await GetSentencesForWord(cardManager.word, []))
     .filter((sen) => {
       return sentences.value.indexOf(sen) === -1;
     });

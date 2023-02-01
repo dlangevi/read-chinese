@@ -21,8 +21,8 @@ type WordlistEntry = {
 
 export const useCardQueue = defineStore('CardQueue', {
   state: () => ({
-    wordList: [],
-  } as { wordList: WordlistEntry[] }),
+    wordList: [] as WordlistEntry[],
+  }),
   getters: {
     words: (state) => state.wordList,
   },
