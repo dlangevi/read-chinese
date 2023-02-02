@@ -27,9 +27,11 @@
           <anki-card-preview />
         </div>
         <div class="h-[60vh] w-full overflow-scroll p-4">
-          <p class="text-4xl">
-            {{ cardManager.word }}
-          </p>
+          <div class="flex gap-4">
+            <p class="text-4xl">
+              {{ cardManager.word }}
+            </p>
+          </div>
           <edit-sentence
             v-show="cardManager.currentStep === StepsEnum.SENTENCE"
             v-if="cardManager.steps.includes(StepsEnum.SENTENCE)"
