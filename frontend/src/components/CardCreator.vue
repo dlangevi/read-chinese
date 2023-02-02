@@ -24,43 +24,37 @@
       <div class="flex">
         <!-- v-if="card !== undefined" -->
         <div class="w-1/3">
-          <anki-card-preview @change-step="changeStep" />
+          <anki-card-preview />
         </div>
         <div class="h-[60vh] w-full overflow-scroll p-4">
           <p class="text-4xl">
             {{ cardManager.word }}
           </p>
           <edit-sentence
-            v-show="step === StepsEnum.SENTENCE"
-            v-if="steps.includes(StepsEnum.SENTENCE)"
+            v-show="cardManager.currentStep === StepsEnum.SENTENCE"
+            v-if="cardManager.steps.includes(StepsEnum.SENTENCE)"
             :prefer-book="preferBookRef"
           />
           <edit-definition
-            v-show="step === StepsEnum.ENGLISH"
-            v-if="steps.includes(StepsEnum.ENGLISH)"
+            v-show="cardManager.currentStep === StepsEnum.ENGLISH"
+            v-if="cardManager.steps.includes(StepsEnum.ENGLISH)"
             type="english"
           />
           <edit-definition
-            v-show="step === StepsEnum.CHINESE"
-            v-if="steps.includes(StepsEnum.CHINESE)"
+            v-show="cardManager.currentStep === StepsEnum.CHINESE"
+            v-if="cardManager.steps.includes(StepsEnum.CHINESE)"
             type="chinese"
           />
           <edit-images
-            v-show="step === StepsEnum.IMAGE"
-            v-if="steps.includes(StepsEnum.IMAGE)"
+            v-show="cardManager.currentStep === StepsEnum.IMAGE"
+            v-if="cardManager.steps.includes(StepsEnum.IMAGE)"
           />
         </div>
       </div>
 
       <div class="modal-action">
+        <card-creator-tracker />
         <div class="flex place-content-end gap-2">
-          <button
-            v-if="steps.length > 0"
-            class="btn-primary btn-sm btn"
-            @click="nextStep()"
-          >
-            Next Step
-          </button>
           <button
             class="btn-primary btn-sm btn"
             @click="store.clearFront()"
@@ -94,13 +88,14 @@ import { useCardManager } from '@/stores/CardManager';
 import AnkiCardPreview from '@/components/AnkiCardPreview.vue';
 import CardCreationSettings from '@/components/CardCreationSettings.vue';
 import { useMessage } from '@/lib/messages';
+import CardCreatorTracker from
+  '@/components/CardCreatorSteps/CardCreatorTracker.vue';
 import EditSentence from '@/components/CardCreatorSteps/EditSentence.vue';
 import EditImages from
   '@/components/CardCreatorSteps/EditImages.vue';
 import EditDefinition from
   '@/components/CardCreatorSteps/EditDefinition.vue';
 import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
-import { getUserSettings } from '@/lib/userSettings';
 
 import { AddWord } from '@wailsjs/backend/KnownWords';
 import {
@@ -117,56 +112,19 @@ import {
   backend,
 } from '@wailsjs/models';
 
-const UserSettings = getUserSettings();
-
 const store = useCardQueue();
 const cardManager = useCardManager();
 const showModal = ref(false);
-const step = ref<StepsEnum>(StepsEnum.SENTENCE);
-const steps = ref<StepsEnum[]>([]);
-let stepsFilled : { [s:string]: boolean } = {};
 let word;
 let action: ActionsEnum;
 let callback: (() => void) | undefined;
 const preferBookRef = ref<number | undefined>(undefined);
 let preferBook;
 
-// Manually change the step from an edit button.
-const changeStep = (estep: StepsEnum) => {
-  step.value = estep;
-};
-
-const nextStep = async () => {
-  const idx = steps.value.indexOf(step.value);
-  if (idx === -1) {
-    return;
-  }
-  // Dont want to auto advance if we are modifying a card
-  if (action === ActionsEnum.MODIFY) {
-    step.value = steps.value[idx + 1];
-    return;
-  }
-  if (idx + 1 === steps.value.length) {
-    // We were on the last step
-    if (UserSettings.CardCreation.AutoAdvanceCard.read()) {
-      submit();
-    }
-  }
-  step.value = steps.value[idx + 1];
-  if (stepsFilled[step.value]) {
-    nextStep();
-  }
-};
-
 // TODO I am leaving the commented out old message code with the plan
 // of eventually having that sort of api avaliable
 const message = useMessage();
 store.$subscribe(async (_, state) => {
-  // This is needed to reset the state
-  step.value = StepsEnum.NONE;
-  // Also needed to reset the state since it flips the v-if statements
-  // TODO this is hacky and needs a better solution
-  steps.value = [];
   // Later we can prefetch new words sentences possibly
   // if (mutation.events.type === 'add' && mutation.events.key === '0') {
   if (state.wordList.length > 0) {
@@ -186,15 +144,6 @@ store.$subscribe(async (_, state) => {
       ankiCard = await GetAnkiNote(word);
     }
     cardManager.loadCard(ankiCard);
-    // TODO figure out how to weave step tracking between
-    // the two. One idea would be to watch for getters to become set
-    steps.value = cardManager.steps;
-
-    stepsFilled = { };
-    steps.value.forEach(step => {
-      stepsFilled[step] = false;
-    });
-    [step.value] = steps.value;
   }
   showModal.value = state.wordList.length !== 0;
 });

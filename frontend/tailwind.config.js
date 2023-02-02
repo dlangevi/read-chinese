@@ -1,6 +1,6 @@
 module.exports = {
   mode: 'jit',
-  important: true,
+  // important: true,
   content: [
     './src/**/*.{ts,js,vue}',
   ],

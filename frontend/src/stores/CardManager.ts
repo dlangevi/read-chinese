@@ -4,26 +4,32 @@ import {
   backend,
 } from '@wailsjs/models';
 
+export const StepState = {
+  EMPTY: 'empty',
+  AUTOFILL: 'autofill',
+  SKIPPED: 'skipped',
+  FILLED: 'filled',
+} as const;
+
+export type StepState = typeof StepState[keyof typeof StepState]
+
+type StateMap = {
+  [key in StepsEnum]: StepState
+};
+
 export const useCardManager = defineStore('CardManager', {
   state: () => {
     return {
       steps: [] as StepsEnum[],
+      currentStep: 'sentence' as StepsEnum,
+      currentStepIndex: 0,
+      stepsState: {} as StateMap,
       originalValues: new backend.Fields(),
       newValues: new backend.Fields(),
-      // Ideally this is a computed value
       note: new backend.RawAnkiNote(),
     };
   },
   getters: {
-
-    currentStep: (_state) => {
-      // complex logic based on various things
-      return StepsEnum.SENTENCE;
-    },
-
-    // steps: (state) => {
-    //   return state.steps;
-    // },
 
     word: (state) => {
       return state.newValues.word || state.originalValues.word;
@@ -50,6 +56,10 @@ export const useCardManager = defineStore('CardManager', {
   },
   actions: {
     loadCard(ankiCard : backend.RawAnkiNote) {
+      // Resets the ui (Does it?)
+      this.currentStep = StepsEnum.NONE;
+      this.steps = [];
+
       this.steps = [
         StepsEnum.SENTENCE,
         StepsEnum.ENGLISH,
@@ -57,15 +67,22 @@ export const useCardManager = defineStore('CardManager', {
         StepsEnum.CHINESE,
         StepsEnum.IMAGE,
       ];
+      this.steps.forEach((step) => {
+        this.stepsState[step] = StepState.EMPTY;
+      });
 
       this.note = ankiCard;
       this.originalValues = backend.Fields.createFrom(this.note.fields);
       this.newValues = backend.Fields.createFrom();
       this.newValues.word = this.originalValues.word;
+
+      this.currentStep = StepsEnum.SENTENCE;
+      this.currentStepIndex = 0;
     },
 
     updateSentence(sentence: string) {
       this.newValues.sentence = sentence;
+      this.stepsState[StepsEnum.SENTENCE] = StepState.FILLED;
     },
 
     updateDefinition(
@@ -77,8 +94,10 @@ export const useCardManager = defineStore('CardManager', {
       ).join('<br>');
       if (defType === 'english') {
         this.newValues.englishDefn = definitions;
+        this.stepsState[StepsEnum.ENGLISH] = StepState.FILLED;
       } else {
         this.newValues.chineseDefn = definitions;
+        this.stepsState[StepsEnum.CHINESE] = StepState.FILLED;
       }
       let pinyin = new Set();
       if (this.newValues.pinyin !== undefined) {
@@ -94,6 +113,33 @@ export const useCardManager = defineStore('CardManager', {
 
     updateImages(newImages: backend.ImageInfo[]) {
       this.newValues.imageUrls = newImages.map((image) => image.thumbnailUrl);
+      this.stepsState[StepsEnum.IMAGE] = StepState.FILLED;
+    },
+
+    changeStep(step: StepsEnum) {
+      this.currentStep = step;
+      this.currentStepIndex = this.steps.indexOf(step);
+    },
+
+    stepState(step: StepsEnum) {
+      return this.stepsState[step];
+    },
+
+    previousStep() {
+      if (this.currentStepIndex === 0) {
+        return;
+      }
+
+      this.currentStepIndex -= 1;
+      this.currentStep = this.steps[this.currentStepIndex];
+    },
+    nextStep() {
+      if (this.currentStepIndex + 1 === this.steps.length) {
+        // We were on the last step
+        return;
+      }
+      this.currentStepIndex += 1;
+      this.currentStep = this.steps[this.currentStepIndex];
     },
 
   },

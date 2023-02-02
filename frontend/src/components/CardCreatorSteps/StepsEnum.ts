@@ -7,3 +7,4 @@ export const StepsEnum = {
 } as const;
 
 export type StepsEnum = typeof StepsEnum[keyof typeof StepsEnum]
+export type StepsEnumType = typeof StepsEnum[keyof typeof StepsEnum]

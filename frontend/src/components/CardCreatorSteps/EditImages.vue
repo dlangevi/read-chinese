@@ -43,21 +43,26 @@ import {
 import { SearchImages } from '@wailsjs/backend/ImageClient';
 import { backend } from '@wailsjs/models';
 import { useCardManager } from '@/stores/CardManager';
+import { storeToRefs } from 'pinia';
 
 const cardManager = useCardManager();
+const { word } = storeToRefs(cardManager);
 
 const images = ref<backend.ImageInfo[]>([]);
 const image = ref([]);
-const loaded = ref(false);
 
 watch(image, async () => {
   const entries = image.value.map((i) => images.value[i]);
   cardManager.updateImages(entries);
 });
 
-onBeforeMount(async () => {
-  images.value = await SearchImages(cardManager.word);
-  loaded.value = true;
+watch(word, () => {
+  loadData();
 });
 
+async function loadData() {
+  images.value = await SearchImages(cardManager.word);
+}
+
+onBeforeMount(loadData);
 </script>

@@ -30,6 +30,7 @@
 import {
   watch, onBeforeMount, ref,
 } from 'vue';
+import { storeToRefs } from 'pinia';
 import { getUserSettings } from '@/lib/userSettings';
 import type { backend } from '@wailsjs/models';
 
@@ -39,6 +40,7 @@ import { useCardManager } from '@/stores/CardManager';
 const UserSettings = getUserSettings();
 
 const cardManager = useCardManager();
+const { word } = storeToRefs(cardManager);
 
 const definitions = ref<backend.DictionaryDefinition[]>([]);
 const definition = ref<string[]>([]);
@@ -51,12 +53,15 @@ watch(definition, async () => {
   updateDefinition(selectedDefinitions);
 });
 
+watch(word, () => {
+  loadData();
+});
+
 const props = defineProps<{
   type: string
 }>();
 
 function updateDefinition(definitions: backend.DictionaryDefinition[]) {
-  console.log('update definition');
   cardManager.updateDefinition(definitions, props.type);
 }
 
@@ -70,21 +75,22 @@ async function calculateDefault() {
   }
 }
 
-let autoFill : boolean;
-if (props.type === 'english') {
-  autoFill = UserSettings.CardCreation.PopulateEnglish.read();
-} else {
-  autoFill = UserSettings.CardCreation.PopulateChinese.read();
-}
-if (autoFill) {
-  calculateDefault();
-}
-
-onBeforeMount(async () => {
+async function loadData() {
+  let autoFill : boolean;
+  if (props.type === 'english') {
+    autoFill = UserSettings.CardCreation.PopulateEnglish.read();
+  } else {
+    autoFill = UserSettings.CardCreation.PopulateChinese.read();
+  }
   definitions.value = await GetDefinitionsForWord(
     cardManager.word,
     props.type,
   );
-});
+
+  if (autoFill) {
+    calculateDefault();
+  }
+}
+onBeforeMount(loadData);
 
 </script>

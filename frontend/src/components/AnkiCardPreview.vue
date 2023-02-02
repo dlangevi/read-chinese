@@ -6,7 +6,7 @@
     <div>
       <button
         class="btn-primary btn-xs btn m-2 inline"
-        @click="$emit('change-step', StepsEnum.SENTENCE)"
+        @click="cardManager.changeStep(StepsEnum.SENTENCE)"
       >
         Edit
       </button>
@@ -18,7 +18,7 @@
     <div>
       <button
         class="btn-primary btn-xs btn m-2"
-        @click="$emit('change-step', StepsEnum.ENGLISH)"
+        @click="cardManager.changeStep(StepsEnum.ENGLISH)"
       >
         Edit
       </button>
@@ -33,7 +33,7 @@
     <div v-if="enableChinese">
       <button
         class="btn-primary btn-xs btn m-2"
-        @click="$emit('change-step', StepsEnum.CHINESE)"
+        @click="cardManager.changeStep(StepsEnum.CHINESE)"
       >
         Edit
       </button>
@@ -48,7 +48,7 @@
     <div>
       <button
         class="btn-primary btn-xs btn m-2"
-        @click="$emit('change-step', StepsEnum.IMAGE)"
+        @click="cardManager.changeStep(StepsEnum.IMAGE)"
       >
         Edit
       </button>
