@@ -24,7 +24,7 @@ func NewGenerator(
 	b BookLibrary,
 	known *KnownWords,
 ) *Generator {
-	return &Generator{
+	generator := Generator{
 		userSettings:    userSettings,
 		segmentation:    s,
 		bookLibrary:     b,
@@ -33,6 +33,8 @@ func NewGenerator(
 		cacheInProgress: false,
 		cacheComplete:   false,
 	}
+	go generator.GenerateSentenceTable()
+	return &generator
 }
 
 func (g *Generator) isT1Sentence(sentence []Token) bool {
