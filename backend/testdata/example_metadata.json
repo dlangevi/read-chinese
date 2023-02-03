@@ -1,5 +1,5 @@
 {
-  "Ran": 1573,
+  "Ran": 1575,
   "Dicts": {
     "example": {
       "Path": "/home/dlangevi/.config/read-chinese/userDicts/example",
@@ -20,5 +20,13 @@
   "AzureApiKey": "these are not real",
   "AzureImageApiKey": "even the ones in the history are now invalid",
   "KnownInterval": 10,
-  "OnlyFavorites": true
+  "IdealSentenceLength": 20,
+  "OnlyFavorites": true,
+  "HideRead": false,
+  "ProblemFlagged": true,
+  "ProblemMissingImage": true,
+  "ProblemMissingSentence": true,
+  "ProblemMissingSentenceAudio": true,
+  "ProblemMissingWordAudio": true,
+  "ProblemMissingPinyin": true
 }

@@ -18,7 +18,7 @@ func TestRank(t *testing.T) {
 		"len = 20 01234567890",
 	}
 
-	rankSentences(&sentences)
+	rankSentences(&sentences, 20)
 	sentences = sentences[0:3]
 
 	if len(sentences[0]) != 20 || len(sentences[1]) != 22 || len(sentences[2]) != 17 {
