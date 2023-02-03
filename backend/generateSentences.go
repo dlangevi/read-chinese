@@ -1,7 +1,6 @@
 package backend
 
 import (
-	"errors"
 	"log"
 	"math"
 	"sort"
@@ -10,11 +9,13 @@ import (
 )
 
 type Generator struct {
-	userSettings  *UserSettings
-	segmentation  *Segmentation
-	bookLibrary   BookLibrary
-	known         *KnownWords
-	sentenceCache map[string][]string
+	userSettings    *UserSettings
+	segmentation    *Segmentation
+	bookLibrary     BookLibrary
+	known           *KnownWords
+	sentenceCache   map[string][]string
+	cacheInProgress bool
+	cacheComplete   bool
 }
 
 func NewGenerator(
@@ -24,10 +25,13 @@ func NewGenerator(
 	known *KnownWords,
 ) *Generator {
 	return &Generator{
-		userSettings: userSettings,
-		segmentation: s,
-		bookLibrary:  b,
-		known:        known,
+		userSettings:    userSettings,
+		segmentation:    s,
+		bookLibrary:     b,
+		known:           known,
+		sentenceCache:   map[string][]string{},
+		cacheInProgress: false,
+		cacheComplete:   false,
 	}
 }
 
@@ -83,8 +87,24 @@ func duration(msg string, start time.Time) {
 // the word we are looking for (using plain text matching). If we want, we could
 // add certian parameters (eg, sentence length) which cut down on the amount of up
 // front computing if this locks the cpu for a bit
+//
+// Timing info (my computer, 21919827 characters across all books)
+// Full index 45 seconds (running on single seperate thread)
+// Seems to take up around 150mb of memory
+// Searching indexed .5 seconds
+// Previous method (quick culling + full search) 3 seconds,
+// as the cache set is slowly loaded, this time slowly decreases eg
+// generateSentences.go:74: Get Sentences: 3.150979092s
+// generateSentences.go:74: Get Sentences: 2.58147285s
+// generateSentences.go:74: Get Sentences: 2.398510062s
+// generateSentences.go:74: Get Sentences: 1.806070047s
+// generateSentences.go:74: Get Sentences: 1.790299864s
+// generateSentences.go:74: Get Sentences: 604.083962ms
+// generateSentences.go:74: Full Generate: 45.802128044s
+
 func (g *Generator) GenerateSentenceTable() error {
-	defer duration(track("Generate"))
+	g.cacheInProgress = true
+	defer duration(track("Full Generate"))
 	books, _ := g.bookLibrary.GetSomeBooks()
 	g.sentenceCache = map[string][]string{}
 	for _, book := range books {
@@ -101,21 +121,32 @@ func (g *Generator) GenerateSentenceTable() error {
 		}
 		g.sentenceCache[book.Title] = sentences
 	}
+	g.cacheComplete = true
 	return nil
 }
 
+// This can still be optimized a ton
 func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]string, error) {
 	defer duration(track("Get Sentences"))
-	if len(g.sentenceCache) == 0 {
-		// Just do this once up front in a simple way for now
-		g.GenerateSentenceTable()
+	// If cache has not been completed
+	if !g.cacheComplete {
+		// Start it if this is the first time
+		if !g.cacheInProgress {
+			go g.GenerateSentenceTable()
+		}
 	}
 	books, _ := g.bookLibrary.GetSomeBooks(bookIds...)
 	sentences := []string{}
 	for _, book := range books {
+
 		t1Segmented, ok := g.sentenceCache[book.Title]
+		var err error = nil
+		// If lookup fails, the book has not been processed yet
 		if !ok {
-			return sentences, errors.New("Failed to lookup book in cache")
+			t1Segmented, err = GetSegmentedText(book)
+			if err != nil {
+				return sentences, err
+			}
 		}
 		for _, sentence := range t1Segmented {
 			if strings.Contains(sentence, word) {
