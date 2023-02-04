@@ -44,7 +44,9 @@ import { SearchImages } from '@wailsjs/backend/ImageClient';
 import { backend } from '@wailsjs/models';
 import { useCardManager } from '@/stores/CardManager';
 import { storeToRefs } from 'pinia';
+import { getUserSettings } from '@/lib/userSettings';
 
+const UserSettings = getUserSettings();
 const cardManager = useCardManager();
 const { word } = storeToRefs(cardManager);
 
@@ -54,6 +56,10 @@ const image = ref([]);
 watch(image, async () => {
   const entries = image.value.map((i) => images.value[i]);
   cardManager.updateImages(entries);
+  const autoAdvance = UserSettings.CardCreation.AutoAdvanceImage.read();
+  if (autoAdvance) {
+    cardManager.nextStep();
+  }
 });
 
 watch(word, () => {

@@ -51,6 +51,12 @@ watch(definition, async () => {
     (def) => selected.has(def.definition),
   );
   updateDefinition(selectedDefinitions);
+  const autoAdvance = await (
+    UserSettings.CardCreation.AutoAdvanceEnglish.read()
+  );
+  if (autoAdvance) {
+    cardManager.nextStep();
+  }
 });
 
 watch(word, () => {

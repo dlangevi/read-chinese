@@ -52,6 +52,11 @@ export const useCardManager = defineStore('CardManager', {
     image64: (state) => {
       return state.newValues.image64 || state.originalValues.image64;
     },
+    ready: (state) => {
+      return Object.values(state.stepsState).every(state => {
+        return state !== StepState.EMPTY;
+      });
+    },
 
   },
   actions: {
@@ -134,6 +139,11 @@ export const useCardManager = defineStore('CardManager', {
       this.currentStep = this.steps[this.currentStepIndex];
     },
     nextStep() {
+      const currentState = this.stepsState[this.currentStep];
+      if (currentState === StepState.EMPTY) {
+        this.stepsState[this.currentStep] = StepState.SKIPPED;
+      }
+      console.log('current state', this.stepsState);
       if (this.currentStepIndex + 1 === this.steps.length) {
         // We were on the last step
         return;

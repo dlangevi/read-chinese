@@ -83,7 +83,7 @@
 
 <script lang="ts" setup>
 import {
-  ref, toRaw,
+  ref, toRaw, watch,
 } from 'vue';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import { useCardManager } from '@/stores/CardManager';
@@ -113,6 +113,9 @@ import {
 import {
   backend,
 } from '@wailsjs/models';
+
+import { storeToRefs } from 'pinia';
+import { getUserSettings } from '@/lib/userSettings';
 
 const store = useCardQueue();
 const cardManager = useCardManager();
@@ -154,6 +157,15 @@ function onClose() {
   store.clearWords();
   return false;
 }
+const UserSettings = getUserSettings();
+const { ready } = storeToRefs(cardManager);
+watch(ready, () => {
+  console.log('readychanged', ready);
+  const autoSubmit = UserSettings.CardCreation.AutoAdvanceCard.read();
+  if (ready && autoSubmit) {
+    submit();
+  }
+});
 
 async function submit() {
   // Todo track changes to the card and submit those for update

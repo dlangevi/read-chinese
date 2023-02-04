@@ -61,6 +61,7 @@ import {
 import { storeToRefs } from 'pinia';
 import { GetSentencesForWord } from '@wailsjs/backend/Generator';
 import { useCardManager } from '@/stores/CardManager';
+import { getUserSettings } from '@/lib/userSettings';
 
 const cardManager = useCardManager();
 const { word } = storeToRefs(cardManager);
@@ -69,9 +70,14 @@ const sentences = ref<string[]>([]);
 const allSentences = ref<string[]>([]);
 const sentence = ref('');
 const loaded = ref(false);
+const UserSettings = getUserSettings();
 
 watch(sentence, async () => {
   cardManager.updateSentence(sentence.value);
+  const autoAdvance = UserSettings.CardCreation.AutoAdvanceSentence.read();
+  if (autoAdvance) {
+    cardManager.nextStep();
+  }
 });
 
 watch(word, () => {
