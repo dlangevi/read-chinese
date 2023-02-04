@@ -5,8 +5,16 @@ import {
 } from '@wailsjs/models';
 
 export const StepState = {
+  // The start state for any field
   EMPTY: 'empty',
+  // Currently not used
   AUTOFILL: 'autofill',
+  // When entries have been selected, we move them to the card preview
+  // This should not trigger the 'ready' state, so 'preview' gets upgrade
+  // To 'filled' only after nextStep has been called
+  PREVIEW: 'preview',
+  // If nextStep is called on an empty field,
+  // we assume they dont want to fill it
   SKIPPED: 'skipped',
   FILLED: 'filled',
 } as const;
@@ -23,6 +31,10 @@ export const useCardManager = defineStore('CardManager', {
       steps: [] as StepsEnum[],
       currentStep: 'sentence' as StepsEnum,
       currentStepIndex: 0,
+      // Flow describes when the user is progressing as normal, either
+      // auto advancing or clicking next step. In this state, when we
+      // advance to a field that has been auto filled, we skip over it
+      flow: true,
       stepsState: {} as StateMap,
       originalValues: new backend.Fields(),
       newValues: new backend.Fields(),
@@ -53,8 +65,11 @@ export const useCardManager = defineStore('CardManager', {
       return state.newValues.image64 || state.originalValues.image64;
     },
     ready: (state) => {
-      return Object.values(state.stepsState).every(state => {
-        return state !== StepState.EMPTY;
+      return state.flow && Object.values(state.stepsState).every(state => {
+        return (
+          state !== StepState.EMPTY &&
+          state !== StepState.PREVIEW
+        );
       });
     },
 
@@ -64,6 +79,7 @@ export const useCardManager = defineStore('CardManager', {
       // Resets the ui (Does it?)
       this.currentStep = StepsEnum.NONE;
       this.steps = [];
+      this.flow = true;
 
       this.steps = [
         StepsEnum.SENTENCE,
@@ -87,7 +103,7 @@ export const useCardManager = defineStore('CardManager', {
 
     updateSentence(sentence: string) {
       this.newValues.sentence = sentence;
-      this.stepsState[StepsEnum.SENTENCE] = StepState.FILLED;
+      this.stepsState[StepsEnum.SENTENCE] = StepState.PREVIEW;
     },
 
     updateDefinition(
@@ -99,10 +115,10 @@ export const useCardManager = defineStore('CardManager', {
       ).join('<br>');
       if (defType === 'english') {
         this.newValues.englishDefn = definitions;
-        this.stepsState[StepsEnum.ENGLISH] = StepState.FILLED;
+        this.stepsState[StepsEnum.ENGLISH] = StepState.PREVIEW;
       } else {
         this.newValues.chineseDefn = definitions;
-        this.stepsState[StepsEnum.CHINESE] = StepState.FILLED;
+        this.stepsState[StepsEnum.CHINESE] = StepState.PREVIEW;
       }
       let pinyin = new Set();
       if (this.newValues.pinyin !== undefined) {
@@ -118,10 +134,11 @@ export const useCardManager = defineStore('CardManager', {
 
     updateImages(newImages: backend.ImageInfo[]) {
       this.newValues.imageUrls = newImages.map((image) => image.thumbnailUrl);
-      this.stepsState[StepsEnum.IMAGE] = StepState.FILLED;
+      this.stepsState[StepsEnum.IMAGE] = StepState.PREVIEW;
     },
 
     changeStep(step: StepsEnum) {
+      this.flow = false;
       this.currentStep = step;
       this.currentStepIndex = this.steps.indexOf(step);
     },
@@ -131,6 +148,7 @@ export const useCardManager = defineStore('CardManager', {
     },
 
     previousStep() {
+      this.flow = false;
       if (this.currentStepIndex === 0) {
         return;
       }
@@ -142,6 +160,8 @@ export const useCardManager = defineStore('CardManager', {
       const currentState = this.stepsState[this.currentStep];
       if (currentState === StepState.EMPTY) {
         this.stepsState[this.currentStep] = StepState.SKIPPED;
+      } else if (currentState === StepState.PREVIEW) {
+        this.stepsState[this.currentStep] = StepState.FILLED;
       }
       console.log('current state', this.stepsState);
       if (this.currentStepIndex + 1 === this.steps.length) {
@@ -150,6 +170,10 @@ export const useCardManager = defineStore('CardManager', {
       }
       this.currentStepIndex += 1;
       this.currentStep = this.steps[this.currentStepIndex];
+      if (this.flow &&
+          this.stepsState[this.currentStep] !== StepState.EMPTY) {
+        this.nextStep();
+      }
     },
 
   },
