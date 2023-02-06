@@ -1,0 +1,10 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\.github",
+    "\\.github\\workflows",
+    "\\backend"
+  ],
+  "SelectedNode": "\\backend\\bookLibrary.go",
+  "PreviewInSolutionExplorer": false
+}
