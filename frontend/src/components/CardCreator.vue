@@ -160,9 +160,9 @@ function onClose() {
 const UserSettings = getUserSettings();
 const { ready } = storeToRefs(cardManager);
 watch(ready, () => {
-  console.log('readychanged', ready);
+  console.log('readychanged', ready.value);
   const autoSubmit = UserSettings.CardCreation.AutoAdvanceCard.read();
-  if (ready && autoSubmit) {
+  if (ready.value && autoSubmit) {
     submit();
   }
 });

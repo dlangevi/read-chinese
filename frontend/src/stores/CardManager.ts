@@ -65,7 +65,9 @@ export const useCardManager = defineStore('CardManager', {
       return state.newValues.image64 || state.originalValues.image64;
     },
     ready: (state) => {
-      return state.flow && Object.values(state.stepsState).every(state => {
+      return state.flow &&
+      Object.keys(state.stepsState).length > 0 &&
+      Object.values(state.stepsState).every(state => {
         return (
           state !== StepState.EMPTY &&
           state !== StepState.PREVIEW
@@ -77,9 +79,9 @@ export const useCardManager = defineStore('CardManager', {
   actions: {
     loadCard(ankiCard : backend.RawAnkiNote) {
       // Resets the ui (Does it?)
+      this.flow = false;
       this.currentStep = StepsEnum.NONE;
       this.steps = [];
-      this.flow = true;
 
       this.steps = [
         StepsEnum.SENTENCE,
@@ -99,6 +101,7 @@ export const useCardManager = defineStore('CardManager', {
 
       this.currentStep = StepsEnum.SENTENCE;
       this.currentStepIndex = 0;
+      this.flow = true;
     },
 
     updateSentence(sentence: string) {
