@@ -15,7 +15,9 @@
         :class="[
           'step',
           {'step-neutral': cardManager.stepsState[step] === StepState.EMPTY},
-          {'step-success': cardManager.stepsState[step] !== StepState.EMPTY},
+          {'step-accent': cardManager.stepsState[step] === StepState.PREVIEW},
+          {'step-success': cardManager.stepsState[step] === StepState.FILLED},
+          {'step-success': cardManager.stepsState[step] === StepState.SKIPPED},
           {'after:ring after:ring-4 after:ring-accent':
             cardManager.currentStep === step},
         ]"
