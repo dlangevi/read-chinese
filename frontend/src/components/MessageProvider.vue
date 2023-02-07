@@ -21,10 +21,8 @@
 </template>
 
 <script lang="ts" setup>
-import { provide } from 'vue';
-import { MessageApi, MessageApiKey } from '@/lib/messages';
+import { useMessage } from '@/lib/messages';
 
-const api = new MessageApi();
-provide(MessageApiKey, api);
+const api = useMessage();
 
 </script>

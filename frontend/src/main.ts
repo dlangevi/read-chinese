@@ -14,6 +14,8 @@ import BookStats from '@/views/BookStats.vue';
 
 import App from './App.vue';
 
+import { MessageApi, MessageApiKey } from '@/lib/messages';
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -84,9 +86,15 @@ async function init() {
   const pinia = createPinia();
   const app = createApp(App);
   const userSettings = await generateUserSettings();
+  const messageApi = new MessageApi();
+  app.provide(MessageApiKey, messageApi);
   app.provide(UserSettingsKey, userSettings);
   app.use(router);
   app.use(pinia);
+  app.config.errorHandler = (err, instance, info) => {
+    console.log(err, instance, info);
+    messageApi.error(`${err}`);
+  };
   app.mount('#app');
 }
 init();

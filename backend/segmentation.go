@@ -164,7 +164,7 @@ func constructDict(d *Dictionaries) error {
 		return err
 	}
 	defer dict.Close()
-	replacementPath := path.Join(os.TempDir(), "replacement.dict.utf8")
+	replacementPath := ConfigDir("jiebaDicts", "replacement.dict.utf8")
 	userDict, err := os.Create(replacementPath)
 	if err != nil {
 		return err
