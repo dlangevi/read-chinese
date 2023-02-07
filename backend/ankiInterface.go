@@ -301,27 +301,27 @@ func (a *ankiInterface) LoadProblemCards() ([]ProblemCard, error) {
 
 	checks := []ProblemCase{
 		{ // Cards Flagged by the user
-			Query:  "-flag:0",
+			Query:  "deck:Reading -flag:0",
 			Setter: func(p *Problems) { p.Flagged = true },
 		},
 		{ // Missing Example Sentence
-			Query:  "ExampleSentence:",
+			Query:  "deck:Reading ExampleSentence:",
 			Setter: func(p *Problems) { p.MissingSentence = true },
 		},
 		{ // Has Sentence, but missing Sentence Audio
-			Query:  "-ExampleSentence: SentenceAudio:",
+			Query:  "deck:Reading -ExampleSentence: SentenceAudio:",
 			Setter: func(p *Problems) { p.MissingSentenceAudio = true },
 		},
 		{ // Missing Image
-			Query:  "Images:",
+			Query:  "deck:Reading Images:",
 			Setter: func(p *Problems) { p.MissingImage = true },
 		},
 		{ // Missing HanziAudio
-			Query:  "HanziAudio:",
+			Query:  "deck:Reading HanziAudio:",
 			Setter: func(p *Problems) { p.MissingWordAudio = true },
 		},
 		{ // Missing Pinyin TODO: check for ugly pinyin? eg: ni3hao3
-			Query:  "Pinyin:",
+			Query:  "deck:Reading Pinyin:",
 			Setter: func(p *Problems) { p.MissingPinyin = true },
 		},
 	}
