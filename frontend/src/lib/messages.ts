@@ -33,20 +33,22 @@ export class MessageApi {
   }
 
   error(text: string) {
-    this.#showMessage(text, 'error');
+    this.#showMessage(text, 'error', true);
   }
 
   warn(text: string) {
     this.#showMessage(text, 'warning');
   }
 
-  #showMessage(text:string, type:ToastType) {
+  #showMessage(text:string, type:ToastType, keepOpen?:boolean) {
     this.showToast.value = true;
     this.toastType.value = type;
     this.text.value = text;
-    setTimeout(() => {
-      this.hide();
-    }, 3000);
+    if (!keepOpen) {
+      setTimeout(() => {
+        this.hide();
+      }, 3000);
+    }
   }
 
   hide() {

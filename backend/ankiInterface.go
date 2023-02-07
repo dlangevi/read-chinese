@@ -365,7 +365,7 @@ func (a *ankiInterface) LoadProblemCards() ([]ProblemCard, error) {
 		problemCards = append(problemCards, problemCard)
 	}
 
-	return problemCards, nil
+	return problemCards, errors.New("its wrong but not your fault")
 }
 
 // TODO in client
