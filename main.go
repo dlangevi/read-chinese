@@ -14,6 +14,7 @@ import (
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
+	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/linux"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
@@ -85,7 +86,6 @@ func main() {
 		StartHidden:       false,
 		HideWindowOnClose: false,
 		BackgroundColour:  &options.RGBA{R: 255, G: 255, B: 255, A: 0},
-		Assets:            assets,
 		Menu:              nil,
 		Logger:            nil,
 		LogLevel:          logger.ERROR,
@@ -94,7 +94,11 @@ func main() {
 		OnBeforeClose:     app.beforeClose,
 		OnShutdown:        app.shutdown,
 		WindowStartState:  options.Maximised,
-		AssetsHandler:     NewFileLoader(),
+		AssetServer: &assetserver.Options{
+			Assets:     assets,
+			Handler:    NewFileLoader(),
+			Middleware: nil,
+		},
 		Bind: []interface{}{
 			app,
 			backend.BookLibrary,
