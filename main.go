@@ -36,9 +36,10 @@ func NewFileLoader() *FileLoader {
 func (h *FileLoader) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	var err error
 	requestedFilename := req.URL.Path
-	println("Requesting file:", requestedFilename)
-	fileData, err := os.ReadFile(requestedFilename)
+	coverLocation := backend.ConfigDir("covers", requestedFilename)
+	fileData, err := os.ReadFile(coverLocation)
 	if err != nil {
+		log.Println("Error reading file", err)
 		res.WriteHeader(http.StatusBadRequest)
 		res.Write([]byte(fmt.Sprintf("Could not load file %s", requestedFilename)))
 	}

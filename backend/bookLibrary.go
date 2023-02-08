@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -109,7 +110,29 @@ func NewBookLibrary(
 	}
 }
 
+func copyCover(author string, title string, coverPath string) (string, error) {
+	if coverPath == "" {
+		return "", errors.New("Empty coverpath")
+	}
+	bytes, err := os.ReadFile(coverPath)
+	if err != nil {
+		return "", err
+	}
+
+	ext := path.Ext(coverPath)
+	subpath := path.Join(author, fmt.Sprintf("%s%s", title, ext))
+	newCoverLocation := ConfigDir("covers", subpath)
+	err = os.WriteFile(newCoverLocation, bytes, 0666)
+	return subpath, err
+}
+
 func (b *bookLibrary) AddBook(author string, title string, cover string, filepath string) error {
+
+	// If there is a problem copying cover maybe that is not a big deal?
+	cover, err := copyCover(author, title, cover)
+	if err != nil {
+		log.Println("Error copying cover: ", err)
+	}
 	bookId, err := addBookToDb(b.db, author, title, cover, filepath)
 	if err != nil {
 		return err
