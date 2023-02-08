@@ -8,7 +8,7 @@
     <figure>
       <img
         class="m-auto max-h-full w-auto rounded"
-        :src="book.cover"
+        :src="'/' + book.cover"
         :alt="book.title"
         @click="bookBigMode"
       >

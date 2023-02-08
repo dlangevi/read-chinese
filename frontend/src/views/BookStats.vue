@@ -10,7 +10,7 @@
     >
       <img
         class="w-auto rounded"
-        :src="book.cover"
+        :src="'/' + book.cover"
         :alt="book.title"
       >
     </div>
