@@ -129,6 +129,7 @@ let callback: (() => void) | undefined;
 const preferBookRef = ref<number | undefined>(undefined);
 let preferBook;
 
+const UserSettings = getUserSettings();
 // TODO I am leaving the commented out old message code with the plan
 // of eventually having that sort of api avaliable
 const message = useMessage();
@@ -151,7 +152,8 @@ store.$subscribe(async (_, state) => {
       // Right now for EDIT we only edit the sentence so start there
       ankiCard = await GetAnkiNote(word);
     }
-    cardManager.loadCard(ankiCard);
+    const enableChinese = UserSettings.Dictionaries.EnableChinese.read();
+    cardManager.loadCard(ankiCard, enableChinese);
   }
   showModal.value = state.wordList.length !== 0;
 });
@@ -160,7 +162,6 @@ function onClose() {
   store.clearWords();
   return false;
 }
-const UserSettings = getUserSettings();
 const { ready } = storeToRefs(cardManager);
 watch(ready, () => {
   console.log('readychanged', ready.value);
