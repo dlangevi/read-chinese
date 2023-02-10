@@ -58,13 +58,11 @@
 import {
   watch, onBeforeMount, ref,
 } from 'vue';
-import { storeToRefs } from 'pinia';
 import { GetSentencesForWord } from '@wailsjs/backend/Generator';
 import { useCardManager } from '@/stores/CardManager';
 import { getUserSettings } from '@/lib/userSettings';
 
 const cardManager = useCardManager();
-const { word } = storeToRefs(cardManager);
 
 const sentences = ref<string[]>([]);
 const allSentences = ref<string[]>([]);
@@ -79,15 +77,6 @@ watch(sentence, async () => {
     cardManager.nextStep();
   }
 });
-
-watch(word, () => {
-  loadData();
-});
-
-// cardManager.$subscribe((mutation, state) => {
-//   console.log(mutation, state);
-//   // loadData();
-// });
 
 const props = defineProps<{
   preferBook?: number

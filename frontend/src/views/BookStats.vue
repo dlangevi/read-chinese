@@ -44,6 +44,10 @@
                 <div class="stat-title"> Total Words </div>
                 <div class="stat-value"> {{ totalWords }} </div>
               </div>
+              <div class="stat place-items-center">
+                <div class="stat-title"> Total Characters </div>
+                <div class="stat-value"> {{ totalCharacters }} </div>
+              </div>
             </div>
 
             <table class="table w-full">
@@ -131,6 +135,7 @@ const knownCharacters = (
   (stats.knownCharacters / stats.totalCharacters) * 100).toFixed(2);
 
 const { totalWords } = book.stats;
+const { totalCharacters } = book.stats;
 const firstTarget = stats.needToKnow.findIndex((n) => n !== 0);
 const targets = stats.targets.slice(firstTarget, firstTarget + 3);
 const needToKnow = stats.needToKnow.slice(firstTarget, firstTarget + 3);

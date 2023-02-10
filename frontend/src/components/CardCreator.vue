@@ -26,7 +26,10 @@
         <div class="w-1/3">
           <anki-card-preview />
         </div>
-        <div class="h-[60vh] w-full overflow-scroll p-4">
+        <div
+          :key="cardManager.word"
+          class="h-[60vh] w-full overflow-scroll p-4"
+        >
           <div class="flex gap-4">
             <p class="text-4xl">
               {{ cardManager.word }}

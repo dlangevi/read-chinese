@@ -30,7 +30,6 @@
 import {
   watch, onBeforeMount, ref,
 } from 'vue';
-import { storeToRefs } from 'pinia';
 import { getUserSettings } from '@/lib/userSettings';
 import type { backend } from '@wailsjs/models';
 
@@ -40,7 +39,6 @@ import { useCardManager } from '@/stores/CardManager';
 const UserSettings = getUserSettings();
 
 const cardManager = useCardManager();
-const { word } = storeToRefs(cardManager);
 
 const definitions = ref<backend.DictionaryDefinition[]>([]);
 const definition = ref<string[]>([]);
@@ -57,10 +55,6 @@ watch(definition, async () => {
   if (autoAdvance) {
     cardManager.nextStep();
   }
-});
-
-watch(word, () => {
-  loadData();
 });
 
 const props = defineProps<{

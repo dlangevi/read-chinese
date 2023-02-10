@@ -38,17 +38,18 @@
 
 <script lang="ts" setup>
 import {
-  watch, onBeforeMount, ref,
+  watch, ref,
 } from 'vue';
 import { SearchImages } from '@wailsjs/backend/ImageClient';
 import { backend } from '@wailsjs/models';
 import { useCardManager } from '@/stores/CardManager';
+import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
 import { storeToRefs } from 'pinia';
 import { getUserSettings } from '@/lib/userSettings';
 
 const UserSettings = getUserSettings();
 const cardManager = useCardManager();
-const { word } = storeToRefs(cardManager);
+const { currentStep } = storeToRefs(cardManager);
 
 const images = ref<backend.ImageInfo[]>([]);
 const image = ref([]);
@@ -62,13 +63,10 @@ watch(image, async () => {
   }
 });
 
-watch(word, () => {
-  loadData();
+watch(currentStep, async () => {
+  if (currentStep.value === StepsEnum.IMAGE && images.value.length === 0) {
+    console.log('now loading images');
+    images.value = await SearchImages(cardManager.word);
+  }
 });
-
-async function loadData() {
-  images.value = await SearchImages(cardManager.word);
-}
-
-onBeforeMount(loadData);
 </script>

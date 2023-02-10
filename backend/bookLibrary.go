@@ -412,7 +412,7 @@ func computeWordTargets(db *sqlx.DB, book *Book) error {
 	}
 
 	targets := [...]int{
-		80, 84, 86, 90, 92, 94, 96, 98, 100,
+		80, 84, 86, 90, 92, 94, 95, 96, 97, 98, 99, 100,
 	}
 	targetOccurances := []int{}
 	needToKnow := []int{}
