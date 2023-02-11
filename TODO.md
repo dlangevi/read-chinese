@@ -7,17 +7,14 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 - [ ] unflag anki cards on edit
 - [ ] allow mapping output to arbitrary anki note format
 - [ ] free edit of card fields
-- [ ] card maintenance (search for missing image, audio, etc)
 - [ ] use forvo for term audio [unclear if possible]
 - [ ] get example sentences from some online service [if free ones exist] 
 - [ ] support frequency lists
 - [ ] chinese voice picker
 - [ ] linux scrollbars dont work in webview
 - [ ] track book progress (eg 15% read)
-- [ ] update image / audio when editing card
 - [ ] write dev instal guide 
 - [ ] use calibre (if possible) to convert from epub etc to txt file
-- [ ] store our own copy of image cover, book text, etc
 - [ ] more compact library table view
 - [ ] manage known words list
 - [ ] create bootstrap flow which installs free dicts and books
@@ -33,9 +30,12 @@ These will definitely be implemented and have priority
 
 - [ ] interactive workflow for importing from calibre (control which books to import etc)
 - [ ] add new book (without needing calibre)
+- [ ] card maintenance (search for missing image, audio, etc)
+- [ ] update image / audio when editing card
 
 
 ### DONE
+- [x] store our own copy of image cover, book text, etc
 - [x] Import wordlist from csv
 - [x] unified pinyin generation (or at least fixed cc-cedicts ugly format)
 - [x] allow cc-cedict to be installed from internet 
