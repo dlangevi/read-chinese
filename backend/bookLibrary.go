@@ -2,12 +2,14 @@ package backend
 
 import (
 	"database/sql"
+	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"path"
+	"strconv"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -24,6 +26,7 @@ type (
 		GetSomeBooks(bookIds ...int64) ([]Book, error)
 		// Get all books
 		GetBooks() ([]Book, error)
+		GetDetailedBooks(path string) ([]Book, error)
 		// Check if book already exists in collection
 		BookExists(author string, title string) (bool, error)
 
@@ -63,6 +66,8 @@ type (
 	BookStats struct {
 		ProbablyKnownWords int   `json:"probablyKnownWords"`
 		KnownCharacters    int   `json:"knownCharacters"`
+		UniqueCharacters   int   `json:"uniqueCharacters"`
+		UniqueWords        int   `json:"uniqueWords"`
 		TotalCharacters    int   `json:"totalCharacters"`
 		TotalWords         int   `json:"totalWords"`
 		TotalKnownWords    int   `json:"totalKnownWords"`
@@ -244,6 +249,53 @@ func (b *bookLibrary) GetBooks() ([]Book, error) {
 	return b.GetSomeBooks()
 }
 
+func (b *bookLibrary) GetDetailedBooks(path string) ([]Book, error) {
+	books, _ := getBooks(b.db)
+
+	f, err := os.Create(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	writer := csv.NewWriter(f)
+	writer.Write([]string{
+		"Author",
+		"Title",
+		"UniqueCharacters",
+		"UniqueWords",
+		"TotalCharacters",
+		"TotalWords",
+		"KnownCharacters",
+		"ProbablyKnownWords",
+		"TotalKnownWords",
+	})
+
+	for index := range books {
+		book := &books[index]
+		book.Stats = NewBookStats()
+		// For now, only these are needed by BookCard
+		book.Stats.TotalKnownWords, _ = getKnownWords(b.db, book.BookId)
+		book.Stats.TotalWords, _ = getTotalWords(b.db, book.BookId)
+		b.computeKnownCharacters(book)
+		computeWordTargets(b.db, book)
+		writer.Write([]string{
+			book.Author,
+			book.Title,
+			strconv.Itoa(book.Stats.UniqueCharacters),
+			strconv.Itoa(book.Stats.UniqueWords),
+			strconv.Itoa(book.Stats.TotalCharacters),
+			strconv.Itoa(book.Stats.TotalWords),
+			strconv.Itoa(book.Stats.KnownCharacters),
+			strconv.Itoa(book.Stats.ProbablyKnownWords),
+			strconv.Itoa(book.Stats.TotalKnownWords),
+		})
+	}
+
+	writer.Flush()
+
+	return books, nil
+}
+
 func (b *bookLibrary) BookExists(author string, title string) (bool, error) {
 	var exists bool
 	err := b.db.QueryRow(`SELECT exists (
@@ -369,10 +421,14 @@ func (b *bookLibrary) computeKnownCharacters(book *Book) error {
 	var probablyKnownWords = 0
 	var knownCharacters = 0
 	var totalCharacters = 0
+	var uniqueWords = map[string]bool{}
+	var uniqueCharacters = map[rune]bool{}
 	for _, row := range words {
 		totalCharacters += len([]rune(row.Word)) * row.Count
 		allKnown := true
+		uniqueWords[row.Word] = true
 		for _, char := range row.Word {
+			uniqueCharacters[char] = true
 			if b.known.isKnownChar(char) {
 				knownCharacters += row.Count
 			} else {
@@ -383,6 +439,8 @@ func (b *bookLibrary) computeKnownCharacters(book *Book) error {
 			probablyKnownWords += row.Count
 		}
 	}
+	book.Stats.UniqueCharacters = len(uniqueCharacters)
+	book.Stats.UniqueWords = len(uniqueWords)
 	book.Stats.ProbablyKnownWords = probablyKnownWords
 	book.Stats.KnownCharacters = knownCharacters
 	book.Stats.TotalCharacters = totalCharacters

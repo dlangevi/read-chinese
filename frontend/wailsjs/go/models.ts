@@ -3,6 +3,8 @@ export namespace backend {
 	export class BookStats {
 	    probablyKnownWords: number;
 	    knownCharacters: number;
+	    uniqueCharacters: number;
+	    uniqueWords: number;
 	    totalCharacters: number;
 	    totalWords: number;
 	    totalKnownWords: number;
@@ -18,6 +20,8 @@ export namespace backend {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.probablyKnownWords = source["probablyKnownWords"];
 	        this.knownCharacters = source["knownCharacters"];
+	        this.uniqueCharacters = source["uniqueCharacters"];
+	        this.uniqueWords = source["uniqueWords"];
 	        this.totalCharacters = source["totalCharacters"];
 	        this.totalWords = source["totalWords"];
 	        this.totalKnownWords = source["totalKnownWords"];

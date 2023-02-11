@@ -15,6 +15,12 @@
       >
         Sync Calibre
       </button>
+      <button
+        class="btn-primary btn-sm btn"
+        @click="exportBooks"
+      >
+        Export Book Stats
+      </button>
     </template>
     <div class="text-center">
       <h2 class="mt-5 text-xl">
@@ -48,13 +54,20 @@ import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
 import { getUserSettings } from '@/lib/userSettings';
 import { backend } from '@wailsjs/models';
-import { GetBooks } from '@wailsjs/backend/bookLibrary';
+import { SaveFile } from '@wailsjs/main/App';
+import { GetBooks, GetDetailedBooks } from '@wailsjs/backend/bookLibrary';
 import { ImportCalibreBooks } from '@wailsjs/backend/Calibre';
 import WithSidebar from '@/layouts/WithSidebar.vue';
 
 async function syncCalibre() {
   const err = await ImportCalibreBooks();
   console.log(err);
+}
+
+async function exportBooks() {
+  const filename = await SaveFile();
+  const detailed = await GetDetailedBooks(filename);
+  console.log(JSON.stringify(detailed));
 }
 
 const UserSettings = getUserSettings();

@@ -27,6 +27,19 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
+func (a *App) SaveFile() (string, error) {
+	selectedFile, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+		Title: "Save book stats",
+		Filters: []runtime.FileFilter{
+			{
+				DisplayName: "csv file",
+				Pattern:     "*.csv",
+			},
+		},
+		DefaultFilename: "BookStats.csv",
+	})
+	return selectedFile, err
+}
 func (a *App) FilePicker(extension string) (string, error) {
 	log.Println("requesting file")
 	selectedFile, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{

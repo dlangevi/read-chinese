@@ -22,6 +22,10 @@ export function GetBooks() {
   return window['go']['backend']['bookLibrary']['GetBooks']();
 }
 
+export function GetDetailedBooks(arg1) {
+  return window['go']['backend']['bookLibrary']['GetDetailedBooks'](arg1);
+}
+
 export function GetSomeBooks(arg1) {
   return window['go']['backend']['bookLibrary']['GetSomeBooks'](arg1);
 }
