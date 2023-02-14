@@ -35,6 +35,10 @@ func NewDictionaries(
 	return dicts
 }
 
+func (d *Dictionaries) HealthCheck() bool {
+	return len(d.Dictionaries) > 0
+}
+
 func (d *Dictionaries) loadDictionaries() error {
 	d.Dictionaries = map[string]UserDictionary{}
 	for name, dict := range d.userSettings.Dicts {

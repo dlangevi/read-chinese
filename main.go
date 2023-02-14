@@ -102,6 +102,7 @@ func main() {
 		},
 		Bind: []interface{}{
 			app,
+			backend,
 			backend.BookLibrary,
 			backend.KnownWords,
 			backend.UserSettings,

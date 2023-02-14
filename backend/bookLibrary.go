@@ -29,6 +29,7 @@ type (
 		GetDetailedBooks(path string) ([]Book, error)
 		// Check if book already exists in collection
 		BookExists(author string, title string) (bool, error)
+		HealthCheck() (bool, error)
 
 		// Get the words in the library that occure the most often
 		LearningTarget() []WordOccuranceRow
@@ -305,6 +306,16 @@ func (b *bookLibrary) BookExists(author string, title string) (bool, error) {
     AND title = $2
   )`, author, title).Scan(&exists)
 	return exists, err
+}
+
+func (b *bookLibrary) HealthCheck() (bool, error) {
+	var exists bool
+	err := b.db.QueryRow(`SELECT exists (
+    SELECT bookId 
+    FROM books 
+  )`).Scan(&exists)
+	return exists, err
+
 }
 
 func (b *bookLibrary) LearningTarget() []WordOccuranceRow {

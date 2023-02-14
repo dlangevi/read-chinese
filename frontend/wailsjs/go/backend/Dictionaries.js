@@ -30,6 +30,10 @@ export function GetPossibleWords(arg1) {
   return window['go']['backend']['Dictionaries']['GetPossibleWords'](arg1);
 }
 
+export function HealthCheck() {
+  return window['go']['backend']['Dictionaries']['HealthCheck']();
+}
+
 export function IsInDictionary(arg1) {
   return window['go']['backend']['Dictionaries']['IsInDictionary'](arg1);
 }

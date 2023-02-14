@@ -31,6 +31,7 @@ type (
 		UpdateNoteFields(noteID int64, fields Fields) string
 		ImportAnkiKeywords() error
 		LoadProblemCards() ([]ProblemCard, error)
+		HealthCheck() bool
 	}
 )
 
@@ -61,6 +62,10 @@ func (a *ankiInterface) GetAnkiNoteSkeleton(word string) RawAnkiNote {
 			Word: word,
 		},
 	}
+}
+func (a *ankiInterface) HealthCheck() bool {
+	restErr := a.anki.Ping()
+	return restErr == nil
 }
 
 func (a *ankiInterface) CreateAnkiNote(fields Fields, tags []string) error {

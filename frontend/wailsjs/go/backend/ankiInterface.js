@@ -14,6 +14,10 @@ export function GetAnkiNoteSkeleton(arg1) {
   return window['go']['backend']['ankiInterface']['GetAnkiNoteSkeleton'](arg1);
 }
 
+export function HealthCheck() {
+  return window['go']['backend']['ankiInterface']['HealthCheck']();
+}
+
 export function ImportAnkiKeywords() {
   return window['go']['backend']['ankiInterface']['ImportAnkiKeywords']();
 }

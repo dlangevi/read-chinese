@@ -29,6 +29,16 @@ type Backend struct {
 	Calibre      *Calibre
 }
 
+func (b *Backend) HealthCheck() (bool, error) {
+	checkBooks, err := b.BookLibrary.HealthCheck()
+	if err != nil {
+		return false, err
+	}
+	checkDicts := b.Dictionaries.HealthCheck()
+	checkAnki := b.AnkiInterface.HealthCheck()
+	return checkBooks && checkDicts && checkAnki, nil
+}
+
 func StartBackend(ctx *context.Context,
 	sqlPath string,
 	metadataPath string) (*Backend, error) {

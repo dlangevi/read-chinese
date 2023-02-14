@@ -16,6 +16,8 @@ export function GetDetailedBooks(arg1:string):Promise<Array<backend.Book>>;
 
 export function GetSomeBooks(arg1:Array<number>):Promise<Array<backend.Book>>;
 
+export function HealthCheck():Promise<boolean>;
+
 export function LearningTarget():Promise<Array<backend.WordOccuranceRow>>;
 
 export function LearningTargetBook(arg1:number):Promise<Array<backend.WordOccuranceRow>>;

@@ -14,6 +14,7 @@ import BookStats from '@/views/BookStats.vue';
 
 import App from './App.vue';
 
+import { HealthCheck } from '@wailsjs/backend/Backend';
 import { MessageApi, MessageApiKey } from '@/lib/messages';
 
 const router = createRouter({
@@ -21,7 +22,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/About',
+      redirect: '/Welcome',
     },
     {
       path: '/Welcome',
@@ -87,6 +88,16 @@ async function init() {
   const app = createApp(App);
   const userSettings = await generateUserSettings();
   const messageApi = new MessageApi();
+
+  router.beforeEach(async (to, _from) => {
+    console.log(to.name);
+    const passes = await HealthCheck();
+    if (!passes && to.name !== 'Welcome') {
+      messageApi.error('Fix your problems before you can play');
+      return '/Welcome';
+    }
+  });
+
   app.provide(MessageApiKey, messageApi);
   app.provide(UserSettingsKey, userSettings);
   app.use(router);

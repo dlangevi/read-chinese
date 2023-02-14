@@ -30,6 +30,10 @@ export function GetSomeBooks(arg1) {
   return window['go']['backend']['bookLibrary']['GetSomeBooks'](arg1);
 }
 
+export function HealthCheck() {
+  return window['go']['backend']['bookLibrary']['HealthCheck']();
+}
+
 export function LearningTarget() {
   return window['go']['backend']['bookLibrary']['LearningTarget']();
 }

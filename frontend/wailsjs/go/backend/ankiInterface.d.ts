@@ -8,6 +8,8 @@ export function GetAnkiNote(arg1:string):Promise<backend.RawAnkiNote>;
 
 export function GetAnkiNoteSkeleton(arg1:string):Promise<backend.RawAnkiNote>;
 
+export function HealthCheck():Promise<boolean>;
+
 export function ImportAnkiKeywords():Promise<Error>;
 
 export function LoadProblemCards():Promise<Array<backend.ProblemCard>>;
