@@ -42,6 +42,7 @@
 </template>
 
 <script lang="ts" setup>
+import { reactive } from 'vue';
 import { HealthCheck as bookHealth } from '@wailsjs/backend/bookLibrary';
 import { HealthCheck as dictHealth } from '@wailsjs/backend/Dictionaries';
 import { HealthCheck as ankiHealth } from '@wailsjs/backend/ankiInterface';
@@ -74,7 +75,7 @@ type Step = {
 // * Add azure API key
 // * Add azure Image key
 // * Check out other settings
-const steps : Step[] = [
+const steps : Step[] = reactive([
   {
     priority: Priority.REQUIRED,
     description: 'Add a dictionary',
@@ -133,7 +134,7 @@ const steps : Step[] = [
     checkResult: false,
     workButton: true,
   },
-];
+]);
 
 function recheck() {
   steps.forEach(async (step) => {
