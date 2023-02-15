@@ -45,7 +45,5 @@
 <script lang="ts" setup>
 import RecommendedActions from '@/components/RecommendedActions.vue';
 import HealthCheck from '@/components/HealthCheck.vue';
-import ChatHealth from '@/components/ChatHealth.vue';
-import ChatList from '@/components/ChatList.vue';
 
 </script>
