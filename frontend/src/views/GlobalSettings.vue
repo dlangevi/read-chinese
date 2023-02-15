@@ -41,6 +41,7 @@
           :is="content.type"
           v-for="content in contents"
           :key="content"
+          :class="[{'bg-sky-500': props.highlight === content.name}]"
           :setting="content"
         />
       </div>
@@ -52,6 +53,9 @@
 import { getUserSettings } from '@/lib/userSettings';
 import { onMounted } from 'vue';
 import { themeChange } from 'theme-change';
+const props = defineProps<{
+  highlight?: string,
+}>();
 onMounted(() => {
   themeChange(false);
 });
@@ -74,6 +78,5 @@ const sections = {
     [...Object.values(UserSettings.CardCreation)],
   DictionarySettings:
     Object.values(UserSettings.Dictionaries),
-
 };
 </script>

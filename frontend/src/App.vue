@@ -3,7 +3,10 @@
     <message-provider>
       <CardCreator />
       <div class="flex h-screen w-screen flex-col bg-base-100">
-        <TopNav class="w-screen basis-16" />
+        <TopNav
+          :class="['w-screen basis-16',
+                   {hidden: route.fullPath === '/Welcome'}]"
+        />
         <div class="w-screen grow basis-auto overflow-auto">
           <Suspense>
             <router-view :key="route.fullPath" />
@@ -31,6 +34,7 @@ onMounted(() => {
 });
 
 const route = useRoute();
+
 </script>
 
 <style>

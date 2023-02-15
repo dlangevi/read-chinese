@@ -43,6 +43,7 @@ const router = createRouter({
       path: '/Settings',
       name: 'Settings',
       component: GlobalSettings,
+      props: route => ({ highlight: route.query.highlight }),
     },
     {
       path: '/Stats',
