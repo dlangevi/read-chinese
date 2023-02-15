@@ -14,7 +14,8 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"],
-      "@wailsjs/*": ["wailsjs/go/*"]
+      "@wailsjs/*": ["wailsjs/go/*"],
+      "@runtime/*": ["wailsjs/runtime/*"]
     },
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true

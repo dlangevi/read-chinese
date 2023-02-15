@@ -62,8 +62,12 @@
         :key="name"
       >
         <div class="divider" />
-        <div class="grid grid-cols-4">
-          <div class="col-span-3 flex gap-3">
+        <div
+          :class="['grid grid-cols-4',
+                   {'bg-primary': dict.isPrimary}
+          ]"
+        >
+          <div :class="['col-span-3 flex gap-3']">
             <div> Name: {{ dict.name }} </div>
             <div> Type: {{ dict.type }} </div>
             <div> Path: {{ dict.path }} </div>
@@ -106,12 +110,14 @@ export type DictionaryType = 'english' | 'chinese';
 
 const addDictModal = ref(false);
 
-function makePrimary(name:string) {
-  SetPrimaryDict(name);
+async function makePrimary(name:string) {
+  await SetPrimaryDict(name);
+  updateDicts();
 }
 
-function deleteDict(name:string) {
-  DeleteDictionary(name);
+async function deleteDict(name:string) {
+  await DeleteDictionary(name);
+  updateDicts();
 }
 
 const newDictFile = ref('');
@@ -132,8 +138,9 @@ async function pickFile() {
   newDictFile.value = await FilePicker('json');
 }
 
-function addCedict() {
-  AddCedict();
+async function addCedict() {
+  await AddCedict();
+  updateDicts();
 }
 
 function addDictionary() {
@@ -144,13 +151,14 @@ function addDictionary() {
   addDictModal.value = true;
 }
 
-function submit() {
+async function submit() {
   // TODO verify
-  AddMigakuDictionary(
+  await AddMigakuDictionary(
     newDictName.value,
     newDictFile.value,
     newDictType.value,
   );
+  updateDicts();
   addDictModal.value = false;
 }
 
@@ -160,14 +168,18 @@ type DictionaryInfo = {
   name: string,
   path: string,
   type: string,
+  isPrimary: boolean,
 };
 type DictionaryInfoMap = {
   [name:string] : DictionaryInfo
 };
 
 const dicts = ref<DictionaryInfoMap>({});
-onBeforeMount(async () => {
+async function updateDicts() {
   dicts.value = await GetDictionaryInfo();
+}
+onBeforeMount(async () => {
+  updateDicts();
 });
 
 </script>

@@ -10,6 +10,7 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@wailsjs': fileURLToPath(new URL('./wailsjs/go', import.meta.url)),
+      '@runtime': fileURLToPath(new URL('./wailsjs/runtime', import.meta.url)),
     },
   },
   build: {

@@ -99,18 +99,20 @@ func (d *Dictionaries) SetPrimaryDict(name string) {
 
 type DictionaryInfoMap map[string]DictionaryInfo
 type DictionaryInfo struct {
-	Name     string `json:"name"`
-	Path     string `json:"path"`
-	Language string `json:"type"`
+	Name      string `json:"name"`
+	Path      string `json:"path"`
+	Language  string `json:"type"`
+	IsPrimary bool   `json:"isPrimary"`
 }
 
 func (d *Dictionaries) GetDictionaryInfo() DictionaryInfoMap {
 	dictInfoMap := DictionaryInfoMap{}
 	for name, dict := range d.userSettings.Dicts {
 		dictInfoMap[name] = DictionaryInfo{
-			Name:     name,
-			Path:     dict.Path,
-			Language: dict.Language,
+			Name:      name,
+			Path:      dict.Path,
+			Language:  dict.Language,
+			IsPrimary: name == d.PrimaryDictName,
 		}
 	}
 	return dictInfoMap
