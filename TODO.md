@@ -5,7 +5,6 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 ### Todo
 - [ ] 90% test coverage for go code
 - [ ] unflag anki cards on edit
-- [ ] allow mapping output to arbitrary anki note format
 - [ ] free edit of card fields
 - [ ] use forvo for term audio [unclear if possible]
 - [ ] get example sentences from some online service [if free ones exist] 
@@ -17,7 +16,7 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 - [ ] use calibre (if possible) to convert from epub etc to txt file
 - [ ] more compact library table view
 - [ ] manage known words list
-- [ ] create bootstrap flow which installs free dicts and books
+- [ ] create bootstrap flow installs free books
 - [ ] Support more variable sources for user word list 
 - [ ] Export user data somehow
 - [ ] View and edit known words
@@ -28,6 +27,7 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 
 These will definitely be implemented and have priority
 
+- [ ] allow mapping output to arbitrary anki note format
 - [ ] interactive workflow for importing from calibre (control which books to import etc)
 - [ ] add new book (without needing calibre)
 - [ ] card maintenance (search for missing image, audio, etc)
@@ -35,6 +35,7 @@ These will definitely be implemented and have priority
 
 
 ### DONE
+- [x] create startup health checks that prepares user for starting to mine 
 - [x] store our own copy of image cover, book text, etc
 - [x] Import wordlist from csv
 - [x] unified pinyin generation (or at least fixed cc-cedicts ugly format)

@@ -83,7 +83,6 @@ const router = createRouter({
     },
   ],
 });
-
 async function init() {
   const pinia = createPinia();
   const app = createApp(App);

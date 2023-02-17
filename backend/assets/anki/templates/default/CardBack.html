@@ -1,0 +1,31 @@
+<div class=hanzi>{{Hanzi}} {{HanziAudio}}</div>
+<div class=pinyin>{{Pinyin}}</div>
+<div class=english>{{ChineseDefinition}}</div>
+{{^ChineseDefinition}}
+<div class=english>{{EnglishDefinition}}</div>
+{{/ChineseDefinition}}
+
+{{#ChineseDefinition}}{{#EnglishDefinition}}
+<div class=surround>
+﻿<a class=hint href="#" onclick="show(this, 'abd')">Show English Definition</a>
+<div id="abd" class=hint>{{EnglishDefinition}}</div>
+<div>
+{{/EnglishDefinition}}{{/ChineseDefinition}}
+
+<div class=image>{{Images}}</div>
+<div class=sentence>{{ExampleSentence}} {{SentenceAudio}}</div>
+<div class=pinyinSen></div>
+
+{{#SentenceTranslation}}
+﻿<a class=hint href="#" onclick="show(this,'abe')">Show Sentence Translation</a>
+<div id="abe" class=hint>{{SentenceTranslation}}</div>
+{{/SentenceTranslation}}
+
+
+<script>
+function show(div, target) {
+   div.style.display='none';
+   document.getElementById(target).style.display='inline-block';
+   return false;
+}
+</script>

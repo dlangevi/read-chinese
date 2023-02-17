@@ -1,0 +1,70 @@
+.card {
+ font-family: Georgia; 
+ font-size: 10px; 
+ text-align: left; 
+ background-color: rgb(47,47,49);
+ color: #fff;
+ padding: 20px;
+}
+
+.hanzi {
+ font-family: Kai;  
+ font-size: 78px;
+ margin-top: 20px;
+}
+
+.surround {
+  margin: 10px;
+}
+
+a.hint{
+  font-size: 12px;
+	text-align: center;
+  border: 1px solid;
+  padding: 5px;
+  border-radius: 3px;
+	color: #ff3333
+}
+
+div.hint {
+  display: none;
+}
+
+.hint {
+  padding: 5px;
+  margin: 10px;
+}
+
+.sentence {
+ font-family: Kai; 
+ font-size:30px; 
+ text-align:left;
+ transition: padding 0.5s ease;
+}
+
+.sentence.big {
+ font-size:40px; 
+}
+
+.pinyin {
+ font-family: Palatino; 
+ font-size: 22px; 
+ color: #55DD55;
+}
+
+.pinyinSen {
+ font-family: Palatino; 
+ font-size: 20px; 
+ color: #55DD55; 
+ text-align:left;
+}
+
+.english {
+ font-family: Didot; 
+ font-size: 16px;
+}
+
+.image{
+	margin: 0 20px;
+  padding: 15px
+}

@@ -1,0 +1,8 @@
+<div id="sentence" class="sentence big">{{ExampleSentence}}</div>
+<script>
+var sentence = document.getElementById("sentence").innerHTML;
+var word = "{{Hanzi}}"
+var boldword = word.fontcolor("yellow");
+var newsentence = sentence.replaceAll(word,boldword);
+document.getElementById("sentence").innerHTML = newsentence;
+</script>

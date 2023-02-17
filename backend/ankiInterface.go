@@ -63,6 +63,7 @@ func (a *ankiInterface) GetAnkiNoteSkeleton(word string) RawAnkiNote {
 		},
 	}
 }
+
 func (a *ankiInterface) HealthCheck() bool {
 	restErr := a.anki.Ping()
 	return restErr == nil
