@@ -90,8 +90,8 @@ onBeforeMount(async () => {
   words.value = await LearningTarget();
 });
 
-function importAnki() {
-  ImportAnkiKeywords();
+async function importAnki() {
+  await ImportAnkiKeywords();
 }
 
 async function loadHsk() {

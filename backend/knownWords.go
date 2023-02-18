@@ -16,7 +16,7 @@ import (
 
 type KnownWords struct {
 	// For now just map word to interval
-	words        map[string]int
+	words        map[string]int64
 	characters   map[rune]bool
 	frequency    map[string]int
 	db           *sqlx.DB
@@ -27,7 +27,7 @@ func NewKnownWords(db *sqlx.DB,
 	userSettings *UserSettings,
 ) *KnownWords {
 	known := &KnownWords{
-		words:        map[string]int{},
+		words:        map[string]int64{},
 		characters:   map[rune]bool{},
 		frequency:    map[string]int{},
 		db:           db,
@@ -41,7 +41,7 @@ func NewKnownWords(db *sqlx.DB,
 func (known *KnownWords) syncWords() {
 	type WordRow struct {
 		Word     string
-		Interval int
+		Interval int64
 	}
 	words := []WordRow{}
 	err := known.db.Select(&words, `
@@ -92,7 +92,7 @@ func (known *KnownWords) GetWordStats() WordStats {
 }
 
 // TODO have the updated_at automatically update
-func (known *KnownWords) AddWord(word string, age int) error {
+func (known *KnownWords) AddWord(word string, age int64) error {
 	tx, err := known.db.Beginx()
 	if err != nil {
 		return err
@@ -115,44 +115,72 @@ func (known *KnownWords) AddWord(word string, age int) error {
 		return err
 	}
 	known.words[word] = age
-	tx.Commit()
-	return nil
+	return tx.Commit()
 }
 
 type WordEntry struct {
-	Word     string
-	Interval int64
+	Word     string `db:"word"`
+	Interval int64  `db:"interval"`
 }
 
 // TODO make this faster if possible
 // TODO chunk in batches of 5000 words
 func (known *KnownWords) AddWords(words []WordEntry) error {
+	newWords := []WordEntry{}
+	needsUpdate := []WordEntry{}
+
+	for _, word := range words {
+		if !known.isKnown(word.Word) {
+			newWords = append(newWords, word)
+		} else {
+			currentInterval := known.words[word.Word]
+			if currentInterval != word.Interval {
+				needsUpdate = append(needsUpdate, word)
+			}
+		}
+	}
+
 	tx, err := known.db.Beginx()
 	if err != nil {
 		return err
 	}
-	_, err = tx.NamedExec(`
-  INSERT OR IGNORE INTO words (word, interval) 
-  VALUES (:word, :interval)`, words)
-	if err != nil {
-		tx.Rollback()
-		return err
+	if len(newWords) > 0 {
+		_, err := tx.NamedExec(`
+  INSERT INTO words (word, interval) 
+  VALUES (:word, :interval)`, newWords)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
 
-	_, err = tx.NamedExec(`
-  UPDATE words 
-  SET interval=:interval, 
-      updated_at=CURRENT_TIMESTAMP 
-  WHERE word=":word"
-  AND interval!=:interval`, words)
+	stmt, err := tx.Preparex(`
+    UPDATE words 
+    SET interval=$1, 
+        updated_at=CURRENT_TIMESTAMP 
+    WHERE word=$2`,
+	)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for _, word := range needsUpdate {
+		_, err := stmt.Exec(word.Interval, word.Word)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	err = tx.Commit()
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 	for _, word := range words {
-		known.words[word.Word] = int(word.Interval)
+		known.words[word.Word] = word.Interval
 	}
-	return tx.Commit()
+	return nil
 }
 
 func (known *KnownWords) ImportCSVWords(path string) error {
@@ -203,7 +231,7 @@ func (known *KnownWords) ImportCSVWords(path string) error {
 
 func (known *KnownWords) isWellKnown(word string) bool {
 	interval, ok := known.words[word]
-	return ok && interval >= known.userSettings.KnownInterval
+	return ok && interval >= int64(known.userSettings.KnownInterval)
 }
 
 func (known *KnownWords) isKnown(word string) bool {
