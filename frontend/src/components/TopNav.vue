@@ -61,7 +61,6 @@ const navigation = ref([
   { name: 'Manage Wordlist', href: '/WordLists', current: false },
   { name: 'Stats', href: '/Stats', current: false },
   { name: 'Settings', href: '/Settings', current: false },
-  { name: 'About', href: '/About', current: false },
 ]);
 function updateNav(currentRoute:RouteLocationNormalizedLoaded) {
   navigation.value.forEach((item) => {

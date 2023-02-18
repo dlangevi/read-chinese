@@ -5,7 +5,6 @@ import { generateUserSettings, UserSettingsKey } from '@/lib/userSettings';
 import GlobalSettings from '@/views/GlobalSettings.vue';
 import Welcome from '@/views/Welcome.vue';
 import BookLibrary from '@/views/BookLibrary.vue';
-import AboutPage from '@/views/AboutPage.vue';
 import UserStats from '@/views/UserStats.vue';
 import WordLists from '@/views/WordLists.vue';
 import FlashCards from '@/views/FlashCards.vue';
@@ -33,11 +32,6 @@ const router = createRouter({
       path: '/BookLibrary',
       name: 'BookLibrary',
       component: BookLibrary,
-    },
-    {
-      path: '/About',
-      name: 'About',
-      component: AboutPage,
     },
     {
       path: '/Settings',
