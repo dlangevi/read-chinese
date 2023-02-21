@@ -27,6 +27,7 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 
 These will definitely be implemented and have priority
 
+- [ ] push premade card format to anki for new users
 - [ ] allow mapping output to arbitrary anki note format
 - [ ] interactive workflow for importing from calibre (control which books to import etc)
 - [ ] add new book (without needing calibre)

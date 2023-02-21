@@ -22,8 +22,20 @@ export function ImportAnkiKeywords() {
   return window['go']['backend']['ankiInterface']['ImportAnkiKeywords']();
 }
 
+export function LoadModelFields(arg1) {
+  return window['go']['backend']['ankiInterface']['LoadModelFields'](arg1);
+}
+
+export function LoadModels() {
+  return window['go']['backend']['ankiInterface']['LoadModels']();
+}
+
 export function LoadProblemCards() {
   return window['go']['backend']['ankiInterface']['LoadProblemCards']();
+}
+
+export function LoadTemplate() {
+  return window['go']['backend']['ankiInterface']['LoadTemplate']();
 }
 
 export function UpdateNoteFields(arg1, arg2) {

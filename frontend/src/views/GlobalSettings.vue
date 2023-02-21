@@ -3,7 +3,6 @@
     <h2 class="mt-5">
       Settings
     </h2>
-    <p>Lets go</p>
     <div>
       <div class="m-5">
         <h2 class="mb-4 text-2xl font-bold text-green-700">Select Theme</h2>
@@ -53,6 +52,7 @@
 import { getUserSettings } from '@/lib/userSettings';
 import { onMounted } from 'vue';
 import { themeChange } from 'theme-change';
+
 const props = defineProps<{
   highlight?: string,
 }>();
@@ -75,8 +75,12 @@ const themes = [
 
 const sections = {
   CardCreationSettings:
-    [...Object.values(UserSettings.CardCreation)],
+    Object.values(UserSettings.CardCreation),
+  AnkiSettings:
+    Object.values(UserSettings.AnkiConfig),
   DictionarySettings:
     Object.values(UserSettings.Dictionaries),
+  SentenceGeneration:
+    Object.values(UserSettings.SentenceGeneration),
 };
 </script>

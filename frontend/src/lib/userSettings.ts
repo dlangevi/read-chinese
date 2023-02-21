@@ -6,6 +6,8 @@ import SettingsTextbox
   from '@/components/SettingsWidgets/SettingsTextbox.vue';
 import DictionariesList
   from '@/components/SettingsWidgets/DictionariesList.vue';
+import ModelManager
+  from '@/components/SettingsWidgets/ModelManager.vue';
 import SettingsSlider
   from '@/components/SettingsWidgets/SettingsSlider.vue';
 import {
@@ -25,13 +27,6 @@ type UserSetting = {
   read?: any;
   write?:any;
 };
-
-type UserSettingsType = {
-  [section:string]: {
-    [label:string]: UserSetting;
-  }
-};
-export const UserSettingsKey = Symbol('u') as InjectionKey<UserSettingsType>;
 
 async function settingsObject(
   name:string,
@@ -114,7 +109,8 @@ async function loadSettings(settings : Promise<UserSetting>[]) {
   return options;
 }
 
-export async function generateUserSettings() :Promise<UserSettingsType> {
+// export async function generateUserSettings() :Promise<UserSettingsType> {
+export async function generateUserSettings() {
   const CardCreation = await loadSettings([
     checkBox(
       'AutoAdvanceSentence',
@@ -142,16 +138,6 @@ export async function generateUserSettings() :Promise<UserSettingsType> {
       'After picking a image, move to the next step',
     ),
     checkBox(
-      'GenerateTermAudio',
-      'Auto generate audio for keyword',
-      'Not implemented yet',
-    ),
-    checkBox(
-      'GenerateSentenceAudio',
-      'Auto generate audio for example sentence',
-      'Not implemented yet',
-    ),
-    checkBox(
       'AutoAdvanceCard',
       'Create card once all fields have been filled',
       'Create card once all fields have been filled',
@@ -175,16 +161,9 @@ export async function generateUserSettings() :Promise<UserSettingsType> {
       'Allow flashcards to use chinese ' +
       'definitions instead of just english ones',
     ),
-    textBox(
-      'AzureApiKey',
-      'Azure Audio Api Key',
-      'Setup an free azure tts account and put your key here',
-    ),
-    textBox(
-      'AzureImageApiKey',
-      'Azure Image Api Key',
-      'Setup an free azure bing search and put your key here',
-    ),
+  ]);
+
+  const SentenceGeneration = await loadSettings([
     slider(
       'KnownInterval',
       'Time before a word is considered "known"',
@@ -195,6 +174,50 @@ export async function generateUserSettings() :Promise<UserSettingsType> {
       'IdealSentenceLength',
       'Ideal Sentence Length"',
       'What the ideal sentence length you want to be selected from books',
+    ),
+
+  ]);
+
+  const AnkiConfig = await loadSettings([
+    (async () => ({
+      name: 'ModelManager',
+      label: 'ModelManager',
+      type: ModelManager,
+    } as UserSetting))(),
+    checkBox(
+      'AddProgramTag',
+      'Add read-chinese tag',
+      'I',
+    ),
+    checkBox(
+      'AddBookTag',
+      'Add source book title tag',
+      'Obck',
+    ),
+    checkBox(
+      'AllowDuplicates',
+      'Allow Duplicates',
+      'K',
+    ),
+    checkBox(
+      'GenerateTermAudio',
+      'Auto generate audio for keyword',
+      'Not implemented yet',
+    ),
+    checkBox(
+      'GenerateSentenceAudio',
+      'Auto generate audio for example sentence',
+      'Not implemented yet',
+    ),
+    textBox(
+      'AzureApiKey',
+      'Azure Audio Api Key',
+      'Setup an free azure tts account and put your key here',
+    ),
+    textBox(
+      'AzureImageApiKey',
+      'Azure Image Api Key',
+      'Setup an free azure bing search and put your key here',
     ),
   ]);
 
@@ -246,11 +269,16 @@ export async function generateUserSettings() :Promise<UserSettingsType> {
 
   return {
     CardCreation,
+    AnkiConfig,
+    SentenceGeneration,
     Dictionaries,
     BookLibrary,
     CardManagement,
   };
 }
+
+type UserSettingsType = Awaited<ReturnType<typeof generateUserSettings>>;
+export const UserSettingsKey = Symbol('u') as InjectionKey<UserSettingsType>;
 
 export function getUserSettings():UserSettingsType {
   return inject(UserSettingsKey) as UserSettingsType;

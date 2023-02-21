@@ -12,6 +12,12 @@ export function HealthCheck():Promise<boolean>;
 
 export function ImportAnkiKeywords():Promise<Error>;
 
+export function LoadModelFields(arg1:string):Promise<Array<string>>;
+
+export function LoadModels():Promise<Array<string>>;
+
 export function LoadProblemCards():Promise<Array<backend.ProblemCard>>;
+
+export function LoadTemplate():Promise<Error>;
 
 export function UpdateNoteFields(arg1:number,arg2:backend.Fields):Promise<string>;

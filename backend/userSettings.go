@@ -14,32 +14,62 @@ type Dict struct {
 	Language string
 }
 
+type Mapping struct {
+	Hanzi             string
+	ExampleSentence   string
+	EnglishDefinition string
+	ChineseDefinition string
+	Pinyin            string
+	HanziAudio        string
+	SentenceAudio     string
+	Images            string
+	Notes             string
+}
+
 type UserSettings struct {
-	path        string
-	Ran         int
-	Dicts       map[string]Dict
-	PrimaryDict string
-	// We are just saving a few settings here so its fine to
-	// Have the values as strings and do conversions
-	AutoAdvanceSentence   bool
-	PopulateEnglish       bool
-	PopulateChinese       bool
-	AutoAdvanceEnglish    bool
-	AutoAdvanceImage      bool
+	// Meta fields
+	path string
+	Ran  int
+
+	// Card Creation Settings
+	// This is what the user interacts with
+	// in the front end
+	AutoAdvanceSentence bool
+	PopulateEnglish     bool
+	PopulateChinese     bool
+	AutoAdvanceEnglish  bool
+	AutoAdvanceImage    bool
+	AutoAdvanceCard     bool
+
+	// Anki / Card generation
+	// This controls how the front end gets
+	// translated into Anki calls
+	ActiveDeck            string
+	ActiveModel           string
+	ModelMappings         map[string]Mapping
+	AddProgramTag         bool
+	AddBookTag            bool
+	AllowDuplicates       bool
 	GenerateTermAudio     bool
 	GenerateSentenceAudio bool
-	AutoAdvanceCard       bool
+	AzureApiKey           string
+	AzureImageApiKey      string
 
-	ShowDefinitions     bool
-	EnableChinese       bool
-	AzureApiKey         string
-	AzureImageApiKey    string
-	KnownInterval       int
+	// Dictionaries
+	Dicts           map[string]Dict
+	PrimaryDict     string
+	ShowDefinitions bool
+	EnableChinese   bool
+
+	// Sentence Generation
 	IdealSentenceLength int
+	KnownInterval       int
 
+	// Book Library
 	OnlyFavorites bool
 	HideRead      bool
 
+	// Card Management
 	ProblemFlagged              bool
 	ProblemMissingImage         bool
 	ProblemMissingSentence      bool
@@ -50,26 +80,58 @@ type UserSettings struct {
 
 func defaultSettings(path string) *UserSettings {
 	return &UserSettings{
-		path:                  path,
-		Ran:                   0,
-		Dicts:                 map[string]Dict{},
-		PrimaryDict:           "",
-		AutoAdvanceSentence:   true,
-		PopulateEnglish:       false,
-		PopulateChinese:       false,
-		AutoAdvanceEnglish:    false,
-		AutoAdvanceImage:      false,
+		// Meta fields
+		path: path,
+		Ran:  0,
+
+		// Card Creation
+		AutoAdvanceSentence: true,
+		PopulateEnglish:     false,
+		PopulateChinese:     false,
+		AutoAdvanceEnglish:  false,
+		AutoAdvanceImage:    false,
+		AutoAdvanceCard:     true,
+
+		// Anki / Card generation
+		ActiveDeck:  "Reading",
+		ActiveModel: "Reading Card",
+		ModelMappings: map[string]Mapping{
+			"Reading Card": {
+				Hanzi:             "Hanzi",
+				ExampleSentence:   "ExampleSentence",
+				EnglishDefinition: "EnglishDefinition",
+				ChineseDefinition: "ChineseDefinition",
+				Pinyin:            "Pinyin",
+				HanziAudio:        "HanziAudio",
+				SentenceAudio:     "SentenceAudio",
+				Images:            "Images",
+				Notes:             "Notes",
+			},
+		},
+		AddProgramTag:   true,
+		AddBookTag:      true,
+		AllowDuplicates: true,
+
 		GenerateTermAudio:     false,
 		GenerateSentenceAudio: false,
-		AutoAdvanceCard:       true,
-		ShowDefinitions:       true,
-		EnableChinese:         true,
 		AzureApiKey:           "",
 		AzureImageApiKey:      "",
-		KnownInterval:         10,
-		IdealSentenceLength:   20,
-		OnlyFavorites:         false,
 
+		// Dictionaries
+		Dicts:           map[string]Dict{},
+		PrimaryDict:     "",
+		ShowDefinitions: true,
+		EnableChinese:   true,
+
+		// Sentence Generation
+		KnownInterval:       10,
+		IdealSentenceLength: 20,
+
+		// Book Library
+		OnlyFavorites: false,
+		HideRead:      false,
+
+		// Card Management
 		ProblemFlagged:              true,
 		ProblemMissingImage:         true,
 		ProblemMissingSentence:      true,

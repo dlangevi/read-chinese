@@ -32,6 +32,9 @@ type (
 		ImportAnkiKeywords() error
 		LoadProblemCards() ([]ProblemCard, error)
 		HealthCheck() bool
+		LoadTemplate() error
+		LoadModels() ([]string, error)
+		LoadModelFields(model string) ([]string, error)
 	}
 )
 
@@ -372,6 +375,45 @@ func (a *ankiInterface) LoadProblemCards() ([]ProblemCard, error) {
 	}
 
 	return problemCards, nil
+}
+
+func (a *ankiInterface) LoadTemplate() error {
+	model := ankiconnect.Model{
+		ModelName:     "fish",
+		InOrderFields: []string{"a", "b"},
+		// Css           string         `json:"css,omitempty"`
+		// Will default to false
+		// IsCloze       bool           `json:"isCloze"`
+		CardTemplates: []ankiconnect.CardTemplate{
+			{
+				Name:  "simple",
+				Front: "The fish is {{a}}",
+				Back:  "The basck is {{b}}",
+			},
+		},
+	}
+	restErr := a.anki.Models.Create(model)
+	if restErr != nil {
+		return toError(restErr)
+	}
+	return nil
+}
+
+func (a *ankiInterface) LoadModels() ([]string, error) {
+	models, restErr := a.anki.Models.GetAll()
+	if restErr != nil {
+		return nil, toError(restErr)
+	}
+	return *models, nil
+}
+
+func (a *ankiInterface) LoadModelFields(model string) ([]string, error) {
+	fields, restErr := a.anki.Models.GetFields(model)
+	if restErr != nil {
+		return nil, toError(restErr)
+	}
+	return *fields, nil
+
 }
 
 // TODO in client
