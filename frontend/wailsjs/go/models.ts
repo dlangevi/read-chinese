@@ -89,6 +89,24 @@ export namespace backend {
 	        this.pronunciation = source["pronunciation"];
 	    }
 	}
+	export class DictionaryInfo {
+	    name: string;
+	    path: string;
+	    type: string;
+	    isPrimary: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new DictionaryInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.path = source["path"];
+	        this.type = source["type"];
+	        this.isPrimary = source["isPrimary"];
+	    }
+	}
 	export class Fields {
 	    word: string;
 	    sentence: string;
@@ -111,6 +129,34 @@ export namespace backend {
 	        this.pinyin = source["pinyin"];
 	        this.imageUrls = source["imageUrls"];
 	        this.image64 = source["image64"];
+	    }
+	}
+	export class FieldsMapping {
+	    hanzi: string;
+	    exampleSentence: string;
+	    englishDefinition: string;
+	    chineseDefinition: string;
+	    pinyin: string;
+	    hanziAudio: string;
+	    sentenceAudio: string;
+	    images: string;
+	    notes: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new FieldsMapping(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.hanzi = source["hanzi"];
+	        this.exampleSentence = source["exampleSentence"];
+	        this.englishDefinition = source["englishDefinition"];
+	        this.chineseDefinition = source["chineseDefinition"];
+	        this.pinyin = source["pinyin"];
+	        this.hanziAudio = source["hanziAudio"];
+	        this.sentenceAudio = source["sentenceAudio"];
+	        this.images = source["images"];
+	        this.notes = source["notes"];
 	    }
 	}
 	export class ImageInfo {

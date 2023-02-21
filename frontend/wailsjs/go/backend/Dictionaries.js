@@ -14,6 +14,10 @@ export function DeleteDictionary(arg1) {
   return window['go']['backend']['Dictionaries']['DeleteDictionary'](arg1);
 }
 
+export function ExportDictionaryInfo() {
+  return window['go']['backend']['Dictionaries']['ExportDictionaryInfo']();
+}
+
 export function GetDefinitions(arg1) {
   return window['go']['backend']['Dictionaries']['GetDefinitions'](arg1);
 }

@@ -6,6 +6,10 @@ export function DeleteDict(arg1) {
   return window['go']['backend']['UserSettings']['DeleteDict'](arg1);
 }
 
+export function ExportMapping() {
+  return window['go']['backend']['UserSettings']['ExportMapping']();
+}
+
 export function GetTimesRan() {
   return window['go']['backend']['UserSettings']['GetTimesRan']();
 }

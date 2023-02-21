@@ -14,16 +14,16 @@ type Dict struct {
 	Language string
 }
 
-type Mapping struct {
-	Hanzi             string
-	ExampleSentence   string
-	EnglishDefinition string
-	ChineseDefinition string
-	Pinyin            string
-	HanziAudio        string
-	SentenceAudio     string
-	Images            string
-	Notes             string
+type FieldsMapping struct {
+	Hanzi             string `json:"hanzi"`
+	ExampleSentence   string `json:"exampleSentence"`
+	EnglishDefinition string `json:"englishDefinition"`
+	ChineseDefinition string `json:"chineseDefinition"`
+	Pinyin            string `json:"pinyin"`
+	HanziAudio        string `json:"hanziAudio"`
+	SentenceAudio     string `json:"sentenceAudio"`
+	Images            string `json:"images"`
+	Notes             string `json:"notes"`
 }
 
 type UserSettings struct {
@@ -46,7 +46,7 @@ type UserSettings struct {
 	// translated into Anki calls
 	ActiveDeck            string
 	ActiveModel           string
-	ModelMappings         map[string]Mapping
+	ModelMappings         map[string]FieldsMapping
 	AddProgramTag         bool
 	AddBookTag            bool
 	AllowDuplicates       bool
@@ -95,7 +95,7 @@ func defaultSettings(path string) *UserSettings {
 		// Anki / Card generation
 		ActiveDeck:  "Reading",
 		ActiveModel: "Reading Card",
-		ModelMappings: map[string]Mapping{
+		ModelMappings: map[string]FieldsMapping{
 			"Reading Card": {
 				Hanzi:             "Hanzi",
 				ExampleSentence:   "ExampleSentence",
@@ -240,4 +240,9 @@ func (m *UserSettings) SetPrimaryDict(dictName string) {
 	// TODO Make sure its a real dict
 	m.PrimaryDict = dictName
 	m.saveMetadata()
+}
+
+func (m *UserSettings) ExportMapping() FieldsMapping {
+	return FieldsMapping{}
+
 }

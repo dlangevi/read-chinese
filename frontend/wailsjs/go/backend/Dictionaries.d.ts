@@ -8,6 +8,8 @@ export function AddMigakuDictionary(arg1:string,arg2:string,arg3:string):Promise
 
 export function DeleteDictionary(arg1:string):Promise<void>;
 
+export function ExportDictionaryInfo():Promise<backend.DictionaryInfo>;
+
 export function GetDefinitions(arg1:Array<string>):Promise<backend.WordDefinitions>;
 
 export function GetDefinitionsForWord(arg1:string,arg2:string):Promise<Array<backend.DictionaryDefinition>>;

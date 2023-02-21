@@ -105,6 +105,10 @@ type DictionaryInfo struct {
 	IsPrimary bool   `json:"isPrimary"`
 }
 
+func (d *Dictionaries) ExportDictionaryInfo() DictionaryInfo {
+	return DictionaryInfo{}
+}
+
 func (d *Dictionaries) GetDictionaryInfo() DictionaryInfoMap {
 	dictInfoMap := DictionaryInfoMap{}
 	for name, dict := range d.userSettings.Dicts {
