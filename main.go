@@ -49,6 +49,9 @@ func (h *FileLoader) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 func main() {
 	logFile := flag.String("log", "", "log file")
+	testUser := flag.String(
+		"user", "",
+		"-user {user} will run the application with a different profile")
 	flag.Parse()
 
 	if *logFile != "" {
@@ -58,6 +61,11 @@ func main() {
 		}
 		defer f.Close()
 		log.SetOutput(f)
+	}
+
+	if *testUser != "" {
+		log.Println("Running as test user: ", *testUser)
+		backend.SetTestUser(*testUser)
 	}
 	// Create an instance of the app structure
 	// 创建一个App结构体实例
