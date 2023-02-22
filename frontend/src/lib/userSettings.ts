@@ -184,6 +184,18 @@ export async function generateUserSettings() {
       label: 'ModelManager',
       type: ModelManager,
     } as UserSetting))(),
+    // TODO these should be read only? Need some better way of
+    // seperating the Values from their associated display
+    textBox(
+      'ActiveDeck',
+      'Active Deck',
+      'The Deck we are loading and saving cards to',
+    ),
+    textBox(
+      'ActiveModel',
+      'Active Note Type',
+      'The anki note type we are mapping the fields to',
+    ),
     checkBox(
       'AddProgramTag',
       'Add read-chinese tag',

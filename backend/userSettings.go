@@ -2,6 +2,7 @@ package backend
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 
@@ -240,6 +241,27 @@ func (m *UserSettings) SetPrimaryDict(dictName string) {
 	// TODO Make sure its a real dict
 	m.PrimaryDict = dictName
 	m.saveMetadata()
+}
+
+func (m *UserSettings) GetMapping(modelName string) (FieldsMapping, error) {
+	mapping, ok := m.ModelMappings[modelName]
+	if !ok {
+		return mapping, errors.New(
+			fmt.Sprintf("Couldn't find mapping for: %v", modelName))
+	}
+	return mapping, nil
+}
+
+func (m *UserSettings) SetMapping(modelName string, mapping FieldsMapping) error {
+	m.ModelMappings[modelName] = mapping
+	m.saveMetadata()
+	return nil
+}
+
+func (m *UserSettings) DeleteMapping(modelName string) error {
+	delete(m.ModelMappings, modelName)
+	m.saveMetadata()
+	return nil
 }
 
 func (m *UserSettings) ExportMapping() FieldsMapping {

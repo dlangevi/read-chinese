@@ -102,6 +102,9 @@ import {
   AddCedict,
   AddMigakuDictionary,
 } from '@wailsjs/backend/Dictionaries';
+import {
+  backend,
+} from '@wailsjs/models';
 
 import { FilePicker } from '@wailsjs/main/App';
 
@@ -162,16 +165,8 @@ async function submit() {
   addDictModal.value = false;
 }
 
-// TODO backend does not export these types
-// even though IMO it should
-type DictionaryInfo = {
-  name: string,
-  path: string,
-  type: string,
-  isPrimary: boolean,
-};
 type DictionaryInfoMap = {
-  [name:string] : DictionaryInfo
+  [name:string] : backend.DictionaryInfo
 };
 
 const dicts = ref<DictionaryInfoMap>({});

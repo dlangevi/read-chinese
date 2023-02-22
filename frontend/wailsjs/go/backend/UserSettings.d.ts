@@ -4,7 +4,11 @@ import {backend} from '../models';
 
 export function DeleteDict(arg1:string):Promise<void>;
 
+export function DeleteMapping(arg1:string):Promise<Error>;
+
 export function ExportMapping():Promise<backend.FieldsMapping>;
+
+export function GetMapping(arg1:string):Promise<backend.FieldsMapping>;
 
 export function GetTimesRan():Promise<number>;
 
@@ -15,6 +19,8 @@ export function GetUserSettingBool(arg1:string):Promise<boolean>;
 export function GetUserSettingInt(arg1:string):Promise<number>;
 
 export function SaveDict(arg1:string,arg2:string,arg3:string):Promise<void>;
+
+export function SetMapping(arg1:string,arg2:backend.FieldsMapping):Promise<Error>;
 
 export function SetPrimaryDict(arg1:string):Promise<void>;
 

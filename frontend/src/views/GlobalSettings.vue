@@ -26,7 +26,9 @@
       class="m-4 grid grid-cols-4 justify-start gap-4 border-2 p-4"
     >
       <div class="border-4">
-        {{ section }}
+        <div class="m-4 text-2xl font-extrabold">
+          {{ section }}
+        </div>
       </div>
       <div
         class="col-span-3
