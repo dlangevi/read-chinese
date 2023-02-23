@@ -1,5 +1,81 @@
 export namespace backend {
 	
+	export class FieldsMapping {
+	    hanzi: string;
+	    exampleSentence: string;
+	    englishDefinition: string;
+	    chineseDefinition: string;
+	    pinyin: string;
+	    hanziAudio: string;
+	    sentenceAudio: string;
+	    images: string;
+	    notes: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new FieldsMapping(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.hanzi = source["hanzi"];
+	        this.exampleSentence = source["exampleSentence"];
+	        this.englishDefinition = source["englishDefinition"];
+	        this.chineseDefinition = source["chineseDefinition"];
+	        this.pinyin = source["pinyin"];
+	        this.hanziAudio = source["hanziAudio"];
+	        this.sentenceAudio = source["sentenceAudio"];
+	        this.images = source["images"];
+	        this.notes = source["notes"];
+	    }
+	}
+	export class AnkiConfig {
+	    ActiveDeck: string;
+	    ActiveModel: string;
+	    ModelMappings: {[key: string]: FieldsMapping};
+	    AddProgramTag: boolean;
+	    AddBookTag: boolean;
+	    AllowDuplicates: boolean;
+	    GenerateTermAudio: boolean;
+	    GenerateSentenceAudio: boolean;
+	    AzureApiKey: string;
+	    AzureImageApiKey: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new AnkiConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ActiveDeck = source["ActiveDeck"];
+	        this.ActiveModel = source["ActiveModel"];
+	        this.ModelMappings = this.convertValues(source["ModelMappings"], FieldsMapping, true);
+	        this.AddProgramTag = source["AddProgramTag"];
+	        this.AddBookTag = source["AddBookTag"];
+	        this.AllowDuplicates = source["AllowDuplicates"];
+	        this.GenerateTermAudio = source["GenerateTermAudio"];
+	        this.GenerateSentenceAudio = source["GenerateSentenceAudio"];
+	        this.AzureApiKey = source["AzureApiKey"];
+	        this.AzureImageApiKey = source["AzureImageApiKey"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class BookStats {
 	    probablyKnownWords: number;
 	    knownCharacters: number;
@@ -75,6 +151,100 @@ export namespace backend {
 		}
 	}
 	
+	export class CardCreationConfig {
+	    AutoAdvanceSentence: boolean;
+	    PopulateEnglish: boolean;
+	    PopulateChinese: boolean;
+	    AutoAdvanceEnglish: boolean;
+	    AutoAdvanceImage: boolean;
+	    AutoAdvanceCard: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new CardCreationConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.AutoAdvanceSentence = source["AutoAdvanceSentence"];
+	        this.PopulateEnglish = source["PopulateEnglish"];
+	        this.PopulateChinese = source["PopulateChinese"];
+	        this.AutoAdvanceEnglish = source["AutoAdvanceEnglish"];
+	        this.AutoAdvanceImage = source["AutoAdvanceImage"];
+	        this.AutoAdvanceCard = source["AutoAdvanceCard"];
+	    }
+	}
+	export class CardManagementConfig {
+	    ProblemFlagged: boolean;
+	    ProblemMissingImage: boolean;
+	    ProblemMissingSentence: boolean;
+	    ProblemMissingSentenceAudio: boolean;
+	    ProblemMissingWordAudio: boolean;
+	    ProblemMissingPinyin: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new CardManagementConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ProblemFlagged = source["ProblemFlagged"];
+	        this.ProblemMissingImage = source["ProblemMissingImage"];
+	        this.ProblemMissingSentence = source["ProblemMissingSentence"];
+	        this.ProblemMissingSentenceAudio = source["ProblemMissingSentenceAudio"];
+	        this.ProblemMissingWordAudio = source["ProblemMissingWordAudio"];
+	        this.ProblemMissingPinyin = source["ProblemMissingPinyin"];
+	    }
+	}
+	export class Dict {
+	    Path: string;
+	    Language: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Dict(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Path = source["Path"];
+	        this.Language = source["Language"];
+	    }
+	}
+	export class DictionaryConfig {
+	    Dicts: {[key: string]: Dict};
+	    PrimaryDict: string;
+	    ShowDefinitions: boolean;
+	    EnableChinese: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new DictionaryConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Dicts = this.convertValues(source["Dicts"], Dict, true);
+	        this.PrimaryDict = source["PrimaryDict"];
+	        this.ShowDefinitions = source["ShowDefinitions"];
+	        this.EnableChinese = source["EnableChinese"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class DictionaryDefinition {
 	    definition: string;
 	    pronunciation: string;
@@ -131,34 +301,7 @@ export namespace backend {
 	        this.image64 = source["image64"];
 	    }
 	}
-	export class FieldsMapping {
-	    hanzi: string;
-	    exampleSentence: string;
-	    englishDefinition: string;
-	    chineseDefinition: string;
-	    pinyin: string;
-	    hanziAudio: string;
-	    sentenceAudio: string;
-	    images: string;
-	    notes: string;
 	
-	    static createFrom(source: any = {}) {
-	        return new FieldsMapping(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.hanzi = source["hanzi"];
-	        this.exampleSentence = source["exampleSentence"];
-	        this.englishDefinition = source["englishDefinition"];
-	        this.chineseDefinition = source["chineseDefinition"];
-	        this.pinyin = source["pinyin"];
-	        this.hanziAudio = source["hanziAudio"];
-	        this.sentenceAudio = source["sentenceAudio"];
-	        this.images = source["images"];
-	        this.notes = source["notes"];
-	    }
-	}
 	export class ImageInfo {
 	    thumbnailUrl: string;
 	
@@ -169,6 +312,32 @@ export namespace backend {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.thumbnailUrl = source["thumbnailUrl"];
+	    }
+	}
+	export class LibraryConfig {
+	    OnlyFavorites: boolean;
+	    HideRead: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new LibraryConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.OnlyFavorites = source["OnlyFavorites"];
+	        this.HideRead = source["HideRead"];
+	    }
+	}
+	export class MetaSettings {
+	    Ran: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new MetaSettings(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Ran = source["Ran"];
 	    }
 	}
 	export class Problems {
@@ -260,6 +429,20 @@ export namespace backend {
 		    return a;
 		}
 	}
+	export class SentenceGenerationConfig {
+	    IdealSentenceLength: number;
+	    KnownInterval: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new SentenceGenerationConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.IdealSentenceLength = source["IdealSentenceLength"];
+	        this.KnownInterval = source["KnownInterval"];
+	    }
+	}
 	export class UnknownWordEntry {
 	    word: string;
 	    occurance?: number;
@@ -277,6 +460,48 @@ export namespace backend {
 	        this.definition = source["definition"];
 	        this.pinyin = source["pinyin"];
 	    }
+	}
+	export class UserConfig {
+	    meta: MetaSettings;
+	    CardCreation: CardCreationConfig;
+	    AnkiConfig: AnkiConfig;
+	    Dictionaries: DictionaryConfig;
+	    SentenceGeneration: SentenceGenerationConfig;
+	    BookLibrary: LibraryConfig;
+	    CardManagement: CardManagementConfig;
+	
+	    static createFrom(source: any = {}) {
+	        return new UserConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.meta = this.convertValues(source["meta"], MetaSettings);
+	        this.CardCreation = this.convertValues(source["CardCreation"], CardCreationConfig);
+	        this.AnkiConfig = this.convertValues(source["AnkiConfig"], AnkiConfig);
+	        this.Dictionaries = this.convertValues(source["Dictionaries"], DictionaryConfig);
+	        this.SentenceGeneration = this.convertValues(source["SentenceGeneration"], SentenceGenerationConfig);
+	        this.BookLibrary = this.convertValues(source["BookLibrary"], LibraryConfig);
+	        this.CardManagement = this.convertValues(source["CardManagement"], CardManagementConfig);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	
 	export class WordOccuranceRow {

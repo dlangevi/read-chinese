@@ -49,9 +49,7 @@ watch(definition, async () => {
     (def) => selected.has(def.definition),
   );
   updateDefinition(selectedDefinitions);
-  const autoAdvance = await (
-    UserSettings.CardCreation.AutoAdvanceEnglish.read()
-  );
+  const autoAdvance = UserSettings.CardCreation.AutoAdvanceEnglish;
   if (autoAdvance) {
     cardManager.nextStep();
   }
@@ -78,9 +76,9 @@ async function calculateDefault() {
 async function loadData() {
   let autoFill : boolean;
   if (props.type === 'english') {
-    autoFill = UserSettings.CardCreation.PopulateEnglish.read();
+    autoFill = UserSettings.CardCreation.PopulateEnglish;
   } else {
-    autoFill = UserSettings.CardCreation.PopulateChinese.read();
+    autoFill = UserSettings.CardCreation.PopulateChinese;
   }
   definitions.value = await GetDefinitionsForWord(
     cardManager.word,

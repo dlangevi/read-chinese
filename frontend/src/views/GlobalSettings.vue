@@ -40,10 +40,11 @@
       >
         <component
           :is="content.type"
-          v-for="content in contents"
-          :key="content"
+          v-for="([initial, content]) in contents"
+          :key="content.name"
           :class="[{'bg-sky-500': props.highlight === content.name}]"
           :setting="content"
+          :initial-value="initial"
         />
       </div>
     </div>
@@ -51,7 +52,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getUserSettings } from '@/lib/userSettings';
+import { getUserSettings, getDisplayable } from '@/lib/userSettings';
 import { onMounted } from 'vue';
 import { themeChange } from 'theme-change';
 
@@ -77,12 +78,14 @@ const themes = [
 
 const sections = {
   CardCreationSettings:
-    Object.values(UserSettings.CardCreation),
+    getDisplayable(UserSettings.CardCreation),
   AnkiSettings:
-    Object.values(UserSettings.AnkiConfig),
+    getDisplayable(UserSettings.AnkiConfig),
   DictionarySettings:
-    Object.values(UserSettings.Dictionaries),
+    getDisplayable(UserSettings.Dictionaries),
   SentenceGeneration:
-    Object.values(UserSettings.SentenceGeneration),
+    getDisplayable(UserSettings.SentenceGeneration),
 };
+console.log(UserSettings.Dictionaries);
+console.log(sections);
 </script>

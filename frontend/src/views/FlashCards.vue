@@ -5,11 +5,12 @@
         <p>Total problem cards: {{ rowData.length }}</p>
         <p>Filtered problem cards: </p>
         <div>
-          <component
-            :is="content.type"
-            v-for="(content) in CardManagement"
-            :key="content"
-            :setting="content"
+          <settings-checkbox
+            v-for="([initial, setting]) in
+              getDisplayable(UserSettings.CardManagement)"
+            :key="setting.name"
+            :setting="setting"
+            :initial-value="initial"
             @update="updateFilter"
           />
         </div>
@@ -35,7 +36,10 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
 import { onBeforeMount, ref, onUnmounted } from 'vue';
-import { getUserSettings } from '@/lib/userSettings';
+import {
+  getDisplayable,
+  getUserSettings,
+} from '@/lib/userSettings';
 import AddToCardQueue from '@/components/AddToCardQueue.vue';
 import type {
   GetRowIdParams, GridApi,
@@ -44,29 +48,16 @@ import type {
 import { LoadProblemCards } from '@wailsjs/backend/ankiInterface';
 import { backend } from '@wailsjs/models';
 import WithSidebar from '@/layouts/WithSidebar.vue';
+import SettingsCheckbox
+  from '@/components/SettingsWidgets/SettingsCheckbox.vue';
 
 const UserSettings = getUserSettings();
 const CardManagement = UserSettings.CardManagement;
 const getRowId = (params:GetRowIdParams) => params.data.Word;
 
-let ProblemFlagged = CardManagement.ProblemFlagged.read();
-let ProblemMissingImage = CardManagement.ProblemMissingImage.read();
-let ProblemMissingSentence = CardManagement.ProblemMissingSentence.read();
-let ProblemMissingSentenceAudio =
-  CardManagement.ProblemMissingSentenceAudio.read();
-let ProblemMissingWordAudio = CardManagement.ProblemMissingWordAudio.read();
-let ProblemMissingPinyin = CardManagement.ProblemMissingPinyin.read();
-
 // Will be set on grid ready
 let gridApi : GridApi;
 function updateFilter() {
-  ProblemFlagged = CardManagement.ProblemFlagged.read();
-  ProblemMissingImage = CardManagement.ProblemMissingImage.read();
-  ProblemMissingSentence = CardManagement.ProblemMissingSentence.read();
-  ProblemMissingSentenceAudio =
-    CardManagement.ProblemMissingSentenceAudio.read();
-  ProblemMissingWordAudio = CardManagement.ProblemMissingWordAudio.read();
-  ProblemMissingPinyin = CardManagement.ProblemMissingPinyin.read();
   gridApi.onFilterChanged();
 }
 
@@ -76,6 +67,13 @@ function isExternalFilterPresent() {
 
 function doesExternalFilterPass(node: RowNode) {
   const problems : backend.Problems = node.data.Problems;
+  const ProblemFlagged = CardManagement.ProblemFlagged;
+  const ProblemMissingImage = CardManagement.ProblemMissingImage;
+  const ProblemMissingSentence = CardManagement.ProblemMissingSentence;
+  const ProblemMissingSentenceAudio =
+    CardManagement.ProblemMissingSentenceAudio;
+  const ProblemMissingWordAudio = CardManagement.ProblemMissingWordAudio;
+  const ProblemMissingPinyin = CardManagement.ProblemMissingPinyin;
 
   const passes = (ProblemFlagged && problems.Flagged) ||
      (ProblemMissingImage && problems.MissingImage) ||

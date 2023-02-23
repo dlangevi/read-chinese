@@ -2,12 +2,13 @@
   <with-sidebar>
     <template #sidebar>
       <settings-checkbox
-        :setting="UserSettings.BookLibrary.OnlyFavorites"
-        @update="updateFilter"
+        :setting="ComponentTable.OnlyFavorites"
+        :initial-value="UserSettings.BookLibrary.OnlyFavorites"
       />
+
       <settings-checkbox
-        :setting="UserSettings.BookLibrary.HideRead"
-        @update="updateFilter"
+        :setting="ComponentTable.HideRead"
+        :initial-value="UserSettings.BookLibrary.HideRead"
       />
       <button
         class="btn-primary btn-sm btn"
@@ -52,7 +53,7 @@ import {
 import BookCard from '@/components/BookCard.vue';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
-import { getUserSettings } from '@/lib/userSettings';
+import { getUserSettings, ComponentTable } from '@/lib/userSettings';
 import { backend } from '@wailsjs/models';
 import { SaveFile } from '@wailsjs/main/App';
 import { GetBooks, GetDetailedBooks } from '@wailsjs/backend/bookLibrary';
@@ -72,31 +73,29 @@ async function exportBooks() {
 
 const UserSettings = getUserSettings();
 
-// TODO Would be nice if these properties them selves were reactive
-const onlyFavorites = ref(UserSettings.BookLibrary.OnlyFavorites.read());
-const hideRead = ref(UserSettings.BookLibrary.HideRead.read());
-function updateFilter() {
-  onlyFavorites.value = UserSettings.BookLibrary.OnlyFavorites.read();
-  hideRead.value = UserSettings.BookLibrary.HideRead.read();
-}
 const books: Ref<backend.Book[]> = ref([]);
 
 const favoriteFilter = computed(
-  () => books.value
-    .filter((book:backend.Book) => {
-      if (hideRead.value && book.hasRead) {
-        return false;
-      }
-      if (!onlyFavorites.value) return true;
-      return book.favorite;
-    }).sort((bookA, bookB) => {
-      const aKnown = (bookA.stats.totalKnownWords / bookA.stats.totalWords);
-      const bKnown = (bookB.stats.totalKnownWords / bookB.stats.totalWords);
-      return bKnown - aKnown;
-    }),
-);
+
+  () => {
+    const onlyFavorites = UserSettings.BookLibrary.OnlyFavorites;
+    const hideRead = UserSettings.BookLibrary.HideRead;
+    return books.value
+      .filter((book:backend.Book) => {
+        if (hideRead && book.hasRead) {
+          return false;
+        }
+        if (!onlyFavorites) return true;
+        return book.favorite;
+      }).sort((bookA, bookB) => {
+        const aKnown = (bookA.stats.totalKnownWords / bookA.stats.totalWords);
+        const bKnown = (bookB.stats.totalKnownWords / bookB.stats.totalWords);
+        return bKnown - aKnown;
+      });
+  });
+
 onBeforeMount(async () => {
   books.value = await GetBooks();
-  console.log(books.value);
+  console.log('books:', books.value);
 });
 </script>

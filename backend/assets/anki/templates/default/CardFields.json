@@ -1,12 +1,12 @@
-{
-  "Hanzi": "Hanzi",
-  "Pinyin": "Pinyin",
-  "ChineseDefinition": "ChineseDefinition",
-  "EnglishDefinition": "EnglishDefinition",
-  "HanziAudio": "HanziAudio",
-  "ExampleSentence": "ExampleSentence",
-  "Images": "Images",
-  "SentenceTranslation": "SentenceTranslation",
-  "SentenceAudio": "SentenceAudio",
-  "Notes": "Notes"
-}
+[
+  "Hanzi",
+  "Pinyin",
+  "ChineseDefinition",
+  "EnglishDefinition",
+  "HanziAudio",
+  "ExampleSentence",
+  "Images",
+  "SentenceTranslation",
+  "SentenceAudio",
+  "Notes"
+]

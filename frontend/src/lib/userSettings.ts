@@ -1,4 +1,4 @@
-import { inject } from 'vue';
+import { inject, reactive } from 'vue';
 import type { InjectionKey } from 'vue';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
@@ -10,51 +10,53 @@ import ModelManager
   from '@/components/SettingsWidgets/ModelManager.vue';
 import SettingsSlider
   from '@/components/SettingsWidgets/SettingsSlider.vue';
+import type { backend } from '@wailsjs/models';
+
 import {
-  GetUserSetting,
   SetUserSetting,
-  GetUserSettingBool,
   SetUserSettingBool,
-  GetUserSettingInt,
   SetUserSettingInt,
-} from '@wailsjs/backend/UserSettings';
+  GetUserSettings,
+} from '@wailsjs/backend/UserConfig';
 
 type UserSetting = {
-  name:string;
+  name?:string;
   label:string;
   tooltip?:string;
-  type:any
-  read?: any;
+  type:any;
+  read?:any;
   write?:any;
 };
 
-async function settingsObject(
+type UserConfigDisplay = {
+  [K in keyof backend.UserConfig]: {
+    [P in keyof backend.UserConfig[K]]?: UserSetting
+  }
+}
+
+export let updateSettings = async () => {};
+function settingsObject(
   name:string,
   label:string,
   tooltip:string,
   widgetType:any,
-  getter:any,
   setter:any,
-):Promise<UserSetting> {
-  let value = await getter(name);
+):UserSetting {
   const option:UserSetting = {
     name,
     label,
     tooltip,
     type: widgetType,
   };
-
-  option.read = function read() {
-    return value;
-  };
   option.write = async function write(newValue:any) {
-    value = newValue;
-    return setter(name, value);
+    console.log('writing', name, newValue);
+    await setter(name, newValue);
+    await updateSettings();
   };
   return option;
 }
 
-async function checkBox(
+function checkBox(
   name:string,
   label:string,
   tooltip:string,
@@ -64,12 +66,11 @@ async function checkBox(
     label,
     tooltip,
     SettingsCheckbox,
-    GetUserSettingBool,
     SetUserSettingBool,
   );
 }
 
-async function textBox(
+function textBox(
   name:string,
   label:string,
   tooltip:string,
@@ -79,12 +80,11 @@ async function textBox(
     label,
     tooltip,
     SettingsTextbox,
-    GetUserSetting,
     SetUserSetting,
   );
 }
 
-async function slider(
+function slider(
   name:string,
   label:string,
   tooltip:string,
@@ -94,199 +94,209 @@ async function slider(
     label,
     tooltip,
     SettingsSlider,
-    GetUserSettingInt,
     SetUserSettingInt,
-
   );
 }
 
-async function loadSettings(settings : Promise<UserSetting>[]) {
-  const waited = await Promise.all(settings);
+function loadSettings(settings : UserSetting[]) {
   const options :{ [label:string]:UserSetting } = {};
-  waited.forEach((setting) => {
-    options[setting.name] = setting;
+  settings.forEach((setting) => {
+    if (setting.name !== undefined) {
+      options[setting.name] = setting;
+    }
   });
   return options;
 }
 
-// export async function generateUserSettings() :Promise<UserSettingsType> {
-export async function generateUserSettings() {
-  const CardCreation = await loadSettings([
-    checkBox(
-      'AutoAdvanceSentence',
-      'Auto advance after sentence selection',
-      'After picking a sentence, move to the next step',
-    ),
-    checkBox(
-      'PopulateEnglish',
-      'Auto fill english definitions',
-      'If only one definition exists, auto select it',
-    ),
-    checkBox(
-      'PopulateChinese',
-      'Auto fill chinese definitions',
-      'If only one definition exists, auto select it',
-    ),
-    checkBox(
-      'AutoAdvanceEnglish',
-      'Auto advance after definition selection',
-      'After picking a definition, move to the next step',
-    ),
-    checkBox(
-      'AutoAdvanceImage',
-      'Auto advance after image selection',
-      'After picking a image, move to the next step',
-    ),
-    checkBox(
-      'AutoAdvanceCard',
-      'Create card once all fields have been filled',
-      'Create card once all fields have been filled',
-    ),
-
-  ]);
-  const Dictionaries = await loadSettings([
-    (async () => ({
-      name: 'Dictionaries',
-      label: 'Dictionaries',
-      type: DictionariesList,
-    } as UserSetting))(),
-    checkBox(
-      'ShowDefinitions',
-      'Show Definitions',
-      'Show the definitions for words in various tables',
-    ),
-    checkBox(
-      'EnableChinese',
-      'Use Chinese definitions',
-      'Allow flashcards to use chinese ' +
+export const ComponentTable = loadSettings([
+  checkBox(
+    'AutoAdvanceSentence',
+    'Auto advance after sentence selection',
+    'After picking a sentence, move to the next step',
+  ),
+  checkBox(
+    'PopulateEnglish',
+    'Auto fill english definitions',
+    'If only one definition exists, auto select it',
+  ),
+  checkBox(
+    'PopulateChinese',
+    'Auto fill chinese definitions',
+    'If only one definition exists, auto select it',
+  ),
+  checkBox(
+    'AutoAdvanceEnglish',
+    'Auto advance after definition selection',
+    'After picking a definition, move to the next step',
+  ),
+  checkBox(
+    'AutoAdvanceImage',
+    'Auto advance after image selection',
+    'After picking a image, move to the next step',
+  ),
+  checkBox(
+    'AutoAdvanceCard',
+    'Create card once all fields have been filled',
+    'Create card once all fields have been filled',
+  ),
+  {
+    name: 'Dicts',
+    label: 'Dictionaries',
+    type: DictionariesList,
+  } as UserSetting,
+  checkBox(
+    'ShowDefinitions',
+    'Show Definitions',
+    'Show the definitions for words in various tables',
+  ),
+  checkBox(
+    'EnableChinese',
+    'Use Chinese definitions',
+    'Allow flashcards to use chinese ' +
       'definitions instead of just english ones',
-    ),
-  ]);
-
-  const SentenceGeneration = await loadSettings([
-    slider(
-      'KnownInterval',
-      'Time before a word is considered "known"',
-      'How long of an interval in anki before a word is ' +
+  ),
+  slider(
+    'KnownInterval',
+    'Time before a word is considered "known"',
+    'How long of an interval in anki before a word is ' +
       ' included in generated sentences',
-    ),
-    slider(
-      'IdealSentenceLength',
-      'Ideal Sentence Length"',
-      'What the ideal sentence length you want to be selected from books',
-    ),
+  ),
+  slider(
+    'IdealSentenceLength',
+    'Ideal Sentence Length"',
+    'What the ideal sentence length you want to be selected from books',
+  ),
+  {
+    name: 'ModelMappings',
+    label: 'ModelManager',
+    type: ModelManager,
+  } as UserSetting,
+  checkBox(
+    'AddProgramTag',
+    'Add read-chinese tag',
+    'I',
+  ),
+  checkBox(
+    'AddBookTag',
+    'Add source book title tag',
+    'Obck',
+  ),
+  checkBox(
+    'AllowDuplicates',
+    'Allow Duplicates',
+    'K',
+  ),
+  checkBox(
+    'GenerateTermAudio',
+    'Auto generate audio for keyword',
+    'Not implemented yet',
+  ),
+  checkBox(
+    'GenerateSentenceAudio',
+    'Auto generate audio for example sentence',
+    'Not implemented yet',
+  ),
+  textBox(
+    'AzureApiKey',
+    'Azure Audio Api Key',
+    'Setup an free azure tts account and put your key here',
+  ),
+  textBox(
+    'AzureImageApiKey',
+    'Azure Image Api Key',
+    'Setup an free azure bing search and put your key here',
+  ),
+  checkBox(
+    'OnlyFavorites',
+    'Only show favorited books',
+    'Obv',
+  ),
+  checkBox(
+    'HideRead',
+    'Hide read books',
+    'Obv',
+  ),
+  checkBox(
+    'ProblemFlagged',
+    'Flagged Cards',
+    'exe',
+  ),
+  checkBox(
+    'ProblemMissingImage',
+    'Missing Images',
+    'exe',
+  ),
+  checkBox(
+    'ProblemMissingSentence',
+    'Missing Sentence',
+    'exe',
+  ),
+  checkBox(
+    'ProblemMissingSentenceAudio',
+    'Missing Sentence Audio',
+    'eexexe',
+  ),
+  checkBox(
+    'ProblemMissingWordAudio',
+    'Missing Word Audio',
+    'exe',
+  ),
+  checkBox(
+    'ProblemMissingPinyin',
+    'Missing Pinyin',
+    'exe',
+  ),
+]);
 
-  ]);
+export const DisplayTable: UserConfigDisplay = {
+  meta: {},
+  convertValues: {},
+  CardCreation: {},
+  AnkiConfig: {},
+  Dictionaries: {},
+  SentenceGeneration: {},
+  BookLibrary: {},
+  CardManagement: {},
+};
 
-  const AnkiConfig = await loadSettings([
-    (async () => ({
-      name: 'ModelManager',
-      label: 'ModelManager',
-      type: ModelManager,
-    } as UserSetting))(),
-    // TODO these should be read only? Need some better way of
-    // seperating the Values from their associated display
-    textBox(
-      'ActiveDeck',
-      'Active Deck',
-      'The Deck we are loading and saving cards to',
-    ),
-    textBox(
-      'ActiveModel',
-      'Active Note Type',
-      'The anki note type we are mapping the fields to',
-    ),
-    checkBox(
-      'AddProgramTag',
-      'Add read-chinese tag',
-      'I',
-    ),
-    checkBox(
-      'AddBookTag',
-      'Add source book title tag',
-      'Obck',
-    ),
-    checkBox(
-      'AllowDuplicates',
-      'Allow Duplicates',
-      'K',
-    ),
-    checkBox(
-      'GenerateTermAudio',
-      'Auto generate audio for keyword',
-      'Not implemented yet',
-    ),
-    checkBox(
-      'GenerateSentenceAudio',
-      'Auto generate audio for example sentence',
-      'Not implemented yet',
-    ),
-    textBox(
-      'AzureApiKey',
-      'Azure Audio Api Key',
-      'Setup an free azure tts account and put your key here',
-    ),
-    textBox(
-      'AzureImageApiKey',
-      'Azure Image Api Key',
-      'Setup an free azure bing search and put your key here',
-    ),
-  ]);
+export function getDisplayable(obj: {[key:string]:any})
+  : [any, UserSetting][] {
+  return Object.entries(obj).filter(([key, _]) => {
+    return key in ComponentTable;
+  }).map(([key, value]) => {
+    return [value, ComponentTable[key]];
+  });
+}
 
-  const BookLibrary = await loadSettings([
-    checkBox(
-      'OnlyFavorites',
-      'Only show favorited books',
-      'Obv',
-    ),
-    checkBox(
-      'HideRead',
-      'Hide read books',
-      'Obv',
-    ),
-  ]);
+export async function generateUserSettings() {
+  const settings = reactive(await GetUserSettings());
 
-  const CardManagement = await loadSettings([
-    checkBox(
-      'ProblemFlagged',
-      'Flagged Cards',
-      'exe',
-    ),
-    checkBox(
-      'ProblemMissingImage',
-      'Missing Images',
-      'exe',
-    ),
-    checkBox(
-      'ProblemMissingSentence',
-      'Missing Sentence',
-      'exe',
-    ),
-    checkBox(
-      'ProblemMissingSentenceAudio',
-      'Missing Sentence Audio',
-      'eexexe',
-    ),
-    checkBox(
-      'ProblemMissingWordAudio',
-      'Missing Word Audio',
-      'exe',
-    ),
-    checkBox(
-      'ProblemMissingPinyin',
-      'Missing Pinyin',
-      'exe',
-    ),
-  ]);
-
-  return {
-    CardCreation,
-    AnkiConfig,
-    SentenceGeneration,
-    Dictionaries,
-    BookLibrary,
-    CardManagement,
+  updateSettings = async () => {
+    // TODO this is a hacky way to update settings.
+    // It should be set locally and not have to do these syncs
+    // as they can end up having things out of sync in the front
+    // end
+    const newSettings = await GetUserSettings();
+    Object.entries(newSettings).forEach(([key, subList]) => {
+      if (key === 'convertValues') {
+        return;
+      }
+      Object.entries(subList).forEach(([usersetting, value]) => {
+        if (key === 'convertValues') {
+          return;
+        }
+        // @ts-ignore
+        const origVal = settings[key][usersetting];
+        if (origVal !== value) {
+          console.log('changed:', key, usersetting, value, origVal);
+          // @ts-ignore
+          settings[key][usersetting] = value;
+        }
+      });
+    });
   };
+
+  return settings;
 }
 
 type UserSettingsType = Awaited<ReturnType<typeof generateUserSettings>>;

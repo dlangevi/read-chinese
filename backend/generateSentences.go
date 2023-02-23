@@ -9,7 +9,7 @@ import (
 )
 
 type Generator struct {
-	userSettings    *UserSettings
+	userSettings    *UserConfig
 	segmentation    *Segmentation
 	bookLibrary     BookLibrary
 	known           *KnownWords
@@ -19,7 +19,7 @@ type Generator struct {
 }
 
 func NewGenerator(
-	userSettings *UserSettings,
+	userSettings *UserConfig,
 	s *Segmentation,
 	b BookLibrary,
 	known *KnownWords,
@@ -159,7 +159,7 @@ func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]string,
 			}
 		}
 	}
-	idealLength := g.userSettings.IdealSentenceLength
+	idealLength := g.userSettings.SentenceGenerationConfig.IdealSentenceLength
 	rankSentences(&sentences, idealLength)
 	min := math.Min(float64(len(sentences)), float64(idealLength))
 	sentences = sentences[0:int(min)]

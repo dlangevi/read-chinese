@@ -1,149 +1,225 @@
 package backend
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"os"
-
-	"encoding/json"
-	"github.com/oleiade/reflections"
+	"reflect"
 )
 
-type Dict struct {
-	Path     string
-	Language string
-}
-
-type FieldsMapping struct {
-	Hanzi             string `json:"hanzi"`
-	ExampleSentence   string `json:"exampleSentence"`
-	EnglishDefinition string `json:"englishDefinition"`
-	ChineseDefinition string `json:"chineseDefinition"`
-	Pinyin            string `json:"pinyin"`
-	HanziAudio        string `json:"hanziAudio"`
-	SentenceAudio     string `json:"sentenceAudio"`
-	Images            string `json:"images"`
-	Notes             string `json:"notes"`
-}
-
-type UserSettings struct {
-	// Meta fields
-	path string
-	Ran  int
-
-	// Card Creation Settings
-	// This is what the user interacts with
-	// in the front end
-	AutoAdvanceSentence bool
-	PopulateEnglish     bool
-	PopulateChinese     bool
-	AutoAdvanceEnglish  bool
-	AutoAdvanceImage    bool
-	AutoAdvanceCard     bool
-
-	// Anki / Card generation
-	// This controls how the front end gets
-	// translated into Anki calls
-	ActiveDeck            string
-	ActiveModel           string
-	ModelMappings         map[string]FieldsMapping
-	AddProgramTag         bool
-	AddBookTag            bool
-	AllowDuplicates       bool
-	GenerateTermAudio     bool
-	GenerateSentenceAudio bool
-	AzureApiKey           string
-	AzureImageApiKey      string
-
-	// Dictionaries
-	Dicts           map[string]Dict
-	PrimaryDict     string
-	ShowDefinitions bool
-	EnableChinese   bool
-
-	// Sentence Generation
-	IdealSentenceLength int
-	KnownInterval       int
-
-	// Book Library
-	OnlyFavorites bool
-	HideRead      bool
-
-	// Card Management
-	ProblemFlagged              bool
-	ProblemMissingImage         bool
-	ProblemMissingSentence      bool
-	ProblemMissingSentenceAudio bool
-	ProblemMissingWordAudio     bool
-	ProblemMissingPinyin        bool
-}
-
-func defaultSettings(path string) *UserSettings {
-	return &UserSettings{
+type (
+	UserConfig struct {
 		// Meta fields
-		path: path,
-		Ran:  0,
+		Meta MetaSettings `json:"meta"`
 
-		// Card Creation
-		AutoAdvanceSentence: true,
-		PopulateEnglish:     false,
-		PopulateChinese:     false,
-		AutoAdvanceEnglish:  false,
-		AutoAdvanceImage:    false,
-		AutoAdvanceCard:     true,
+		// Card Creation Settings
+		CardCreationConfig CardCreationConfig `json:"CardCreation"`
 
 		// Anki / Card generation
-		ActiveDeck:  "Reading",
-		ActiveModel: "Reading Card",
-		ModelMappings: map[string]FieldsMapping{
-			"Reading Card": {
-				Hanzi:             "Hanzi",
-				ExampleSentence:   "ExampleSentence",
-				EnglishDefinition: "EnglishDefinition",
-				ChineseDefinition: "ChineseDefinition",
-				Pinyin:            "Pinyin",
-				HanziAudio:        "HanziAudio",
-				SentenceAudio:     "SentenceAudio",
-				Images:            "Images",
-				Notes:             "Notes",
-			},
-		},
-		AddProgramTag:   true,
-		AddBookTag:      true,
-		AllowDuplicates: true,
-
-		GenerateTermAudio:     false,
-		GenerateSentenceAudio: false,
-		AzureApiKey:           "",
-		AzureImageApiKey:      "",
+		AnkiConfig AnkiConfig `json:"AnkiConfig"`
 
 		// Dictionaries
-		Dicts:           map[string]Dict{},
-		PrimaryDict:     "",
-		ShowDefinitions: true,
-		EnableChinese:   true,
+		DictionariesConfig DictionaryConfig `json:"Dictionaries"`
 
 		// Sentence Generation
-		KnownInterval:       10,
-		IdealSentenceLength: 20,
+		SentenceGenerationConfig SentenceGenerationConfig `json:"SentenceGeneration"`
 
 		// Book Library
-		OnlyFavorites: false,
-		HideRead:      false,
+		LibraryConfig LibraryConfig `json:"BookLibrary"`
 
 		// Card Management
-		ProblemFlagged:              true,
-		ProblemMissingImage:         true,
-		ProblemMissingSentence:      true,
-		ProblemMissingSentenceAudio: true,
-		ProblemMissingWordAudio:     true,
-		ProblemMissingPinyin:        true,
+		CardManagementConfig CardManagementConfig `json:"CardManagement"`
+	}
+
+	MetaSettings struct {
+		path string
+		Ran  int `json:"Ran"`
+	}
+
+	CardCreationConfig struct {
+		AutoAdvanceSentence bool `json:"AutoAdvanceSentence"`
+		PopulateEnglish     bool `json:"PopulateEnglish"`
+		PopulateChinese     bool `json:"PopulateChinese"`
+		AutoAdvanceEnglish  bool `json:"AutoAdvanceEnglish"`
+		AutoAdvanceImage    bool `json:"AutoAdvanceImage"`
+		AutoAdvanceCard     bool `json:"AutoAdvanceCard"`
+	}
+
+	FieldsMapping struct {
+		Hanzi             string `json:"hanzi"`
+		ExampleSentence   string `json:"exampleSentence"`
+		EnglishDefinition string `json:"englishDefinition"`
+		ChineseDefinition string `json:"chineseDefinition"`
+		Pinyin            string `json:"pinyin"`
+		HanziAudio        string `json:"hanziAudio"`
+		SentenceAudio     string `json:"sentenceAudio"`
+		Images            string `json:"images"`
+		Notes             string `json:"notes"`
+	}
+	AnkiConfig struct {
+		ActiveDeck            string                   `json:"ActiveDeck"`
+		ActiveModel           string                   `json:"ActiveModel"`
+		ModelMappings         map[string]FieldsMapping `json:"ModelMappings"`
+		AddProgramTag         bool                     `json:"AddProgramTag"`
+		AddBookTag            bool                     `json:"AddBookTag"`
+		AllowDuplicates       bool                     `json:"AllowDuplicates"`
+		GenerateTermAudio     bool                     `json:"GenerateTermAudio"`
+		GenerateSentenceAudio bool                     `json:"GenerateSentenceAudio"`
+		AzureApiKey           string                   `json:"AzureApiKey"`
+		AzureImageApiKey      string                   `json:"AzureImageApiKey"`
+	}
+
+	Dict struct {
+		Path     string `json:"Path"`
+		Language string `json:"Language"`
+	}
+
+	DictionaryConfig struct {
+		Dicts           map[string]Dict `json:"Dicts"`
+		PrimaryDict     string          `json:"PrimaryDict"`
+		ShowDefinitions bool            `json:"ShowDefinitions"`
+		EnableChinese   bool            `json:"EnableChinese"`
+	}
+
+	SentenceGenerationConfig struct {
+		IdealSentenceLength int `json:"IdealSentenceLength"`
+		KnownInterval       int `json:"KnownInterval"`
+	}
+
+	LibraryConfig struct {
+		OnlyFavorites bool `json:"OnlyFavorites"`
+		HideRead      bool `json:"HideRead"`
+	}
+
+	CardManagementConfig struct {
+		ProblemFlagged              bool `json:"ProblemFlagged"`
+		ProblemMissingImage         bool `json:"ProblemMissingImage"`
+		ProblemMissingSentence      bool `json:"ProblemMissingSentence"`
+		ProblemMissingSentenceAudio bool `json:"ProblemMissingSentenceAudio"`
+		ProblemMissingWordAudio     bool `json:"ProblemMissingWordAudio"`
+		ProblemMissingPinyin        bool `json:"ProblemMissingPinyin"`
+	}
+)
+
+func defaultConfig(path string) *UserConfig {
+	return &UserConfig{
+		Meta: MetaSettings{
+			path: path,
+			Ran:  0,
+		},
+
+		CardCreationConfig: CardCreationConfig{
+			AutoAdvanceSentence: true,
+			PopulateEnglish:     false,
+			PopulateChinese:     false,
+			AutoAdvanceEnglish:  false,
+			AutoAdvanceImage:    false,
+			AutoAdvanceCard:     true,
+		},
+
+		AnkiConfig: AnkiConfig{
+			ActiveDeck:  "Reading",
+			ActiveModel: "Reading Card",
+			ModelMappings: map[string]FieldsMapping{
+				"Reading Card": {
+					Hanzi:             "Hanzi",
+					ExampleSentence:   "ExampleSentence",
+					EnglishDefinition: "EnglishDefinition",
+					ChineseDefinition: "ChineseDefinition",
+					Pinyin:            "Pinyin",
+					HanziAudio:        "HanziAudio",
+					SentenceAudio:     "SentenceAudio",
+					Images:            "Images",
+					Notes:             "Notes",
+				},
+			},
+			AddProgramTag:         true,
+			AddBookTag:            true,
+			AllowDuplicates:       true,
+			GenerateTermAudio:     false,
+			GenerateSentenceAudio: false,
+			AzureApiKey:           "",
+			AzureImageApiKey:      "",
+		},
+
+		DictionariesConfig: DictionaryConfig{
+			Dicts:           map[string]Dict{},
+			PrimaryDict:     "",
+			ShowDefinitions: true,
+			EnableChinese:   true,
+		},
+
+		SentenceGenerationConfig: SentenceGenerationConfig{
+			KnownInterval:       10,
+			IdealSentenceLength: 20,
+		},
+
+		LibraryConfig: LibraryConfig{
+			OnlyFavorites: false,
+			HideRead:      false,
+		},
+
+		CardManagementConfig: CardManagementConfig{
+			ProblemFlagged:              true,
+			ProblemMissingImage:         true,
+			ProblemMissingSentence:      true,
+			ProblemMissingSentenceAudio: true,
+			ProblemMissingWordAudio:     true,
+			ProblemMissingPinyin:        true,
+		},
 	}
 }
 
-func LoadMetadata(path string) (*UserSettings, error) {
-	userSettings := defaultSettings(path)
+func getValue(settings *UserConfig, field string) interface{} {
+	value := reflect.ValueOf(settings).Elem()
+
+	for i := 0; i < value.NumField(); i++ {
+		subVal := value.Field(i)
+		if subVal.Kind() != reflect.Struct {
+			continue
+		}
+
+		subFieldVal := subVal.FieldByName(field)
+		if subFieldVal.IsValid() {
+			return subFieldVal.Interface()
+		}
+	}
+
+	return nil
+}
+
+func setValue(settings *UserConfig, field string, newValue interface{}) error {
+	value := reflect.ValueOf(settings).Elem()
+
+	for i := 0; i < value.NumField(); i++ {
+		subVal := value.Field(i)
+		if subVal.Kind() != reflect.Struct {
+			continue
+		}
+
+		subFieldVal := subVal.FieldByName(field)
+		if subFieldVal.IsValid() {
+			if !subFieldVal.CanSet() {
+				return fmt.Errorf("cannot set field %s", field)
+			}
+			structFieldType := subFieldVal.Type()
+			val := reflect.ValueOf(newValue)
+			if val.Type().AssignableTo(structFieldType) {
+				subFieldVal.Set(val)
+				return nil
+			} else {
+				return fmt.Errorf("value type %s cannot be assigned to field %s", val.Type(), field)
+			}
+		}
+	}
+
+	return fmt.Errorf("field %s not found", field)
+}
+
+func LoadMetadata(path string) (*UserConfig, error) {
+	userSettings := defaultConfig(path)
 
 	if _, err := os.Stat(path); err == nil {
 		// metadata already exists, read from it
@@ -161,8 +237,12 @@ func LoadMetadata(path string) (*UserSettings, error) {
 	return userSettings, nil
 }
 
-func (m *UserSettings) saveMetadata() error {
-	path := m.path
+func (m *UserConfig) GetUserSettings() UserConfig {
+	return *m
+}
+
+func (m *UserConfig) saveMetadata() error {
+	path := m.Meta.path
 	str, err := json.MarshalIndent(m, "", "  ")
 	if err != nil {
 		return err
@@ -170,81 +250,63 @@ func (m *UserSettings) saveMetadata() error {
 	if err = os.WriteFile(path, str, 0666); err != nil {
 		return err
 	}
+
+	// runtime.EventsEmit(*m.ctx, "UpdatedConfig", m)
 	return nil
 }
 
-func (m *UserSettings) UpdateTimesRan() {
-	m.Ran += 1
+func (m *UserConfig) UpdateTimesRan() {
+	m.Meta.Ran += 1
 	m.saveMetadata()
 }
 
-func (m *UserSettings) GetTimesRan() int {
-	return m.Ran
+func (m *UserConfig) GetTimesRan() int {
+	return m.Meta.Ran
 }
 
-func (m *UserSettings) GetUserSetting(key string) string {
-	return getUserSetting[string](m, key)
-}
-
-func (m *UserSettings) GetUserSettingBool(key string) bool {
-	return getUserSetting[bool](m, key)
-}
-
-func (m *UserSettings) GetUserSettingInt(key string) int {
-	return getUserSetting[int](m, key)
-}
-
-func getUserSetting[T int | string | bool](m *UserSettings, key string) T {
-	val, err := reflections.GetField(m, key)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return val.(T)
-}
-
-func (m *UserSettings) SetUserSetting(key string, val string) {
+func (m *UserConfig) SetUserSetting(key string, val string) {
 	setUserSetting(m, key, val)
 	m.saveMetadata()
 }
 
-func (m *UserSettings) SetUserSettingBool(key string, val bool) {
+func (m *UserConfig) SetUserSettingBool(key string, val bool) {
 	setUserSetting(m, key, val)
 	m.saveMetadata()
 }
 
-func (m *UserSettings) SetUserSettingInt(key string, val int) {
+func (m *UserConfig) SetUserSettingInt(key string, val int) {
 	setUserSetting(m, key, val)
 	m.saveMetadata()
 }
 
-func setUserSetting[T int | string | bool](m *UserSettings, key string, val T) {
-	err := reflections.SetField(m, key, val)
+func setUserSetting[T int | string | bool](m *UserConfig, key string, val T) {
+	err := setValue(m, key, val)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (m *UserSettings) SaveDict(name string, dictPath string, language string) {
-	m.Dicts[name] = Dict{
+func (m *UserConfig) SaveDict(name string, dictPath string, language string) {
+	m.DictionariesConfig.Dicts[name] = Dict{
 		Path:     dictPath,
 		Language: language,
 	}
 	m.saveMetadata()
 }
 
-func (m *UserSettings) DeleteDict(name string) {
-	delete(m.Dicts, name)
+func (m *UserConfig) DeleteDict(name string) {
+	delete(m.DictionariesConfig.Dicts, name)
 	m.saveMetadata()
 }
 
-func (m *UserSettings) SetPrimaryDict(dictName string) {
+func (m *UserConfig) SetPrimaryDict(dictName string) {
 	// TODO Make sure its a real dict
-	m.PrimaryDict = dictName
+	m.DictionariesConfig.PrimaryDict = dictName
 	m.saveMetadata()
 }
 
-func (m *UserSettings) GetMapping(modelName string) (FieldsMapping, error) {
-	mapping, ok := m.ModelMappings[modelName]
+func (m *UserConfig) GetMapping(modelName string) (FieldsMapping, error) {
+	mapping, ok := m.AnkiConfig.ModelMappings[modelName]
 	if !ok {
 		return mapping, errors.New(
 			fmt.Sprintf("Couldn't find mapping for: %v", modelName))
@@ -252,19 +314,19 @@ func (m *UserSettings) GetMapping(modelName string) (FieldsMapping, error) {
 	return mapping, nil
 }
 
-func (m *UserSettings) SetMapping(modelName string, mapping FieldsMapping) error {
-	m.ModelMappings[modelName] = mapping
+func (m *UserConfig) SetMapping(modelName string, mapping FieldsMapping) error {
+	m.AnkiConfig.ModelMappings[modelName] = mapping
 	m.saveMetadata()
 	return nil
 }
 
-func (m *UserSettings) DeleteMapping(modelName string) error {
-	delete(m.ModelMappings, modelName)
+func (m *UserConfig) DeleteMapping(modelName string) error {
+	delete(m.AnkiConfig.ModelMappings, modelName)
 	m.saveMetadata()
 	return nil
 }
 
-func (m *UserSettings) ExportMapping() FieldsMapping {
+func (m *UserConfig) ExportMapping() FieldsMapping {
 	return FieldsMapping{}
 
 }

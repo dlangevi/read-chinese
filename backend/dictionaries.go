@@ -9,7 +9,7 @@ type Dictionaries struct {
 	PrimaryDictName string
 	PrimaryDict     Dictionary
 	Dictionaries    map[string]UserDictionary
-	userSettings    *UserSettings
+	userSettings    *UserConfig
 	known           *KnownWords
 }
 
@@ -19,7 +19,7 @@ type UserDictionary struct {
 }
 
 func NewDictionaries(
-	userSettings *UserSettings,
+	userSettings *UserConfig,
 	known *KnownWords,
 ) *Dictionaries {
 	dicts := &Dictionaries{
@@ -27,7 +27,7 @@ func NewDictionaries(
 		known:        known,
 	}
 	dicts.loadDictionaries()
-	primaryName := userSettings.PrimaryDict
+	primaryName := userSettings.DictionariesConfig.PrimaryDict
 	dicts.PrimaryDictName = primaryName
 	// TODO this could fail
 	dicts.PrimaryDict = dicts.Dictionaries[primaryName].Dictionary
@@ -41,7 +41,7 @@ func (d *Dictionaries) HealthCheck() bool {
 
 func (d *Dictionaries) loadDictionaries() error {
 	d.Dictionaries = map[string]UserDictionary{}
-	for name, dict := range d.userSettings.Dicts {
+	for name, dict := range d.userSettings.DictionariesConfig.Dicts {
 		newDict, err := FromSavedDictionary(dict.Path)
 		if err != nil {
 			return err
@@ -51,7 +51,7 @@ func (d *Dictionaries) loadDictionaries() error {
 			dict.Language,
 		}
 	}
-	primaryName := d.userSettings.PrimaryDict
+	primaryName := d.userSettings.DictionariesConfig.PrimaryDict
 	d.PrimaryDictName = primaryName
 	// TODO this could fail
 	d.PrimaryDict = d.Dictionaries[primaryName].Dictionary
@@ -111,7 +111,7 @@ func (d *Dictionaries) ExportDictionaryInfo() DictionaryInfo {
 
 func (d *Dictionaries) GetDictionaryInfo() DictionaryInfoMap {
 	dictInfoMap := DictionaryInfoMap{}
-	for name, dict := range d.userSettings.Dicts {
+	for name, dict := range d.userSettings.DictionariesConfig.Dicts {
 		dictInfoMap[name] = DictionaryInfo{
 			Name:      name,
 			Path:      dict.Path,

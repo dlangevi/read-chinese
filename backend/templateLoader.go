@@ -37,7 +37,7 @@ type (
 		Front  string
 		Back   string
 		Css    string
-		Fields map[string]string
+		Fields []string
 	}
 
 	templateLoader struct {
@@ -51,24 +51,29 @@ func NewTemplateLoader() *templateLoader {
 func (c *templateLoader) GetTemplate() (AnkiTemplate, error) {
 	template := AnkiTemplate{}
 
+	template.Name = "read-chinese-note"
+
 	fileBytes, err := templates.ReadFile(
 		"assets/anki/templates/default/CardFront.html")
 	if err != nil {
 		return template, err
 	}
 	template.Front = string(fileBytes)
+
 	fileBytes, err = templates.ReadFile(
 		"assets/anki/templates/default/CardBack.html")
 	if err != nil {
 		return template, err
 	}
 	template.Back = string(fileBytes)
+
 	fileBytes, err = templates.ReadFile(
 		"assets/anki/templates/default/CardStyle.css")
 	if err != nil {
 		return template, err
 	}
 	template.Css = string(fileBytes)
+
 	fileBytes, err = templates.ReadFile(
 		"assets/anki/templates/default/CardFields.json")
 	if err != nil {

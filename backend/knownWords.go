@@ -20,11 +20,11 @@ type KnownWords struct {
 	characters   map[rune]bool
 	frequency    map[string]int
 	db           *sqlx.DB
-	userSettings *UserSettings
+	userSettings *UserConfig
 }
 
 func NewKnownWords(db *sqlx.DB,
-	userSettings *UserSettings,
+	userSettings *UserConfig,
 ) *KnownWords {
 	known := &KnownWords{
 		words:        map[string]int64{},
@@ -231,7 +231,7 @@ func (known *KnownWords) ImportCSVWords(path string) error {
 
 func (known *KnownWords) isWellKnown(word string) bool {
 	interval, ok := known.words[word]
-	return ok && interval >= int64(known.userSettings.KnownInterval)
+	return ok && interval >= int64(known.userSettings.SentenceGenerationConfig.KnownInterval)
 }
 
 func (known *KnownWords) isKnown(word string) bool {

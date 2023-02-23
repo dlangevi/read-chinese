@@ -41,11 +41,11 @@ type (
 type ankiInterface struct {
 	anki         *ankiconnect.Client
 	textToSpeech *TextToSpeech
-	userSettings *UserSettings
+	userSettings *UserConfig
 	known        *KnownWords
 }
 
-func NewAnkiInterface(userSettings *UserSettings, known *KnownWords) *ankiInterface {
+func NewAnkiInterface(userSettings *UserConfig, known *KnownWords) *ankiInterface {
 	return &ankiInterface{
 		anki:         ankiconnect.NewClient(),
 		textToSpeech: NewTextToSpeach(userSettings),
@@ -97,14 +97,14 @@ func (a *ankiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 		})
 		return nil
 	}
-	if a.userSettings.GenerateTermAudio {
+	if a.userSettings.AnkiConfig.GenerateTermAudio {
 		err := addAudio(fields.Word, "HanziAudio")
 		if err != nil {
 			return err
 		}
 	}
 	// dont generate if sentence is empty
-	if a.userSettings.GenerateSentenceAudio && len(fields.Sentence) > 0 {
+	if a.userSettings.AnkiConfig.GenerateSentenceAudio && len(fields.Sentence) > 0 {
 		err := addAudio(fields.Sentence, "SentenceAudio")
 		if err != nil {
 			return err
@@ -378,17 +378,21 @@ func (a *ankiInterface) LoadProblemCards() ([]ProblemCard, error) {
 }
 
 func (a *ankiInterface) LoadTemplate() error {
+	template, err := NewTemplateLoader().GetTemplate()
+	if err != nil {
+		return err
+	}
+
 	model := ankiconnect.Model{
-		ModelName:     "fish",
-		InOrderFields: []string{"a", "b"},
-		// Css           string         `json:"css,omitempty"`
-		// Will default to false
-		// IsCloze       bool           `json:"isCloze"`
+		ModelName:     template.Name,
+		InOrderFields: template.Fields,
+		Css:           template.Css,
+		IsCloze:       false,
 		CardTemplates: []ankiconnect.CardTemplate{
 			{
-				Name:  "simple",
-				Front: "The fish is {{a}}",
-				Back:  "The basck is {{b}}",
+				Name:  template.Name,
+				Front: template.Front,
+				Back:  template.Back,
 			},
 		},
 	}

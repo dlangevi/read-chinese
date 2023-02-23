@@ -11,7 +11,7 @@ type Backend struct {
 	RuntimeContext *context.Context
 
 	// Primary data layer
-	UserSettings *UserSettings
+	UserSettings *UserConfig
 	DB           *sqlx.DB
 
 	// Independent Libraries

@@ -82,7 +82,7 @@ import { getUserSettings } from '@/lib/userSettings';
 
 const UserSettings = getUserSettings();
 
-const enableChinese = UserSettings.Dictionaries.EnableChinese.read();
+const enableChinese = UserSettings.Dictionaries.EnableChinese;
 const cardManager = useCardManager();
 
 defineEmits(['change-step']);

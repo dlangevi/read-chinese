@@ -57,7 +57,7 @@ const image = ref([]);
 watch(image, async () => {
   const entries = image.value.map((i) => images.value[i]);
   cardManager.updateImages(entries);
-  const autoAdvance = UserSettings.CardCreation.AutoAdvanceImage.read();
+  const autoAdvance = UserSettings.CardCreation.AutoAdvanceImage;
   if (autoAdvance) {
     cardManager.nextStep();
   }

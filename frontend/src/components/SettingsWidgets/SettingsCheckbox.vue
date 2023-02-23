@@ -29,17 +29,26 @@
 <script lang="ts" setup>
 // TODO have some kind of hover popup with more info
 import { InformationCircle } from '@vicons/ionicons5';
+import { ref } from 'vue';
 
 const emit = defineEmits(['update']);
 
 const props = defineProps({
   setting: {
     type: Object,
+    required: false,
+    default: () => ({
+      label: 'Error: passed undefined setting',
+      value: true,
+    }),
+  },
+  initialValue: {
+    type: Boolean,
     required: true,
   },
 });
 
-const isChecked = props.setting.read();
+const isChecked = ref(props.initialValue);
 
 function submitChange(event: Event) {
   const checked = (event.target as HTMLInputElement).checked;

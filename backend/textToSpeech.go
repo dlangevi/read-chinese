@@ -16,11 +16,11 @@ type TextToSpeech struct {
 	httpClient   *resty.Client
 	currentVoice int
 	voices       []string
-	userSettings *UserSettings
+	userSettings *UserConfig
 }
 
 func NewTextToSpeach(
-	userSettings *UserSettings,
+	userSettings *UserConfig,
 ) *TextToSpeech {
 	client := &TextToSpeech{
 		httpClient:   resty.New(),
@@ -46,7 +46,7 @@ func (tts *TextToSpeech) Synthesize(text string) (string, error) {
     </voice>
   </speak>`, voice, text)
 
-	key := tts.userSettings.AzureApiKey
+	key := tts.userSettings.AnkiConfig.AzureApiKey
 	rsp, err := tts.httpClient.NewRequest().
 		SetHeader("Content-Type", "application/ssml+xml").
 		SetHeader("Ocp-Apim-Subscription-Key", key).

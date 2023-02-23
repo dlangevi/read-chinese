@@ -1,32 +1,64 @@
 {
-  "Ran": 1575,
-  "Dicts": {
-    "example": {
-      "Path": "/home/dlangevi/.config/read-chinese/userDicts/example",
-      "Language": "english"
-    }
+  "meta": {
+    "ran": 5
   },
-  "PrimaryDict": "example",
-  "AutoAdvanceSentence": true,
-  "PopulateEnglish": true,
-  "PopulateChinese": true,
-  "AutoAdvanceEnglish": false,
-  "AutoAdvanceImage": false,
-  "GenerateTermAudio": false,
-  "GenerateSentenceAudio": true,
-  "AutoAdvanceCard": true,
-  "ShowDefinitions": true,
-  "EnableChinese": true,
-  "AzureApiKey": "these are not real",
-  "AzureImageApiKey": "even the ones in the history are now invalid",
-  "KnownInterval": 10,
-  "IdealSentenceLength": 20,
-  "OnlyFavorites": true,
-  "HideRead": false,
-  "ProblemFlagged": true,
-  "ProblemMissingImage": true,
-  "ProblemMissingSentence": true,
-  "ProblemMissingSentenceAudio": true,
-  "ProblemMissingWordAudio": true,
-  "ProblemMissingPinyin": true
+  "cardCreationConfig": {
+    "autoAdvanceSentence": true,
+    "populateEnglish": false,
+    "populateChinese": false,
+    "autoAdvanceEnglish": false,
+    "autoAdvanceImage": false,
+    "autoAdvanceCard": true
+  },
+  "ankiConfig": {
+    "activeDeck": "Reading",
+    "activeModel": "Reading Card",
+    "modelMappings": {
+      "Reading Card": {
+        "hanzi": "Hanzi",
+        "exampleSentence": "ExampleSentence",
+        "englishDefinition": "EnglishDefinition",
+        "chineseDefinition": "ChineseDefinition",
+        "pinyin": "Pinyin",
+        "hanziAudio": "HanziAudio",
+        "sentenceAudio": "SentenceAudio",
+        "images": "Images",
+        "notes": "Notes"
+      }
+    },
+    "addProgramTag": true,
+    "addBookTag": true,
+    "allowDuplicates": true,
+    "generateTermAudio": false,
+    "generateSentenceAudio": false,
+    "azureApiKey": "",
+    "azureImageApiKey": ""
+  },
+  "dictionaryConfig": {
+    "dicts": {
+      "example": {
+        "Path": "/home/dlangevi/.config/read-chinese/userDicts/example",
+        "Language": "english"
+      }
+    },
+    "primaryDict": "example",
+    "showDefinitions": true,
+    "enableChinese": true
+  },
+  "sentenceGenerationConfig": {
+    "idealSentenceLength": 20,
+    "knownInterval": 10
+  },
+  "libraryConfig": {
+    "onlyFavorites": false,
+    "hideRead": false
+  },
+  "cardManagementConfig": {
+    "problemFlagged": true,
+    "problemMissingImage": true,
+    "problemMissingSentence": true,
+    "problemMissingSentenceAudio": true,
+    "problemMissingWordAudio": true,
+    "problemMissingPinyin": true
+  }
 }

@@ -11,8 +11,8 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/mattn/go-sqlite3 v1.14.16
-	github.com/oleiade/reflections v1.0.1
 	github.com/privatesquare/bkst-go-utils v1.5.4
+	github.com/stretchr/testify v1.7.1
 	github.com/wailsapp/wails/v2 v2.2.0
 	github.com/yanyiwu/gojieba v1.2.0
 	golang.org/x/net v0.0.0-20220722155237-a158d28d115b
@@ -20,6 +20,7 @@ require (
 
 require (
 	github.com/bep/debounce v1.2.1 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.7.7 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -46,6 +47,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/samber/lo v1.27.1 // indirect
 	github.com/tkrajina/go-reflector v0.5.5 // indirect
@@ -62,6 +64,7 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 // Clone dlangevi/ankiconnect

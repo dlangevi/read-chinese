@@ -45,12 +45,19 @@ const readonly = ref(true);
 const props = defineProps({
   setting: {
     type: Object,
+    required: false,
+    default: () => ({
+      label: 'Error: passed undefined setting',
+      value: true,
+    }),
+  },
+  initialValue: {
+    type: String,
     required: true,
   },
 });
 
-const initialValue = await props.setting.read();
-const currentValue = ref(initialValue);
+const currentValue = ref(props.initialValue);
 
 function startEdit() {
   readonly.value = false;

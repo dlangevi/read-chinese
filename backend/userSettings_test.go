@@ -1,34 +1,42 @@
 package backend
 
 import (
+	"context"
 	"os"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestDefault(t *testing.T) {
 	tmpMetaData := path.Join(os.TempDir(), "metadata.json")
-	userSettings, _ := LoadMetadata(tmpMetaData)
+	ctx := context.Background()
+	userSettings, _ := LoadMetadata(tmpMetaData, &ctx)
 
 	settingName := "EnableChinese"
-	setting := userSettings.EnableChinese
+	setting := userSettings.DictionariesConfig.EnableChinese
 	if setting != true {
 		t.Errorf("%v, had the wrong value %v", settingName, setting)
 	}
-	if userSettings.PrimaryDict != "" {
-		t.Errorf("PrimaryDict had wrong default value %v", userSettings.PrimaryDict)
+	if userSettings.DictionariesConfig.PrimaryDict != "" {
+		t.Errorf("PrimaryDict had wrong default value %v",
+			userSettings.DictionariesConfig.PrimaryDict)
 	}
 	// TODO have a test where the dictionary does not exist
 	userSettings.SetPrimaryDict("foo")
-	if userSettings.PrimaryDict != "foo" {
+	if userSettings.DictionariesConfig.PrimaryDict != "foo" {
 		t.Errorf("PrimaryDict was not updated")
 	}
-	if userSettings.GetUserSettingBool(settingName) != true {
-		t.Errorf("%v was not initialized correctly", settingName)
-	}
-	userSettings.SetUserSettingBool(settingName, false)
-	if userSettings.GetUserSettingBool(settingName) != false {
-		t.Errorf("%v was not updated", settingName)
-	}
 	os.Remove(tmpMetaData)
+}
+
+func TestNew(t *testing.T) {
+	newConfig := defaultConfig("foobar")
+	assert.Equal(t, true, getValue(newConfig, "AutoAdvanceSentence"))
+	assert.Equal(t, false, getValue(newConfig, "OnlyFavorites"))
+	err := setValue(newConfig, "OnlyFavorites", true)
+	assert.Nil(t, err)
+	assert.Equal(t, true, getValue(newConfig, "OnlyFavorites"))
+
 }

@@ -21,11 +21,11 @@ type ImageResponse struct {
 
 type ImageClient struct {
 	httpClient   *resty.Client
-	userSettings *UserSettings
+	userSettings *UserConfig
 }
 
 func NewImageClient(
-	userSettings *UserSettings,
+	userSettings *UserConfig,
 ) *ImageClient {
 	client := &ImageClient{
 		httpClient:   resty.New(),
@@ -39,7 +39,7 @@ func (i *ImageClient) SearchImages(query string) ([]ImageInfo, error) {
 	// i.httpClient.SetDisableWarn(true)
 	result := &ImageResponse{}
 	rsp, err := i.httpClient.R().
-		SetHeader("Ocp-Apim-Subscription-Key", i.userSettings.AzureImageApiKey).
+		SetHeader("Ocp-Apim-Subscription-Key", i.userSettings.AnkiConfig.AzureImageApiKey).
 		SetQueryParams(map[string]string{
 			"q":          query,
 			"count":      "6",

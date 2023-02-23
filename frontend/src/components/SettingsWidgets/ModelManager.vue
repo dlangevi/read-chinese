@@ -43,8 +43,8 @@ import {
 } from '@wailsjs/backend/ankiInterface';
 import {
   GetMapping,
-  GetUserSetting,
-} from '@wailsjs/backend/UserSettings';
+  GetUserSettings,
+} from '@wailsjs/backend/UserConfig';
 import {
   backend,
 } from '@wailsjs/models';
@@ -64,7 +64,8 @@ watch(fields, () => {
 
 onBeforeMount(async () => {
   models.value = await LoadModels();
-  const activeModel = await GetUserSetting('ActiveModel');
+  const userSettings = await GetUserSettings();
+  const activeModel = userSettings.AnkiConfig.ActiveModel;
   modelFields.value = await LoadModelFields(activeModel);
   console.log(fields);
   fields.value = await GetMapping(activeModel);

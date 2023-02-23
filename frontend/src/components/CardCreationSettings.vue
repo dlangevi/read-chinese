@@ -18,9 +18,10 @@
       >✕</label>
       <div class="grid grid-cols-2 gap-8">
         <settings-checkbox
-          v-for="content in UserSettings.CardCreation"
-          :key="content.name"
-          :setting="content"
+          v-for="(value, key) in UserSettings.CardCreation"
+          :key="key"
+          :setting="ComponentTable[key]"
+          :initial-value="value"
         />
       </div>
     </div>
@@ -31,7 +32,7 @@
 import { SettingsSharp } from '@vicons/ionicons5';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
-import { getUserSettings } from '@/lib/userSettings';
+import { ComponentTable, getUserSettings } from '@/lib/userSettings';
 
 const UserSettings = getUserSettings();
 

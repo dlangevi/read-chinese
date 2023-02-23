@@ -65,7 +65,7 @@ const columnDefs:ColDef[] = [
   },
 ];
 
-const showDefinitions = UserSettings.Dictionaries.ShowDefinitions.read();
+const showDefinitions = UserSettings.Dictionaries.ShowDefinitions;
 if (showDefinitions) {
   columnDefs.push(
     {

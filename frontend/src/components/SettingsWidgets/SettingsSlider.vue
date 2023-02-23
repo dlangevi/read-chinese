@@ -31,11 +31,19 @@ const emit = defineEmits(['update']);
 const props = defineProps({
   setting: {
     type: Object,
+    required: false,
+    default: () => ({
+      label: 'Error: passed undefined setting',
+      value: true,
+    }),
+  },
+  initialValue: {
+    type: Number,
     required: true,
   },
 });
 
-const value = ref(props.setting.read());
+const value = ref(props.initialValue);
 
 function submitChange(event : Event) {
   const number = parseInt((event.target as HTMLInputElement).value);

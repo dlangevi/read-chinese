@@ -72,7 +72,7 @@ const UserSettings = getUserSettings();
 
 watch(sentence, async () => {
   cardManager.updateSentence(sentence.value);
-  const autoAdvance = UserSettings.CardCreation.AutoAdvanceSentence.read();
+  const autoAdvance = UserSettings.CardCreation.AutoAdvanceSentence;
   if (autoAdvance) {
     cardManager.nextStep();
   }

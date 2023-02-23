@@ -152,7 +152,7 @@ store.$subscribe(async (_, state) => {
       // Right now for EDIT we only edit the sentence so start there
       ankiCard = await GetAnkiNote(word);
     }
-    const enableChinese = UserSettings.Dictionaries.EnableChinese.read();
+    const enableChinese = UserSettings.Dictionaries.EnableChinese;
     cardManager.loadCard(ankiCard, enableChinese);
   }
   showModal.value = state.wordList.length !== 0;
@@ -165,7 +165,7 @@ function onClose() {
 const { ready } = storeToRefs(cardManager);
 watch(ready, () => {
   console.log('readychanged', ready.value);
-  const autoSubmit = UserSettings.CardCreation.AutoAdvanceCard.read();
+  const autoSubmit = UserSettings.CardCreation.AutoAdvanceCard;
   if (ready.value && autoSubmit) {
     submit();
   }
