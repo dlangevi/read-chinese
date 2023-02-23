@@ -52,7 +52,9 @@
 </template>
 
 <script lang="ts" setup>
-import { getUserSettings, getDisplayable } from '@/lib/userSettings';
+import {
+  getUserSettings, getDisplayable,
+} from '@/lib/userSettings';
 import { onMounted } from 'vue';
 import { themeChange } from 'theme-change';
 

@@ -1,9 +1,12 @@
 import { inject, reactive } from 'vue';
+import { LoadModels, LoadDecks } from '@wailsjs/backend/ankiInterface';
 import type { InjectionKey } from 'vue';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
 import SettingsTextbox
   from '@/components/SettingsWidgets/SettingsTextbox.vue';
+import SettingsSelector
+  from '@/components/SettingsWidgets/SettingsSelector.vue';
 import DictionariesList
   from '@/components/SettingsWidgets/DictionariesList.vue';
 import ModelManager
@@ -19,13 +22,13 @@ import {
   GetUserSettings,
 } from '@wailsjs/backend/UserConfig';
 
-type UserSetting = {
-  name?:string;
+export type UserSetting = {
+  name:string;
   label:string;
   tooltip?:string;
   type:any;
-  read?:any;
-  write?:any;
+  write:any;
+  dataSource?: () => Promise<any>;
 };
 
 type UserConfigDisplay = {
@@ -47,11 +50,32 @@ function settingsObject(
     label,
     tooltip,
     type: widgetType,
+    write: async function write(newValue:any) {
+      console.log('writing', name, newValue);
+      await setter(name, newValue);
+      await updateSettings();
+    },
   };
-  option.write = async function write(newValue:any) {
-    console.log('writing', name, newValue);
-    await setter(name, newValue);
-    await updateSettings();
+  return option;
+}
+
+function selector(
+  name:string,
+  label:string,
+  tooltip:string,
+  dataSource: () => Promise<string[]>,
+):UserSetting {
+  const option:UserSetting = {
+    name,
+    label,
+    tooltip,
+    type: SettingsSelector,
+    write: async function write(newValue:string) {
+      console.log('writing', name, newValue);
+      await SetUserSetting(name, newValue);
+      await updateSettings();
+    },
+    dataSource,
   };
   return option;
 }
@@ -109,6 +133,18 @@ function loadSettings(settings : UserSetting[]) {
 }
 
 export const ComponentTable = loadSettings([
+  selector(
+    'ActiveDeck',
+    'Active Anki Deck',
+    'Where your cards go',
+    LoadDecks,
+  ),
+  selector(
+    'ActiveModel',
+    'Active Anki Model',
+    'How your cards go',
+    LoadModels,
+  ),
   checkBox(
     'AutoAdvanceSentence',
     'Auto advance after sentence selection',

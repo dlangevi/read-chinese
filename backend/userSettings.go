@@ -305,13 +305,12 @@ func (m *UserConfig) SetPrimaryDict(dictName string) {
 	m.saveMetadata()
 }
 
-func (m *UserConfig) GetMapping(modelName string) (FieldsMapping, error) {
+func (m *UserConfig) GetMapping(modelName string) FieldsMapping {
 	mapping, ok := m.AnkiConfig.ModelMappings[modelName]
 	if !ok {
-		return mapping, errors.New(
-			fmt.Sprintf("Couldn't find mapping for: %v", modelName))
+		return FieldsMapping{}
 	}
-	return mapping, nil
+	return mapping
 }
 
 func (m *UserConfig) SetMapping(modelName string, mapping FieldsMapping) error {

@@ -76,7 +76,6 @@ const UserSettings = getUserSettings();
 const books: Ref<backend.Book[]> = ref([]);
 
 const favoriteFilter = computed(
-
   () => {
     const onlyFavorites = UserSettings.BookLibrary.OnlyFavorites;
     const hideRead = UserSettings.BookLibrary.HideRead;

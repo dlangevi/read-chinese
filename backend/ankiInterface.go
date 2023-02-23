@@ -411,6 +411,14 @@ func (a *ankiInterface) LoadModels() ([]string, error) {
 	return *models, nil
 }
 
+func (a *ankiInterface) LoadDecks() ([]string, error) {
+	decks, restErr := a.anki.Decks.GetAll()
+	if restErr != nil {
+		return nil, toError(restErr)
+	}
+	return *decks, nil
+}
+
 func (a *ankiInterface) LoadModelFields(model string) ([]string, error) {
 	fields, restErr := a.anki.Models.GetFields(model)
 	if restErr != nil {

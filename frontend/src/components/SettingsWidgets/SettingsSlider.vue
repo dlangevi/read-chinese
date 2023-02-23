@@ -1,5 +1,5 @@
 <template>
-  <div class="col-span-2 flex gap-2">
+  <div class="col-span-2 flex items-center gap-4">
     <span>
       {{ setting.label }}
     </span>
