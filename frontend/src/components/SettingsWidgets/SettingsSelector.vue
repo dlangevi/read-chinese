@@ -3,7 +3,11 @@
     <span>
       {{ setting.label }}
     </span>
-    <select v-model="currentValue" class="select-primary select">
+    <select
+      v-model="currentValue"
+      class="select-primary select"
+      @input="submitChange"
+    >
       <option
         v-for="option in options"
         :key="option"
@@ -12,12 +16,6 @@
         {{ option }}
       </option>
     </select>
-    <button
-      class="btn-primary btn-sm btn"
-      @click="submitChange"
-    >
-      submit
-    </button>
     <div
       class="tooltip tooltip-right"
       :data-tip="setting.tooltip"

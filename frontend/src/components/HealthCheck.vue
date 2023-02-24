@@ -33,7 +33,7 @@
     >
       <div class="modal-box">
         <h3 class="text-xl font-extrabold">
-          How to connect Anki
+          How to install and connect to Anki
         </h3>
         <p>
           For this application to work you need to have Anki opened along with
@@ -57,7 +57,7 @@
               @click="BrowserOpenURL('https://foosoft.net/projects/anki-connect/')"
               @click.stop
             >
-              Setup up the Anki-Connect plugin
+              How to setup up the Anki-Connect plugin
             </a>
           </li>
         </ul>
@@ -76,7 +76,7 @@
       @click="() => ankiConfigure = false"
     >
       <div
-        v-if="checks.ANKIAVALIABLE.checkResult === ''"
+        v-if="checks.AnkiAvaliable.checkResult === ''"
         class="modal-box flex w-4/5 max-w-full flex-col gap-4"
         @click.stop
       >
@@ -96,7 +96,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeUnmount, reactive, computed, ref } from 'vue';
+import { onBeforeUnmount, watch, reactive, computed, ref } from 'vue';
 import { BrowserOpenURL } from '@runtime/runtime';
 import { HealthCheck as bookHealth } from '@wailsjs/backend/bookLibrary';
 import { HealthCheck as dictHealth } from '@wailsjs/backend/Dictionaries';
@@ -120,14 +120,14 @@ const dictInfo = ref(false);
 const ankiConfigure = ref(false);
 
 const checks = reactive({
-  DICTIONARY: {
+  Dictionary: {
     description: 'Have at least one Dictionary installed',
     checkAction: dictHealth,
     checkResult: 'not checked yet',
     buttonText: 'Add dictionary',
     buttonAction: () => { dictInfo.value = true; },
   },
-  BOOKLIBRARY: {
+  BookLibrary: {
     description: 'Import at least one book',
     checkAction: bookHealth,
     checkResult: 'not checked yet',
@@ -136,14 +136,14 @@ const checks = reactive({
       await loader.withLoader(ImportCalibreBooks, 'Importing calibre');
     },
   },
-  ANKIAVALIABLE: {
+  AnkiAvaliable: {
     description: 'Anki is avaliable through anki-connect',
     checkAction: ankiHealth,
     checkResult: 'not checked yet',
-    buttonText: 'Get Help',
+    buttonText: 'How to setup Anki',
     buttonAction: () => { ankiInfo.value = true; },
   },
-  ANKICONFIGURED: {
+  AnkiConfigured: {
     description: 'Configure the names of anki fields',
     // Currently only I use this so its true because of
     // hardcoded anki settings
@@ -161,37 +161,62 @@ const checks = reactive({
   },
 });
 
+watch(
+  () => checks.Dictionary.checkResult,
+  () => {
+    console.log('checkResult changed');
+    if (checks.Dictionary.checkResult === '') {
+      dictInfo.value = false;
+    }
+  });
+watch(
+  () => checks.AnkiAvaliable.checkResult,
+  () => {
+    console.log('checkResult changed');
+    if (checks.AnkiAvaliable.checkResult === '') {
+      ankiInfo.value = false;
+    }
+  });
+watch(
+  () => checks.AnkiConfigured.checkResult,
+  () => {
+    console.log('checkResult changed');
+    if (checks.AnkiConfigured.checkResult === '') {
+      ankiConfigure.value = false;
+    }
+  });
+
 const allComplete = computed(() => {
   return Object.values(checks).every(check => check.checkResult === '');
 });
 
 const nextActionText = computed(() => {
-  if (checks.DICTIONARY.checkResult !== '') {
-    return checks.DICTIONARY.buttonText;
+  if (checks.Dictionary.checkResult !== '') {
+    return checks.Dictionary.buttonText;
   }
-  if (checks.BOOKLIBRARY.checkResult !== '') {
-    return checks.BOOKLIBRARY.buttonText;
+  if (checks.BookLibrary.checkResult !== '') {
+    return checks.BookLibrary.buttonText;
   }
-  if (checks.ANKIAVALIABLE.checkResult !== '') {
-    return checks.ANKIAVALIABLE.buttonText;
+  if (checks.AnkiAvaliable.checkResult !== '') {
+    return checks.AnkiAvaliable.buttonText;
   }
-  if (checks.ANKICONFIGURED.checkResult !== '') {
-    return checks.ANKICONFIGURED.buttonText;
+  if (checks.AnkiConfigured.checkResult !== '') {
+    return checks.AnkiConfigured.buttonText;
   }
   return 'error';
 });
 const nextAction = computed(() => {
-  if (checks.DICTIONARY.checkResult !== '') {
-    return checks.DICTIONARY.buttonAction;
+  if (checks.Dictionary.checkResult !== '') {
+    return checks.Dictionary.buttonAction;
   }
-  if (checks.BOOKLIBRARY.checkResult !== '') {
-    return checks.BOOKLIBRARY.buttonAction;
+  if (checks.BookLibrary.checkResult !== '') {
+    return checks.BookLibrary.buttonAction;
   }
-  if (checks.ANKIAVALIABLE.checkResult !== '') {
-    return checks.ANKIAVALIABLE.buttonAction;
+  if (checks.AnkiAvaliable.checkResult !== '') {
+    return checks.AnkiAvaliable.buttonAction;
   }
-  if (checks.ANKICONFIGURED.checkResult !== '') {
-    return checks.ANKICONFIGURED.buttonAction;
+  if (checks.AnkiConfigured.checkResult !== '') {
+    return checks.AnkiConfigured.buttonAction;
   }
   return () => {};
 });
