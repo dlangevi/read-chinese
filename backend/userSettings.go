@@ -34,8 +34,10 @@ type (
 	}
 
 	MetaSettings struct {
-		path string
-		Ran  int `json:"Ran"`
+		path               string
+		CacheSentences     bool `json:"CacheSentences"`
+		EnableExperimental bool `json:"EnableExperimental"`
+		Ran                int  `json:"Ran"`
 	}
 
 	CardCreationConfig struct {
@@ -107,8 +109,10 @@ type (
 func defaultConfig(path string) *UserConfig {
 	return &UserConfig{
 		Meta: MetaSettings{
-			path: path,
-			Ran:  0,
+			path:               path,
+			CacheSentences:     false,
+			EnableExperimental: false,
+			Ran:                0,
 		},
 
 		CardCreationConfig: CardCreationConfig{

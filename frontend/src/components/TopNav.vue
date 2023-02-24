@@ -51,14 +51,18 @@
 import { useRoute } from 'vue-router';
 import type { RouteLocationNormalizedLoaded } from 'vue-router';
 import { watch, ref } from 'vue';
+import { getUserSettings } from '@/lib/userSettings';
+const UserSettings = getUserSettings();
 
 const route = useRoute();
 // TODO get the image working better
 const navigation = ref([
   { name: 'BookLibrary', href: '/BookLibrary', current: false },
-  { name: 'Manage FlashCards', href: '/FlashCards', current: false },
-  { name: 'Create FlashCards', href: '/MakeCards', current: false },
-  { name: 'Manage Wordlist', href: '/WordLists', current: false },
+  ...(UserSettings.meta.EnableExperimental
+    ? [{ name: 'Manage FlashCards', href: '/FlashCards', current: false },
+      { name: 'Create FlashCards', href: '/MakeCards', current: false }]
+    : []),
+  { name: 'Wordlists', href: '/WordLists', current: false },
   { name: 'Stats', href: '/Stats', current: false },
   { name: 'Settings', href: '/Settings', current: false },
 ]);

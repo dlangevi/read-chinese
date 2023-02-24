@@ -61,6 +61,7 @@ import {
 } from '@wailsjs/backend/KnownWords';
 import { ImportAnkiKeywords } from '@wailsjs/backend/ankiInterface';
 import UnknownWords from '../components/UnknownWords.vue';
+import { useLoader } from '@/lib/loading';
 
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 
@@ -90,8 +91,9 @@ onBeforeMount(async () => {
   words.value = await LearningTarget();
 });
 
+const loader = useLoader();
 async function importAnki() {
-  await ImportAnkiKeywords();
+  return loader.withLoader(ImportAnkiKeywords, 'Syncing anki words');
 }
 
 async function loadHsk() {

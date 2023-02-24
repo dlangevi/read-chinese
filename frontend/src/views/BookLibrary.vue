@@ -58,11 +58,12 @@ import { backend } from '@wailsjs/models';
 import { SaveFile } from '@wailsjs/main/App';
 import { GetBooks, GetDetailedBooks } from '@wailsjs/backend/bookLibrary';
 import { ImportCalibreBooks } from '@wailsjs/backend/Calibre';
+import { useLoader } from '@/lib/loading';
 import WithSidebar from '@/layouts/WithSidebar.vue';
+const loader = useLoader();
 
 async function syncCalibre() {
-  const err = await ImportCalibreBooks();
-  console.log(err);
+  return loader.withLoader(ImportCalibreBooks, 'Importing calibre');
 }
 
 async function exportBooks() {

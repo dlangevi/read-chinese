@@ -33,18 +33,26 @@ func NewGenerator(
 		cacheInProgress: false,
 		cacheComplete:   false,
 	}
-	go generator.GenerateSentenceTable()
+	if userSettings.Meta.CacheSentences {
+		go generator.GenerateSentenceTable()
+	}
 	return &generator
 }
 
 func (g *Generator) isT1Sentence(sentence []Token) bool {
-	unknown := 0
+	haventFoundAnyYet := false
+	firstUnknown := ""
 	for _, token := range sentence {
 		if token.IsWord && !g.known.isWellKnown(token.Data) {
-			unknown += 1
-		}
-		if unknown > 1 {
-			return false
+			if haventFoundAnyYet {
+				haventFoundAnyYet = false
+				firstUnknown = token.Data
+				continue
+			}
+
+			if firstUnknown != token.Data {
+				return false
+			}
 		}
 	}
 	return true
@@ -90,7 +98,7 @@ func duration(msg string, start time.Time) {
 // add certian parameters (eg, sentence length) which cut down on the amount of up
 // front computing if this locks the cpu for a bit
 //
-// Timing info (my computer, 21919827 characters across all books)
+// Timing info (my computer, 21,919,827 characters across all books)
 // Full index 45 seconds (running on single seperate thread)
 // Seems to take up around 150mb of memory
 // Searching indexed .5 seconds
@@ -130,13 +138,16 @@ func (g *Generator) GenerateSentenceTable() error {
 // This can still be optimized a ton
 func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]string, error) {
 	defer duration(track("Get Sentences"))
-	// If cache has not been completed
-	if !g.cacheComplete {
-		// Start it if this is the first time
-		if !g.cacheInProgress {
-			go g.GenerateSentenceTable()
+	if g.userSettings.Meta.CacheSentences {
+		// If cache has not been completed
+		if !g.cacheComplete {
+			// Start it if this is the first time
+			if !g.cacheInProgress {
+				go g.GenerateSentenceTable()
+			}
 		}
 	}
+
 	books, _ := g.bookLibrary.GetSomeBooks(bookIds...)
 	sentences := []string{}
 	for _, book := range books {
