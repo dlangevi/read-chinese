@@ -116,12 +116,12 @@ func defaultConfig(path string) *UserConfig {
 		},
 
 		CardCreationConfig: CardCreationConfig{
-			AutoAdvanceSentence: true,
+			AutoAdvanceSentence: false,
 			PopulateEnglish:     false,
 			PopulateChinese:     false,
 			AutoAdvanceEnglish:  false,
 			AutoAdvanceImage:    false,
-			AutoAdvanceCard:     true,
+			AutoAdvanceCard:     false,
 		},
 
 		AnkiConfig: AnkiConfig{
@@ -153,7 +153,7 @@ func defaultConfig(path string) *UserConfig {
 			Dicts:           map[string]Dict{},
 			PrimaryDict:     "",
 			ShowDefinitions: true,
-			EnableChinese:   true,
+			EnableChinese:   false,
 		},
 
 		SentenceGenerationConfig: SentenceGenerationConfig{

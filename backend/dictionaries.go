@@ -62,8 +62,18 @@ func (d *Dictionaries) loadDictionaries() error {
 	}
 	primaryName := d.userSettings.DictionariesConfig.PrimaryDict
 	d.PrimaryDictName = primaryName
-	// TODO this could fail
-	d.PrimaryDict = d.Dictionaries[primaryName].Dictionary
+	primaryDict, ok := d.Dictionaries[primaryName]
+	if !ok {
+		if len(d.Dictionaries) > 0 {
+			for name := range d.Dictionaries {
+				primaryName = name
+				d.SetPrimaryDict(name)
+				continue
+			}
+		}
+	} else {
+		d.PrimaryDict = primaryDict.Dictionary
+	}
 	if d.Segmentation != nil {
 		err := d.Segmentation.ReloadJieba(d)
 		if err != nil {
