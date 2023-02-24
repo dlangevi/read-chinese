@@ -108,6 +108,8 @@ import {
 
 import { FilePicker } from '@wailsjs/main/App';
 
+import { useLoader } from '@/lib/loading';
+
 // TODO see if the go type system can represent these
 export type DictionaryType = 'english' | 'chinese';
 
@@ -140,9 +142,9 @@ const options = [
 async function pickFile() {
   newDictFile.value = await FilePicker('json');
 }
-
+const loader = useLoader();
 async function addCedict() {
-  await AddCedict();
+  await loader.withLoader(AddCedict, 'adding cedict');
   updateDicts();
 }
 

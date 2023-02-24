@@ -18,7 +18,7 @@ export function GetDictionaryInfo():Promise<backend.DictionaryInfoMap>;
 
 export function GetPossibleWords(arg1:string):Promise<backend.WordDefinitions>;
 
-export function HealthCheck():Promise<boolean>;
+export function HealthCheck():Promise<string>;
 
 export function IsInDictionary(arg1:string):Promise<boolean>;
 

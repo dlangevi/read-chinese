@@ -3,7 +3,6 @@
 Currently the following have to be implemented before I would recommend any
 random person on the internet tries to use this
 
-* Requires very specific Anki deck names and card fields
 * I need to make a guide on how to get your own Azure api keys
 * I need to make a guide on how to import known word lists
 

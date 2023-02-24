@@ -35,8 +35,11 @@ func NewDictionaries(
 	return dicts
 }
 
-func (d *Dictionaries) HealthCheck() bool {
-	return len(d.Dictionaries) > 0
+func (d *Dictionaries) HealthCheck() string {
+	if len(d.Dictionaries) == 0 {
+		return "User has no dictionaries"
+	}
+	return ""
 }
 
 func (d *Dictionaries) loadDictionaries() error {

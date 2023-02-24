@@ -1,6 +1,7 @@
 export namespace backend {
 	
 	export class FieldsMapping {
+	    firstField: string;
 	    hanzi: string;
 	    exampleSentence: string;
 	    englishDefinition: string;
@@ -17,6 +18,7 @@ export namespace backend {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.firstField = source["firstField"];
 	        this.hanzi = source["hanzi"];
 	        this.exampleSentence = source["exampleSentence"];
 	        this.englishDefinition = source["englishDefinition"];

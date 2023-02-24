@@ -1,7 +1,5 @@
 import { ref, inject } from 'vue';
 import type { InjectionKey } from 'vue';
-// import type { Ref } from 'vue';
-//
 
 type ToastType = 'info' | 'success' | 'warning' | 'error'
 export class MessageApi {

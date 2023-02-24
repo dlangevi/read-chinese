@@ -9,6 +9,7 @@ import (
 
 	"github.com/atselvan/ankiconnect"
 	restError "github.com/privatesquare/bkst-go-utils/utils/errors"
+	"golang.org/x/exp/slices"
 	"golang.org/x/net/html"
 )
 
@@ -28,10 +29,11 @@ type (
 		GetAnkiNoteSkeleton(word string) RawAnkiNote
 		CreateAnkiNote(fields Fields, tags []string) error
 		GetAnkiNote(word string) (RawAnkiNote, error)
-		UpdateNoteFields(noteID int64, fields Fields) string
+		UpdateNoteFields(noteID int64, fields Fields) (string, error)
 		ImportAnkiKeywords() error
 		LoadProblemCards() ([]ProblemCard, error)
-		HealthCheck() bool
+		HealthCheck() string
+		ConfigurationCheck() (string, error)
 		LoadTemplate() error
 		LoadModels() ([]string, error)
 		LoadModelFields(model string) ([]string, error)
@@ -67,12 +69,101 @@ func (a *ankiInterface) GetAnkiNoteSkeleton(word string) RawAnkiNote {
 	}
 }
 
-func (a *ankiInterface) HealthCheck() bool {
+func (a *ankiInterface) HealthCheck() string {
 	restErr := a.anki.Ping()
-	return restErr == nil
+	if restErr != nil {
+		return "Could not connect to Anki"
+	}
+	return ""
+}
+
+func (a *ankiInterface) ConfigurationCheck() (string, error) {
+	// ActiveDeck needs to be a real deck
+	decks, restErr := a.anki.Decks.GetAll()
+	if restErr != nil {
+		return "", toError(restErr)
+	}
+	if !slices.Contains(*decks, a.userSettings.AnkiConfig.ActiveDeck) {
+		return "Active Deck does exist in Anki", nil
+	}
+
+	// ActiveModel needs to be a real model
+	models, restErr := a.anki.Models.GetAll()
+	if restErr != nil {
+		return "", toError(restErr)
+	}
+	activeModel := a.userSettings.AnkiConfig.ActiveModel
+	if !slices.Contains(*models, activeModel) {
+		return "Chose Note type does exist in Anki", nil
+	}
+
+	// CardConfiguration needs to exists and have certian fields
+	// and those fields all need to be real fields
+	currentModelFields, restErr := a.anki.Models.GetFields(activeModel)
+	if restErr != nil {
+		return "", toError(restErr)
+	}
+	fieldsConfig := a.userSettings.GetMapping(activeModel)
+
+	allEmpty := true
+	for fieldName, value := range map[string]string{
+		"FirstField":        fieldsConfig.FirstField,
+		"Hanzi":             fieldsConfig.Hanzi,
+		"ExampleSentence":   fieldsConfig.ExampleSentence,
+		"EnglishDefinition": fieldsConfig.EnglishDefinition,
+		"ChineseDefinition": fieldsConfig.ChineseDefinition,
+		"Pinyin":            fieldsConfig.Pinyin,
+		"HanziAudio":        fieldsConfig.HanziAudio,
+		"SentenceAudio":     fieldsConfig.SentenceAudio,
+		"Images":            fieldsConfig.Images,
+		"Notes":             fieldsConfig.Notes,
+	} {
+		if value == "" {
+			continue
+		} else if !slices.Contains(*currentModelFields, value) {
+			return fmt.Sprintf(
+				"Configured field for %v : (%v) does not exist",
+				fieldName, value), nil
+		} else {
+			allEmpty = false
+		}
+	}
+
+	if allEmpty {
+		return "No fields have been configured for current model", nil
+	}
+
+	return "", nil
+}
+
+func (a *ankiInterface) getConfiguredMapping() (FieldsMapping, error) {
+
+	currentModel := a.userSettings.AnkiConfig.ActiveModel
+	currentSettings := a.userSettings.GetMapping(currentModel)
+	// Required fields are:
+	// Hanzi: yes
+	// ExampleSentence: yes
+	// EnglishDefinition <- one of these
+	// ChineseDefinition <- one of these
+	// HanziAudio: if genhanziaudio is set
+	// SentenceAudio: if genAudio is set
+	// Images: if imageApi is set
+	// Notes: nope
+	// For now just make sure hanzi is set
+	if currentSettings.Hanzi == "" {
+		return currentSettings, errors.New("Hanzi is not mapped")
+	}
+
+	return currentSettings, nil
+
 }
 
 func (a *ankiInterface) CreateAnkiNote(fields Fields, tags []string) error {
+	currentMapping, err := a.getConfiguredMapping()
+	if err != nil {
+		return err
+	}
+
 	restErr := a.anki.Ping()
 	if restErr != nil {
 		return toError(restErr)
@@ -98,14 +189,15 @@ func (a *ankiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 		return nil
 	}
 	if a.userSettings.AnkiConfig.GenerateTermAudio {
-		err := addAudio(fields.Word, "HanziAudio")
+
+		err := addAudio(fields.Word, currentMapping.HanziAudio)
 		if err != nil {
 			return err
 		}
 	}
 	// dont generate if sentence is empty
 	if a.userSettings.AnkiConfig.GenerateSentenceAudio && len(fields.Sentence) > 0 {
-		err := addAudio(fields.Sentence, "SentenceAudio")
+		err := addAudio(fields.Sentence, currentMapping.SentenceAudio)
 		if err != nil {
 			return err
 		}
@@ -117,24 +209,35 @@ func (a *ankiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 			// TODO dont guess the encoding format
 			Filename: fmt.Sprintf("read-chinese-image-%v-%v.jpg", milli, i),
 			Fields: []string{
-				"Images",
+				currentMapping.Images,
 			},
 		})
 	}
 
+	noteFields := ankiconnect.Fields{
+		currentMapping.Hanzi:             fields.Word,
+		currentMapping.ExampleSentence:   fields.Sentence,
+		currentMapping.EnglishDefinition: fields.EnglishDefn,
+		currentMapping.ChineseDefinition: fields.ChineseDefn,
+		currentMapping.Pinyin:            fields.Pinyin,
+	}
+
+	firstField := currentMapping.FirstField
+	// If your first field is something else then ???
+	if firstField != currentMapping.Hanzi ||
+		firstField != currentMapping.ExampleSentence ||
+		firstField != currentMapping.EnglishDefinition ||
+		firstField != currentMapping.ChineseDefinition {
+		noteFields[currentMapping.FirstField] = fmt.Sprint(time.Now().UnixMilli())
+	}
+
 	note := ankiconnect.Note{
-		DeckName:  "Reading",
-		ModelName: "Reading Card",
-		Fields: ankiconnect.Fields{
-			"Hanzi":             fields.Word,
-			"ExampleSentence":   fields.Sentence,
-			"EnglishDefinition": fields.EnglishDefn,
-			"ChineseDefinition": fields.ChineseDefn,
-			"Pinyin":            fields.Pinyin,
-		},
-		Tags: append(tags, "read-chinese"),
+		DeckName:  a.userSettings.AnkiConfig.ActiveDeck,
+		ModelName: a.userSettings.AnkiConfig.ActiveModel,
+		Fields:    noteFields,
+		Tags:      tags,
 		Options: &ankiconnect.Options{
-			AllowDuplicate: true,
+			AllowDuplicate: a.userSettings.AnkiConfig.AllowDuplicates,
 		},
 		Audio:   audio,
 		Picture: pictures,
@@ -154,7 +257,12 @@ func toError(restErr *restError.RestErr) error {
 }
 
 func (a *ankiInterface) GetAnkiNote(word string) (RawAnkiNote, error) {
-	notes, restErr := a.anki.Notes.Get(fmt.Sprintf("Hanzi:%v", word))
+	currentMapping, err := a.getConfiguredMapping()
+	if err != nil {
+		return RawAnkiNote{}, err
+	}
+
+	notes, restErr := a.anki.Notes.Get(fmt.Sprintf("%v:%v", currentMapping.Hanzi, word))
 	if restErr != nil {
 		return RawAnkiNote{}, toError(restErr)
 	}
@@ -173,7 +281,7 @@ func (a *ankiInterface) GetAnkiNote(word string) (RawAnkiNote, error) {
 
 	images := []string{}
 	// Images will (hopefully) have html <img src=\"filename.jpg\">
-	imagesString := extract("Images")
+	imagesString := extract(currentMapping.Images)
 	if imagesString != "" {
 		log.Print(imagesString)
 		doc, err := html.Parse(strings.NewReader(imagesString))
@@ -211,37 +319,38 @@ func (a *ankiInterface) GetAnkiNote(word string) (RawAnkiNote, error) {
 	rawNote := RawAnkiNote{
 		NoteId: note.NoteId,
 		Fields: Fields{
-			Word:        extract("Hanzi"),
-			Sentence:    extract("ExampleSentence"),
-			EnglishDefn: extract("EnglishDefinition"),
-			ChineseDefn: extract("ChineseDefinition"),
-			Pinyin:      extract("Pinyin"),
-			// TODO how to load the image from a card which already exists?
-			// use retrieveMediaFile to get base64 encoded image
+			Word:        extract(currentMapping.Hanzi),
+			Sentence:    extract(currentMapping.ExampleSentence),
+			EnglishDefn: extract(currentMapping.EnglishDefinition),
+			ChineseDefn: extract(currentMapping.ChineseDefinition),
+			Pinyin:      extract(currentMapping.Pinyin),
 			// ImageUrls: [],
 			Image64: images,
 		},
-		// rawNote,
 	}
 	return rawNote, nil
 }
 
-func (a *ankiInterface) UpdateNoteFields(noteID int64, fields Fields) string {
+func (a *ankiInterface) UpdateNoteFields(noteID int64, fields Fields) (string, error) {
+	currentMapping, err := a.getConfiguredMapping()
+	if err != nil {
+		return "", err
+	}
 	ankiFields := ankiconnect.Fields{}
 	if fields.Word != "" {
-		ankiFields["Hanzi"] = fields.Word
+		ankiFields[currentMapping.Hanzi] = fields.Word
 	}
 	if fields.Sentence != "" {
-		ankiFields["ExampleSentence"] = fields.Sentence
+		ankiFields[currentMapping.ExampleSentence] = fields.Sentence
 	}
 	if fields.EnglishDefn != "" {
-		ankiFields["EnglishDefinition"] = fields.EnglishDefn
+		ankiFields[currentMapping.EnglishDefinition] = fields.EnglishDefn
 	}
 	if fields.ChineseDefn != "" {
-		ankiFields["ChineseDefinition"] = fields.ChineseDefn
+		ankiFields[currentMapping.ChineseDefinition] = fields.ChineseDefn
 	}
 	if fields.Pinyin != "" {
-		ankiFields["Pinyin"] = fields.Pinyin
+		ankiFields[currentMapping.Pinyin] = fields.Pinyin
 	}
 	// TODO include new audio and images
 	update := ankiconnect.UpdateNote{
@@ -250,23 +359,28 @@ func (a *ankiInterface) UpdateNoteFields(noteID int64, fields Fields) string {
 	}
 	restErr := a.anki.Notes.Update(update)
 	if restErr != nil {
-		return restErr.Error
+		return "", toError(restErr)
 	}
 
 	// TODO clear flag if needed
 
-	return "success"
+	return "success", nil
 }
 
 func (a *ankiInterface) ImportAnkiKeywords() error {
-	cards, restErr := a.anki.Cards.Get("deck:Reading")
+	currentMapping, err := a.getConfiguredMapping()
+	if err != nil {
+		return err
+	}
+	cards, restErr := a.anki.Cards.Get(
+		fmt.Sprintf("deck:%v", a.userSettings.AnkiConfig.ActiveDeck))
 	if restErr != nil {
 		return toError(restErr)
 	}
 
 	words := []WordEntry{}
 	for _, card := range *cards {
-		word, _ := card.Fields["Hanzi"]
+		word, _ := card.Fields[currentMapping.Hanzi]
 		words = append(words, WordEntry{
 			Word:     word.Value,
 			Interval: card.Interval,
@@ -299,6 +413,11 @@ type ProblemCard struct {
 
 func (a *ankiInterface) LoadProblemCards() ([]ProblemCard, error) {
 	problemCardsMap := map[int64]ProblemCard{}
+	problemCards := []ProblemCard{}
+	currentMapping, err := a.getConfiguredMapping()
+	if err != nil {
+		return problemCards, err
+	}
 
 	// For each query, get the noteIds. Add them all to the map
 	// with problems
@@ -308,29 +427,32 @@ func (a *ankiInterface) LoadProblemCards() ([]ProblemCard, error) {
 		Setter func(*Problems)
 	}
 
+	currentDeck := a.userSettings.AnkiConfig.ActiveDeck
+
 	checks := []ProblemCase{
 		{ // Cards Flagged by the user
-			Query:  "deck:Reading -flag:0",
+			Query:  fmt.Sprintf("deck:%v -flag:0", currentDeck),
 			Setter: func(p *Problems) { p.Flagged = true },
 		},
 		{ // Missing Example Sentence
-			Query:  "deck:Reading ExampleSentence:",
+			Query:  fmt.Sprintf("deck:%v %v:", currentDeck, currentMapping.ExampleSentence),
 			Setter: func(p *Problems) { p.MissingSentence = true },
 		},
 		{ // Has Sentence, but missing Sentence Audio
-			Query:  "deck:Reading -ExampleSentence: SentenceAudio:",
+			Query: fmt.Sprintf("deck:%v -%v: %v:", currentDeck,
+				currentMapping.ExampleSentence, currentMapping.SentenceAudio),
 			Setter: func(p *Problems) { p.MissingSentenceAudio = true },
 		},
 		{ // Missing Image
-			Query:  "deck:Reading Images:",
+			Query:  fmt.Sprintf("deck:%v %v:", currentDeck, currentMapping.Images),
 			Setter: func(p *Problems) { p.MissingImage = true },
 		},
 		{ // Missing HanziAudio
-			Query:  "deck:Reading HanziAudio:",
+			Query:  fmt.Sprintf("deck:%v %v:", currentDeck, currentMapping.HanziAudio),
 			Setter: func(p *Problems) { p.MissingWordAudio = true },
 		},
 		{ // Missing Pinyin TODO: check for ugly pinyin? eg: ni3hao3
-			Query:  "deck:Reading Pinyin:",
+			Query:  fmt.Sprintf("deck:%v %v:", currentDeck, currentMapping.Pinyin),
 			Setter: func(p *Problems) { p.MissingPinyin = true },
 		},
 	}
@@ -343,7 +465,7 @@ func (a *ankiInterface) LoadProblemCards() ([]ProblemCard, error) {
 		}
 
 		for _, id := range *ids {
-			word, ok := id.Fields["Hanzi"]
+			word, ok := id.Fields[currentMapping.Hanzi]
 			if !ok {
 				return nil, errors.New("Hanzi not found")
 			}
@@ -354,7 +476,7 @@ func (a *ankiInterface) LoadProblemCards() ([]ProblemCard, error) {
 					Problems: Problems{},
 				}
 
-				notes, ok := id.Fields["Notes"]
+				notes, ok := id.Fields[currentMapping.Notes]
 				if ok {
 					problemCard.Notes = notes.Value
 				}
@@ -369,7 +491,6 @@ func (a *ankiInterface) LoadProblemCards() ([]ProblemCard, error) {
 	// For now just do
 
 	// Finally map to array since wails cant do the needed ts stuff
-	problemCards := []ProblemCard{}
 	for _, problemCard := range problemCardsMap {
 		problemCards = append(problemCards, problemCard)
 	}

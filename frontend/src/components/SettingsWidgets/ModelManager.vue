@@ -26,7 +26,7 @@
     </div>
     <div class="grid grid-cols-3 gap-4">
       <div
-        v-for="(_, key) in fields"
+        v-for="(key) in filteredFields"
         :key="key"
         class="flex place-content-between"
       >
@@ -70,7 +70,16 @@ async function generateModel() {
   await LoadTemplate();
 }
 
+type FieldsMapKey = keyof backend.FieldsMapping
 const fields = ref(backend.FieldsMapping.createFrom());
+const filteredFields = computed((): FieldsMapKey[] => {
+  return Object.keys(fields.value).filter((key) => {
+    return key !== 'firstField';
+  }).map((key) => {
+    return key as FieldsMapKey;
+    // return key as keyof backend.FieldsMapping;
+  });
+});
 const models = ref<string[]>([]);
 const modelFields = ref<string[]>([]);
 const currentModel = ref('');
@@ -86,6 +95,7 @@ watch(currentModel, async () => {
   if (currentModel.value !== '') {
     fields.value = await GetMapping(currentModel.value);
     modelFields.value = await LoadModelFields(currentModel.value);
+    fields.value.firstField = modelFields.value[0];
   }
 });
 
@@ -94,19 +104,29 @@ function saveMapping() {
   SetMapping(currentModel.value, fields.value);
 }
 
-onBeforeMount(async () => {
-  models.value = await LoadModels();
+async function fetchModels() {
+  return LoadModels().then(async (loaded) => {
+    if (loaded !== undefined) {
+      models.value = loaded;
 
-  // Ideally we would pass the usersettings in somehow
-  // But this works for now
-  const userSettings = await GetUserSettings();
-  let activeModel = userSettings.AnkiConfig.ActiveModel;
-  fields.value = await GetMapping(activeModel);
-  if (models.value.length > 0) {
-    if (!models.value.includes(activeModel)) {
-      activeModel = models.value[0];
+      // Ideally we would pass the usersettings in somehow
+      // But this works for now
+      const userSettings = await GetUserSettings();
+      const activeModel = userSettings.AnkiConfig.ActiveModel;
+      if (loaded.includes(activeModel)) {
+        currentModel.value = activeModel;
+      }
+    } else {
+      console.log('Failed to fetch data for selector');
+      setTimeout(fetchModels, 1000);
     }
-    modelFields.value = await LoadModelFields(activeModel);
-  }
+  }).catch((err) => {
+    console.log(err);
+    setTimeout(fetchModels, 1000);
+  });
+}
+
+onBeforeMount(async () => {
+  await fetchModels();
 });
 </script>

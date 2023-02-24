@@ -182,9 +182,13 @@ async function submit() {
   if (action === ActionsEnum.CREATE) {
     const cardValues = toRaw(cardManager.newValues);
     const tags = [];
-    if (preferBookRef.value !== undefined) {
+    if (preferBookRef.value !== undefined &&
+        UserSettings.AnkiConfig.AddBookTag) {
       const book = await GetBook(preferBookRef.value);
       tags.push(book.title);
+    }
+    if (UserSettings.AnkiConfig.AddProgramTag) {
+      tags.push('read-chinese');
     }
     // TODO do this kind of catching elsewhere
     console.log('creating values ', cardValues);

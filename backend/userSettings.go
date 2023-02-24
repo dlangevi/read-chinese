@@ -48,6 +48,7 @@ type (
 	}
 
 	FieldsMapping struct {
+		FirstField        string `json:"firstField"`
 		Hanzi             string `json:"hanzi"`
 		ExampleSentence   string `json:"exampleSentence"`
 		EnglishDefinition string `json:"englishDefinition"`
@@ -120,10 +121,10 @@ func defaultConfig(path string) *UserConfig {
 		},
 
 		AnkiConfig: AnkiConfig{
-			ActiveDeck:  "Reading",
-			ActiveModel: "Reading Card",
+			ActiveDeck:  "Default",
+			ActiveModel: "",
 			ModelMappings: map[string]FieldsMapping{
-				"Reading Card": {
+				"read-chinese-note": {
 					Hanzi:             "Hanzi",
 					ExampleSentence:   "ExampleSentence",
 					EnglishDefinition: "EnglishDefinition",

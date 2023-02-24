@@ -29,7 +29,7 @@ type (
 		GetDetailedBooks(path string) ([]Book, error)
 		// Check if book already exists in collection
 		BookExists(author string, title string) (bool, error)
-		HealthCheck() (bool, error)
+		HealthCheck() (string, error)
 
 		// Get the words in the library that occure the most often
 		LearningTarget() []WordOccuranceRow
@@ -308,13 +308,20 @@ func (b *bookLibrary) BookExists(author string, title string) (bool, error) {
 	return exists, err
 }
 
-func (b *bookLibrary) HealthCheck() (bool, error) {
+func (b *bookLibrary) HealthCheck() (string, error) {
 	var exists bool
 	err := b.db.QueryRow(`SELECT exists (
     SELECT bookId 
     FROM books 
   )`).Scan(&exists)
-	return exists, err
+	if err != nil {
+		return "", err
+	}
+
+	if !exists {
+		return "User has 0 books", nil
+	}
+	return "", nil
 
 }
 
@@ -385,7 +392,7 @@ func (b *bookLibrary) TopUnknownWords(bookId int, numWords int) []string {
 }
 
 func getKnownWords(db *sqlx.DB, bookId int64) (int, error) {
-	var known int
+	var known sql.NullInt64
 	err := db.QueryRow(`
     SELECT SUM(count) as known 
     FROM frequency
@@ -398,7 +405,11 @@ func getKnownWords(db *sqlx.DB, bookId int64) (int, error) {
 	if err != nil {
 		log.Println("Error with getKnownWords", err)
 	}
-	return known, err
+	if known.Valid {
+		return int(known.Int64), err
+	} else {
+		return 0, err
+	}
 }
 
 func getTotalWords(db *sqlx.DB, bookId int64) (int, error) {

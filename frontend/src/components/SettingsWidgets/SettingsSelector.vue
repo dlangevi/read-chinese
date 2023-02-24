@@ -49,14 +49,22 @@ const props = withDefaults(defineProps<{
 const currentValue = ref(props.initialValue);
 const options = ref<string[]>([]);
 
-(async () => {
+async function fetchFields() {
   if (props.setting.dataSource !== undefined) {
-    const loaded = await props.setting.dataSource();
-    if (loaded !== undefined) {
-      options.value = loaded;
-    }
+    props.setting.dataSource().then((loaded) => {
+      if (loaded !== undefined) {
+        options.value = loaded;
+      } else {
+        console.log('Failed to fetch data for selector');
+        setTimeout(fetchFields, 1000);
+      }
+    }).catch((err) => {
+      console.log(err);
+      setTimeout(fetchFields, 1000);
+    });
   }
-})();
+}
+fetchFields();
 
 function submitChange() {
   console.log(currentValue.value);

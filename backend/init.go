@@ -29,14 +29,33 @@ type Backend struct {
 	Calibre      *Calibre
 }
 
-func (b *Backend) HealthCheck() (bool, error) {
+func (b *Backend) HealthCheck() (string, error) {
 	checkBooks, err := b.BookLibrary.HealthCheck()
 	if err != nil {
-		return false, err
+		return "", err
+	}
+	if checkBooks != "" {
+		return checkBooks, nil
 	}
 	checkDicts := b.Dictionaries.HealthCheck()
+	if checkDicts != "" {
+		return checkDicts, nil
+	}
+
 	checkAnki := b.AnkiInterface.HealthCheck()
-	return checkBooks && checkDicts && checkAnki, nil
+	if checkAnki != "" {
+		return checkAnki, nil
+	}
+
+	configureAnki, err := b.AnkiInterface.ConfigurationCheck()
+	if err != nil {
+		return "", err
+	}
+	if configureAnki != "" {
+		return configureAnki, nil
+	}
+
+	return "", nil
 }
 
 func StartBackend(ctx *context.Context,

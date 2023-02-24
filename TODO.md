@@ -20,15 +20,13 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 - [ ] Support more variable sources for user word list 
 - [ ] Export user data somehow
 - [ ] View and edit known words
-
+- [ ] Import from multiple anki decks
 
 
 ### In Progress
 
 These will definitely be implemented and have priority
 
-- [ ] push premade card format to anki for new users
-- [ ] allow mapping output to arbitrary anki note format
 - [ ] interactive workflow for importing from calibre (control which books to import etc)
 - [ ] add new book (without needing calibre)
 - [ ] card maintenance (search for missing image, audio, etc)
@@ -36,6 +34,8 @@ These will definitely be implemented and have priority
 
 
 ### DONE
+- [x] push premade card format to anki for new users
+- [x] allow mapping output to arbitrary anki note / deck format
 - [x] create startup health checks that prepares user for starting to mine 
 - [x] store our own copy of image cover, book text, etc
 - [x] Import wordlist from csv

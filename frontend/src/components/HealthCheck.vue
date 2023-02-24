@@ -4,25 +4,26 @@
       <router-link class="btn" to="/BookLibrary">Lets get started</router-link>
     </div>
     <div v-else>
-      <h2 class="text-2xl font-extrabold text-white">
-        Before Getting Started
-      </h2>
+      <div class="flex gap-4">
+        <h2 class="text-2xl font-extrabold text-white">
+          Before Getting Started
+        </h2>
+        <div
+          class="btn-primary btn"
+          @click="nextAction"
+        >
+          {{ nextActionText }}
+        </div>
+      </div>
       <ul class="list-outside list-disc space-y-2">
         <li
           v-for="check in checks"
           :key="check.description"
           class="items-center space-x-2"
         >
-          <span :class="{ 'line-through': check.checkResult }">
+          <span :class="{ 'line-through': check.checkResult == ''}">
             {{ check.description }}
           </span>
-          <div
-            v-if="!check.checkResult"
-            class="btn-primary btn-sm btn"
-            @click="check.buttonAction"
-          >
-            {{ check.buttonText }}
-          </div>
         </li>
       </ul>
     </div>
@@ -70,6 +71,27 @@
         <dictionaries-list />
       </div>
     </div>
+    <div
+      :class="['modal', {'modal-open': ankiConfigure}]"
+      @click="() => ankiConfigure = false"
+    >
+      <div
+        v-if="checks.ANKIAVALIABLE.checkResult === ''"
+        class="modal-box flex w-4/5 max-w-full flex-col gap-4"
+        @click.stop
+      >
+        <settings-selector
+          :setting="ComponentTable.ActiveDeck"
+          :initial-value="UserSettings.AnkiConfig.ActiveDeck"
+        />
+        <settings-selector
+          :setting="ComponentTable.ActiveModel"
+          :initial-value="UserSettings.AnkiConfig.ActiveModel"
+        />
+
+        <model-manager />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -78,60 +100,101 @@ import { onBeforeUnmount, reactive, computed, ref } from 'vue';
 import { BrowserOpenURL } from '@runtime/runtime';
 import { HealthCheck as bookHealth } from '@wailsjs/backend/bookLibrary';
 import { HealthCheck as dictHealth } from '@wailsjs/backend/Dictionaries';
-import { HealthCheck as ankiHealth } from '@wailsjs/backend/ankiInterface';
+import {
+  HealthCheck as ankiHealth,
+  ConfigurationCheck as ankiConfigured,
+} from '@wailsjs/backend/ankiInterface';
 import { ImportCalibreBooks } from '@wailsjs/backend/Calibre';
+import SettingsSelector from
+  '@/components/SettingsWidgets/SettingsSelector.vue';
 import DictionariesList
   from '@/components/SettingsWidgets/DictionariesList.vue';
+import ModelManager
+  from '@/components/SettingsWidgets/ModelManager.vue';
+import { ComponentTable, getUserSettings } from '@/lib/userSettings';
+import { useLoader } from '@/lib/loading';
+const loader = useLoader();
+const UserSettings = getUserSettings();
 const ankiInfo = ref(false);
 const dictInfo = ref(false);
-
-const Check = {
-  BOOKLIBRARY: 'books',
-  DICTIONARY: 'dictionary',
-  ANKIAVALIABLE: 'ankiavaliable',
-  ANKICONFIGURED: 'ankiconfigured',
-} as const;
+const ankiConfigure = ref(false);
 
 const checks = reactive({
-  [Check.DICTIONARY]: {
+  DICTIONARY: {
     description: 'Have at least one Dictionary installed',
     checkAction: dictHealth,
-    checkResult: false,
+    checkResult: 'not checked yet',
     buttonText: 'Add dictionary',
     buttonAction: () => { dictInfo.value = true; },
   },
-  [Check.BOOKLIBRARY]: {
+  BOOKLIBRARY: {
     description: 'Import at least one book',
     checkAction: bookHealth,
-    checkResult: false,
+    checkResult: 'not checked yet',
     buttonText: 'Sync Calibre',
     buttonAction: async () => {
-      const err = await ImportCalibreBooks();
-      console.log(err);
+      await loader.withLoader(ImportCalibreBooks, 'Importing calibre');
     },
   },
-  [Check.ANKIAVALIABLE]: {
+  ANKIAVALIABLE: {
     description: 'Anki is avaliable through anki-connect',
     checkAction: ankiHealth,
-    checkResult: false,
+    checkResult: 'not checked yet',
     buttonText: 'Get Help',
     buttonAction: () => { ankiInfo.value = true; },
   },
-  [Check.ANKICONFIGURED]: {
+  ANKICONFIGURED: {
     description: 'Configure the names of anki fields',
     // Currently only I use this so its true because of
     // hardcoded anki settings
-    checkAction: async () => true,
-    checkResult: false,
+    checkAction: async () => {
+      const health = await ankiHealth();
+      if (health !== '') {
+        return health;
+      } else {
+        return ankiConfigured();
+      }
+    },
+    checkResult: 'not checked yet',
     buttonText: 'Configure Anki',
-    buttonAction: () => true,
+    buttonAction: () => { ankiConfigure.value = true; },
   },
 });
 
 const allComplete = computed(() => {
-  return Object.values(checks).every(check => check.checkResult);
+  return Object.values(checks).every(check => check.checkResult === '');
 });
 
+const nextActionText = computed(() => {
+  if (checks.DICTIONARY.checkResult !== '') {
+    return checks.DICTIONARY.buttonText;
+  }
+  if (checks.BOOKLIBRARY.checkResult !== '') {
+    return checks.BOOKLIBRARY.buttonText;
+  }
+  if (checks.ANKIAVALIABLE.checkResult !== '') {
+    return checks.ANKIAVALIABLE.buttonText;
+  }
+  if (checks.ANKICONFIGURED.checkResult !== '') {
+    return checks.ANKICONFIGURED.buttonText;
+  }
+  return 'error';
+});
+const nextAction = computed(() => {
+  if (checks.DICTIONARY.checkResult !== '') {
+    return checks.DICTIONARY.buttonAction;
+  }
+  if (checks.BOOKLIBRARY.checkResult !== '') {
+    return checks.BOOKLIBRARY.buttonAction;
+  }
+  if (checks.ANKIAVALIABLE.checkResult !== '') {
+    return checks.ANKIAVALIABLE.buttonAction;
+  }
+  if (checks.ANKICONFIGURED.checkResult !== '') {
+    return checks.ANKICONFIGURED.buttonAction;
+  }
+  return () => {};
+});
 function recheck() {
   Object.values(checks).forEach(async (check) => {
     check.checkResult = await check.checkAction();

@@ -15,6 +15,7 @@ import App from './App.vue';
 
 import { HealthCheck } from '@wailsjs/backend/Backend';
 import { MessageApi, MessageApiKey } from '@/lib/messages';
+import { LoadingApi, LoadingApiKey } from '@/lib/loading';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -82,17 +83,19 @@ async function init() {
   const app = createApp(App);
   const userSettings = await generateUserSettings();
   const messageApi = new MessageApi();
+  const loadingApi = new LoadingApi();
 
   router.beforeEach(async (to, _from) => {
     console.log(to.name);
     const passes = await HealthCheck();
-    if (!passes && to.name !== 'Welcome') {
+    if (passes !== '' && to.name !== 'Welcome') {
       messageApi.error('Fix your problems before you can play');
       return '/Welcome';
     }
   });
 
   app.provide(MessageApiKey, messageApi);
+  app.provide(LoadingApiKey, loadingApi);
   app.provide(UserSettingsKey, userSettings);
   app.use(router);
   app.use(pinia);
