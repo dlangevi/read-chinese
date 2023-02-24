@@ -373,7 +373,7 @@ func (a *ankiInterface) ImportAnkiKeywords() error {
 		return err
 	}
 	cards, restErr := a.anki.Cards.Get(
-		fmt.Sprintf("deck:%v", a.userSettings.AnkiConfig.ActiveDeck))
+		fmt.Sprintf(`"deck:%v"`, a.userSettings.AnkiConfig.ActiveDeck))
 	if restErr != nil {
 		return toError(restErr)
 	}

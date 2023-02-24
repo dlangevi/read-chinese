@@ -55,7 +55,6 @@ func (known *KnownWords) syncWords() {
 		known.words[word.Word] = word.Interval
 		for _, char := range word.Word {
 			known.characters[char] = true
-
 		}
 	}
 }
@@ -128,14 +127,23 @@ type WordEntry struct {
 func (known *KnownWords) AddWords(words []WordEntry) error {
 	newWords := []WordEntry{}
 	needsUpdate := []WordEntry{}
+	alreadySeen := map[string]int64{}
+	log.Println("Adding", len(words), "words")
 
 	for _, word := range words {
-		if !known.isKnown(word.Word) {
-			newWords = append(newWords, word)
+		// Doing this ensures no duplicates are added
+		_, seen := alreadySeen[word.Word]
+		if seen {
+			log.Println("Duplicate words: ", word.Word)
 		} else {
-			currentInterval := known.words[word.Word]
-			if currentInterval != word.Interval {
-				needsUpdate = append(needsUpdate, word)
+			alreadySeen[word.Word] = word.Interval
+			if !known.isKnown(word.Word) {
+				newWords = append(newWords, word)
+			} else {
+				currentInterval := known.words[word.Word]
+				if currentInterval != word.Interval {
+					needsUpdate = append(needsUpdate, word)
+				}
 			}
 		}
 	}
@@ -179,6 +187,9 @@ func (known *KnownWords) AddWords(words []WordEntry) error {
 	}
 	for _, word := range words {
 		known.words[word.Word] = word.Interval
+		for _, char := range word.Word {
+			known.characters[char] = true
+		}
 	}
 	return nil
 }
