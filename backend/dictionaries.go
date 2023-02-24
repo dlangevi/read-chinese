@@ -11,6 +11,7 @@ type Dictionaries struct {
 	Dictionaries    map[string]UserDictionary
 	userSettings    *UserConfig
 	known           *KnownWords
+	Segmentation    *Segmentation
 }
 
 type UserDictionary struct {
@@ -42,6 +43,11 @@ func (d *Dictionaries) HealthCheck() string {
 	return ""
 }
 
+// Is this the way to do a reference loop?
+func (d *Dictionaries) PassSegmentation(s *Segmentation) {
+	d.Segmentation = s
+}
+
 func (d *Dictionaries) loadDictionaries() error {
 	d.Dictionaries = map[string]UserDictionary{}
 	for name, dict := range d.userSettings.DictionariesConfig.Dicts {
@@ -58,6 +64,12 @@ func (d *Dictionaries) loadDictionaries() error {
 	d.PrimaryDictName = primaryName
 	// TODO this could fail
 	d.PrimaryDict = d.Dictionaries[primaryName].Dictionary
+	if d.Segmentation != nil {
+		err := d.Segmentation.ReloadJieba(d)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

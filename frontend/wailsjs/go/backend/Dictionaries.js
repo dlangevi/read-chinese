@@ -42,6 +42,10 @@ export function IsInDictionary(arg1) {
   return window['go']['backend']['Dictionaries']['IsInDictionary'](arg1);
 }
 
+export function PassSegmentation(arg1) {
+  return window['go']['backend']['Dictionaries']['PassSegmentation'](arg1);
+}
+
 export function SetPrimaryDict(arg1) {
   return window['go']['backend']['Dictionaries']['SetPrimaryDict'](arg1);
 }

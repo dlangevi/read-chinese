@@ -13,6 +13,7 @@ import (
 )
 
 type Segmentation struct {
+	jieba *gojieba.Jieba
 }
 
 //go:embed assets/dict
@@ -42,7 +43,6 @@ type Token struct {
 	IsWord bool
 }
 
-var jieba *gojieba.Jieba
 var punctuation = regexp.MustCompile(`\p{P}`)
 var whitespace = regexp.MustCompile(`\s+`)
 var latin = regexp.MustCompile(`\p{Latin}`)
@@ -66,7 +66,7 @@ func isChineseWord(word string) bool {
 
 // segmentSentence
 func (s *Segmentation) SegmentSentence(sentence string) []Token {
-	words := jieba.Cut(sentence, false)
+	words := s.jieba.Cut(sentence, false)
 	tokens := []Token{}
 	for _, word := range words {
 		isWord := isChineseWord(word)
@@ -87,7 +87,7 @@ func (s *Segmentation) SegmentFullText(path string) ([]string, FrequencyTable, e
 		return nil, nil, err
 	}
 
-	words := jieba.Cut(string(bytes), false)
+	words := s.jieba.Cut(string(bytes), false)
 	sentences := []string{}
 	frequency := FrequencyTable{}
 	previousSentence := strings.Builder{}
@@ -157,7 +157,7 @@ func (s *Segmentation) SegmentFullText(path string) ([]string, FrequencyTable, e
 	return sentences, frequency, nil
 }
 
-func constructDict(d *Dictionaries) error {
+func constructDict(d *Dictionaries, s *Segmentation) error {
 	dict, err := jiebaDicts.Open(path.Join(
 		"assets", "dict", jiebaFiles["DICT_PATH"]))
 	if err != nil {
@@ -190,7 +190,7 @@ func constructDict(d *Dictionaries) error {
 	// If the user has not installed dictionaries we just use the
 	// default segmentation
 	if validWords != 0 {
-		jieba = gojieba.NewJieba(
+		s.jieba = gojieba.NewJieba(
 			replacementPath,
 			ConfigDir("jiebaDicts", jiebaFiles["HMM_PATH"]),
 			ConfigDir("jiebaDicts", jiebaFiles["USER_DICT_PATH"]),
@@ -198,7 +198,7 @@ func constructDict(d *Dictionaries) error {
 			ConfigDir("jiebaDicts", jiebaFiles["STOP_WORDS_PATH"]),
 		)
 	} else {
-		jieba = gojieba.NewJieba(
+		s.jieba = gojieba.NewJieba(
 			ConfigDir("jiebaDicts", jiebaFiles["DICT_PATH"]),
 			ConfigDir("jiebaDicts", jiebaFiles["HMM_PATH"]),
 			ConfigDir("jiebaDicts", jiebaFiles["USER_DICT_PATH"]),
@@ -210,11 +210,20 @@ func constructDict(d *Dictionaries) error {
 	return nil
 }
 
+func (s *Segmentation) ReloadJieba(d *Dictionaries) error {
+	err := constructDict(d, s)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func NewSegmentation(d *Dictionaries) (*Segmentation, error) {
 	s := &Segmentation{}
-	err := constructDict(d)
+	err := constructDict(d, s)
 	if err != nil {
 		return s, err
 	}
+	d.PassSegmentation(s)
 	return s, nil
 }

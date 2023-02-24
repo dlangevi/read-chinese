@@ -22,4 +22,6 @@ export function HealthCheck():Promise<string>;
 
 export function IsInDictionary(arg1:string):Promise<boolean>;
 
+export function PassSegmentation(arg1:backend.Segmentation):Promise<void>;
+
 export function SetPrimaryDict(arg1:string):Promise<void>;

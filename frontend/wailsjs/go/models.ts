@@ -435,6 +435,7 @@ export namespace backend {
 		    return a;
 		}
 	}
+	
 	export class SentenceGenerationConfig {
 	    IdealSentenceLength: number;
 	    KnownInterval: number;
