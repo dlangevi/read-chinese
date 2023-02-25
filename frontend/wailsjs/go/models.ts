@@ -334,6 +334,7 @@ export namespace backend {
 	    CacheSentences: boolean;
 	    EnableExperimental: boolean;
 	    Ran: number;
+	    Theme: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new MetaSettings(source);
@@ -344,6 +345,7 @@ export namespace backend {
 	        this.CacheSentences = source["CacheSentences"];
 	        this.EnableExperimental = source["EnableExperimental"];
 	        this.Ran = source["Ran"];
+	        this.Theme = source["Theme"];
 	    }
 	}
 	export class Problems {

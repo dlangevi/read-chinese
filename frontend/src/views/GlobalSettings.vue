@@ -7,8 +7,10 @@
       <div class="m-5">
         <h2 class="mb-4 text-2xl font-bold text-green-700">Select Theme</h2>
         <select
+          v-model="currentTheme"
           data-choose-theme
           class="select-primary select"
+          @change="saveTheme"
         >
           <option
             v-for="theme in themes"
@@ -53,10 +55,14 @@
 
 <script lang="ts" setup>
 import {
+  ref,
+  onMounted,
+} from 'vue';
+import {
   getUserSettings, getDisplayable,
 } from '@/lib/userSettings';
-import { onMounted } from 'vue';
 import { themeChange } from 'theme-change';
+import { SetUserSetting } from '@wailsjs/backend/UserConfig';
 
 const props = defineProps<{
   highlight?: string,
@@ -65,6 +71,7 @@ onMounted(() => {
   themeChange(false);
 });
 
+const currentTheme = ref('');
 const UserSettings = getUserSettings();
 const themes = [
   'light', 'dark', 'cupcake',
@@ -77,6 +84,9 @@ const themes = [
   'autumn', 'business', 'acid',
   'lemonade', 'night', 'coffee', 'winter',
 ];
+function saveTheme() {
+  SetUserSetting('Theme', currentTheme.value);
+}
 
 const sections = {
   CardCreationSettings:

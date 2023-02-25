@@ -26,14 +26,14 @@ import MessageProvider from '@/components/MessageProvider.vue';
 import LoaderProvider from '@/components/LoaderProvider.vue';
 import TopNav from '@/components/TopNav.vue';
 import CardCreator from '@/components/CardCreator.vue';
+import { getUserSettings } from '@/lib/userSettings';
 
 import './App.css';
 
+const UserSettings = getUserSettings();
+
 onMounted(() => {
-  const theme = localStorage.getItem('theme');
-  if (theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-  }
+  document.documentElement.setAttribute('data-theme', UserSettings.meta.Theme);
 });
 
 const route = useRoute();
