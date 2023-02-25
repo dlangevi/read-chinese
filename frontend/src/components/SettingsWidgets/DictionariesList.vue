@@ -46,15 +46,35 @@
       </div>
     </div>
     <div class="grid grid-cols-3 gap-2 text-2xl">
-      <div>
-        Dictionaries
+      <div class="col-span-3 flex items-center gap-4">
+        <div class="grow">
+          Dictionaries
+        </div>
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center gap-2">
+            <button class="btn-secondary btn justify-end" @click="addCedict">
+              Add Default Dict
+            </button>
+            <div
+              class="tooltip tooltip-left"
+              data-tip="Downloads CC-Cedict"
+            >
+              <information-circle class="h-6 w-6" />
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="btn-secondary btn" @click="addDictionary">
+              Add Custom Dictionary
+            </button>
+            <div
+              class="tooltip tooltip-left"
+              data-tip="Import your own json dictionary"
+            >
+              <information-circle class="h-6 w-6" />
+            </div>
+          </div>
+        </div>
       </div>
-      <button class="btn-secondary btn" @click="addCedict">
-        Add CC-CEDICT
-      </button>
-      <button class="btn-secondary btn" @click="addDictionary">
-        Add Custom Dictionary
-      </button>
     </div>
     <div class="col-span-3 row-span-2">
       <div
@@ -94,6 +114,7 @@
 
 <script lang="ts" setup>
 import { onBeforeMount, ref } from 'vue';
+import { InformationCircle } from '@vicons/ionicons5';
 
 import {
   GetDictionaryInfo,
@@ -144,7 +165,8 @@ async function pickFile() {
 }
 const loader = useLoader();
 async function addCedict() {
-  await loader.withLoader(AddCedict, 'adding cedict');
+  await loader.withLoader(AddCedict,
+    'Install CC-CEDICT dictionary...');
   updateDicts();
 }
 

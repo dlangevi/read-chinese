@@ -11,7 +11,7 @@ import (
 var configFolderName = "read-chinese"
 
 func SetTestUser(username string) {
-	configFolderName = fmt.Sprintf("%v-%v", configFolderName, username)
+	configFolderName = fmt.Sprintf("test-read-chinese-%v", username)
 }
 
 func ConfigDir(file ...string) string {

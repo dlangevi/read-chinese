@@ -6,7 +6,7 @@
     <select
       v-model="currentValue"
       class="select-primary select"
-      @input="submitChange"
+      @change="submitChange"
     >
       <option
         v-for="option in options"

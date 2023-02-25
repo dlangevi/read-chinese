@@ -77,7 +77,9 @@ export const useCardManager = defineStore('CardManager', {
 
   },
   actions: {
-    loadCard(ankiCard : backend.RawAnkiNote, includeChinese : boolean) {
+    loadCard(ankiCard : backend.RawAnkiNote,
+      includeChinese : boolean,
+      hasImageApi:boolean) {
       // Resets the ui (Does it?)
       this.flow = false;
       this.currentStep = StepsEnum.NONE;
@@ -88,7 +90,7 @@ export const useCardManager = defineStore('CardManager', {
         StepsEnum.ENGLISH,
         // toggle this based on user settings
         ...(includeChinese ? [StepsEnum.CHINESE] : []),
-        StepsEnum.IMAGE,
+        ...(hasImageApi ? [StepsEnum.IMAGE] : []),
       ];
       this.steps.forEach((step) => {
         this.stepsState[step] = StepState.EMPTY;

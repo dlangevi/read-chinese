@@ -2,15 +2,19 @@ import { ref, inject } from 'vue';
 import type { InjectionKey } from 'vue';
 
 export class LoadingApi {
-  loadingText = ref('loading ...');
+  displayText = ref('loading ...');
   active = ref(false);
 
   get shouldShow() {
     return this.active.value;
   }
 
+  get loadingText() {
+    return this.displayText.value;
+  }
+
   async withLoader(func:() => Promise<any>, message:string) {
-    this.loadingText.value = message;
+    this.displayText.value = message;
     this.active.value = true;
     const ret = await func();
     this.active.value = false;

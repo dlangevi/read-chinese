@@ -213,13 +213,26 @@ func (a *ankiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 			},
 		})
 	}
+	noteFields := ankiconnect.Fields{}
 
-	noteFields := ankiconnect.Fields{
-		currentMapping.Hanzi:             fields.Word,
-		currentMapping.ExampleSentence:   fields.Sentence,
-		currentMapping.EnglishDefinition: fields.EnglishDefn,
-		currentMapping.ChineseDefinition: fields.ChineseDefn,
-		currentMapping.Pinyin:            fields.Pinyin,
+	if currentMapping.Hanzi != "" {
+		noteFields[currentMapping.Hanzi] = fields.Word
+	}
+
+	if currentMapping.ExampleSentence != "" {
+		noteFields[currentMapping.ExampleSentence] = fields.Sentence
+	}
+
+	if currentMapping.EnglishDefinition != "" {
+		noteFields[currentMapping.EnglishDefinition] = fields.EnglishDefn
+	}
+
+	if currentMapping.ChineseDefinition != "" {
+		noteFields[currentMapping.ChineseDefinition] = fields.ChineseDefn
+	}
+
+	if currentMapping.Pinyin != "" {
+		noteFields[currentMapping.Pinyin] = fields.Pinyin
 	}
 
 	firstField := currentMapping.FirstField

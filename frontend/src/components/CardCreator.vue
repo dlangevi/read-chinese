@@ -153,7 +153,8 @@ store.$subscribe(async (_, state) => {
       ankiCard = await GetAnkiNote(word);
     }
     const enableChinese = UserSettings.Dictionaries.EnableChinese;
-    cardManager.loadCard(ankiCard, enableChinese);
+    const hasImageApi = UserSettings.AnkiConfig.AzureImageApiKey !== '';
+    cardManager.loadCard(ankiCard, enableChinese, hasImageApi);
   }
   showModal.value = state.wordList.length !== 0;
 });

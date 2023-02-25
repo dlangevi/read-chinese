@@ -67,7 +67,10 @@
       :class="['modal', {'modal-open': dictInfo}]"
       @click="() => dictInfo = false"
     >
-      <div class="modal-box" @click.stop>
+      <div
+        class="modal-box"
+        @click.stop
+      >
         <dictionaries-list />
       </div>
     </div>

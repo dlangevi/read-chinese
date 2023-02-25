@@ -125,7 +125,7 @@ func defaultConfig(path string) *UserConfig {
 		},
 
 		AnkiConfig: AnkiConfig{
-			ActiveDeck:  "Default",
+			ActiveDeck:  "",
 			ActiveModel: "",
 			ModelMappings: map[string]FieldsMapping{
 				"read-chinese-note": {

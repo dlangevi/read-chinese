@@ -30,7 +30,7 @@
         <span v-html="cardManager.englishDefn" />
       </p>
     </div>
-    <div v-if="enableChinese">
+    <div v-if="cardManager.steps.includes(StepsEnum.CHINESE)">
       <button
         class="btn-primary btn-xs btn m-2"
         @click="cardManager.changeStep(StepsEnum.CHINESE)"
@@ -45,7 +45,7 @@
         <span v-html="cardManager.chineseDefn" />
       </p>
     </div>
-    <div>
+    <div v-if="cardManager.steps.includes(StepsEnum.IMAGE)">
       <button
         class="btn-primary btn-xs btn m-2"
         @click="cardManager.changeStep(StepsEnum.IMAGE)"
@@ -78,11 +78,7 @@
 <script lang="ts" setup>
 import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
 import { useCardManager } from '@/stores/CardManager';
-import { getUserSettings } from '@/lib/userSettings';
 
-const UserSettings = getUserSettings();
-
-const enableChinese = UserSettings.Dictionaries.EnableChinese;
 const cardManager = useCardManager();
 
 defineEmits(['change-step']);

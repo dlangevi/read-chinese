@@ -35,6 +35,9 @@
           v-model="fields[key]"
           class="select-primary select"
         >
+          <option value="">
+            Unused
+          </option>
           <option
             v-for="field in modelFields"
             :key="field"
