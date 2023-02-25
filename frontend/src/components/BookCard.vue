@@ -1,13 +1,13 @@
 <template>
   <div
     :class="[
-      'card shadow-xl p-4',
+      'card shadow-xl p-4 flex',
       {'bg-success text-success-content': (known > 90)},
     ]"
   >
     <figure>
       <img
-        class="m-auto max-h-full w-auto rounded"
+        class="m-auto max-h-full grow rounded object-contain"
         :src="'/' + book.cover"
         :alt="book.title"
         @click="bookBigMode"
