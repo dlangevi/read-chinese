@@ -43,6 +43,8 @@ type Token struct {
 	IsWord bool
 }
 
+type TokenizedSentence []Token
+
 var punctuation = regexp.MustCompile(`\p{P}`)
 var whitespace = regexp.MustCompile(`\s+`)
 var latin = regexp.MustCompile(`\p{Latin}`)
@@ -81,17 +83,17 @@ func (s *Segmentation) SegmentSentence(sentence string) []Token {
 type FrequencyTable map[string]int
 
 // doFullSegmentation
-func (s *Segmentation) SegmentFullText(path string) ([]string, FrequencyTable, error) {
+func (s *Segmentation) SegmentFullText(path string) ([]TokenizedSentence, FrequencyTable, error) {
 	bytes, err := os.ReadFile(path)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	words := s.jieba.Cut(string(bytes), false)
-	sentences := []string{}
+	segmentedSentences := []TokenizedSentence{}
+	previousSegmented := TokenizedSentence{}
+	currentSegmented := TokenizedSentence{}
 	frequency := FrequencyTable{}
-	previousSentence := strings.Builder{}
-	currentSentence := strings.Builder{}
 
 	incrementFrequency := func(word string) {
 		current, ok := frequency[word]
@@ -103,12 +105,12 @@ func (s *Segmentation) SegmentFullText(path string) ([]string, FrequencyTable, e
 	}
 
 	terminateSentence := func() {
-		if previousSentence.Len() > 0 {
-			sentences = append(sentences, previousSentence.String())
-			previousSentence.Reset()
+		if len(previousSegmented) > 0 {
+			segmentedSentences = append(segmentedSentences, previousSegmented)
+			previousSegmented = TokenizedSentence{}
 		}
-		previousSentence.WriteString(currentSentence.String())
-		currentSentence.Reset()
+		previousSegmented = currentSegmented
+		currentSegmented = TokenizedSentence{}
 	}
 
 	for _, word := range words {
@@ -124,37 +126,63 @@ func (s *Segmentation) SegmentFullText(path string) ([]string, FrequencyTable, e
 		if word == "\n" {
 			terminateSentence()
 		} else if word == "？" || word == "！" || word == "。" || word == "…" || word == "." {
-			if currentSentence.Len() == 0 {
-				previousSentence.WriteString(word)
+			if len(currentSegmented) == 0 {
+				previousSegmented = append(previousSegmented, Token{
+					Data:   word,
+					IsWord: isWord,
+				})
 			} else {
-				currentSentence.WriteString(word)
+				currentSegmented = append(currentSegmented, Token{
+					Data:   word,
+					IsWord: isWord,
+				})
 				terminateSentence()
 			}
 		} else if word == " " || word == "　" || word == "\t" {
 			// Do I actually need this?
-			if currentSentence.Len() > 0 {
-				currentSentence.WriteString(word)
+			if len(currentSegmented) > 0 {
+				currentSegmented = append(currentSegmented, Token{
+					Data:   word,
+					IsWord: isWord,
+				})
 			}
 		} else if word == "”" || word == "‘" || word == "』" {
 			// Closing quotes go onto previous sentence if needed
-			if currentSentence.Len() == 0 {
-				previousSentence.WriteString(word)
+			if len(currentSegmented) == 0 {
+				previousSegmented = append(previousSegmented, Token{
+					Data:   word,
+					IsWord: isWord,
+				})
 			} else {
-				currentSentence.WriteString(word)
+				currentSegmented = append(currentSegmented, Token{
+					Data:   word,
+					IsWord: isWord,
+				})
 			}
 		} else {
-			currentSentence.WriteString(word)
+			currentSegmented = append(currentSegmented, Token{
+				Data:   word,
+				IsWord: isWord,
+			})
 		}
 	}
 
-	if previousSentence.Len() > 0 {
-		sentences = append(sentences, previousSentence.String())
+	if len(previousSegmented) > 0 {
+		segmentedSentences = append(segmentedSentences, previousSegmented)
 	}
-	if currentSentence.Len() > 0 {
-		sentences = append(sentences, currentSentence.String())
+	if len(currentSegmented) > 0 {
+		segmentedSentences = append(segmentedSentences, currentSegmented)
 	}
 
-	return sentences, frequency, nil
+	return segmentedSentences, frequency, nil
+}
+
+func toString(sentence []Token) string {
+	wordSentence := strings.Builder{}
+	for _, token := range sentence {
+		wordSentence.WriteString(token.Data)
+	}
+	return wordSentence.String()
 }
 
 func constructDict(d *Dictionaries, s *Segmentation) error {

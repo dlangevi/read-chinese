@@ -10,13 +10,17 @@
 <script lang="ts" setup>
 import type { ICellRendererParams } from 'ag-grid-community';
 import { AddWord } from '@wailsjs/backend/KnownWords';
+import {
+  UpdateSentenceTable,
+} from '@wailsjs/backend/Generator';
 
 const props = defineProps<{ params:ICellRendererParams }>();
 
-function markKnown() {
+async function markKnown() {
   const rowData = props.params.data;
   // Keep with the convention of 10000 == user has claimed to known a word
-  AddWord(rowData.word, 10000);
+  await AddWord(rowData.word, 10000);
+  UpdateSentenceTable(rowData.word);
   props.params.api.applyTransaction({
     remove: [rowData],
   });

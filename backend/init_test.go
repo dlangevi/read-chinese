@@ -24,7 +24,7 @@ func TestMain(m *testing.M) {
 	testRuntime = createBackend(tempDb)
 	// This will be the first book added, so tests can query its data with
 	// BookdId = 1
-	err := testRuntime.BookLibrary.AddBook("张天翼", "秃秃大王", "fake.jpg", "testdata/example_book.txt")
+	_, err := testRuntime.BookLibrary.AddBook("张天翼", "秃秃大王", "fake.jpg", "testdata/example_book.txt")
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)

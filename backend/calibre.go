@@ -9,11 +9,13 @@ import (
 
 type Calibre struct {
 	bookLibrary BookLibrary
+	generator   *Generator
 }
 
-func NewCalibre(b BookLibrary) *Calibre {
+func NewCalibre(b BookLibrary, g *Generator) *Calibre {
 	return &Calibre{
 		bookLibrary: b,
+		generator:   g,
 	}
 }
 
@@ -66,11 +68,18 @@ func (c *Calibre) ImportCalibreBooks() error {
 			log.Println("Potential new book", book.Author, book.Title)
 			for _, format := range book.Formats {
 				if strings.HasSuffix(format, ".txt") {
-					err := c.bookLibrary.AddBook(book.Author, book.Title, book.Cover, format)
+					bookId, err := c.bookLibrary.AddBook(book.Author, book.Title, book.Cover, format)
 					if err != nil {
 						log.Println("error ", err)
 						return err
 					}
+					book, err := c.bookLibrary.GetBook(bookId)
+					if err != nil {
+						log.Println("error ", err)
+						return err
+					}
+					c.generator.GenerateSentenceTableForBook(book)
+
 					break
 				}
 			}

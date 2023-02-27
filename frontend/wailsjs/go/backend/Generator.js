@@ -6,6 +6,14 @@ export function GenerateSentenceTable() {
   return window['go']['backend']['Generator']['GenerateSentenceTable']();
 }
 
+export function GenerateSentenceTableForBook(arg1) {
+  return window['go']['backend']['Generator']['GenerateSentenceTableForBook'](arg1);
+}
+
 export function GetSentencesForWord(arg1, arg2) {
   return window['go']['backend']['Generator']['GetSentencesForWord'](arg1, arg2);
+}
+
+export function UpdateSentenceTable(arg1) {
+  return window['go']['backend']['Generator']['UpdateSentenceTable'](arg1);
 }

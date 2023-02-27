@@ -33,7 +33,8 @@ func TestGenerate(t *testing.T) {
 	defer os.Remove(tempDb)
 	myBackend := createBackend(tempDb)
 	bookIds := []int64{1}
-	err := myBackend.BookLibrary.AddBook("张天翼", "秃秃大王", "fake.jpg", "testdata/example_book.txt")
+	_, err := myBackend.BookLibrary.AddBook("张天翼", "秃秃大王", "fake.jpg", "testdata/example_book.txt")
+	myBackend.Generator.GenerateSentenceTable()
 	if err != nil {
 		t.Error("Failed to insert book snip", err)
 	}
@@ -49,6 +50,7 @@ func TestGenerate(t *testing.T) {
 	myBackend.KnownWords.AddWord("真", 100)
 	// Not well known enough
 	myBackend.KnownWords.AddWord("的", 1)
+	myBackend.Generator.GenerateSentenceTable()
 	sentences, _ = myBackend.Generator.GetSentencesForWord("么", bookIds)
 	if len(sentences) != 0 {
 		t.Error("Too many sentences", sentences)
@@ -56,6 +58,7 @@ func TestGenerate(t *testing.T) {
 
 	// Now it is
 	myBackend.KnownWords.AddWord("的", 100)
+	myBackend.Generator.GenerateSentenceTable()
 	sentences, _ = myBackend.Generator.GetSentencesForWord("么", bookIds)
 	if len(sentences) != 1 {
 		t.Error("Not enough sentences", sentences)
@@ -70,6 +73,7 @@ func TestGenerate(t *testing.T) {
 		{"就是", 100},
 		{"来", 100},
 	})
+	myBackend.Generator.GenerateSentenceTable()
 	sentences, _ = myBackend.Generator.GetSentencesForWord("这么", bookIds)
 	if len(sentences) != 1 {
 		t.Error("Not enough sentences", sentences)

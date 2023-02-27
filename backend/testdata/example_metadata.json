@@ -1,20 +1,36 @@
 {
   "meta": {
-    "ran": 5
+    "CacheSentences": false,
+    "EnableExperimental": false,
+    "Ran": 47,
+    "Theme": "emerald"
   },
-  "cardCreationConfig": {
-    "autoAdvanceSentence": true,
-    "populateEnglish": false,
-    "populateChinese": false,
-    "autoAdvanceEnglish": false,
-    "autoAdvanceImage": false,
-    "autoAdvanceCard": true
+  "CardCreation": {
+    "AutoAdvanceSentence": false,
+    "PopulateEnglish": false,
+    "PopulateChinese": false,
+    "AutoAdvanceEnglish": false,
+    "AutoAdvanceImage": false,
+    "AutoAdvanceCard": false
   },
-  "ankiConfig": {
-    "activeDeck": "Reading",
-    "activeModel": "Reading Card",
-    "modelMappings": {
+  "AnkiConfig": {
+    "ActiveDeck": "Reading",
+    "ActiveModel": "Reading Card",
+    "ModelMappings": {
       "Reading Card": {
+        "firstField": "",
+        "hanzi": "Hanzi",
+        "exampleSentence": "ExampleSentence",
+        "englishDefinition": "EnglishDefinition",
+        "chineseDefinition": "ChineseDefinition",
+        "pinyin": "Pinyin",
+        "hanziAudio": "HanziAudio",
+        "sentenceAudio": "SentenceAudio",
+        "images": "Images",
+        "notes": "Notes"
+      },
+      "read-chinese-note": {
+        "firstField": "",
         "hanzi": "Hanzi",
         "exampleSentence": "ExampleSentence",
         "englishDefinition": "EnglishDefinition",
@@ -26,39 +42,39 @@
         "notes": "Notes"
       }
     },
-    "addProgramTag": true,
-    "addBookTag": true,
-    "allowDuplicates": true,
-    "generateTermAudio": false,
-    "generateSentenceAudio": false,
-    "azureApiKey": "",
-    "azureImageApiKey": ""
+    "AddProgramTag": true,
+    "AddBookTag": true,
+    "AllowDuplicates": true,
+    "GenerateTermAudio": false,
+    "GenerateSentenceAudio": false,
+    "AzureApiKey": "",
+    "AzureImageApiKey": ""
   },
-  "dictionaryConfig": {
-    "dicts": {
+  "Dictionaries": {
+    "Dicts": {
       "example": {
         "Path": "/home/dlangevi/.config/read-chinese/userDicts/example",
         "Language": "english"
       }
     },
-    "primaryDict": "example",
-    "showDefinitions": true,
-    "enableChinese": true
+    "PrimaryDict": "example",
+    "ShowDefinitions": true,
+    "EnableChinese": false
   },
-  "sentenceGenerationConfig": {
-    "idealSentenceLength": 20,
-    "knownInterval": 10
+  "SentenceGeneration": {
+    "IdealSentenceLength": 20,
+    "KnownInterval": 10
   },
-  "libraryConfig": {
-    "onlyFavorites": false,
-    "hideRead": false
+  "BookLibrary": {
+    "OnlyFavorites": false,
+    "HideRead": false
   },
-  "cardManagementConfig": {
-    "problemFlagged": true,
-    "problemMissingImage": true,
-    "problemMissingSentence": true,
-    "problemMissingSentenceAudio": true,
-    "problemMissingWordAudio": true,
-    "problemMissingPinyin": true
+  "CardManagement": {
+    "ProblemFlagged": true,
+    "ProblemMissingImage": true,
+    "ProblemMissingSentence": true,
+    "ProblemMissingSentenceAudio": true,
+    "ProblemMissingWordAudio": true,
+    "ProblemMissingPinyin": true
   }
 }

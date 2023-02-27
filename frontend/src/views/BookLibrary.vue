@@ -22,6 +22,12 @@
       >
         Export Book Stats
       </button>
+      <button
+        class="btn-primary btn-sm btn"
+        @click="recalculateBooks"
+      >
+        Resegment Books
+      </button>
     </template>
     <div class="text-center">
       <h2 class="mt-5 text-xl">
@@ -56,7 +62,10 @@ import SettingsCheckbox
 import { getUserSettings, ComponentTable } from '@/lib/userSettings';
 import { backend } from '@wailsjs/models';
 import { SaveFile } from '@wailsjs/main/App';
-import { GetBooks, GetDetailedBooks } from '@wailsjs/backend/bookLibrary';
+import {
+  GetBooks, GetDetailedBooks,
+  RecalculateBooks,
+} from '@wailsjs/backend/bookLibrary';
 import { ImportCalibreBooks } from '@wailsjs/backend/Calibre';
 import { useLoader } from '@/lib/loading';
 import WithSidebar from '@/layouts/WithSidebar.vue';
@@ -70,6 +79,10 @@ async function exportBooks() {
   const filename = await SaveFile();
   const detailed = await GetDetailedBooks(filename);
   console.log(JSON.stringify(detailed));
+}
+
+async function recalculateBooks() {
+  return loader.withLoader(RecalculateBooks, 'Resegmenting library');
 }
 
 const UserSettings = getUserSettings();

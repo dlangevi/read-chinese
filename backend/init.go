@@ -103,7 +103,7 @@ func StartBackend(ctx *context.Context,
 	runtime.BookLibrary = NewBookLibrary(db, s, runtime.KnownWords)
 	runtime.Segmentation = s
 	runtime.Generator = NewGenerator(userSettings, s, runtime.BookLibrary, runtime.KnownWords)
-	runtime.Calibre = NewCalibre(runtime.BookLibrary)
+	runtime.Calibre = NewCalibre(runtime.BookLibrary, runtime.Generator)
 
 	return runtime, nil
 }

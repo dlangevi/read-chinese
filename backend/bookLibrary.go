@@ -3,7 +3,7 @@ package backend
 import (
 	"database/sql"
 	"encoding/csv"
-	"encoding/json"
+	"encoding/gob"
 	"errors"
 	"fmt"
 	"log"
@@ -17,7 +17,7 @@ import (
 type (
 	BookLibrary interface {
 		// Add book to collection of books
-		AddBook(author string, title string, cover string, filepath string) error
+		AddBook(author string, title string, cover string, filepath string) (int64, error)
 		// Delete book from book collection
 		DeleteBook(bookId int64) error
 		// Get a book by its unique identifier
@@ -30,6 +30,9 @@ type (
 		// Check if book already exists in collection
 		BookExists(author string, title string) (bool, error)
 		HealthCheck() (string, error)
+
+		// Resegement books
+		RecalculateBooks() error
 
 		// Get the words in the library that occure the most often
 		LearningTarget() []WordOccuranceRow
@@ -132,7 +135,44 @@ func copyCover(author string, title string, coverPath string) (string, error) {
 	return subpath, err
 }
 
-func (b *bookLibrary) AddBook(author string, title string, cover string, filepath string) error {
+func (b *bookLibrary) RecalculateBooks() error {
+	books, err := b.GetBooks()
+	if err != nil {
+		return err
+	}
+	for _, book := range books {
+		log.Println("Processing:", book.Title, "...")
+		filepath := book.Filepath
+		sentences, wordTable, err := b.segmentation.SegmentFullText(filepath)
+		if err != nil {
+			return err
+		}
+
+		cacheLocation := getSegmentationPath(book.Title, book.Author)
+		err = saveCacheFile(b.db, int(book.BookId), sentences, cacheLocation)
+		if err != nil {
+			return err
+		}
+
+		err = deleteWordTable(b.db, int(book.BookId))
+		if err != nil {
+			return err
+		}
+		_, err = saveWordTable(b.db, int(book.BookId), wordTable)
+		if err != nil {
+			return err
+		}
+
+	}
+
+	return nil
+}
+
+func (b *bookLibrary) AddBook(
+	author string,
+	title string,
+	cover string,
+	filepath string) (int64, error) {
 
 	// If there is a problem copying cover maybe that is not a big deal?
 	cover, err := copyCover(author, title, cover)
@@ -141,22 +181,22 @@ func (b *bookLibrary) AddBook(author string, title string, cover string, filepat
 	}
 	bookId, err := addBookToDb(b.db, author, title, cover, filepath)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	sentences, wordTable, err := b.segmentation.SegmentFullText(filepath)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	// Compute WordTable and Save it
 	cacheLocation := getSegmentationPath(title, author)
 	err = saveCacheFile(b.db, int(bookId), sentences, cacheLocation)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	_, err = saveWordTable(b.db, int(bookId), wordTable)
 	// This can be nil
-	return err
+	return bookId, err
 }
 
 func addBookToDb(db *sqlx.DB, author string, title string, cover string, filepath string) (int64, error) {
@@ -413,7 +453,7 @@ func getKnownWords(db *sqlx.DB, bookId int64) (int, error) {
 }
 
 func getTotalWords(db *sqlx.DB, bookId int64) (int, error) {
-	var total int
+	var total sql.NullInt64
 	err := db.QueryRow(`
     SELECT SUM(count) as known 
     FROM frequency
@@ -422,7 +462,11 @@ func getTotalWords(db *sqlx.DB, bookId int64) (int, error) {
 	if err != nil {
 		log.Println("Error with totalWords", err)
 	}
-	return total, err
+	if total.Valid {
+		return int(total.Int64), err
+	} else {
+		return 0, err
+	}
 }
 
 func (b *bookLibrary) computeKnownCharacters(book *Book) error {
@@ -570,15 +614,23 @@ func (b *bookLibrary) SetRead(bookId int64, isRead bool) error {
 	return err
 }
 
-func saveCacheFile(db *sqlx.DB, bookId int, sentences []string, filepath string) error {
-	bytes, err := json.Marshal(sentences)
+func saveCacheFile(
+	db *sqlx.DB,
+	bookId int,
+	sentences []TokenizedSentence,
+	filepath string) error {
+
+	file, err := os.Create(filepath)
 	if err != nil {
+		return nil
+	}
+	defer file.Close()
+
+	encoder := gob.NewEncoder(file)
+	if err := encoder.Encode(sentences); err != nil {
 		return err
 	}
-	err = os.WriteFile(filepath, bytes, 0666)
-	if err != nil {
-		return err
-	}
+
 	_, err = db.Exec(`
   UPDATE books 
   SET segmented_file = ?1 
@@ -588,28 +640,38 @@ func saveCacheFile(db *sqlx.DB, bookId int, sentences []string, filepath string)
 }
 
 func getSegmentationPath(title string, author string) string {
-	fileName := fmt.Sprintf("%v-%v.json", title, author)
+	fileName := fmt.Sprintf("%v-%v.gob", title, author)
 	cacheLocation := ConfigDir("segmentationCache", fileName)
 	return cacheLocation
 }
 
-func GetSegmentedText(book Book) (*[]string, error) {
+func GetSegmentedText(book Book) ([]TokenizedSentence, error) {
 	if !book.SegmentedFile.Valid {
 		return nil, errors.New("Book has not been segmented yet")
 	}
 	cacheLocation := getSegmentationPath(book.Title, book.Author)
 
-	segBytes, err := os.ReadFile(cacheLocation)
+	file, err := os.Open(cacheLocation)
 	if err != nil {
 		return nil, err
 	}
-	sentences := []string{}
-	err = json.Unmarshal(segBytes, &sentences)
-	return &sentences, err
+	defer file.Close()
 
+	decoder := gob.NewDecoder(file)
+	s := []TokenizedSentence{}
+	if err := decoder.Decode(&s); err != nil {
+		return nil, err
+	}
+
+	return s, nil
 }
 
-// dbSaveWordTable, // TODO once segmentation is done we can test this
+func deleteWordTable(db *sqlx.DB, bookId int) error {
+	_, err := db.Exec(
+		`DELETE FROM frequency WHERE book = $1`, bookId)
+	return err
+}
+
 func saveWordTable(db *sqlx.DB, bookId int, frequencyTable FrequencyTable) (sql.Result, error) {
 	wordTable := WordTable{}
 	for word, count := range frequencyTable {

@@ -1,7 +1,6 @@
 package backend
 
 import (
-	"context"
 	"os"
 	"path"
 	"testing"
@@ -11,12 +10,11 @@ import (
 
 func TestDefault(t *testing.T) {
 	tmpMetaData := path.Join(os.TempDir(), "metadata.json")
-	ctx := context.Background()
-	userSettings, _ := LoadMetadata(tmpMetaData, &ctx)
+	userSettings, _ := LoadMetadata(tmpMetaData)
 
 	settingName := "EnableChinese"
 	setting := userSettings.DictionariesConfig.EnableChinese
-	if setting != true {
+	if setting != false {
 		t.Errorf("%v, had the wrong value %v", settingName, setting)
 	}
 	if userSettings.DictionariesConfig.PrimaryDict != "" {
@@ -33,7 +31,7 @@ func TestDefault(t *testing.T) {
 
 func TestNew(t *testing.T) {
 	newConfig := defaultConfig("foobar")
-	assert.Equal(t, true, getValue(newConfig, "AutoAdvanceSentence"))
+	assert.Equal(t, true, getValue(newConfig, "AddProgramTag"))
 	assert.Equal(t, false, getValue(newConfig, "OnlyFavorites"))
 	err := setValue(newConfig, "OnlyFavorites", true)
 	assert.Nil(t, err)

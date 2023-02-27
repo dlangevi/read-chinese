@@ -114,6 +114,9 @@ import {
   GetBook,
 } from '@wailsjs/backend/bookLibrary';
 import {
+  UpdateSentenceTable,
+} from '@wailsjs/backend/Generator';
+import {
   backend,
 } from '@wailsjs/models';
 
@@ -216,8 +219,9 @@ async function submit() {
   store.clearFront();
 }
 
-function markKnown() {
-  AddWord(cardManager.word, 10000);
+async function markKnown() {
+  await AddWord(cardManager.word, 10000);
+  UpdateSentenceTable(cardManager.word);
   store.clearFront();
 }
 </script>
