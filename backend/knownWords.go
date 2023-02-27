@@ -17,6 +17,7 @@ import (
 type KnownWords struct {
 	// For now just map word to interval
 	words        map[string]int64
+	wellKnown    map[string]struct{}
 	characters   map[rune]bool
 	frequency    map[string]int
 	db           *sqlx.DB
@@ -29,12 +30,14 @@ func NewKnownWords(db *sqlx.DB,
 	known := &KnownWords{
 		words:        map[string]int64{},
 		characters:   map[rune]bool{},
+		wellKnown:    map[string]struct{}{},
 		frequency:    map[string]int{},
 		db:           db,
 		userSettings: userSettings,
 	}
 	known.syncWords()
 	known.syncFrequency()
+	known.calculateFastKnown()
 	return known
 }
 
@@ -238,6 +241,19 @@ func (known *KnownWords) ImportCSVWords(path string) error {
 		}
 	}
 	return known.AddWords(words)
+}
+
+func (known *KnownWords) calculateFastKnown() {
+	for word, interval := range known.words {
+		if interval > int64(known.userSettings.SentenceGenerationConfig.KnownInterval) {
+			known.wellKnown[word] = struct{}{}
+		}
+	}
+}
+
+func (known *KnownWords) isWellKnownFast(word string) bool {
+	_, ok := known.wellKnown[word]
+	return ok
 }
 
 func (known *KnownWords) isWellKnown(word string) bool {

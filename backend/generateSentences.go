@@ -5,6 +5,7 @@ import (
 	"math"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -13,9 +14,10 @@ type Generator struct {
 	segmentation    *Segmentation
 	bookLibrary     BookLibrary
 	known           *KnownWords
-	sentenceCache   map[string][]string
+	sentenceCache   map[string]*[]string
 	cacheInProgress bool
 	cacheComplete   bool
+	mapLock         *sync.RWMutex
 }
 
 func NewGenerator(
@@ -29,9 +31,10 @@ func NewGenerator(
 		segmentation:    s,
 		bookLibrary:     b,
 		known:           known,
-		sentenceCache:   map[string][]string{},
+		sentenceCache:   map[string]*[]string{},
 		cacheInProgress: false,
 		cacheComplete:   false,
+		mapLock:         &sync.RWMutex{},
 	}
 	if userSettings.Meta.CacheSentences {
 		go generator.GenerateSentenceTable()
@@ -43,7 +46,7 @@ func (g *Generator) isT1Sentence(sentence []Token) bool {
 	haventFoundAnyYet := true
 	firstUnknown := ""
 	for _, token := range sentence {
-		if token.IsWord && !g.known.isWellKnown(token.Data) {
+		if token.IsWord && !g.known.isWellKnownFast(token.Data) {
 			if haventFoundAnyYet {
 				haventFoundAnyYet = false
 				firstUnknown = token.Data
@@ -114,22 +117,34 @@ func duration(msg string, start time.Time) {
 func (g *Generator) GenerateSentenceTable() error {
 	g.cacheInProgress = true
 	defer duration(track("Full Generate"))
+	numSentences := 0
 	books, _ := g.bookLibrary.GetSomeBooks()
-	g.sentenceCache = map[string][]string{}
+	g.sentenceCache = map[string]*[]string{}
+	var wg sync.WaitGroup
 	for _, book := range books {
-		fullSegmented, err := GetSegmentedText(book)
-		sentences := []string{}
-		if err != nil {
-			return err
-		}
-		for _, sentence := range fullSegmented {
-			segmented := g.segmentation.SegmentSentence(sentence)
-			if g.isT1Sentence(segmented) {
-				sentences = append(sentences, sentence)
+		wg.Add(1)
+		go func(book Book) {
+			defer wg.Done()
+			fullSegmented, err := GetSegmentedText(book)
+			sentences := []string{}
+			if err != nil {
+				log.Println("Error loading:", book.Title)
+				return
 			}
-		}
-		g.sentenceCache[book.Title] = sentences
+			for _, sentence := range *fullSegmented {
+				numSentences += 1
+				segmented := g.segmentation.SegmentSentence(sentence)
+				if g.isT1Sentence(segmented) {
+					sentences = append(sentences, sentence)
+				}
+			}
+			g.mapLock.Lock()
+			g.sentenceCache[book.Title] = &sentences
+			g.mapLock.Unlock()
+		}(book)
 	}
+	wg.Wait()
+	log.Println("Scanned", numSentences, "sentences")
 	g.cacheComplete = true
 	return nil
 }
@@ -137,21 +152,14 @@ func (g *Generator) GenerateSentenceTable() error {
 // This can still be optimized a ton
 func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]string, error) {
 	defer duration(track("Get Sentences"))
-	if g.userSettings.Meta.CacheSentences {
-		// If cache has not been completed
-		if !g.cacheComplete {
-			// Start it if this is the first time
-			if !g.cacheInProgress {
-				go g.GenerateSentenceTable()
-			}
-		}
-	}
 
 	books, _ := g.bookLibrary.GetSomeBooks(bookIds...)
 	sentences := []string{}
 	for _, book := range books {
 
+		g.mapLock.RLock()
 		t1Segmented, ok := g.sentenceCache[book.Title]
+		g.mapLock.RUnlock()
 		var err error = nil
 		// If lookup fails, the book has not been processed yet
 		if !ok {
@@ -160,7 +168,7 @@ func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]string,
 				return sentences, err
 			}
 		}
-		for _, sentence := range t1Segmented {
+		for _, sentence := range *t1Segmented {
 			if strings.Contains(sentence, word) {
 				segmented := g.segmentation.SegmentSentence(sentence)
 				if tokensContains(segmented, word) && g.isT1Candidate(segmented, word) {

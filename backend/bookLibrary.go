@@ -593,7 +593,7 @@ func getSegmentationPath(title string, author string) string {
 	return cacheLocation
 }
 
-func GetSegmentedText(book Book) ([]string, error) {
+func GetSegmentedText(book Book) (*[]string, error) {
 	if !book.SegmentedFile.Valid {
 		return nil, errors.New("Book has not been segmented yet")
 	}
@@ -605,7 +605,7 @@ func GetSegmentedText(book Book) ([]string, error) {
 	}
 	sentences := []string{}
 	err = json.Unmarshal(segBytes, &sentences)
-	return sentences, err
+	return &sentences, err
 
 }
 
