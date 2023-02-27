@@ -82,9 +82,9 @@ those words will tend to have more T1 sentences to choose from.
 ### Dependancies:
 Let me know if something else is needed that I am not aware of
 
-* calibre
-* wails (golang)
-* yarn (javascript)
+* [calibre](https://calibre-ebook.com/download)
+* [wails](https://wails.io/docs/gettingstarted/installation) (make sure to add $HOME/go/bin to path)
+* [yarn](https://yarnpkg.com/getting-started/install)
 * some sort of c++ compiler (to compile the Jieba implementation)
 
 ### to run dev mode:
