@@ -40,7 +40,7 @@ func NewGenerator(
 }
 
 func (g *Generator) isT1Sentence(sentence []Token) bool {
-	haventFoundAnyYet := false
+	haventFoundAnyYet := true
 	firstUnknown := ""
 	for _, token := range sentence {
 		if token.IsWord && !g.known.isWellKnown(token.Data) {
@@ -49,7 +49,6 @@ func (g *Generator) isT1Sentence(sentence []Token) bool {
 				firstUnknown = token.Data
 				continue
 			}
-
 			if firstUnknown != token.Data {
 				return false
 			}
