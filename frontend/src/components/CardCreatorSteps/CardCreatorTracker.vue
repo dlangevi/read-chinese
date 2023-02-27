@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="flex items-center">
     <button
       v-if="cardManager.steps.length > 0"
       class="btn-primary btn-sm btn"

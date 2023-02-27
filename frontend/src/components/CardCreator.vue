@@ -22,9 +22,8 @@
         Creating card for {{ cardManager.word }}
       </p>
       <div class="flex">
-        <!-- v-if="card !== undefined" -->
         <div class="w-1/3">
-          <anki-card-preview />
+          <anki-card-preview class="" />
         </div>
         <div
           :key="cardManager.word"
@@ -57,8 +56,9 @@
         </div>
       </div>
 
-      <div class="modal-action">
-        <card-creator-tracker />
+      <div class="modal-action flex items-center justify-center">
+        <div class="w-1/4" />
+        <card-creator-tracker class="grow justify-start" />
         <div class="flex place-content-end gap-2">
           <button
             class="btn-primary btn-sm btn"
