@@ -5,7 +5,23 @@
         Sync from Anki
       </button>
       <import-csv />
-      <div class="flex place-content-between">
+      <select
+        v-model="gridSource"
+        class="select-primary select"
+        @change="changeSource"
+      >
+        <option
+          v-for="source in sources"
+          :key="source"
+          :value="source"
+        >
+          {{ source }}
+        </option>
+      </select>
+      <div
+        v-if="gridSource=='hsk'"
+        class="flex place-content-between"
+      >
         <span>Hsk 2.0</span>
         <input
           v-model="selectedVersion"
@@ -15,6 +31,7 @@
         <span>Hsk 3.0</span>
       </div>
       <select
+        v-if="gridSource=='hsk'"
         v-model="selectedLevel"
         class="select-primary select"
         @change="loadHsk"
@@ -55,7 +72,10 @@ import WithSidebar from '@/layouts/WithSidebar.vue';
 import ImportCsv from '@/components/ImportCsv.vue';
 import { watch, ref, onBeforeMount } from 'vue';
 import { backend } from '@wailsjs/models';
-import { LearningTarget } from '@wailsjs/backend/bookLibrary';
+import {
+  LearningTarget,
+  LearningTargetFavorites,
+} from '@wailsjs/backend/bookLibrary';
 import {
   GetUnknownHskWords,
 } from '@wailsjs/backend/KnownWords';
@@ -86,7 +106,25 @@ watch(selectedVersion, () => {
   }
 });
 
+const sources = [
+  'all books',
+  'favorites',
+  'hsk',
+];
+
 const words = ref<backend.UnknownWordEntry[]>([]);
+const gridSource = ref('all books');
+async function changeSource() {
+  const newSource = gridSource.value;
+  if (newSource === 'all books') {
+    words.value = await LearningTarget();
+  } else if (newSource === 'favorites') {
+    words.value = await LearningTargetFavorites();
+  } else if (newSource === 'hsk') {
+    loadHsk();
+  }
+}
+
 onBeforeMount(async () => {
   words.value = await LearningTarget();
 });

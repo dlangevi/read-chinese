@@ -42,6 +42,10 @@ export function LearningTargetBook(arg1) {
   return window['go']['backend']['bookLibrary']['LearningTargetBook'](arg1);
 }
 
+export function LearningTargetFavorites() {
+  return window['go']['backend']['bookLibrary']['LearningTargetFavorites']();
+}
+
 export function RecalculateBooks() {
   return window['go']['backend']['bookLibrary']['RecalculateBooks']();
 }

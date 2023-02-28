@@ -22,6 +22,8 @@ export function LearningTarget():Promise<Array<backend.WordOccuranceRow>>;
 
 export function LearningTargetBook(arg1:number):Promise<Array<backend.WordOccuranceRow>>;
 
+export function LearningTargetFavorites():Promise<Array<backend.WordOccuranceRow>>;
+
 export function RecalculateBooks():Promise<Error>;
 
 export function SetFavorite(arg1:number,arg2:boolean):Promise<Error>;

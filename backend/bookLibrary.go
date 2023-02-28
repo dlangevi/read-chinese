@@ -36,6 +36,8 @@ type (
 
 		// Get the words in the library that occure the most often
 		LearningTarget() []WordOccuranceRow
+		// Get the words in the library that occure the most often in favorite books
+		LearningTargetFavorites() []WordOccuranceRow
 		// Get the words in a specific book that occure the most often
 		LearningTargetBook(bookId int) []WordOccuranceRow
 		TopUnknownWords(bookId int, numWords int) []string
@@ -374,6 +376,32 @@ func (b *bookLibrary) LearningTarget() []WordOccuranceRow {
         FROM words
         WHERE words.word==frequency.word
     ) 
+    GROUP BY word
+    ORDER BY occurance DESC
+    LIMIT 200
+    `)
+	if err != nil {
+		log.Println(err)
+		return words
+	}
+
+	return words
+}
+
+func (b *bookLibrary) LearningTargetFavorites() []WordOccuranceRow {
+	words := []WordOccuranceRow{}
+	err := b.db.Select(&words, `
+    SELECT word, sum(count) as occurance FROM frequency 
+    WHERE NOT EXISTS (
+        SELECT word
+        FROM words
+        WHERE words.word==frequency.word
+    ) AND EXISTS (
+      SELECT bookId
+      FROM books
+      WHERE books.bookId==frequency.book
+      AND books.favorite==true
+    )
     GROUP BY word
     ORDER BY occurance DESC
     LIMIT 200
