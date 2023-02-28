@@ -4,7 +4,7 @@
       <button class="btn-primary btn" @click="importAnki">
         Sync from Anki
       </button>
-      <import-csv />
+      <import-csv v-if="UserSettings.meta.EnableExperimental" />
       <select
         v-model="gridSource"
         class="select-primary select"
@@ -84,6 +84,8 @@ import UnknownWords from '../components/UnknownWords.vue';
 import { useLoader } from '@/lib/loading';
 
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
+import { getUserSettings } from '@/lib/userSettings';
+const UserSettings = getUserSettings();
 
 type HskVersion = '2.0' | '3.0';
 type HskLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7;

@@ -3,35 +3,31 @@
 Think of the todos as just ideas I would like to optimistically work to, and not actual roadmapped features
 
 ### Todo
-- [ ] 90% test coverage for go code
+
+#### Still Intend to Do
+- [ ] more compact library table view
+- [ ] interactive workflow for importing from calibre
+- [ ] add new book (without needing calibre)
+- [ ] use calibre (if possible) to convert from epub etc to txt file
+- [ ] chinese voice picker
+- [ ] View and edit known words
+- [ ] write dev install guide 
+- [ ] Import from multiple anki decks
+- [ ] update image / audio when editing card
+- [ ] card maintenance (search for missing image, audio, etc)
 - [ ] unflag anki cards on edit
-- [ ] free edit of card fields
+- [ ] 90% test coverage for go code
+- [ ] linux scrollbars dont work in webview
+
+#### Ideas to Explore / Deprioritized Ideas
+- [ ] create bootstrap flow that installs free books
+- [ ] Support ways outside of anki for importing words 
 - [ ] use forvo for term audio [unclear if possible]
 - [ ] get example sentences from some online service [if free ones exist] 
-- [ ] support frequency lists
-- [ ] chinese voice picker
-- [ ] linux scrollbars dont work in webview
 - [ ] track book progress (eg 15% read)
-- [ ] write dev instal guide 
-- [ ] use calibre (if possible) to convert from epub etc to txt file
-- [ ] more compact library table view
-- [ ] manage known words list
-- [ ] create bootstrap flow installs free books
-- [ ] Support more variable sources for user word list 
 - [ ] Export user data somehow
-- [ ] View and edit known words
-- [ ] Import from multiple anki decks
-
-
-### In Progress
-
-These will definitely be implemented and have priority
-
-- [ ] interactive workflow for importing from calibre (control which books to import etc)
-- [ ] add new book (without needing calibre)
-- [ ] card maintenance (search for missing image, audio, etc)
-- [ ] update image / audio when editing card
-
+- [ ] support frequency lists
+- [ ] free edit of card fields
 
 ### DONE
 - [x] push premade card format to anki for new users
