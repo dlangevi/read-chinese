@@ -10,15 +10,15 @@ function insertIfNonEmpty(dest, contents) {
   }
 }
 
-sentence = "{{ExampleSentence}}";
-hanzi = "{{Hanzi}}"
+sentence = '{{ExampleSentence}}';
+hanzi = '{{Hanzi}}'
 
 if (sentence.length > 0) {
-  var yellowHanzi = hanzi.fontcolor("yellow");
+  var yellowHanzi = hanzi.fontcolor('yellow');
   var highlighted = sentence.replaceAll(hanzi, yellowHanzi);
-  document.getElementById("sentence").innerHTML = highlighted;
+  document.getElementById('sentence').innerHTML = highlighted;
 }
 else {
-  insertIfNonEmpty("hanzi", hanzi);
+  insertIfNonEmpty('hanzi', hanzi);
 }
 </script>

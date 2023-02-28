@@ -58,18 +58,17 @@ function hintify(dest, contents, hintText) {
   }
 }
 
-exampleSentence = "{{ExampleSentence}}";
-englishDefinition = "{{EnglishDefinition}}";
-chineseDefinition = "{{ChineseDefinition}}";
+exampleSentence = '{{ExampleSentence}}';
+englishDefinition = '{{EnglishDefinition}}';
+chineseDefinition = '{{ChineseDefinition}}';
 
 if (chineseDefinition.length > 0) {
-  insertIfNonEmpty("chinese", chineseDefinition);
-  hintify("english", englishDefinition,
+  hintify('english', englishDefinition,
           'Show English Definition')
 } else {
-  insertIfNonEmpty("english", englishDefinition);
+  insertIfNonEmpty('english', englishDefinition);
 }
 
-hintify("translation", "{{SentenceTranslation}}",
-          'Show Translation');
+hintify('translation', '{{SentenceTranslation}}',
+        'Show Translation');
 </script>
