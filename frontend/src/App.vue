@@ -1,22 +1,21 @@
 <template>
   <div
     id="app"
-    class="text-base-content"
+    class="overflow-hide text-base-content"
     :data-theme="UserSettings.meta.Theme"
   >
     <message-provider>
       <loader-provider>
         <CardCreator />
-        <div class="flex h-screen w-screen flex-col bg-base-100">
+        <div class="h-screen w-screen bg-base-100">
           <TopNav
-            :class="['w-screen basis-16',
+            :class="['w-screen h-16',
                      {hidden: route.fullPath === '/Welcome'}]"
           />
-          <div class="w-screen grow basis-auto overflow-auto">
-            <Suspense>
-              <router-view :key="route.fullPath" />
-            </Suspense>
-          </div>
+          <router-view
+            :key="route.fullPath"
+            class="h-[calc(100vh-4rem)] w-screen overflow-scroll "
+          />
         </div>
       </loader-provider>
     </message-provider>

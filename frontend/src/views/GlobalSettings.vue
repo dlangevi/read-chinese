@@ -1,8 +1,5 @@
 <template>
   <div class="container mx-auto px-4">
-    <h2 class="mt-5">
-      Settings
-    </h2>
     <div
       v-for="(contents, section, index) in sections"
       :key="index"
@@ -57,6 +54,4 @@ const sections = {
   SentenceGeneration:
     getDisplayable(UserSettings.SentenceGeneration),
 };
-console.log(UserSettings.Dictionaries);
-console.log(sections);
 </script>

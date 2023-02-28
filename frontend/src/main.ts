@@ -85,7 +85,7 @@ async function init() {
   const messageApi = new MessageApi();
   const loadingApi = new LoadingApi();
 
-  router.beforeEach(async (to, _from) => {
+  router.beforeEach(async (to) => {
     console.log(to.name);
     const passes = await HealthCheck();
     if (passes !== '' && to.name !== 'Welcome') {
