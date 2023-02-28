@@ -18,12 +18,12 @@
               v-for="item in navigation"
               :key="item.name"
               :to="item.href"
-              :class="[item.current
+              :class="[item.href === route.fullPath
                          ? 'bg-accent-focus '
                          : 'hover:bg-accent-focus',
                        'px-3 py-2 rounded-md text-accent-content',
                        'text-sm font-medium']"
-              :aria-current="item.current ? 'page' : undefined"
+              :aria-current="item.href === route.fullPath ? 'page' : undefined"
             >
               {{ item.name }}
             </router-link>
@@ -49,31 +49,20 @@
 
 <script lang="ts" setup>
 import { useRoute } from 'vue-router';
-import type { RouteLocationNormalizedLoaded } from 'vue-router';
-import { watch, ref } from 'vue';
+import { computed } from 'vue';
 import { getUserSettings } from '@/lib/userSettings';
 const UserSettings = getUserSettings();
 
 const route = useRoute();
-// TODO get the image working better
-const navigation = ref([
-  { name: 'BookLibrary', href: '/BookLibrary', current: false },
+const navigation = computed(() => [
+  { name: 'BookLibrary', href: '/BookLibrary' },
   ...(UserSettings.meta.EnableExperimental
-    ? [{ name: 'Manage FlashCards', href: '/FlashCards', current: false },
-      { name: 'Create FlashCards', href: '/MakeCards', current: false }]
+    ? [{ name: 'Manage FlashCards', href: '/FlashCards' },
+      { name: 'Create FlashCards', href: '/MakeCards' }]
     : []),
-  { name: 'Wordlists', href: '/WordLists', current: false },
-  { name: 'Stats', href: '/Stats', current: false },
-  { name: 'Settings', href: '/Settings', current: false },
+  { name: 'Wordlists', href: '/WordLists' },
+  { name: 'Stats', href: '/Stats' },
+  { name: 'Settings', href: '/Settings' },
 ]);
-function updateNav(currentRoute:RouteLocationNormalizedLoaded) {
-  navigation.value.forEach((item) => {
-    item.current = item.href === currentRoute.fullPath;
-  });
-}
-
-watch(route, (_, newRoute) => {
-  updateNav(newRoute);
-});
 
 </script>

@@ -35,7 +35,6 @@ type (
 
 	MetaSettings struct {
 		path               string
-		CacheSentences     bool   `json:"CacheSentences"`
 		EnableExperimental bool   `json:"EnableExperimental"`
 		Ran                int    `json:"Ran"`
 		Theme              string `json:"Theme"`
@@ -111,7 +110,6 @@ func defaultConfig(path string) *UserConfig {
 	return &UserConfig{
 		Meta: MetaSettings{
 			path:               path,
-			CacheSentences:     false,
 			EnableExperimental: false,
 			Ran:                0,
 			Theme:              "emerald",

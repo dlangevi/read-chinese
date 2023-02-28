@@ -331,7 +331,6 @@ export namespace backend {
 	    }
 	}
 	export class MetaSettings {
-	    CacheSentences: boolean;
 	    EnableExperimental: boolean;
 	    Ran: number;
 	    Theme: string;
@@ -342,7 +341,6 @@ export namespace backend {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.CacheSentences = source["CacheSentences"];
 	        this.EnableExperimental = source["EnableExperimental"];
 	        this.Ran = source["Ran"];
 	        this.Theme = source["Theme"];

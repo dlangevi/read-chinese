@@ -1,5 +1,9 @@
 <template>
-  <div id="app" class="text-base-content">
+  <div
+    id="app"
+    class="text-base-content"
+    :data-theme="UserSettings.meta.Theme"
+  >
     <message-provider>
       <loader-provider>
         <CardCreator />
@@ -26,6 +30,7 @@ import MessageProvider from '@/components/MessageProvider.vue';
 import LoaderProvider from '@/components/LoaderProvider.vue';
 import TopNav from '@/components/TopNav.vue';
 import CardCreator from '@/components/CardCreator.vue';
+import { themeChange } from 'theme-change';
 import { getUserSettings } from '@/lib/userSettings';
 
 import './App.css';
@@ -33,7 +38,7 @@ import './App.css';
 const UserSettings = getUserSettings();
 
 onMounted(() => {
-  document.documentElement.setAttribute('data-theme', UserSettings.meta.Theme);
+  themeChange(false);
 });
 
 const route = useRoute();

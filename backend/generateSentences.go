@@ -40,9 +40,7 @@ func NewGenerator(
 		cacheLock:     &sync.Mutex{},
 		bookCache:     map[string][]TokenizedSentence{},
 	}
-	if userSettings.Meta.CacheSentences {
-		go generator.GenerateSentenceTable()
-	}
+	go generator.GenerateSentenceTable()
 	return &generator
 }
 

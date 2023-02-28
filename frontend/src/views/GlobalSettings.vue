@@ -3,25 +3,6 @@
     <h2 class="mt-5">
       Settings
     </h2>
-    <div>
-      <div class="m-5">
-        <h2 class="mb-4 text-2xl font-bold text-green-700">Select Theme</h2>
-        <select
-          v-model="currentTheme"
-          data-choose-theme
-          class="select-primary select"
-          @change="saveTheme"
-        >
-          <option
-            v-for="theme in themes"
-            :key="theme"
-            :value="theme"
-          >
-            {{ theme }}
-          </option>
-        </select>
-      </div>
-    </div>
     <div
       v-for="(contents, section, index) in sections"
       :key="index"
@@ -55,40 +36,18 @@
 
 <script lang="ts" setup>
 import {
-  ref,
-  onMounted,
-} from 'vue';
-import {
   getUserSettings, getDisplayable,
 } from '@/lib/userSettings';
-import { themeChange } from 'theme-change';
-import { SetUserSetting } from '@wailsjs/backend/UserConfig';
 
 const props = defineProps<{
   highlight?: string,
 }>();
-onMounted(() => {
-  themeChange(false);
-});
 
-const currentTheme = ref('');
 const UserSettings = getUserSettings();
-const themes = [
-  'light', 'dark', 'cupcake',
-  'bumblebee', 'emerald', 'corporate',
-  'synthwave', 'retro', 'cyberpunk',
-  'valentine', 'halloween', 'garden',
-  'forest', 'aqua', 'lofi', 'pastel',
-  'fantasy', 'wireframe', 'black',
-  'luxury', 'dracula', 'cmyk',
-  'autumn', 'business', 'acid',
-  'lemonade', 'night', 'coffee', 'winter',
-];
-function saveTheme() {
-  SetUserSetting('Theme', currentTheme.value);
-}
 
 const sections = {
+  GeneralSettings:
+    getDisplayable(UserSettings.meta),
   CardCreationSettings:
     getDisplayable(UserSettings.CardCreation),
   AnkiSettings:

@@ -134,6 +134,29 @@ function loadSettings(settings : UserSetting[]) {
 
 export const ComponentTable = loadSettings([
   selector(
+    'Theme',
+    'Select Theme',
+    'Choose the theme',
+    async function () {
+      return [
+        'light', 'dark', 'cupcake',
+        'bumblebee', 'emerald', 'corporate',
+        'synthwave', 'retro', 'cyberpunk',
+        'valentine', 'halloween', 'garden',
+        'forest', 'aqua', 'lofi', 'pastel',
+        'fantasy', 'wireframe', 'black',
+        'luxury', 'dracula', 'cmyk',
+        'autumn', 'business', 'acid',
+        'lemonade', 'night', 'coffee', 'winter',
+      ];
+    },
+  ),
+  checkBox(
+    'EnableExperimental',
+    'Enable Experimental Features',
+    'Only do this if you are me',
+  ),
+  selector(
     'ActiveDeck',
     'Active Anki Deck',
     'Where your cards go',
