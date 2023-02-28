@@ -186,11 +186,15 @@ async function submit() {
   if (action === ActionsEnum.CREATE) {
     const cardValues = toRaw(cardManager.newValues);
     const tags = [];
-    if (preferBookRef.value !== undefined &&
-        UserSettings.AnkiConfig.AddBookTag) {
-      const book = await GetBook(preferBookRef.value);
-      tags.push(book.title);
+    if (UserSettings.AnkiConfig.AddBookTag) {
+      if (preferBookRef.value !== undefined) {
+        const book = await GetBook(preferBookRef.value);
+        tags.push(book.title);
+      } else if (cardManager.sentenceSource !== '') {
+        tags.push(cardManager.sentenceSource);
+      }
     }
+
     if (UserSettings.AnkiConfig.AddProgramTag) {
       tags.push('read-chinese');
     }

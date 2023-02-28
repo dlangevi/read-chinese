@@ -15,16 +15,19 @@
         :key="i"
         class="text-3xl"
       >
-        <label class="label cursor-pointer justify-start gap-2" :for="sen">
+        <label
+          class="label cursor-pointer justify-start gap-2"
+          :for="sen.sentence"
+        >
           <input
-            :id="sen"
+            :id="sen.sentence"
             v-model="sentence"
             class="radio"
             :value="sen"
             type="radio"
             name="sentences"
           >
-          <span>{{ sen }}</span>
+          <span>{{ sen.sentence }}</span>
         </label>
       </div>
     </div>
@@ -38,16 +41,19 @@
         :key="i"
         class="text-3xl"
       >
-        <label class="label cursor-pointer justify-start gap-2" :for="sen">
+        <label
+          class="label cursor-pointer justify-start gap-2"
+          :for="sen.sentence"
+        >
           <input
-            :id="sen"
+            :id="sen.sentence"
             v-model="sentence"
             class="radio"
             :value="sen"
             type="radio"
             name="sentences"
           >
-          <span>{{ sen }}</span>
+          <span>{{ sen.sentence }}</span>
         </label>
       </div>
     </div>
@@ -61,16 +67,18 @@ import {
 import { GetSentencesForWord } from '@wailsjs/backend/Generator';
 import { useCardManager } from '@/stores/CardManager';
 import { getUserSettings } from '@/lib/userSettings';
+import { backend } from '@wailsjs/models';
 
 const cardManager = useCardManager();
 
-const sentences = ref<string[]>([]);
-const allSentences = ref<string[]>([]);
-const sentence = ref('');
+const sentences = ref<backend.Sentence[]>([]);
+const allSentences = ref<backend.Sentence[]>([]);
+const sentence = ref<backend.Sentence>(backend.Sentence.createFrom());
 const loaded = ref(false);
 const UserSettings = getUserSettings();
 
 watch(sentence, async () => {
+  console.log('Setting sentence', sentence.value);
   cardManager.updateSentence(sentence.value);
   const autoAdvance = UserSettings.CardCreation.AutoAdvanceSentence;
   if (autoAdvance) {

@@ -1,31 +1,75 @@
-<div class=hanzi>{{Hanzi}} {{HanziAudio}}</div>
-<div class=pinyin>{{Pinyin}}</div>
-<div class=english>{{ChineseDefinition}}</div>
-{{^ChineseDefinition}}
-<div class=english>{{EnglishDefinition}}</div>
-{{/ChineseDefinition}}
+<div class="hanzi">
+  {{Hanzi}} 
+</div>
+<div class="pinyin">
+  {{Pinyin}}
+</div>
 
-{{#ChineseDefinition}}{{#EnglishDefinition}}
-<div class=surround>
-﻿<a class=hint href="#" onclick="show(this, 'abd')">Show English Definition</a>
-<div id="abd" class=hint>{{EnglishDefinition}}</div>
-<div>
-{{/EnglishDefinition}}{{/ChineseDefinition}}
+<div id="chinese" class="definition">
+  {{ChineseDefinition}}
+</div>
 
-<div class=image>{{Images}}</div>
-<div class=sentence>{{ExampleSentence}} {{SentenceAudio}}</div>
-<div class=pinyinSen></div>
+<div id="english" class="definition"></div>
 
-{{#SentenceTranslation}}
-﻿<a class=hint href="#" onclick="show(this,'abe')">Show Sentence Translation</a>
-<div id="abe" class=hint>{{SentenceTranslation}}</div>
-{{/SentenceTranslation}}
+<div class="image">
+  {{Images}}
+</div>
 
+<div id="sentence" class="sentence small">
+  {{ExampleSentence}}
+</div>
+
+<div id="translation" class="sentence small"></div>
+
+<div class="audio">
+  {{HanziAudio}} {{SentenceAudio}}
+</div>
 
 <script>
-function show(div, target) {
-   div.style.display='none';
-   document.getElementById(target).style.display='inline-block';
-   return false;
+function insertIfNonEmpty(dest, contents) {
+  if (contents.length > 0) {
+    const elem = document.getElementById(dest);
+    elem.innerHTML = contents
+  }
 }
+
+function hintify(dest, contents, hintText) {
+  if (contents.length > 0) {
+    const elem = document.getElementById(dest)
+      
+    const link = document.createElement('a'); 
+    link.textContent = hintText;
+    link.className = 'hint';
+    link.style.display='inline-block';
+
+    const div = document.createElement('div'); 
+    div.textContent = contents; 
+    div.style.display='none';
+    div.className = 'hint';
+
+    link.addEventListener('click', function(event) {
+        event.preventDefault(); 
+        link.style.display='none';
+        div.style.display='inline-block';
+    });
+
+    elem.appendChild(link); 
+    elem.appendChild(div); 
+  }
+}
+
+exampleSentence = "{{ExampleSentence}}";
+englishDefinition = "{{EnglishDefinition}}";
+chineseDefinition = "{{ChineseDefinition}}";
+
+if (chineseDefinition.length > 0) {
+  insertIfNonEmpty("chinese", chineseDefinition);
+  hintify("english", englishDefinition,
+          'Show English Definition')
+} else {
+  insertIfNonEmpty("english", englishDefinition);
+}
+
+hintify("translation", "{{SentenceTranslation}}",
+          'Show Translation');
 </script>

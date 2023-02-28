@@ -438,6 +438,20 @@ export namespace backend {
 		}
 	}
 	
+	export class Sentence {
+	    sentence: string;
+	    source: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Sentence(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.sentence = source["sentence"];
+	        this.source = source["source"];
+	    }
+	}
 	export class SentenceGenerationConfig {
 	    IdealSentenceLength: number;
 	    KnownInterval: number;

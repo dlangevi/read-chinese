@@ -201,14 +201,19 @@ func (g *Generator) UpdateSentenceTable(newWord string) error {
 	return nil
 }
 
+type Sentence struct {
+	Sentence string `json:"sentence"`
+	Source   string `json:"source"`
+}
+
 // This can still be optimized a ton
-func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]string, error) {
+func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]Sentence, error) {
 	defer duration(track("Get Sentences"))
 	g.cacheLock.Lock()
 	defer g.cacheLock.Unlock()
 
 	books, _ := g.bookLibrary.GetSomeBooks(bookIds...)
-	sentences := []string{}
+	sentences := []Sentence{}
 	for _, book := range books {
 		g.mapLock.RLock()
 		t1Segmented, ok := g.sentenceCache[book.Title]
@@ -221,24 +226,27 @@ func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]string,
 		t1Sentences, ok := t1Segmented[word]
 		if ok {
 			for _, sentence := range t1Sentences {
-				sentences = append(sentences, toString(sentence))
+				sentences = append(sentences, Sentence{
+					Sentence: toString(sentence),
+					Source:   book.Title,
+				})
 			}
 		}
 	}
 	idealLength := g.userSettings.SentenceGenerationConfig.IdealSentenceLength
-	rankSentences(&sentences, idealLength)
+	rankSentences(sentences, idealLength)
 	min := math.Min(float64(len(sentences)), 15)
 	sentences = sentences[0:int(min)]
 
 	return sentences, nil
 }
 
-func rankSentences(sentences *[]string, idealLength int) {
+func rankSentences(sentences []Sentence, idealLength int) {
 	// Is a less than b?
-	sort.Slice(*sentences, func(a int, b int) bool {
+	sort.Slice(sentences, func(a int, b int) bool {
 		// Which ever score is closer to 0 is better
-		aScore := math.Abs(float64(len([]rune((*sentences)[a])) - idealLength))
-		bScore := math.Abs(float64(len([]rune((*sentences)[b])) - idealLength))
+		aScore := math.Abs(float64(len([]rune(sentences[a].Sentence)) - idealLength))
+		bScore := math.Abs(float64(len([]rune(sentences[b].Sentence)) - idealLength))
 		return (aScore <= bScore)
 	})
 }

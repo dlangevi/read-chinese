@@ -35,6 +35,7 @@ export const useCardManager = defineStore('CardManager', {
       // auto advancing or clicking next step. In this state, when we
       // advance to a field that has been auto filled, we skip over it
       flow: true,
+      sentenceSource: '',
       stepsState: {} as StateMap,
       originalValues: new backend.Fields(),
       newValues: new backend.Fields(),
@@ -100,14 +101,17 @@ export const useCardManager = defineStore('CardManager', {
       this.originalValues = backend.Fields.createFrom(this.note.fields);
       this.newValues = backend.Fields.createFrom();
       this.newValues.word = this.originalValues.word;
+      this.sentenceSource = '';
 
       this.currentStep = StepsEnum.SENTENCE;
       this.currentStepIndex = 0;
       this.flow = true;
     },
 
-    updateSentence(sentence: string) {
-      this.newValues.sentence = sentence;
+    updateSentence(sentence: backend.Sentence) {
+      this.newValues.sentence = sentence.sentence;
+      console.log('setting source', sentence.source);
+      this.sentenceSource = sentence.source;
       this.stepsState[StepsEnum.SENTENCE] = StepState.PREVIEW;
     },
 

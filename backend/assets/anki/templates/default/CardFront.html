@@ -1,14 +1,24 @@
-{{#ExampleSentence}}
-<div id="sentence" class="sentence big">{{ExampleSentence}}</div>
-<script>
-var sentence = document.getElementById("sentence").innerHTML;
-var word = "{{Hanzi}}"
-var boldword = word.fontcolor("yellow");
-var newsentence = sentence.replaceAll(word,boldword);
-document.getElementById("sentence").innerHTML = newsentence;
-</script>
-{{/ExampleSentence}}
+<div id="hanzi" class="hanzi"></div>
 
-{{^ExampleSentence}}
-<div id="sentence" class="sentence big">{{Hanzi}}</div>
-{{/ExampleSentence}}
+<div id="sentence" class="sentence"></div>
+
+<script>
+function insertIfNonEmpty(dest, contents) {
+  if (contents.length > 0) {
+    const elem = document.getElementById(dest);
+    elem.innerHTML = contents
+  }
+}
+
+sentence = "{{ExampleSentence}}";
+hanzi = "{{Hanzi}}"
+
+if (sentence.length > 0) {
+  var yellowHanzi = hanzi.fontcolor("yellow");
+  var highlighted = sentence.replaceAll(hanzi, yellowHanzi);
+  document.getElementById("sentence").innerHTML = highlighted;
+}
+else {
+  insertIfNonEmpty("hanzi", hanzi);
+}
+</script>
