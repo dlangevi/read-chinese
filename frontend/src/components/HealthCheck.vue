@@ -1,6 +1,9 @@
 <template>
   <div class="">
-    <div v-if="allComplete">
+    <div v-if="firstRoundDone">
+      Loading ...
+    </div>
+    <div v-else-if="allComplete">
       <router-link class="btn" to="/BookLibrary">Lets get started</router-link>
     </div>
     <div v-else>
@@ -191,6 +194,10 @@ watch(
 
 const allComplete = computed(() => {
   return Object.values(checks).every(check => check.checkResult === '');
+});
+const firstRoundDone = computed(() => {
+  return Object.values(checks).some(
+    check => check.checkResult === 'not checked yet');
 });
 
 const nextActionText = computed(() => {

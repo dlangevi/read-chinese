@@ -22,21 +22,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { GetWordStats } from '@wailsjs/backend/KnownWords';
 import { TotalRead, TotalReadChars } from '@wailsjs/backend/bookLibrary';
 
-const totalWords = ref(0);
-const totalChars = ref(0);
-const words = ref(0);
-const characters = ref(0);
-async function run() {
-  totalWords.value = await TotalRead();
-  totalChars.value = await TotalReadChars();
-  const wordStats = await GetWordStats();
-  words.value = wordStats.words;
-  characters.value = wordStats.characters;
-}
-run();
+const totalWords = await TotalRead();
+const totalChars = await TotalReadChars();
+const {
+  words,
+  characters,
+} = await GetWordStats();
 
 </script>

@@ -77,8 +77,7 @@ async function syncCalibre() {
 
 async function exportBooks() {
   const filename = await SaveFile();
-  const detailed = await GetDetailedBooks(filename);
-  console.log(JSON.stringify(detailed));
+  return GetDetailedBooks(filename);
 }
 
 async function recalculateBooks() {
@@ -109,6 +108,5 @@ const favoriteFilter = computed(
 
 onBeforeMount(async () => {
   books.value = await GetBooks();
-  console.log('books:', books.value);
 });
 </script>

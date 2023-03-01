@@ -12,10 +12,15 @@
             :class="['w-screen h-16',
                      {hidden: route.fullPath === '/Welcome'}]"
           />
-          <router-view
-            :key="route.fullPath"
-            class="h-[calc(100vh-4rem)] w-screen overflow-scroll "
-          />
+          <!-- While we use Suspense, we want to limit async components to
+          lightweight fetch only due to the current bug described here
+          https://github.com/vuejs/router/issues/1324 -->
+          <Suspense>
+            <router-view
+              :key="route.fullPath"
+              class="h-[calc(100vh-4rem)] w-screen overflow-scroll "
+            />
+          </Suspense>
         </div>
       </loader-provider>
     </message-provider>
@@ -23,25 +28,17 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import MessageProvider from '@/components/MessageProvider.vue';
 import LoaderProvider from '@/components/LoaderProvider.vue';
 import TopNav from '@/components/TopNav.vue';
 import CardCreator from '@/components/CardCreator.vue';
-import { themeChange } from 'theme-change';
 import { getUserSettings } from '@/lib/userSettings';
 
 import './App.css';
 
 const UserSettings = getUserSettings();
-
-onMounted(() => {
-  themeChange(false);
-});
-
 const route = useRoute();
-
 </script>
 
 <style>
