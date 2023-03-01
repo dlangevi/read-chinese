@@ -61,7 +61,7 @@ import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
 import { getUserSettings, ComponentTable } from '@/lib/userSettings';
 import { backend } from '@wailsjs/models';
-import { SaveFile } from '@wailsjs/main/App';
+import { SaveFile } from '@wailsjs/backend/Backend';
 import {
   GetBooks, GetDetailedBooks,
   RecalculateBooks,

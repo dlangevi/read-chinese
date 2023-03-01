@@ -71,17 +71,13 @@ func main() {
 	// 创建一个App结构体实例
 	log.SetFlags(log.Ltime | log.Lshortfile)
 
-	app := NewApp()
 	sqlDbPath := backend.ConfigDir("db.sqlite3")
 	metadataPath := backend.ConfigDir("metadata.json")
-	backend, err := backend.StartBackend(&app.ctx, sqlDbPath, metadataPath)
-	if err != nil {
-		log.Fatal(err)
-	}
+	backendObj := backend.NewBackend(sqlDbPath, metadataPath)
 
 	// Create application with options
 	// 使用选项创建应用
-	err = wails.Run(&options.App{
+	err := wails.Run(&options.App{
 		Title:             "read-chinese",
 		Width:             1200,
 		Height:            800,
@@ -98,10 +94,10 @@ func main() {
 		Menu:              nil,
 		Logger:            nil,
 		LogLevel:          logger.ERROR,
-		OnStartup:         app.startup,
-		OnDomReady:        app.domReady,
-		OnBeforeClose:     app.beforeClose,
-		OnShutdown:        app.shutdown,
+		OnStartup:         backendObj.Startup,
+		OnDomReady:        backendObj.DomReady,
+		OnBeforeClose:     backendObj.BeforeClose,
+		OnShutdown:        backendObj.Shutdown,
 		WindowStartState:  options.Maximised,
 		AssetServer: &assetserver.Options{
 			Assets:     assets,
@@ -109,16 +105,15 @@ func main() {
 			Middleware: nil,
 		},
 		Bind: []interface{}{
-			app,
-			backend,
-			backend.BookLibrary,
-			backend.KnownWords,
-			backend.UserSettings,
-			backend.ImageClient,
-			backend.Dictionaries,
-			backend.Generator,
-			backend.AnkiInterface,
-			backend.Calibre,
+			backendObj,
+			backendObj.BookLibrary,
+			backendObj.KnownWords,
+			backendObj.UserSettings,
+			backendObj.ImageClient,
+			backendObj.Dictionaries,
+			backendObj.Generator,
+			backendObj.AnkiInterface,
+			backendObj.Calibre,
 		},
 		// Windows platform specific options
 		// Windows平台特定选项

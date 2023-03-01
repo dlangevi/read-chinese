@@ -127,7 +127,7 @@ import {
   backend,
 } from '@wailsjs/models';
 
-import { FilePicker } from '@wailsjs/main/App';
+import { FilePicker } from '@wailsjs/backend/Backend';
 
 import { useLoader } from '@/lib/loading';
 

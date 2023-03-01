@@ -35,7 +35,7 @@
 import {
   ImportCSVWords,
 } from '@wailsjs/backend/KnownWords';
-import { FilePicker } from '@wailsjs/main/App';
+import { FilePicker } from '@wailsjs/backend/Backend';
 import { ref } from 'vue';
 
 const importCsvModal = ref(false);
