@@ -72,7 +72,7 @@ import WithSidebar from '@/layouts/WithSidebar.vue';
 const loader = useLoader();
 
 async function syncCalibre() {
-  return loader.withLoader(ImportCalibreBooks, 'Importing calibre');
+  return loader.withLoader(ImportCalibreBooks);
 }
 
 async function exportBooks() {
@@ -81,7 +81,7 @@ async function exportBooks() {
 }
 
 async function recalculateBooks() {
-  return loader.withLoader(RecalculateBooks, 'Resegmenting library');
+  return loader.withLoader(RecalculateBooks);
 }
 
 const UserSettings = getUserSettings();

@@ -139,7 +139,7 @@ const checks = reactive({
     checkResult: 'not checked yet',
     buttonText: 'Sync Calibre',
     buttonAction: async () => {
-      await loader.withLoader(ImportCalibreBooks, 'Importing calibre');
+      await loader.withLoader(ImportCalibreBooks);
     },
   },
   AnkiAvaliable: {

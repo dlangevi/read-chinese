@@ -165,8 +165,7 @@ async function pickFile() {
 }
 const loader = useLoader();
 async function addCedict() {
-  await loader.withLoader(AddCedict,
-    'Install CC-CEDICT dictionary...');
+  await loader.withLoader(AddCedict);
   updateDicts();
 }
 

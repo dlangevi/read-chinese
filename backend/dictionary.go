@@ -57,7 +57,7 @@ func SaveDictionary(d *dictionary, path string) error {
 
 var entryRegexp = regexp.MustCompile(`^(.*) (.*) \[(.*)\] /(?:(.*)/)+`)
 
-func downloadCedict() (io.ReadCloser, error) {
+func downloadCedict(backend *Backend) (io.ReadCloser, error) {
 	resp, err := http.Get(URL)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,13 @@ func downloadCedict() (io.ReadCloser, error) {
 		return nil, fmt.Errorf("bad status: %s", resp.Status)
 	}
 
-	gz, err := gzip.NewReader(resp.Body)
+	fmt.Printf("Predicting %v length\n", resp.ContentLength)
+
+	counter := &ReportedDownload{
+		backend:    backend,
+		TotalBytes: uint64(resp.ContentLength),
+	}
+	gz, err := gzip.NewReader(io.TeeReader(resp.Body, counter))
 	if err != nil {
 		return nil, err
 	}
@@ -75,9 +81,9 @@ func downloadCedict() (io.ReadCloser, error) {
 	return gz, nil
 }
 
-func FromCedictFormat() (*dictionary, error) {
+func FromCedictFormat(backend *Backend) (*dictionary, error) {
 	dictionary := newDictionary()
-	ccdict, err := downloadCedict()
+	ccdict, err := downloadCedict(backend)
 	if err != nil {
 		return dictionary, err
 	}

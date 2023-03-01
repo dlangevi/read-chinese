@@ -8,12 +8,14 @@ import (
 )
 
 type Calibre struct {
+	backend     *Backend
 	bookLibrary BookLibrary
 	generator   *Generator
 }
 
-func NewCalibre(b BookLibrary, g *Generator) *Calibre {
+func NewCalibre(backend *Backend, b BookLibrary, g *Generator) *Calibre {
 	return &Calibre{
+		backend:     backend,
 		bookLibrary: b,
 		generator:   g,
 	}
@@ -57,6 +59,8 @@ func (c *Calibre) ImportCalibreBooks() error {
 		log.Println("Failed", err)
 		return err
 	}
+
+	c.backend.setupProgress("Processing calibre books", len(books))
 	for _, book := range books {
 		log.Println("Trying", book.Author, book.Title)
 		exists, err := c.bookLibrary.BookExists(book.Author, book.Title)
@@ -85,8 +89,8 @@ func (c *Calibre) ImportCalibreBooks() error {
 			}
 		} else {
 			log.Println("It exists")
-
 		}
+		c.backend.progress()
 	}
 	return nil
 }

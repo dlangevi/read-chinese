@@ -41,14 +41,16 @@ type (
 )
 
 type ankiInterface struct {
+	backend      *Backend
 	anki         *ankiconnect.Client
 	textToSpeech *TextToSpeech
 	userSettings *UserConfig
 	known        *KnownWords
 }
 
-func NewAnkiInterface(userSettings *UserConfig, known *KnownWords) *ankiInterface {
+func NewAnkiInterface(backend *Backend, userSettings *UserConfig, known *KnownWords) *ankiInterface {
 	return &ankiInterface{
+		backend:      backend,
 		anki:         ankiconnect.NewClient(),
 		textToSpeech: NewTextToSpeach(userSettings),
 		userSettings: userSettings,
@@ -381,6 +383,10 @@ func (a *ankiInterface) UpdateNoteFields(noteID int64, fields Fields) (string, e
 }
 
 func (a *ankiInterface) ImportAnkiKeywords() error {
+
+	// Not able to do a good progress bar but this is
+	// fine for now
+	a.backend.setupProgress("Loading ankikey words", 1)
 	currentMapping, err := a.getConfiguredMapping()
 	if err != nil {
 		return err

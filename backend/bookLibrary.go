@@ -52,6 +52,7 @@ type (
 
 	// bookLibrary implements bookLibrary
 	bookLibrary struct {
+		backend      *Backend
 		db           *sqlx.DB
 		segmentation *Segmentation
 		known        *KnownWords
@@ -110,11 +111,13 @@ func NewBookStats() BookStats {
 }
 
 func NewBookLibrary(
+	b *Backend,
 	db *sqlx.DB,
 	s *Segmentation,
 	known *KnownWords,
 ) *bookLibrary {
 	return &bookLibrary{
+		backend:      b,
 		db:           db,
 		segmentation: s,
 		known:        known,
@@ -142,6 +145,7 @@ func (b *bookLibrary) RecalculateBooks() error {
 	if err != nil {
 		return err
 	}
+	b.backend.setupProgress("Resegmenting books", len(books))
 	for _, book := range books {
 		log.Println("Processing:", book.Title, "...")
 		filepath := book.Filepath
@@ -164,7 +168,7 @@ func (b *bookLibrary) RecalculateBooks() error {
 		if err != nil {
 			return err
 		}
-
+		b.backend.progress()
 	}
 
 	return nil

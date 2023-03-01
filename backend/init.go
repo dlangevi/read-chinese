@@ -94,8 +94,8 @@ func NewBackend(
 		ImageClient: NewImageClient(userSettings),
 	}
 
-	backend.Dictionaries = NewDictionaries(userSettings, backend.KnownWords)
-	backend.AnkiInterface = NewAnkiInterface(userSettings, backend.KnownWords)
+	backend.Dictionaries = NewDictionaries(backend, userSettings, backend.KnownWords)
+	backend.AnkiInterface = NewAnkiInterface(backend, userSettings, backend.KnownWords)
 
 	err = UnloadJiebaDicts()
 	if err != nil {
@@ -106,10 +106,10 @@ func NewBackend(
 		log.Fatal(err)
 	}
 
-	backend.BookLibrary = NewBookLibrary(db, s, backend.KnownWords)
+	backend.BookLibrary = NewBookLibrary(backend, db, s, backend.KnownWords)
 	backend.Segmentation = s
 	backend.Generator = NewGenerator(userSettings, s, backend.BookLibrary, backend.KnownWords)
-	backend.Calibre = NewCalibre(backend.BookLibrary, backend.Generator)
+	backend.Calibre = NewCalibre(backend, backend.BookLibrary, backend.Generator)
 
 	return backend
 }
@@ -167,4 +167,32 @@ func (b *Backend) BeforeClose(ctx context.Context) (prevent bool) {
 func (b *Backend) Shutdown(ctx context.Context) {
 	// Perform your teardown here
 	// 在此处做一些资源释放的操作
+}
+
+type ReportedDownload struct {
+	backend          *Backend
+	TotalBytes       uint64
+	lastSentProgress uint64
+	bytesSoFar       uint64
+}
+
+func (wc *ReportedDownload) Write(p []byte) (int, error) {
+	n := len(p)
+	wc.bytesSoFar += uint64(n)
+	progress := wc.bytesSoFar * 100 / wc.TotalBytes
+	if progress > wc.lastSentProgress {
+		wc.backend.progress()
+		wc.lastSentProgress = progress
+	}
+	return n, nil
+}
+
+func (b *Backend) setupProgress(
+	message string,
+	steps int) {
+	runtime.EventsEmit(b.ctx, "setupProgress", message, steps)
+}
+
+func (b *Backend) progress() {
+	runtime.EventsEmit(b.ctx, "progress")
 }

@@ -12,6 +12,7 @@ type Dictionaries struct {
 	userSettings    *UserConfig
 	known           *KnownWords
 	Segmentation    *Segmentation
+	backend         *Backend
 }
 
 type UserDictionary struct {
@@ -20,10 +21,12 @@ type UserDictionary struct {
 }
 
 func NewDictionaries(
+	backend *Backend,
 	userSettings *UserConfig,
 	known *KnownWords,
 ) *Dictionaries {
 	dicts := &Dictionaries{
+		backend:      backend,
 		userSettings: userSettings,
 		known:        known,
 	}
@@ -85,7 +88,8 @@ func (d *Dictionaries) loadDictionaries() error {
 
 func (d *Dictionaries) AddCedict() {
 	// Parse it into a *dictionary
-	dictionary, err := FromCedictFormat()
+	d.backend.setupProgress("Downloading cc-cedict", 100)
+	dictionary, err := FromCedictFormat(d.backend)
 	if err != nil {
 		log.Println(err)
 	}
