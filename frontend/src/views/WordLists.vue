@@ -1,23 +1,23 @@
 <template>
   <with-sidebar>
     <template #sidebar>
-      <button class="btn-primary btn" @click="importAnki">
-        Sync from Anki
-      </button>
-      <import-csv v-if="UserSettings.meta.EnableExperimental" />
-      <select
-        v-model="gridSource"
-        class="select-primary select"
-        @change="changeSource"
-      >
-        <option
-          v-for="source in sources"
-          :key="source"
-          :value="source"
+      <div class="flex items-center gap-4">
+        <label for="sourceSelect">Source:</label>
+        <select
+          id="sourceSelect"
+          v-model="gridSource"
+          class="select-primary select grow"
+          @change="changeSource"
         >
-          {{ source }}
-        </option>
-      </select>
+          <option
+            v-for="source in sources"
+            :key="source"
+            :value="source"
+          >
+            {{ source }}
+          </option>
+        </select>
+      </div>
       <div
         v-if="gridSource=='hsk'"
         class="flex place-content-between"
@@ -47,7 +47,14 @@
       <button class="btn-primary btn" @click="makeCards">
         Make Cards
       </button>
-      <div class="border-2 p-2 text-center">
+      <button class="btn-primary btn" @click="importAnki">
+        Sync from Anki
+      </button>
+      <import-csv v-if="UserSettings.meta.EnableExperimental" />
+      <div
+        v-if="gridSource=='hsk'"
+        class="border-2 p-2 text-center"
+      >
         {{ words.length }} remaining words
       </div>
     </template>

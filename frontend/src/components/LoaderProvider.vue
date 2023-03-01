@@ -2,13 +2,16 @@
   <div>
     <div
       v-if="api.shouldShow"
-      class="bg-opacity/50 fixed inset-0 z-[1000]
-  flex items-center justify-center bg-gray-800"
+      class="
+      fixed inset-0
+      z-50 flex
+      items-center justify-center
+      bg-gray-900/50 "
     >
       <div class="flex flex-col items-center">
         <div
-          class="mb-4 h-12 w-12 animate-spin
-      rounded-full border-b-2 border-white"
+          class="my-4 h-24 w-24 animate-spin
+        rounded-full border-b-4 border-white"
         />
         <p class="text-white">{{ api.loadingText }}</p>
       </div>

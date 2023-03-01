@@ -8,10 +8,7 @@
           alt="Read More"
         >
       </router-link>
-      <div
-        class="flex flex-1 items-center justify-center
-          sm:items-stretch sm:justify-start"
-      >
+      <div class="flex flex-1 items-center justify-center">
         <div class="hidden sm:ml-6 sm:block">
           <div class="flex space-x-4">
             <router-link
@@ -22,7 +19,7 @@
                          ? 'bg-accent-focus '
                          : 'hover:bg-accent-focus',
                        'px-3 py-2 rounded-md text-accent-content',
-                       'text-sm font-medium']"
+                       'text-md font-medium']"
               :aria-current="item.href === route.fullPath ? 'page' : undefined"
             >
               {{ item.name }}
