@@ -41,7 +41,7 @@ export let updateSettings = async () => {};
 function settingsObject(
   name:string,
   label:string,
-  tooltip:string,
+  tooltip:string|undefined,
   widgetType:any,
   setter:any,
 ):UserSetting {
@@ -62,8 +62,8 @@ function settingsObject(
 function selector(
   name:string,
   label:string,
-  tooltip:string,
   dataSource: () => Promise<string[]>,
+  tooltip?:string,
 ):UserSetting {
   const option:UserSetting = {
     name,
@@ -83,7 +83,7 @@ function selector(
 function checkBox(
   name:string,
   label:string,
-  tooltip:string,
+  tooltip?:string,
 ) {
   return settingsObject(
     name,
@@ -97,7 +97,7 @@ function checkBox(
 function textBox(
   name:string,
   label:string,
-  tooltip:string,
+  tooltip?:string,
 ) {
   return settingsObject(
     name,
@@ -111,7 +111,7 @@ function textBox(
 function slider(
   name:string,
   label:string,
-  tooltip:string,
+  tooltip?:string,
 ) {
   return settingsObject(
     name,
@@ -136,7 +136,6 @@ export const ComponentTable = loadSettings([
   selector(
     'Theme',
     'Select Theme',
-    'Choose the theme',
     async function () {
       return [
         'light', 'dark', 'cupcake',
@@ -159,13 +158,11 @@ export const ComponentTable = loadSettings([
   selector(
     'ActiveDeck',
     'Active Anki Deck',
-    'Where your cards go',
     LoadDecks,
   ),
   selector(
     'ActiveModel',
     'Active Anki Model',
-    'How your cards go',
     LoadModels,
   ),
   checkBox(
@@ -233,27 +230,22 @@ export const ComponentTable = loadSettings([
   checkBox(
     'AddProgramTag',
     'Add read-chinese tag',
-    'I',
   ),
   checkBox(
     'AddBookTag',
     'Add source book title tag',
-    'Obck',
   ),
   checkBox(
     'AllowDuplicates',
     'Allow Duplicates',
-    'K',
   ),
   checkBox(
     'GenerateTermAudio',
     'Auto generate audio for keyword',
-    'Not implemented yet',
   ),
   checkBox(
     'GenerateSentenceAudio',
     'Auto generate audio for example sentence',
-    'Not implemented yet',
   ),
   textBox(
     'AzureApiKey',
@@ -268,42 +260,34 @@ export const ComponentTable = loadSettings([
   checkBox(
     'OnlyFavorites',
     'Only show favorited books',
-    'Obv',
   ),
   checkBox(
     'HideRead',
     'Hide read books',
-    'Obv',
   ),
   checkBox(
     'ProblemFlagged',
     'Flagged Cards',
-    'exe',
   ),
   checkBox(
     'ProblemMissingImage',
     'Missing Images',
-    'exe',
   ),
   checkBox(
     'ProblemMissingSentence',
     'Missing Sentence',
-    'exe',
   ),
   checkBox(
     'ProblemMissingSentenceAudio',
     'Missing Sentence Audio',
-    'eexexe',
   ),
   checkBox(
     'ProblemMissingWordAudio',
     'Missing Word Audio',
-    'exe',
   ),
   checkBox(
     'ProblemMissingPinyin',
     'Missing Pinyin',
-    'exe',
   ),
 ]);
 

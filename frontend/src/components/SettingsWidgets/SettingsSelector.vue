@@ -17,6 +17,7 @@
       </option>
     </select>
     <div
+      v-if="setting.tooltip"
       class="tooltip tooltip-right"
       :data-tip="setting.tooltip"
     >

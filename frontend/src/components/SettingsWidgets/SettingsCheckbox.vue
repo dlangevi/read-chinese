@@ -11,14 +11,15 @@
     >
     <!-- TODO how to align the label vertically? -->
     <label
-      v-if="setting.tooltip"
       class="flex-1"
       :for="setting.value"
     >
       {{ setting.label }}
     </label>
     <div
-      class="tooltip tooltip-right"
+      v-if="setting.tooltip"
+      class="tooltip tooltip-right
+      "
       :data-tip="setting.tooltip"
     >
       <information-circle class="h-6 w-6" />
