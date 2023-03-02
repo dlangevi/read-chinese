@@ -1,30 +1,22 @@
 <template>
   <div
     :class="['modal', {'modal-open': showModal}]"
-    @click="onClose"
+    @click.stop
   >
     <div
       v-if="showModal"
       class="modal-box flex h-[80vh] w-4/5 max-w-full flex-col"
       @click.stop
     >
-      <!-- TODO dont use absolute positions. Do like a flex on the right -->
       <div class="absolute right-4 top-4 flex gap-2">
         <card-creation-settings />
-        <button
-          class="btn-sm btn-circle btn"
-          @click="onClose"
-        >
-          ✕
-        </button>
+        <close-circle-sharp class="h-6 w-6 cursor-pointer" @click="onClose" />
       </div>
       <p class="text-xl">
         Creating card for {{ cardManager.word }}
       </p>
       <div class="flex">
-        <div class="w-1/3">
-          <anki-card-preview class="" />
-        </div>
+        <anki-card-preview class="w-1/3" />
         <div
           :key="cardManager.word"
           class="h-[60vh] w-full overflow-scroll p-4"
@@ -85,6 +77,7 @@
 </template>
 
 <script lang="ts" setup>
+import { CloseCircleSharp } from '@vicons/ionicons5';
 import {
   ref, toRaw, watch,
 } from 'vue';
