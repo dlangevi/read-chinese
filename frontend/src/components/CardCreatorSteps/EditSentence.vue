@@ -6,55 +6,31 @@
     <div v-if="loaded && (allSentences.length + sentences.length) == 0">
       No sentences found, please skip for now
     </div>
-    <div v-if="props.preferBook">
-      <p class="text-4xl">
-        From Current Book
-      </p>
-      <div
-        v-for="(sen, i) in sentences"
-        :key="i"
-        class="text-3xl"
-      >
-        <label
-          class="label cursor-pointer justify-start gap-2"
-          :for="sen.sentence"
+    <div v-for="(sectionSentences, section) in sections" :key="section">
+      <div v-if="sectionSentences.value.length > 0">
+        <p class="text-4xl">
+          {{ section }}
+        </p>
+        <div
+          v-for="(sen, i) in sectionSentences.value"
+          :key="i"
+          class="text-3xl"
         >
-          <input
-            :id="sen.sentence"
-            v-model="sentence"
-            class="radio"
-            :value="sen"
-            type="radio"
-            name="sentences"
+          <label
+            class="label cursor-pointer justify-start gap-2"
+            :for="sen.sentence"
           >
-          <span>{{ sen.sentence }}</span>
-        </label>
-      </div>
-    </div>
-    <div>
-      <p class="text-4xl">
-        From All Books
-      </p>
-
-      <div
-        v-for="(sen, i) in allSentences"
-        :key="i"
-        class="text-3xl"
-      >
-        <label
-          class="label cursor-pointer justify-start gap-2"
-          :for="sen.sentence"
-        >
-          <input
-            :id="sen.sentence"
-            v-model="sentence"
-            class="radio"
-            :value="sen"
-            type="radio"
-            name="sentences"
-          >
-          <span>{{ sen.sentence }}</span>
-        </label>
+            <input
+              :id="sen.sentence"
+              v-model="sentence"
+              class="radio"
+              :value="sen"
+              type="radio"
+              name="sentences"
+            >
+            <span>{{ sen.sentence }}</span>
+          </label>
+        </div>
       </div>
     </div>
   </div>
@@ -81,6 +57,11 @@ const allSentences = ref<backend.Sentence[]>([]);
 const sentence = ref<backend.Sentence>(backend.Sentence.createFrom());
 const loaded = ref(false);
 
+const sections = {
+  'From Current Book': sentences,
+  'From All Books': allSentences,
+};
+
 watch(sentence, async () => {
   cardManager.updateSentence(sentence.value);
   const autoAdvance = UserSettings.CardCreation.AutoAdvanceSentence;
@@ -99,9 +80,10 @@ onBeforeMount(async () => {
   // filter out repeats (TODO do this be passing a negative filter to
   // GetSentencesForWord ?)
   const unfilteredAll = await GetSentencesForWord(cardManager.word, []);
-  allSentences.value = unfilteredAll.filter(
-    (sen) => sentences.value.some(
-      (other) => sen.sentence === other.sentence));
+  allSentences.value = unfilteredAll.filter((sen) => {
+    return !sentences.value.some(
+      (other) => sen.sentence === other.sentence);
+  });
   loaded.value = true;
 });
 

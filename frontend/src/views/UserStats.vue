@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-full">
+  <div class="flex">
     <div class="stats m-auto bg-primary text-primary-content shadow">
       <div class="stat place-items-center">
         <div class="stat-title"> Known Words </div>

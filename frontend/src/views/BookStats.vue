@@ -1,6 +1,6 @@
 <template>
   <div
-    class="m-4 flex"
+    class="flex"
     has-sider
   >
     <div
