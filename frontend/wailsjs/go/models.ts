@@ -158,6 +158,7 @@ export namespace backend {
 	    PopulateEnglish: boolean;
 	    PopulateChinese: boolean;
 	    AutoAdvanceEnglish: boolean;
+	    AutoAdvanceChinese: boolean;
 	    AutoAdvanceImage: boolean;
 	    AutoAdvanceCard: boolean;
 	
@@ -171,6 +172,7 @@ export namespace backend {
 	        this.PopulateEnglish = source["PopulateEnglish"];
 	        this.PopulateChinese = source["PopulateChinese"];
 	        this.AutoAdvanceEnglish = source["AutoAdvanceEnglish"];
+	        this.AutoAdvanceChinese = source["AutoAdvanceChinese"];
 	        this.AutoAdvanceImage = source["AutoAdvanceImage"];
 	        this.AutoAdvanceCard = source["AutoAdvanceCard"];
 	    }

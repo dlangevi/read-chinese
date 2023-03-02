@@ -42,12 +42,12 @@
           <edit-definition
             v-show="cardManager.currentStep === StepsEnum.ENGLISH"
             v-if="cardManager.steps.includes(StepsEnum.ENGLISH)"
-            type="english"
+            :english="true"
           />
           <edit-definition
             v-show="cardManager.currentStep === StepsEnum.CHINESE"
             v-if="cardManager.steps.includes(StepsEnum.CHINESE)"
-            type="chinese"
+            :chinese="true"
           />
           <edit-images
             v-show="cardManager.currentStep === StepsEnum.IMAGE"

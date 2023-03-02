@@ -14,9 +14,9 @@
       >
         <input
           :id="def.definition"
-          v-model="definition"
+          v-model="selectedDefs"
           class="checkbox"
-          :value="def.definition"
+          :value="def"
           type="checkbox"
           name="definitions"
         >
@@ -37,58 +37,49 @@ import { GetDefinitionsForWord } from '@wailsjs/backend/Dictionaries';
 import { useCardManager } from '@/stores/CardManager';
 
 const UserSettings = getUserSettings();
-
 const cardManager = useCardManager();
 
 const definitions = ref<backend.DictionaryDefinition[]>([]);
-const definition = ref<string[]>([]);
+const selectedDefs = ref<backend.DictionaryDefinition[]>([]);
 
-watch(definition, async () => {
-  const selected = new Set<string>(definition.value.values());
-  const selectedDefinitions = definitions.value.filter(
-    (def) => selected.has(def.definition),
-  );
-  updateDefinition(selectedDefinitions);
-  const autoAdvance = UserSettings.CardCreation.AutoAdvanceEnglish;
-  if (autoAdvance) {
+const props = defineProps<{
+  chinese?: boolean
+  english?: boolean
+}>();
+
+watch(selectedDefs, async () => {
+  updateDefinition(selectedDefs.value);
+  if (props.english
+    ? UserSettings.CardCreation.AutoAdvanceEnglish
+    : UserSettings.CardCreation.AutoAdvanceChinese
+  ) {
     cardManager.nextStep();
   }
 });
 
-const props = defineProps<{
-  type: string
-}>();
-
 function updateDefinition(definitions: backend.DictionaryDefinition[]) {
-  cardManager.updateDefinition(definitions, props.type);
+  cardManager.updateDefinition(definitions,
+    props.english ? 'english' : 'chinese');
 }
 
 async function calculateDefault() {
-  const definitions = await GetDefinitionsForWord(
-    cardManager.word,
-    props.type,
-  );
-  if (definitions.length === 1) {
-    updateDefinition(definitions);
+  if (definitions.value.length === 1) {
+    updateDefinition(definitions.value);
   }
 }
 
-async function loadData() {
-  let autoFill : boolean;
-  if (props.type === 'english') {
-    autoFill = UserSettings.CardCreation.PopulateEnglish;
-  } else {
-    autoFill = UserSettings.CardCreation.PopulateChinese;
-  }
+onBeforeMount(async () => {
   definitions.value = await GetDefinitionsForWord(
     cardManager.word,
-    props.type,
+    props.english ? 'english' : 'chinese',
   );
 
-  if (autoFill) {
+  if (props.english
+    ? UserSettings.CardCreation.PopulateEnglish
+    : UserSettings.CardCreation.PopulateChinese
+  ) {
     calculateDefault();
   }
-}
-onBeforeMount(loadData);
+});
 
 </script>

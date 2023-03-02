@@ -182,8 +182,13 @@ export const ComponentTable = loadSettings([
   ),
   checkBox(
     'AutoAdvanceEnglish',
-    'Auto advance after definition selection',
-    'After picking a definition, move to the next step',
+    'Auto advance after english definition selection',
+    'After picking an english definition, move to the next step',
+  ),
+  checkBox(
+    'AutoAdvanceChinese',
+    'Auto advance after chinese definition selection',
+    'After picking a chinese definition, move to the next step',
   ),
   checkBox(
     'AutoAdvanceImage',

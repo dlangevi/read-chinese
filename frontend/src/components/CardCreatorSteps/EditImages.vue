@@ -19,9 +19,9 @@
 
           <input
             :id="i.toString()"
-            v-model="image"
+            v-model="selectedImages"
             class="checkbox"
-            :value="i"
+            :value="imageData"
             type="checkbox"
             name="images"
           >
@@ -52,11 +52,10 @@ const cardManager = useCardManager();
 const { currentStep } = storeToRefs(cardManager);
 
 const images = ref<backend.ImageInfo[]>([]);
-const image = ref([]);
+const selectedImages = ref<backend.ImageInfo[]>([]);
 
-watch(image, async () => {
-  const entries = image.value.map((i) => images.value[i]);
-  cardManager.updateImages(entries);
+watch(selectedImages, async () => {
+  cardManager.updateImages(selectedImages.value);
   const autoAdvance = UserSettings.CardCreation.AutoAdvanceImage;
   if (autoAdvance) {
     cardManager.nextStep();
@@ -65,7 +64,6 @@ watch(image, async () => {
 
 watch(currentStep, async () => {
   if (currentStep.value === StepsEnum.IMAGE && images.value.length === 0) {
-    console.log('now loading images');
     images.value = await SearchImages(cardManager.word);
   }
 });

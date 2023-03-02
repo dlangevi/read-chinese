@@ -45,6 +45,7 @@ type (
 		PopulateEnglish     bool `json:"PopulateEnglish"`
 		PopulateChinese     bool `json:"PopulateChinese"`
 		AutoAdvanceEnglish  bool `json:"AutoAdvanceEnglish"`
+		AutoAdvanceChinese  bool `json:"AutoAdvanceChinese"`
 		AutoAdvanceImage    bool `json:"AutoAdvanceImage"`
 		AutoAdvanceCard     bool `json:"AutoAdvanceCard"`
 	}
@@ -120,6 +121,7 @@ func defaultConfig(path string) *UserConfig {
 			PopulateEnglish:     false,
 			PopulateChinese:     false,
 			AutoAdvanceEnglish:  false,
+			AutoAdvanceChinese:  false,
 			AutoAdvanceImage:    false,
 			AutoAdvanceCard:     false,
 		},

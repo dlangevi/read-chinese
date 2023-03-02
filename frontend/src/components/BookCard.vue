@@ -3,6 +3,7 @@
     :class="[
       'card shadow-xl p-4 flex',
       {'bg-success text-success-content': (known > 90)},
+      { 'bg-base-200': (known <= 90) },
     ]"
   >
     <figure>

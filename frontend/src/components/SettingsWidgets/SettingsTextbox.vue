@@ -37,7 +37,6 @@
 </template>
 
 <script lang="ts" setup>
-// TODO have some kind of hover popup with more info
 import { ref } from 'vue';
 import { InformationCircle } from '@vicons/ionicons5';
 

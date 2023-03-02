@@ -1,31 +1,26 @@
 <template>
-  <nav class="navbar bg-accent px-8">
-    <div class="flex h-16 items-center justify-between">
+  <nav class="navbar h-16 bg-accent px-8">
+    <div class="flex items-center justify-between">
       <router-link to="/Welcome">
         <img
-          class="block h-auto w-32"
+          class="h-auto w-32"
           src="../assets/logo_transparent.png"
-          alt="Read More"
+          alt="Read Chinese Logo"
         >
       </router-link>
-      <div class="flex flex-1 items-center justify-center">
-        <div class="hidden sm:ml-6 sm:block">
-          <div class="flex space-x-4">
-            <router-link
-              v-for="item in navigation"
-              :key="item.name"
-              :to="item.href"
-              :class="[item.href === route.fullPath
-                         ? 'bg-accent-focus '
-                         : 'hover:bg-accent-focus',
-                       'px-3 py-2 rounded-md text-accent-content',
-                       'text-md font-medium']"
-              :aria-current="item.href === route.fullPath ? 'page' : undefined"
-            >
-              {{ item.name }}
-            </router-link>
-          </div>
-        </div>
+      <div class="ml-6 flex space-x-4">
+        <router-link
+          v-for="item in navigation"
+          :key="item.name"
+          :to="item.href"
+          :class="[{'bg-accent-focus': item.isActive},
+                   'px-3 py-2 rounded-md text-accent-content',
+                   'hover:bg-accent-focus',
+                   'text-md font-semibold']"
+          :aria-current="{'page': item.isActive}"
+        >
+          {{ item.name }}
+        </router-link>
       </div>
     </div>
   </nav>
@@ -36,8 +31,14 @@ import { useRoute } from 'vue-router';
 import { computed } from 'vue';
 import { getUserSettings } from '@/lib/userSettings';
 const UserSettings = getUserSettings();
-
 const route = useRoute();
+
+type listEntry = {
+  name: string,
+  href: string,
+  isActive?: boolean,
+};
+
 const navigation = computed(() => [
   { name: 'BookLibrary', href: '/BookLibrary' },
   ...(UserSettings.meta.EnableExperimental
@@ -47,6 +48,8 @@ const navigation = computed(() => [
   { name: 'Wordlists', href: '/WordLists' },
   { name: 'Stats', href: '/Stats' },
   { name: 'Settings', href: '/Settings' },
-]);
-
+].map((item:listEntry) => {
+  item.isActive = item.href === route.fullPath;
+  return item;
+}));
 </script>

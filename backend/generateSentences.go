@@ -233,7 +233,7 @@ func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]Sentenc
 	}
 	idealLength := g.userSettings.SentenceGenerationConfig.IdealSentenceLength
 	rankSentences(sentences, idealLength)
-	min := math.Min(float64(len(sentences)), 15)
+	min := math.Min(float64(len(sentences)), 8)
 	sentences = sentences[0:int(min)]
 
 	return sentences, nil

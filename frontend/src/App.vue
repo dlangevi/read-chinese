@@ -18,7 +18,10 @@
           <Suspense>
             <router-view
               :key="route.fullPath"
-              class="h-[calc(100vh-4rem)] w-screen overflow-scroll "
+              :class="['w-screen overflow-scroll',
+                       {'h-[calc(100vh-4rem)]': route.fullPath !== '/Welcome'},
+                       {'h-100vh': route.fullPath === '/Welcome'}
+              ]"
             />
           </Suspense>
         </div>
