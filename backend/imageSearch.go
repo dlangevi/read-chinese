@@ -10,13 +10,20 @@ const (
 	IMAGEURI = "https://api.bing.microsoft.com"
 )
 
-type ImageInfo struct {
+// The format Azure responds in
+type AzureImageInfo struct {
 	Name         string
 	ThumbnailUrl string `json:"thumbnailUrl"`
 }
 
+type ImageInfo struct {
+	Name      string `json:"name,omitempty"`
+	Url       string `json:"url,omitempty"`
+	ImageData string `json:"imageData,omitempty"`
+}
+
 type ImageResponse struct {
-	Value []ImageInfo
+	Value []AzureImageInfo
 }
 
 type ImageClient struct {
@@ -36,7 +43,6 @@ func NewImageClient(
 
 func (i *ImageClient) SearchImages(query string) ([]ImageInfo, error) {
 	i.httpClient.SetBaseURL(IMAGEURI)
-	// i.httpClient.SetDisableWarn(true)
 	result := &ImageResponse{}
 	rsp, err := i.httpClient.R().
 		SetHeader("Ocp-Apim-Subscription-Key", i.userSettings.AnkiConfig.AzureImageApiKey).
@@ -52,6 +58,15 @@ func (i *ImageClient) SearchImages(query string) ([]ImageInfo, error) {
 	if len(result.Value) != 6 {
 		err = errors.New(fmt.Sprintf("Something failed with imageSearch %v", rsp))
 	}
-	return result.Value, err
+
+	imageInfo := []ImageInfo{}
+	for _, image := range result.Value {
+		imageInfo = append(imageInfo, ImageInfo{
+			Name: image.Name,
+			Url:  image.ThumbnailUrl,
+		})
+	}
+
+	return imageInfo, err
 
 }

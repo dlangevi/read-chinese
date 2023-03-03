@@ -111,7 +111,6 @@
 import TabbedPane from '@/layouts/TabbedPane.vue';
 import TabbedPaneTab from '@/components/TabbedPaneTab.vue';
 import UnknownWords from '@/components/UnknownWords.vue';
-import { provide } from 'vue';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import type { backend } from '@wailsjs/models';
 
@@ -128,10 +127,7 @@ const props = defineProps({
   },
 });
 
-provide('preferBook', props.bookId);
-
 const book:backend.Book = await GetBook(props.bookId);
-console.log(book);
 const words = await LearningTargetBook(book.bookId);
 const { stats } = book;
 

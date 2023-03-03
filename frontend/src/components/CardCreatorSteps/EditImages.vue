@@ -27,8 +27,9 @@
           >
           <img
             class="h-auto w-auto"
-            :src="imageData.thumbnailUrl"
-            alt="image for word"
+            :src="imageData.url"
+            :alt="imageData.name ||
+              'Image related to search word, no alt text generated'"
           >
         </label>
       </div>
@@ -65,6 +66,7 @@ watch(selectedImages, async () => {
 watch(currentStep, async () => {
   if (currentStep.value === StepsEnum.IMAGE && images.value.length === 0) {
     images.value = await SearchImages(cardManager.word);
+    console.log('images', images.value);
   }
 });
 </script>

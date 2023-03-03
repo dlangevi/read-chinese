@@ -14,14 +14,12 @@ import (
 )
 
 type Fields struct {
-	Word        string `json:"word"`
-	Sentence    string `json:"sentence"`
-	EnglishDefn string `json:"englishDefn"`
-	ChineseDefn string `json:"chineseDefn"`
-	Pinyin      string `json:"pinyin"`
-	// TODO merge these in some nice way
-	ImageUrls []string `json:"imageUrls"`
-	Image64   []string `json:"image64"`
+	Word        string      `json:"word"`
+	Sentence    string      `json:"sentence"`
+	EnglishDefn string      `json:"englishDefn"`
+	ChineseDefn string      `json:"chineseDefn"`
+	Pinyin      string      `json:"pinyin"`
+	Images      []ImageInfo `json:"images"`
 }
 
 type (
@@ -204,16 +202,20 @@ func (a *ankiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 			return err
 		}
 	}
-	for i, image := range fields.ImageUrls {
-		milli := time.Now().UnixMilli()
-		pictures = append(pictures, ankiconnect.Picture{
-			URL: image,
-			// TODO dont guess the encoding format
-			Filename: fmt.Sprintf("read-chinese-image-%v-%v.jpg", milli, i),
-			Fields: []string{
-				currentMapping.Images,
-			},
-		})
+	for i, image := range fields.Images {
+		// Only upload images that have a url. If they are base64 it means
+		// They should already be in anki?
+		if len(image.Url) > 0 {
+			milli := time.Now().UnixMilli()
+			pictures = append(pictures, ankiconnect.Picture{
+				URL: image.Url,
+				// TODO dont guess the encoding format
+				Filename: fmt.Sprintf("read-chinese-image-%v-%v.jpg", milli, i),
+				Fields: []string{
+					currentMapping.Images,
+				},
+			})
+		}
 	}
 	noteFields := ankiconnect.Fields{}
 
@@ -294,7 +296,7 @@ func (a *ankiInterface) GetAnkiNote(word string) (RawAnkiNote, error) {
 		return value.Value
 	}
 
-	images := []string{}
+	images := []ImageInfo{}
 	// Images will (hopefully) have html <img src=\"filename.jpg\">
 	imagesString := extract(currentMapping.Images)
 	if imagesString != "" {
@@ -326,7 +328,9 @@ func (a *ankiInterface) GetAnkiNote(word string) (RawAnkiNote, error) {
 			if err != nil {
 				return RawAnkiNote{}, toError(err)
 			}
-			images = append(images, *image)
+			images = append(images, ImageInfo{
+				ImageData: *image,
+			})
 		}
 
 	}
@@ -339,8 +343,7 @@ func (a *ankiInterface) GetAnkiNote(word string) (RawAnkiNote, error) {
 			EnglishDefn: extract(currentMapping.EnglishDefinition),
 			ChineseDefn: extract(currentMapping.ChineseDefinition),
 			Pinyin:      extract(currentMapping.Pinyin),
-			// ImageUrls: [],
-			Image64: images,
+			Images:      images,
 		},
 	}
 	return rawNote, nil

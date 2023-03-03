@@ -36,7 +36,7 @@ type (
 	// The type that interfaces with typescript front end
 	DictionaryDefinition struct {
 		Definition    string `json:"definition"`
-		Pronunciation string `json:"pronunciation"`
+		Pronunciation string `json:"pronunciation,omitempty"`
 	}
 )
 

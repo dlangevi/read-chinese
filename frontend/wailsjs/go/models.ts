@@ -251,7 +251,7 @@ export namespace backend {
 	}
 	export class DictionaryDefinition {
 	    definition: string;
-	    pronunciation: string;
+	    pronunciation?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new DictionaryDefinition(source);
@@ -281,14 +281,29 @@ export namespace backend {
 	        this.isPrimary = source["isPrimary"];
 	    }
 	}
+	export class ImageInfo {
+	    name?: string;
+	    url?: string;
+	    imageData?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ImageInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.url = source["url"];
+	        this.imageData = source["imageData"];
+	    }
+	}
 	export class Fields {
 	    word: string;
 	    sentence: string;
 	    englishDefn: string;
 	    chineseDefn: string;
 	    pinyin: string;
-	    imageUrls: string[];
-	    image64: string[];
+	    images: ImageInfo[];
 	
 	    static createFrom(source: any = {}) {
 	        return new Fields(source);
@@ -301,23 +316,29 @@ export namespace backend {
 	        this.englishDefn = source["englishDefn"];
 	        this.chineseDefn = source["chineseDefn"];
 	        this.pinyin = source["pinyin"];
-	        this.imageUrls = source["imageUrls"];
-	        this.image64 = source["image64"];
+	        this.images = this.convertValues(source["images"], ImageInfo);
 	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	
-	export class ImageInfo {
-	    thumbnailUrl: string;
 	
-	    static createFrom(source: any = {}) {
-	        return new ImageInfo(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.thumbnailUrl = source["thumbnailUrl"];
-	    }
-	}
 	export class LibraryConfig {
 	    OnlyFavorites: boolean;
 	    HideRead: boolean;
@@ -440,7 +461,7 @@ export namespace backend {
 	
 	export class Sentence {
 	    sentence: string;
-	    source: string;
+	    source?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Sentence(source);

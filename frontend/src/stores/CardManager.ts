@@ -25,6 +25,78 @@ type StateMap = {
   [key in StepsEnum]: StepState
 };
 
+// Instead of the strings we get from Anki, we want to
+// manage the data using the formats we see up front
+type FrontFields = {
+  word: string;
+  sentence?: backend.Sentence;
+  englishDefn?: backend.DictionaryDefinition[];
+  chineseDefn?: backend.DictionaryDefinition[];
+  pinyin?: string;
+  images?: backend.ImageInfo[]
+}
+
+export function transformDefinition(definition: string)
+  : backend.DictionaryDefinition[] {
+  // Current definitions are stored as follows
+  // [pinyin] Text for definition<br>[pinyin] Text for second definition
+  // We will try to match this exactly and on failure just return
+  // [] Full Text of failed definition
+  const splitDefinitions = definition
+    .split('<br>')
+    .filter((def) => def.length > 0);
+
+  // Capture [unicode letter + numbers] remove space
+  // inbetween then capture the rest
+  const regex = /\[([\p{L}\s\d]*)\]\s+(.+)/u;
+  const allMatch = splitDefinitions.every((def) => regex.test(def));
+  if (!allMatch) {
+    return [{
+      definition,
+      pronunciation: undefined,
+    }];
+  }
+
+  return splitDefinitions.map((def) => {
+    const match = (regex.exec(def) as RegExpExecArray);
+    return {
+      definition: match[2],
+      pronunciation: match[1],
+    };
+  });
+}
+
+function transformDefinitionFrom(
+  definitions: backend.DictionaryDefinition[]) : string {
+  return definitions.map(
+    (def) => (def.pronunciation
+      ? `[${def.pronunciation}] ${def.definition}`
+      : def.definition),
+  ).join('<br>');
+}
+
+function transformDefinitionFromPinyin(
+  definitions: backend.DictionaryDefinition[]) : string[] {
+  return definitions
+    .map((def) => def.pronunciation)
+    .filter((pro) => pro) as string[];
+}
+
+function transformTo(fields : backend.Fields) : FrontFields {
+  const frontFields : FrontFields = {
+    word: fields.word,
+    sentence: {
+      sentence: fields.sentence,
+      source: undefined,
+    },
+    englishDefn: transformDefinition(fields.englishDefn),
+    chineseDefn: transformDefinition(fields.chineseDefn),
+    pinyin: '',
+    images: fields.images,
+  };
+  return frontFields;
+}
+
 export const useCardManager = defineStore('CardManager', {
   state: () => {
     return {
@@ -35,10 +107,9 @@ export const useCardManager = defineStore('CardManager', {
       // auto advancing or clicking next step. In this state, when we
       // advance to a field that has been auto filled, we skip over it
       flow: true,
-      sentenceSource: '',
       stepsState: {} as StateMap,
-      originalValues: new backend.Fields(),
-      newValues: new backend.Fields(),
+      originalValues: ({} as FrontFields),
+      newValues: ({} as FrontFields),
       note: new backend.RawAnkiNote(),
     };
   },
@@ -48,22 +119,28 @@ export const useCardManager = defineStore('CardManager', {
       return state.newValues.word || state.originalValues.word;
     },
     sentence: (state) => {
-      return state.newValues.sentence || state.originalValues.sentence;
+      const sentence =
+        state.newValues.sentence || state.originalValues.sentence;
+      return sentence?.sentence;
+    },
+    sentenceSource: (state) => {
+      const sentence =
+        state.newValues.sentence || state.originalValues.sentence;
+      return sentence?.source;
     },
     englishDefn: (state) => {
-      return state.newValues.englishDefn || state.originalValues.englishDefn;
+      return state.newValues.englishDefn ||
+        state.originalValues.englishDefn || [];
     },
     chineseDefn: (state) => {
-      return state.newValues.chineseDefn || state.originalValues.chineseDefn;
+      return state.newValues.chineseDefn ||
+        state.originalValues.chineseDefn || [];
     },
     pinyin: (state) => {
       return state.newValues.pinyin || state.originalValues.pinyin;
     },
-    imageUrls: (state) => {
-      return state.newValues.imageUrls || state.originalValues.imageUrls;
-    },
-    image64: (state) => {
-      return state.newValues.image64 || state.originalValues.image64;
+    images: (state) => {
+      return state.newValues.images || state.originalValues.images;
     },
     ready: (state) => {
       return state.flow &&
@@ -98,30 +175,62 @@ export const useCardManager = defineStore('CardManager', {
       });
 
       this.note = ankiCard;
-      this.originalValues = backend.Fields.createFrom(this.note.fields);
-      this.newValues = backend.Fields.createFrom();
+      this.originalValues = transformTo(this.note.fields);
+      this.newValues = { word: this.originalValues.word };
       this.newValues.word = this.originalValues.word;
-      this.sentenceSource = '';
 
       this.currentStep = StepsEnum.SENTENCE;
       this.currentStepIndex = 0;
       this.flow = true;
     },
 
+    getChanged() : backend.Fields {
+      const fields = backend.Fields.createFrom({});
+      fields.word = this.word;
+      if (this.newValues.sentence) {
+        fields.sentence = this.newValues.sentence.sentence;
+      }
+      if (this.newValues.englishDefn) {
+        fields.englishDefn = transformDefinitionFrom(
+          this.newValues.englishDefn);
+      }
+      if (this.newValues.chineseDefn) {
+        fields.chineseDefn = transformDefinitionFrom(
+          this.newValues.chineseDefn);
+      }
+      if (this.newValues.chineseDefn || this.newValues.englishDefn) {
+        // If either of these has been set. Recalculate pinyin
+        const oldPinyin = (this.originalValues.pinyin || '')
+          .split(',')
+          .map(pinyin => pinyin.trim())
+          .filter(pinyin => pinyin.length > 0);
+
+        fields.pinyin = [...new Set([
+          ...transformDefinitionFromPinyin(this.chineseDefn),
+          ...transformDefinitionFromPinyin(this.englishDefn),
+          ...oldPinyin,
+        ])].join(', ');
+      }
+
+      if (this.newValues.images) {
+        fields.images = this.newValues.images;
+      }
+
+      return fields;
+    },
+
     updateSentence(sentence: backend.Sentence) {
-      this.newValues.sentence = sentence.sentence;
-      console.log('setting source', sentence.source);
-      this.sentenceSource = sentence.source;
+      this.newValues.sentence = sentence;
       this.stepsState[StepsEnum.SENTENCE] = StepState.PREVIEW;
     },
 
     updateDefinition(
-      newDefinitions: backend.DictionaryDefinition[],
+      definitions: backend.DictionaryDefinition[],
       defType: string,
     ) {
-      const definitions = newDefinitions.map(
-        (def) => `[${def.pronunciation}] ${def.definition}`,
-      ).join('<br>');
+      // const definitions = newDefinitions.map(
+      //   (def) => `[${def.pronunciation}] ${def.definition}`,
+      // ).join('<br>');
       if (defType === 'english') {
         this.newValues.englishDefn = definitions;
         this.stepsState[StepsEnum.ENGLISH] = StepState.PREVIEW;
@@ -129,20 +238,20 @@ export const useCardManager = defineStore('CardManager', {
         this.newValues.chineseDefn = definitions;
         this.stepsState[StepsEnum.CHINESE] = StepState.PREVIEW;
       }
-      let pinyin = new Set();
-      if (this.newValues.pinyin !== undefined) {
-        pinyin = new Set(this.newValues.pinyin.split(', '));
-      }
-      newDefinitions.forEach((def) => {
-        const pronunciation = def.pronunciation.replace(/\s/g, '');
-        pinyin.add(pronunciation);
-      });
-      pinyin.delete('');
-      this.newValues.pinyin = [...pinyin].join(', ');
+      // let pinyin = new Set();
+      // if (this.newValues.pinyin !== undefined) {
+      //   pinyin = new Set(this.newValues.pinyin.split(', '));
+      // }
+      // newDefinitions.forEach((def) => {
+      //   const pronunciation = def.pronunciation.replace(/\s/g, '');
+      //   pinyin.add(pronunciation);
+      // });
+      // pinyin.delete('');
+      // this.newValues.pinyin = [...pinyin].join(', ');
     },
 
     updateImages(newImages: backend.ImageInfo[]) {
-      this.newValues.imageUrls = newImages.map((image) => image.thumbnailUrl);
+      this.newValues.images = newImages;
       this.stepsState[StepsEnum.IMAGE] = StepState.PREVIEW;
     },
 

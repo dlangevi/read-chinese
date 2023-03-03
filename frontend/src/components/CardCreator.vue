@@ -8,28 +8,19 @@
       class="modal-box flex h-[80vh] w-4/5 max-w-full flex-col"
       @click.stop
     >
-      <div class="absolute right-4 top-4 flex gap-2">
-        <card-creation-settings />
-        <close-circle-sharp class="h-6 w-6 cursor-pointer" @click="onClose" />
-      </div>
-      <p class="text-xl">
+      <h2 class="m-4 text-4xl font-semibold">
         Creating card for {{ cardManager.word }}
-      </p>
+      </h2>
       <div class="flex">
         <anki-card-preview class="w-1/3" />
         <div
           :key="cardManager.word"
           class="h-[60vh] w-full overflow-scroll p-4"
         >
-          <div class="flex gap-4">
-            <p class="text-4xl">
-              {{ cardManager.word }}
-            </p>
-          </div>
           <edit-sentence
             v-show="cardManager.currentStep === StepsEnum.SENTENCE"
             v-if="cardManager.steps.includes(StepsEnum.SENTENCE)"
-            :prefer-book="preferBookRef"
+            :prefer-book="preferBook"
           />
           <edit-definition
             v-show="cardManager.currentStep === StepsEnum.ENGLISH"
@@ -48,13 +39,19 @@
         </div>
       </div>
 
+      <!-- Settings and close buttons -->
+      <div class="absolute right-4 top-4 flex gap-2">
+        <card-creation-settings />
+        <close-circle-sharp class="h-6 w-6 cursor-pointer" @click="onClose" />
+      </div>
+
       <div class="modal-action flex items-center justify-center">
         <div class="w-1/4" />
         <card-creator-tracker class="grow justify-start" />
         <div class="flex place-content-end gap-2">
           <button
             class="btn-primary btn-sm btn"
-            @click="store.clearFront()"
+            @click="store.clearFront"
           >
             Skip Word
           </button>
@@ -66,7 +63,7 @@
           </button>
           <button
             class="btn-primary btn-sm btn"
-            @click="submit()"
+            @click="submit"
           >
             Submit
           </button>
@@ -79,7 +76,7 @@
 <script lang="ts" setup>
 import { CloseCircleSharp } from '@vicons/ionicons5';
 import {
-  ref, toRaw, watch,
+  ref, watch,
 } from 'vue';
 import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
 import { useCardManager } from '@/stores/CardManager';
@@ -104,9 +101,6 @@ import {
 } from '@wailsjs/backend/ankiInterface';
 
 import {
-  GetBook,
-} from '@wailsjs/backend/bookLibrary';
-import {
   UpdateSentenceTable,
 } from '@wailsjs/backend/Generator';
 import {
@@ -119,33 +113,28 @@ import { getUserSettings } from '@/lib/userSettings';
 const store = useCardQueue();
 const cardManager = useCardManager();
 const showModal = ref(false);
-let word;
-let action: ActionsEnum;
-let callback: (() => void) | undefined;
-const preferBookRef = ref<number | undefined>(undefined);
-let preferBook;
+const action = ref<ActionsEnum>(ActionsEnum.CREATE);
+const callback = ref<(() => void) | undefined>();
+const preferBook = ref<number | undefined>();
 
 const UserSettings = getUserSettings();
-// TODO I am leaving the commented out old message code with the plan
-// of eventually having that sort of api avaliable
 const message = useMessage();
 store.$subscribe(async (_, state) => {
-  // Later we can prefetch new words sentences possibly
-  // if (mutation.events.type === 'add' && mutation.events.key === '0') {
   if (state.wordList.length > 0) {
-    [{
+    const [{
       word,
-      action,
-      preferBook,
-      callback,
+      action: _action,
+      preferBook: _preferBook,
+      callback: _callback,
     }] = state.wordList;
-    preferBookRef.value = preferBook;
+    action.value = _action;
+    callback.value = _callback;
+    preferBook.value = _preferBook;
 
     let ankiCard;
-    if (action === ActionsEnum.CREATE) {
+    if (action.value === ActionsEnum.CREATE) {
       ankiCard = await GetAnkiNoteSkeleton(word);
     } else {
-      // Right now for EDIT we only edit the sentence so start there
       ankiCard = await GetAnkiNote(word);
     }
     const enableChinese = UserSettings.Dictionaries.EnableChinese;
@@ -159,9 +148,9 @@ function onClose() {
   store.clearWords();
   return false;
 }
+
 const { ready } = storeToRefs(cardManager);
 watch(ready, () => {
-  console.log('readychanged', ready.value);
   const autoSubmit = UserSettings.CardCreation.AutoAdvanceCard;
   if (ready.value && autoSubmit) {
     submit();
@@ -169,49 +158,30 @@ watch(ready, () => {
 });
 
 async function submit() {
-  // Todo track changes to the card and submit those for update
-  // const messageReactive = message.create('Card submited', {
-  //   type: 'loading',
-  //   duration: 1e4,
-  // });
   message.info('Card submited');
-  // TODO figure out the logic for determining changes better
-  if (action === ActionsEnum.CREATE) {
-    const cardValues = toRaw(cardManager.newValues);
-    const tags = [];
+  if (action.value === ActionsEnum.CREATE) {
+    const cardValues = cardManager.getChanged();
+
+    const tags : string[] = [];
     if (UserSettings.AnkiConfig.AddBookTag) {
-      if (preferBookRef.value !== undefined) {
-        const book = await GetBook(preferBookRef.value);
-        tags.push(book.title);
-      } else if (cardManager.sentenceSource !== '') {
+      if (cardManager.sentenceSource) {
         tags.push(cardManager.sentenceSource);
       }
     }
-
     if (UserSettings.AnkiConfig.AddProgramTag) {
       tags.push('read-chinese');
     }
-    // TODO do this kind of catching elsewhere
+
     console.log('creating values ', cardValues);
-    CreateAnkiNote(cardValues, tags)
-      .then(() => {
-        message.success('success');
-      })
-      .catch((err) => {
-        message.error(err);
-      });
+    await CreateAnkiNote(cardValues, tags);
+    message.success('success');
   } else {
-    const cardValues: backend.Fields = toRaw(cardManager.newValues);
-    UpdateNoteFields(cardManager.note.noteId, cardValues)
-      .then(() => {
-        message.success('success');
-      })
-      .catch((err) => {
-        message.error(err);
-      });
+    const cardValues: backend.Fields = cardManager.getChanged();
+    await UpdateNoteFields(cardManager.note.noteId, cardValues);
+    message.success('success');
   }
-  if (callback) {
-    callback();
+  if (callback.value) {
+    callback.value();
   }
   store.clearFront();
 }

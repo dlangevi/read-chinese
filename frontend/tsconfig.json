@@ -26,6 +26,7 @@
     "src/**/*.d.ts", 
     "src/**/*.tsx", 
     "src/**/*.vue",
+    "test/**/*.ts", 
     "vite.config.ts",
     "tailwind.config.js",
     "postcss.config.js",

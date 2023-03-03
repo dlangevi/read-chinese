@@ -1,10 +1,8 @@
 <template>
-  <!-- The button to open modal -->
   <label for="card-settings" class="cursor-pointer">
     <settings-sharp class="h-6 w-6" />
   </label>
 
-  <!-- Put this part before </body> tag -->
   <input id="card-settings" type="checkbox" class="modal-toggle">
   <label for="card-settings" class="modal cursor-pointer">
     <div class="modal-box relative w-1/2 max-w-5xl">

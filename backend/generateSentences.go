@@ -201,7 +201,7 @@ func (g *Generator) UpdateSentenceTable(newWord string) error {
 
 type Sentence struct {
 	Sentence string `json:"sentence"`
-	Source   string `json:"source"`
+	Source   string `json:"source,omitempty"`
 }
 
 // This can still be optimized a ton

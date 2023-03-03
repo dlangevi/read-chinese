@@ -43,7 +43,7 @@ function hintify(dest, contents, hintText) {
     link.style.display='inline-block';
 
     const div = document.createElement('div'); 
-    div.textContent = contents; 
+    div.innerHTML = contents; 
     div.style.display='none';
     div.className = 'hint';
 

@@ -1,73 +1,51 @@
 <template>
-  <div class="card">
+  <div class="card flex flex-col gap-4 border-4 border-base-300 p-4">
     <h2 class="text-xl font-bold">
       Hanzi: {{ cardManager.word }}
     </h2>
     <div>
-      <button
-        class="btn-primary btn-xs btn m-2 inline"
-        @click="cardManager.changeStep(StepsEnum.SENTENCE)"
-      >
-        Edit
-      </button>
       <h2 class="text-l inline font-bold">
         Sentence:
       </h2>
       <span> {{ cardManager.sentence }}</span>
     </div>
-    <div>
-      <button
-        class="btn-primary btn-xs btn m-2"
-        @click="cardManager.changeStep(StepsEnum.ENGLISH)"
-      >
-        Edit
-      </button>
+    <div @click="cardManager.changeStep(StepsEnum.ENGLISH)">
       <h2 class="text-l inline font-bold">
         Definition:
       </h2>
+      <!-- Definitions can have html formatting in them -->
       <p>
-        <!-- Definitions can have html formatting in them -->
-        <span v-html="cardManager.englishDefn" />
+        <span
+          v-for="definition in cardManager.englishDefn"
+          :key="definition.definition"
+        >
+          [{{ definition.pronunciation }}] {{ definition.definition }}
+        </span>
       </p>
     </div>
     <div v-if="cardManager.steps.includes(StepsEnum.CHINESE)">
-      <button
-        class="btn-primary btn-xs btn m-2"
-        @click="cardManager.changeStep(StepsEnum.CHINESE)"
-      >
-        Edit
-      </button>
       <h2 class="text-l inline font-bold">
         ChineseDefinition:
       </h2>
       <p>
-        <!-- Definitions can have html formatting in them -->
-        <span v-html="cardManager.chineseDefn" />
+        <span
+          v-for="definition in cardManager.chineseDefn"
+          :key="definition.definition"
+        >
+          [{{ definition.pronunciation }}] {{ definition.definition }}
+        </span>
       </p>
     </div>
     <div v-if="cardManager.steps.includes(StepsEnum.IMAGE)">
-      <button
-        class="btn-primary btn-xs btn m-2"
-        @click="cardManager.changeStep(StepsEnum.IMAGE)"
-      >
-        Edit
-      </button>
       <h2 class="text-l inline font-bold">
         Images:
       </h2>
-      <div class="flex gap-1">
+      <div class="flex flex-wrap gap-1">
         <img
-          v-for="image in cardManager.imageUrls"
-          :key="image"
+          v-for="image, i in cardManager.images"
+          :key="i"
           class="max-h-24 w-auto"
-          :src="image"
-          alt="image for word"
-        >
-        <img
-          v-for="imagedata in cardManager.image64"
-          :key="imagedata"
-          class="max-h-24 w-auto"
-          :src="`data:image/png;base64, ${imagedata}`"
+          :src="getImageSrc(image)"
           alt="image for word"
         >
       </div>
@@ -78,8 +56,23 @@
 <script lang="ts" setup>
 import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
 import { useCardManager } from '@/stores/CardManager';
+import {
+  backend,
+} from '@wailsjs/models';
 
 const cardManager = useCardManager();
+
+function getImageSrc(image : backend.ImageInfo | undefined) : string {
+  if (image === undefined) {
+    return '';
+  } else if (image.url !== undefined) {
+    return image.url;
+  } else if (image.imageData !== undefined) {
+    return `data:image/png;base64, ${image.imageData}`;
+  } else {
+    return '';
+  }
+}
 
 defineEmits(['change-step']);
 

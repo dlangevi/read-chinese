@@ -13,11 +13,13 @@
         :key="step"
         :data-content="i"
         :class="[
-          'step',
+          'step cursor-pointer',
+          'hover:after:ring hover:after:ring-6 hover:after:ring-primary',
           getClass(step),
           {'after:ring after:ring-4 after:ring-accent':
             cardManager.currentStep === step},
         ]"
+        @click="cardManager.changeStep(step)"
       >
         {{ step }}
       </li>
