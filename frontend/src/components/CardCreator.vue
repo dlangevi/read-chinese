@@ -5,17 +5,21 @@
   >
     <div
       v-if="showModal"
-      class="modal-box flex h-[80vh] w-4/5 max-w-full flex-col"
+      class="modal-box m-4 flex h-[80vh] w-4/5 max-w-full flex-col"
       @click.stop
     >
-      <h2 class="m-4 text-4xl font-semibold">
+      <h2 class="p-4 text-4xl font-semibold">
         Creating card for {{ cardManager.word }}
+        <pulse-sharp
+          v-if="cardManager.flow"
+          class="inline h-12 w-12 text-accent"
+        />
       </h2>
       <div class="flex">
         <anki-card-preview class="w-1/3" />
         <div
           :key="cardManager.word"
-          class="h-[60vh] w-full overflow-scroll p-4"
+          class="h-[58vh] w-full overflow-scroll p-4"
         >
           <edit-sentence
             v-show="cardManager.currentStep === StepsEnum.SENTENCE"
@@ -74,11 +78,11 @@
 </template>
 
 <script lang="ts" setup>
-import { CloseCircleSharp } from '@vicons/ionicons5';
+import { CloseCircleSharp, PulseSharp } from '@vicons/ionicons5';
 import {
   ref, watch,
 } from 'vue';
-import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
+import { useCardQueue } from '@/stores/CardQueue';
 import { useCardManager } from '@/stores/CardManager';
 import AnkiCardPreview from '@/components/AnkiCardPreview.vue';
 import CardCreationSettings from '@/components/CardCreationSettings.vue';
@@ -96,24 +100,17 @@ import { AddWord } from '@wailsjs/backend/KnownWords';
 import {
   CreateAnkiNote,
   UpdateNoteFields,
-  GetAnkiNote,
-  GetAnkiNoteSkeleton,
 } from '@wailsjs/backend/ankiInterface';
 
 import {
   UpdateSentenceTable,
 } from '@wailsjs/backend/Generator';
-import {
-  backend,
-} from '@wailsjs/models';
 
-import { storeToRefs } from 'pinia';
 import { getUserSettings } from '@/lib/userSettings';
 
 const store = useCardQueue();
 const cardManager = useCardManager();
 const showModal = ref(false);
-const action = ref<ActionsEnum>(ActionsEnum.CREATE);
 const callback = ref<(() => void) | undefined>();
 const preferBook = ref<number | undefined>();
 
@@ -122,24 +119,24 @@ const message = useMessage();
 store.$subscribe(async (_, state) => {
   if (state.wordList.length > 0) {
     const [{
-      word,
-      action: _action,
+      options,
       preferBook: _preferBook,
       callback: _callback,
     }] = state.wordList;
-    action.value = _action;
     callback.value = _callback;
     preferBook.value = _preferBook;
 
-    let ankiCard;
-    if (action.value === ActionsEnum.CREATE) {
-      ankiCard = await GetAnkiNoteSkeleton(word);
-    } else {
-      ankiCard = await GetAnkiNote(word);
-    }
-    const enableChinese = UserSettings.Dictionaries.EnableChinese;
-    const hasImageApi = UserSettings.AnkiConfig.AzureImageApiKey !== '';
-    cardManager.loadCard(ankiCard, enableChinese, hasImageApi);
+    options.includeChinese =
+      UserSettings.Dictionaries.EnableChinese;
+    // If there is a sourceCardId, we disable flow
+    // Since the user is doing careful editing
+    options.disableFlow = (options.sourceCardId !== undefined);
+    // TODO have some check which makes sure the image api has
+    // a correct key
+    options.hasImageApi =
+      UserSettings.AnkiConfig.AzureImageApiKey !== '';
+    // TODO called twice for some reason
+    cardManager.loadCard(options);
   }
   showModal.value = state.wordList.length !== 0;
 });
@@ -149,19 +146,23 @@ function onClose() {
   return false;
 }
 
-const { ready } = storeToRefs(cardManager);
-watch(ready, () => {
+watch(() => cardManager.ready, () => {
   const autoSubmit = UserSettings.CardCreation.AutoAdvanceCard;
-  if (ready.value && autoSubmit) {
+  if (cardManager.ready && autoSubmit) {
     submit();
   }
 });
 
 async function submit() {
   message.info('Card submited');
-  if (action.value === ActionsEnum.CREATE) {
-    const cardValues = cardManager.getChanged();
-
+  const cardValues = cardManager.getChanged();
+  // If there is a note id, we need to update a note
+  // and not create a new one (can we do this in the backend?)
+  if (cardManager.noteId) {
+    console.log(cardManager.noteId, cardValues);
+    await UpdateNoteFields(cardManager.noteId, cardValues);
+    console.log('after update');
+  } else {
     const tags : string[] = [];
     if (UserSettings.AnkiConfig.AddBookTag) {
       if (cardManager.sentenceSource) {
@@ -171,15 +172,10 @@ async function submit() {
     if (UserSettings.AnkiConfig.AddProgramTag) {
       tags.push('read-chinese');
     }
-
-    console.log('creating values ', cardValues);
     await CreateAnkiNote(cardValues, tags);
-    message.success('success');
-  } else {
-    const cardValues: backend.Fields = cardManager.getChanged();
-    await UpdateNoteFields(cardManager.note.noteId, cardValues);
-    message.success('success');
   }
+  message.success('success');
+
   if (callback.value) {
     callback.value();
   }

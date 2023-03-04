@@ -22,7 +22,7 @@ describe('CardManager unit tests', () => {
       'to answer positively/to agree/to accept/to promise';
     expect(transformDefinition(anOldDefinition)).toStrictEqual([{
       definition: anOldDefinition,
-      pronunciation: '',
+      pronunciation: undefined,
     }]);
 
     // TODO transform old pinyin
@@ -51,7 +51,7 @@ describe('CardManager unit tests', () => {
     const fullOfHtml = '<br>[lǐzhì] reason/rational<br><br><br><div></div>';
     expect(transformDefinition(fullOfHtml)).toStrictEqual([{
       definition: fullOfHtml,
-      pronunciation: '',
+      pronunciation: undefined,
     }]);
     const multiSylable = '[wèicǐ] for this reason/with regards to this';
     expect(transformDefinition(multiSylable)).toStrictEqual([{
@@ -62,18 +62,21 @@ describe('CardManager unit tests', () => {
 
   test('Update Sentence', () => {
     const cardManager = useCardManager();
-    cardManager.loadCard(backend.RawAnkiNote.createFrom({
-      noteId: 34,
-      fields: backend.Fields.createFrom({
-        word: '你好',
-        sentence: '你好我是大卫',
-        englishDefn: '[ni3hao3] Hello',
-        chineseDefn: '',
-        pinyin: 'ni3hao3',
-        images: [],
+    cardManager.loadCard({
+      word: '你好',
+      sourceCard: backend.RawAnkiNote.createFrom({
+        noteId: 34,
+        fields: backend.Fields.createFrom({
+          word: '你好',
+          sentence: '你好我是大卫',
+          englishDefn: '[ni3hao3] Hello',
+          chineseDefn: '',
+          pinyin: 'ni3hao3',
+          images: [],
+        }),
       }),
-    }), true, true);
+    });
     expect(cardManager.sentence).toBe('你好我是大卫');
-    expect(cardManager.sentenceSource).toBe('anki');
+    expect(cardManager.sentenceSource).toBe(undefined);
   });
 });

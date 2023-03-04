@@ -90,7 +90,7 @@ import { ImportAnkiKeywords } from '@wailsjs/backend/ankiInterface';
 import UnknownWords from '../components/UnknownWords.vue';
 import { useLoader } from '@/lib/loading';
 
-import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
+import { useCardQueue } from '@/stores/CardQueue';
 import { getUserSettings } from '@/lib/userSettings';
 const UserSettings = getUserSettings();
 
@@ -168,7 +168,7 @@ async function makeCards() {
   });
   const topWords = sorted.slice(0, 50);
   topWords.forEach((word) => {
-    store.addWord(word.word, ActionsEnum.CREATE);
+    store.addWord({ word: word.word });
   });
 }
 

@@ -299,11 +299,11 @@ export namespace backend {
 	}
 	export class Fields {
 	    word: string;
-	    sentence: string;
-	    englishDefn: string;
-	    chineseDefn: string;
-	    pinyin: string;
-	    images: ImageInfo[];
+	    sentence?: string;
+	    englishDefn?: string;
+	    chineseDefn?: string;
+	    pinyin?: string;
+	    images?: ImageInfo[];
 	
 	    static createFrom(source: any = {}) {
 	        return new Fields(source);
@@ -395,6 +395,7 @@ export namespace backend {
 	    Word: string;
 	    Problems: Problems;
 	    Notes: string;
+	    NoteId: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new ProblemCard(source);
@@ -405,6 +406,7 @@ export namespace backend {
 	        this.Word = source["Word"];
 	        this.Problems = this.convertValues(source["Problems"], Problems);
 	        this.Notes = source["Notes"];
+	        this.NoteId = source["NoteId"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

@@ -5,7 +5,7 @@
     </div>
     <div class="flex flex-wrap">
       <div
-        v-for="(imageData, i) in images"
+        v-for="(image, i) in images"
         :key="i"
         class="max-w-[33%]"
       >
@@ -21,14 +21,14 @@
             :id="i.toString()"
             v-model="selectedImages"
             class="checkbox"
-            :value="imageData"
+            :value="image"
             type="checkbox"
             name="images"
           >
           <img
             class="h-auto w-auto"
-            :src="imageData.url"
-            :alt="imageData.name ||
+            :src="getImageSrc(image)"
+            :alt="image.name ||
               'Image related to search word, no alt text generated'"
           >
         </label>
@@ -39,34 +39,52 @@
 
 <script lang="ts" setup>
 import {
-  watch, ref,
+  onBeforeMount, watch, ref, toRaw,
 } from 'vue';
 import { SearchImages } from '@wailsjs/backend/ImageClient';
 import { backend } from '@wailsjs/models';
-import { useCardManager } from '@/stores/CardManager';
+import { useCardManager, getImageSrc } from '@/stores/CardManager';
 import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
-import { storeToRefs } from 'pinia';
 import { getUserSettings } from '@/lib/userSettings';
+let allowUpdate = false;
+let loaded = false;
 
 const UserSettings = getUserSettings();
 const cardManager = useCardManager();
-const { currentStep } = storeToRefs(cardManager);
 
 const images = ref<backend.ImageInfo[]>([]);
 const selectedImages = ref<backend.ImageInfo[]>([]);
 
 watch(selectedImages, async () => {
-  cardManager.updateImages(selectedImages.value);
+  if (!allowUpdate) {
+    return;
+  }
+  cardManager.updateImages(
+    selectedImages.value.map((img) => toRaw(img)));
   const autoAdvance = UserSettings.CardCreation.AutoAdvanceImage;
   if (autoAdvance) {
     cardManager.nextStep();
   }
 });
 
-watch(currentStep, async () => {
-  if (currentStep.value === StepsEnum.IMAGE && images.value.length === 0) {
-    images.value = await SearchImages(cardManager.word);
-    console.log('images', images.value);
+watch(() => cardManager.currentStep, async () => {
+  if (cardManager.currentStep === StepsEnum.IMAGE && !loaded) {
+    loaded = true;
+    console.log('doing image query now');
+    images.value.push(...await SearchImages(cardManager.word));
+  }
+
+  allowUpdate = true;
+}, {
+  immediate: true,
+});
+
+onBeforeMount(async () => {
+  const originalImages = cardManager.originalValues?.images;
+  if (originalImages) {
+    images.value.push(...originalImages);
+    selectedImages.value.push(...originalImages);
   }
 });
+
 </script>

@@ -111,7 +111,7 @@
 import TabbedPane from '@/layouts/TabbedPane.vue';
 import TabbedPaneTab from '@/components/TabbedPaneTab.vue';
 import UnknownWords from '@/components/UnknownWords.vue';
-import { useCardQueue, ActionsEnum } from '@/stores/CardQueue';
+import { useCardQueue } from '@/stores/CardQueue';
 import type { backend } from '@wailsjs/models';
 
 import {
@@ -152,7 +152,7 @@ const store = useCardQueue();
 async function makeFlashCards() {
   const topWords: string[] = await TopUnknownWords(props.bookId, 50);
   topWords.forEach((word) => {
-    store.addWord(word, ActionsEnum.CREATE, { preferBook: props.bookId });
+    store.addWord({ word }, () => {}, props.bookId);
   });
 }
 </script>

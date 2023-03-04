@@ -2,7 +2,6 @@
   <with-sidebar>
     <template #sidebar>
       <div>
-        <p>Total problem cards: {{ rowData.length }}</p>
         <p>Filtered problem cards: </p>
         <div>
           <settings-checkbox
@@ -11,9 +10,14 @@
             :key="setting.name"
             :setting="setting"
             :initial-value="initial"
-            @update="updateFilter"
           />
         </div>
+      </div>
+      <div class="border-2 p-2 text-center">
+        {{ rowData.length }} total 'problem' cards
+      </div>
+      <div class="border-2 p-2 text-center">
+        {{ visibleRows }} cards after filter
       </div>
     </template>
     <div class="container m-4 mx-auto flex h-full flex-col px-4">
@@ -25,6 +29,7 @@
         :row-data="rowData"
         :is-external-filter-present="isExternalFilterPresent"
         :does-external-filter-pass="doesExternalFilterPass"
+        @filter-changed="filterChanged"
         @grid-ready="onGridReady"
       />
     </div>
@@ -35,12 +40,12 @@
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
-import { onBeforeMount, ref, onUnmounted } from 'vue';
+import { onBeforeMount, ref, onUnmounted, watch } from 'vue';
 import {
   getDisplayable,
   getUserSettings,
 } from '@/lib/userSettings';
-import AddToCardQueue from '@/components/AddToCardQueue.vue';
+import ProblemResolver from '@/components/ProblemResolver.vue';
 import type {
   GetRowIdParams, GridApi,
   GridReadyEvent, ColDef, ICellRendererParams, RowNode,
@@ -56,10 +61,28 @@ const CardManagement = UserSettings.CardManagement;
 const getRowId = (params:GetRowIdParams) => params.data.Word;
 
 // Will be set on grid ready
-let gridApi : GridApi;
-function updateFilter() {
-  gridApi.onFilterChanged();
+const gridApi = ref<GridApi>();
+const visibleRows = ref(0);
+function filterChanged() {
+  if (gridApi.value) {
+    visibleRows.value = gridApi.value.getModel().getRowCount();
+  }
 }
+watch(() => ([
+  CardManagement.ProblemFlagged,
+  CardManagement.ProblemMissingImage,
+  CardManagement.ProblemMissingSentence,
+  CardManagement.ProblemMissingSentenceAudio,
+  CardManagement.ProblemMissingWordAudio,
+  CardManagement.ProblemMissingPinyin,
+]), () => {
+  gridApi.value?.onFilterChanged();
+  if (gridApi.value) {
+    visibleRows.value = gridApi.value.getModel().getRowCount();
+  }
+},
+
+);
 
 function isExternalFilterPresent() {
   return true;
@@ -113,19 +136,17 @@ const columnDefs:ColDef[] = [
   },
   {
     headerName: '',
-    field: 'Make FlashCard',
-    width: 50,
-    cellRenderer: AddToCardQueue,
-    cellRendererParams: {
-      text: 'Fix Card',
-    },
+    field: 'Fix the problem',
+    width: 200,
+    cellClass: 'flex flex-row-reverse items-center',
+    cellRenderer: ProblemResolver,
   },
 ];
 
 let resizeCallback: () => void;
 function onGridReady(params:GridReadyEvent) {
   params.api.sizeColumnsToFit();
-  gridApi = params.api;
+  gridApi.value = params.api;
   resizeCallback = () => {
     setTimeout(() => {
       params.api.sizeColumnsToFit();
@@ -142,5 +163,6 @@ onUnmounted(() => {
 const rowData = ref<backend.ProblemCard[]>([]);
 onBeforeMount(async () => {
   rowData.value = await LoadProblemCards();
+  gridApi.value?.onFilterChanged();
 });
 </script>

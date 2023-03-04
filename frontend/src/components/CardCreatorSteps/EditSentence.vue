@@ -52,17 +52,22 @@ const props = defineProps<{
 const cardManager = useCardManager();
 const UserSettings = getUserSettings();
 
+const originalSentences = ref<backend.Sentence[]>([]);
 const sentences = ref<backend.Sentence[]>([]);
 const allSentences = ref<backend.Sentence[]>([]);
 const sentence = ref<backend.Sentence>(backend.Sentence.createFrom());
 const loaded = ref(false);
 
 const sections = {
+  'Original Sentence': originalSentences,
   'From Current Book': sentences,
   'From All Books': allSentences,
 };
 
 watch(sentence, async () => {
+  if (!loaded.value) {
+    return;
+  }
   cardManager.updateSentence(sentence.value);
   const autoAdvance = UserSettings.CardCreation.AutoAdvanceSentence;
   if (autoAdvance) {
@@ -71,19 +76,31 @@ watch(sentence, async () => {
 });
 
 onBeforeMount(async () => {
+  const originalSentence = cardManager.originalValues?.sentence;
+  if (originalSentence) {
+    sentence.value = originalSentence;
+    originalSentences.value.push(originalSentence);
+  }
+
   if (props.preferBook) {
-    sentences.value = await GetSentencesForWord(
+    // PreferBook and OriginalSentence cant currently both
+    // be true, but filter anyways
+    sentences.value = (await GetSentencesForWord(
       cardManager.word,
       [props.preferBook],
-    );
+    )).filter((sen) => {
+      return !originalSentences.value.some(
+        (other) => sen.sentence === other.sentence);
+    });
   }
   // filter out repeats (TODO do this be passing a negative filter to
   // GetSentencesForWord ?)
   const unfilteredAll = await GetSentencesForWord(cardManager.word, []);
   allSentences.value = unfilteredAll.filter((sen) => {
-    return !sentences.value.some(
+    return ![...sentences.value, ...originalSentences.value].some(
       (other) => sen.sentence === other.sentence);
   });
+
   loaded.value = true;
 });
 

@@ -1,20 +1,8 @@
 import { defineStore } from 'pinia';
-
-export const ActionsEnum = {
-  CREATE: 'create',
-  MODIFY: 'modify',
-} as const;
-
-export type ActionsEnum = typeof ActionsEnum[keyof typeof ActionsEnum]
-
-export type WordOptions = {
-  preferBook?:number
-  callback?: () => void
-};
+import type { LoadOptions } from './CardManager';
 
 type WordlistEntry = {
-  word:string
-  action:ActionsEnum
+  options:LoadOptions
   preferBook?:number
   callback?: () => void
 };
@@ -30,15 +18,14 @@ export const useCardQueue = defineStore('CardQueue', {
     // Callback runs on word submition
     // TODO? also have a callback for word failure?
     async addWord(
-      word:string,
-      action:ActionsEnum,
-      options:WordOptions = {
-      },
+      cardOptions:LoadOptions,
+      callback?: () => void,
+      preferBook?:number,
     ) {
       this.wordList.push({
-        word,
-        action,
-        ...options,
+        options: cardOptions,
+        callback,
+        preferBook,
       });
     },
     clearFront() {

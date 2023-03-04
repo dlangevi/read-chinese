@@ -1,5 +1,9 @@
 import { defineStore } from 'pinia';
 import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
+import { toRaw } from 'vue';
+import {
+  GetAnkiNote,
+} from '@wailsjs/backend/ankiInterface';
 import {
   backend,
 } from '@wailsjs/models';
@@ -24,6 +28,21 @@ export type StepState = typeof StepState[keyof typeof StepState]
 type StateMap = {
   [key in StepsEnum]: StepState
 };
+
+export type LoadOptions = {
+  word: string
+  // If set load the prev values from source card
+  // Either can pass the noteId or the already loaded note
+  // ( for testing )
+  sourceCardId?: number,
+  sourceCard?: backend.RawAnkiNote,
+  // a list of steps that are 'important' (if empty its all)
+  keySteps?: StepsEnum[],
+  includeChinese?: boolean
+  hasImageApi?: boolean
+  disableFlow?: boolean
+
+}
 
 // Instead of the strings we get from Anki, we want to
 // manage the data using the formats we see up front
@@ -84,14 +103,14 @@ function transformDefinitionFromPinyin(
 
 function transformTo(fields : backend.Fields) : FrontFields {
   const frontFields : FrontFields = {
-    word: fields.word,
+    word: fields.word || '',
     sentence: {
-      sentence: fields.sentence,
+      sentence: fields.sentence || '',
       source: undefined,
     },
-    englishDefn: transformDefinition(fields.englishDefn),
-    chineseDefn: transformDefinition(fields.chineseDefn),
-    pinyin: '',
+    englishDefn: transformDefinition(fields.englishDefn || ''),
+    chineseDefn: transformDefinition(fields.chineseDefn || ''),
+    pinyin: fields.pinyin,
     images: fields.images,
   };
   return frontFields;
@@ -107,40 +126,38 @@ export const useCardManager = defineStore('CardManager', {
       // auto advancing or clicking next step. In this state, when we
       // advance to a field that has been auto filled, we skip over it
       flow: true,
+      word: '',
+      noteId: (undefined as number | undefined),
       stepsState: {} as StateMap,
-      originalValues: ({} as FrontFields),
+      originalValues: (undefined as FrontFields | undefined),
       newValues: ({} as FrontFields),
-      note: new backend.RawAnkiNote(),
     };
   },
   getters: {
 
-    word: (state) => {
-      return state.newValues.word || state.originalValues.word;
-    },
     sentence: (state) => {
       const sentence =
-        state.newValues.sentence || state.originalValues.sentence;
+        state.newValues.sentence || state.originalValues?.sentence;
       return sentence?.sentence;
     },
     sentenceSource: (state) => {
       const sentence =
-        state.newValues.sentence || state.originalValues.sentence;
+        state.newValues.sentence || state.originalValues?.sentence;
       return sentence?.source;
     },
     englishDefn: (state) => {
       return state.newValues.englishDefn ||
-        state.originalValues.englishDefn || [];
+        state.originalValues?.englishDefn || [];
     },
     chineseDefn: (state) => {
       return state.newValues.chineseDefn ||
-        state.originalValues.chineseDefn || [];
+        state.originalValues?.chineseDefn || [];
     },
     pinyin: (state) => {
-      return state.newValues.pinyin || state.originalValues.pinyin;
+      return state.newValues.pinyin || state.originalValues?.pinyin;
     },
     images: (state) => {
-      return state.newValues.images || state.originalValues.images;
+      return state.newValues.images || state.originalValues?.images;
     },
     ready: (state) => {
       return state.flow &&
@@ -155,37 +172,57 @@ export const useCardManager = defineStore('CardManager', {
 
   },
   actions: {
-    loadCard(ankiCard : backend.RawAnkiNote,
-      includeChinese : boolean,
-      hasImageApi:boolean) {
-      // Resets the ui (Does it?)
+    async loadCard(options : LoadOptions) {
       this.flow = false;
       this.currentStep = StepsEnum.NONE;
-      this.steps = [];
-
       this.steps = [
         StepsEnum.SENTENCE,
         StepsEnum.ENGLISH,
         // toggle this based on user settings
-        ...(includeChinese ? [StepsEnum.CHINESE] : []),
-        ...(hasImageApi ? [StepsEnum.IMAGE] : []),
+        ...(options.includeChinese ? [StepsEnum.CHINESE] : []),
+        ...(options.hasImageApi ? [StepsEnum.IMAGE] : []),
       ];
       this.steps.forEach((step) => {
         this.stepsState[step] = StepState.EMPTY;
       });
 
-      this.note = ankiCard;
-      this.originalValues = transformTo(this.note.fields);
-      this.newValues = { word: this.originalValues.word };
-      this.newValues.word = this.originalValues.word;
+      if (options.sourceCard) {
+        this.originalValues = transformTo(options.sourceCard.fields);
+      } else if (options.sourceCardId) {
+        const noteData = await GetAnkiNote(options.sourceCardId);
+        this.noteId = options.sourceCardId;
+        this.originalValues = transformTo(noteData.fields);
+      } else {
+        this.noteId = undefined;
+        this.originalValues = undefined;
+      }
+      this.word = options.word;
+      this.newValues = { word: options.word };
 
-      this.currentStep = StepsEnum.SENTENCE;
-      this.currentStepIndex = 0;
-      this.flow = true;
+      if (options.keySteps) {
+        const keySteps = options.keySteps;
+        const firstStep = this.steps.find(
+          (step) => keySteps.includes(step));
+        if (!firstStep) {
+          throw new Error('Somehow keySteps did not have any valid steps');
+        }
+        this.currentStep = firstStep;
+      } else {
+        this.currentStep = StepsEnum.SENTENCE;
+      }
+      this.currentStepIndex = this.steps.indexOf(this.currentStep);
+      this.flow = !options.disableFlow;
     },
 
     getChanged() : backend.Fields {
-      const fields = backend.Fields.createFrom({});
+      const fields : {
+        word?: string,
+        sentence?: string,
+        englishDefn?: string,
+        chineseDefn?: string,
+        pinyin?: string,
+        images?: backend.ImageInfo[],
+      } = {}; // backend.Fields.createFrom({});
       fields.word = this.word;
       if (this.newValues.sentence) {
         fields.sentence = this.newValues.sentence.sentence;
@@ -198,9 +235,13 @@ export const useCardManager = defineStore('CardManager', {
         fields.chineseDefn = transformDefinitionFrom(
           this.newValues.chineseDefn);
       }
-      if (this.newValues.chineseDefn || this.newValues.englishDefn) {
-        // If either of these has been set. Recalculate pinyin
-        const oldPinyin = (this.originalValues.pinyin || '')
+      // If either of the definitions has changed
+      if (this.newValues.chineseDefn ||
+          this.newValues.englishDefn ||
+            // Or if the original pinyin was not set at all
+            !this.originalValues?.pinyin) {
+        // Then generate a new pinyin field
+        const oldPinyin = (this.originalValues?.pinyin || '')
           .split(',')
           .map(pinyin => pinyin.trim())
           .filter(pinyin => pinyin.length > 0);
@@ -213,10 +254,10 @@ export const useCardManager = defineStore('CardManager', {
       }
 
       if (this.newValues.images) {
-        fields.images = this.newValues.images;
+        fields.images = toRaw(this.newValues.images);
       }
 
-      return fields;
+      return backend.Fields.createFrom(fields);
     },
 
     updateSentence(sentence: backend.Sentence) {
@@ -228,9 +269,6 @@ export const useCardManager = defineStore('CardManager', {
       definitions: backend.DictionaryDefinition[],
       defType: string,
     ) {
-      // const definitions = newDefinitions.map(
-      //   (def) => `[${def.pronunciation}] ${def.definition}`,
-      // ).join('<br>');
       if (defType === 'english') {
         this.newValues.englishDefn = definitions;
         this.stepsState[StepsEnum.ENGLISH] = StepState.PREVIEW;
@@ -238,16 +276,6 @@ export const useCardManager = defineStore('CardManager', {
         this.newValues.chineseDefn = definitions;
         this.stepsState[StepsEnum.CHINESE] = StepState.PREVIEW;
       }
-      // let pinyin = new Set();
-      // if (this.newValues.pinyin !== undefined) {
-      //   pinyin = new Set(this.newValues.pinyin.split(', '));
-      // }
-      // newDefinitions.forEach((def) => {
-      //   const pronunciation = def.pronunciation.replace(/\s/g, '');
-      //   pinyin.add(pronunciation);
-      // });
-      // pinyin.delete('');
-      // this.newValues.pinyin = [...pinyin].join(', ');
     },
 
     updateImages(newImages: backend.ImageInfo[]) {
@@ -270,10 +298,10 @@ export const useCardManager = defineStore('CardManager', {
       if (this.currentStepIndex === 0) {
         return;
       }
-
       this.currentStepIndex -= 1;
       this.currentStep = this.steps[this.currentStepIndex];
     },
+
     nextStep() {
       const currentState = this.stepsState[this.currentStep];
       if (currentState === StepState.EMPTY) {
@@ -281,9 +309,7 @@ export const useCardManager = defineStore('CardManager', {
       } else if (currentState === StepState.PREVIEW) {
         this.stepsState[this.currentStep] = StepState.FILLED;
       }
-      console.log('current state', this.stepsState);
       if (this.currentStepIndex + 1 === this.steps.length) {
-        // We were on the last step
         return;
       }
       this.currentStepIndex += 1;
@@ -297,3 +323,22 @@ export const useCardManager = defineStore('CardManager', {
   },
 
 });
+
+export function formatDefinition(definition : backend.DictionaryDefinition) {
+  if (definition.pronunciation) {
+    return `[${definition.pronunciation}] ${definition.definition}`;
+  }
+  return definition.definition;
+}
+
+export function getImageSrc(image : backend.ImageInfo | undefined) : string {
+  if (image === undefined) {
+    return '';
+  } else if (image.url !== undefined) {
+    return image.url;
+  } else if (image.imageData !== undefined) {
+    return `data:image/png;base64, ${image.imageData}`;
+  } else {
+    return '';
+  }
+}

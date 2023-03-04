@@ -1,7 +1,7 @@
 {
   "meta": {
     "EnableExperimental": false,
-    "Ran": 47,
+    "Ran": 49,
     "Theme": "emerald"
   },
   "CardCreation": {
@@ -9,6 +9,7 @@
     "PopulateEnglish": false,
     "PopulateChinese": false,
     "AutoAdvanceEnglish": false,
+    "AutoAdvanceChinese": false,
     "AutoAdvanceImage": false,
     "AutoAdvanceCard": false
   },

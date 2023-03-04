@@ -63,39 +63,27 @@ const columnDefs:ColDef[] = [
     width: 50,
     minWidth: 50,
   },
-];
-
-const showDefinitions = UserSettings.Dictionaries.ShowDefinitions;
-if (showDefinitions) {
-  columnDefs.push(
-    {
-      headerName: 'definition',
-      field: 'definition',
-      minWidth: 400,
-    },
-  );
-}
-
-columnDefs.push(
+  ...(UserSettings.Dictionaries.ShowDefinitions
+    ? [
+      {
+        headerName: 'definition',
+        field: 'definition',
+        minWidth: 400,
+      }]
+    : []),
   {
     headerName: '',
     field: 'markButton',
     width: 120,
     cellRenderer: MarkLearned,
   },
-);
-columnDefs.push(
   {
     headerName: '',
     field: 'Make FlashCard',
     width: 120,
     cellRenderer: AddToCardQueue,
-    cellRendererParams: {
-      text: 'Create FlashCard',
-      create: true,
-    },
   },
-);
+];
 
 const rowData = ref<any[]>([]);
 watch(() => props.words, async () => {

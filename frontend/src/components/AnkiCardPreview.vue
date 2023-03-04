@@ -19,7 +19,8 @@
           v-for="definition in cardManager.englishDefn"
           :key="definition.definition"
         >
-          [{{ definition.pronunciation }}] {{ definition.definition }}
+          {{ formatDefinition(definition) }}
+          <br>
         </span>
       </p>
     </div>
@@ -32,7 +33,7 @@
           v-for="definition in cardManager.chineseDefn"
           :key="definition.definition"
         >
-          [{{ definition.pronunciation }}] {{ definition.definition }}
+          {{ formatDefinition(definition) }}
         </span>
       </p>
     </div>
@@ -46,7 +47,8 @@
           :key="i"
           class="max-h-24 w-auto"
           :src="getImageSrc(image)"
-          alt="image for word"
+          :alt="image.name ||
+            'Image related to search word, no alt text generated'"
         >
       </div>
     </div>
@@ -55,24 +57,13 @@
 
 <script lang="ts" setup>
 import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
-import { useCardManager } from '@/stores/CardManager';
 import {
-  backend,
-} from '@wailsjs/models';
+  useCardManager,
+  formatDefinition,
+  getImageSrc,
+} from '@/stores/CardManager';
 
 const cardManager = useCardManager();
-
-function getImageSrc(image : backend.ImageInfo | undefined) : string {
-  if (image === undefined) {
-    return '';
-  } else if (image.url !== undefined) {
-    return image.url;
-  } else if (image.imageData !== undefined) {
-    return `data:image/png;base64, ${image.imageData}`;
-  } else {
-    return '';
-  }
-}
 
 defineEmits(['change-step']);
 

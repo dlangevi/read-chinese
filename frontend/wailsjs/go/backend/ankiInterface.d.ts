@@ -6,7 +6,7 @@ export function ConfigurationCheck():Promise<string>;
 
 export function CreateAnkiNote(arg1:backend.Fields,arg2:Array<string>):Promise<Error>;
 
-export function GetAnkiNote(arg1:string):Promise<backend.RawAnkiNote>;
+export function GetAnkiNote(arg1:number):Promise<backend.RawAnkiNote>;
 
 export function GetAnkiNoteSkeleton(arg1:string):Promise<backend.RawAnkiNote>;
 
@@ -24,4 +24,8 @@ export function LoadProblemCards():Promise<Array<backend.ProblemCard>>;
 
 export function LoadTemplate():Promise<Error>;
 
-export function UpdateNoteFields(arg1:number,arg2:backend.Fields):Promise<string>;
+export function UpdateNoteFields(arg1:number,arg2:backend.Fields):Promise<Error>;
+
+export function UpdateSentenceAudio(arg1:number):Promise<Error>;
+
+export function UpdateWordAudio(arg1:number):Promise<Error>;

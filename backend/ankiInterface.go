@@ -3,7 +3,6 @@ package backend
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -15,19 +14,21 @@ import (
 
 type Fields struct {
 	Word        string      `json:"word"`
-	Sentence    string      `json:"sentence"`
-	EnglishDefn string      `json:"englishDefn"`
-	ChineseDefn string      `json:"chineseDefn"`
-	Pinyin      string      `json:"pinyin"`
-	Images      []ImageInfo `json:"images"`
+	Sentence    string      `json:"sentence,omitempty"`
+	EnglishDefn string      `json:"englishDefn,omitempty"`
+	ChineseDefn string      `json:"chineseDefn,omitempty"`
+	Pinyin      string      `json:"pinyin,omitempty"`
+	Images      []ImageInfo `json:"images,omitempty"`
 }
 
 type (
 	AnkiInterface interface {
 		GetAnkiNoteSkeleton(word string) RawAnkiNote
 		CreateAnkiNote(fields Fields, tags []string) error
-		GetAnkiNote(word string) (RawAnkiNote, error)
-		UpdateNoteFields(noteID int64, fields Fields) (string, error)
+		GetAnkiNote(word int64) (RawAnkiNote, error)
+		UpdateNoteFields(noteID int64, fields Fields) error
+		UpdateSentenceAudio(noteId int64) error
+		UpdateWordAudio(noteId int64) error
 		ImportAnkiKeywords() error
 		LoadProblemCards() ([]ProblemCard, error)
 		HealthCheck() string
@@ -189,7 +190,6 @@ func (a *ankiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 		return nil
 	}
 	if a.userSettings.AnkiConfig.GenerateTermAudio {
-
 		err := addAudio(fields.Word, currentMapping.HanziAudio)
 		if err != nil {
 			return err
@@ -203,19 +203,22 @@ func (a *ankiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 		}
 	}
 	for i, image := range fields.Images {
-		// Only upload images that have a url. If they are base64 it means
-		// They should already be in anki?
-		if len(image.Url) > 0 {
-			milli := time.Now().UnixMilli()
-			pictures = append(pictures, ankiconnect.Picture{
-				URL: image.Url,
-				// TODO dont guess the encoding format
-				Filename: fmt.Sprintf("read-chinese-image-%v-%v.jpg", milli, i),
-				Fields: []string{
-					currentMapping.Images,
-				},
-			})
+		// This should only contain valid image.Url type images
+		if len(image.ImageData) > 0 {
+			return errors.New("Somehow a base64 image got into anki fields")
 		}
+		if len(image.Url) == 0 {
+			return errors.New("image.Url was empty")
+		}
+		milli := time.Now().UnixMilli()
+		pictures = append(pictures, ankiconnect.Picture{
+			URL: image.Url,
+			// TODO dont guess the encoding format
+			Filename: fmt.Sprintf("read-chinese-image-%v-%v.jpg", milli, i),
+			Fields: []string{
+				currentMapping.Images,
+			},
+		})
 	}
 	noteFields := ankiconnect.Fields{}
 
@@ -273,23 +276,19 @@ func toError(restErr *restError.RestErr) error {
 	return errors.New(fmt.Sprintf("%v, %v", restErr.Error, restErr.Message))
 }
 
-func (a *ankiInterface) GetAnkiNote(word string) (RawAnkiNote, error) {
+func (a *ankiInterface) GetAnkiNote(noteId int64) (RawAnkiNote, error) {
 	currentMapping, err := a.getConfiguredMapping()
 	if err != nil {
 		return RawAnkiNote{}, err
 	}
 
-	notes, restErr := a.anki.Notes.Get(fmt.Sprintf("%v:%v", currentMapping.Hanzi, word))
+	notes, restErr := a.anki.Notes.Get(fmt.Sprintf("nid:%v", noteId))
 	if restErr != nil {
 		return RawAnkiNote{}, toError(restErr)
 	}
 	if len(*notes) == 0 {
 		return RawAnkiNote{}, errors.New("No note exists")
 	}
-	if len(*notes) > 1 {
-		return RawAnkiNote{}, errors.New("Duplicate notes exists")
-	}
-
 	note := (*notes)[0]
 	extract := func(field string) string {
 		value, _ := note.Fields[field]
@@ -300,7 +299,6 @@ func (a *ankiInterface) GetAnkiNote(word string) (RawAnkiNote, error) {
 	// Images will (hopefully) have html <img src=\"filename.jpg\">
 	imagesString := extract(currentMapping.Images)
 	if imagesString != "" {
-		log.Print(imagesString)
 		doc, err := html.Parse(strings.NewReader(imagesString))
 		if err != nil {
 			return RawAnkiNote{}, err
@@ -334,7 +332,6 @@ func (a *ankiInterface) GetAnkiNote(word string) (RawAnkiNote, error) {
 		}
 
 	}
-
 	rawNote := RawAnkiNote{
 		NoteId: note.NoteId,
 		Fields: Fields{
@@ -349,17 +346,115 @@ func (a *ankiInterface) GetAnkiNote(word string) (RawAnkiNote, error) {
 	return rawNote, nil
 }
 
-func (a *ankiInterface) UpdateNoteFields(noteID int64, fields Fields) (string, error) {
+func (a *ankiInterface) createAudio(text string, field string) (ankiconnect.Audio, error) {
+	audio64, err := a.textToSpeech.Synthesize(text)
+	if err != nil {
+		return ankiconnect.Audio{}, err
+	}
+	audio := ankiconnect.Audio{
+		Data: audio64,
+		Filename: fmt.Sprintf("read-chinese-%v-%v.wav",
+			field,
+			time.Now().UnixMilli()),
+		Fields: []string{
+			field,
+		},
+	}
+	return audio, nil
+}
+
+func (a *ankiInterface) createImage(url string, field string) ankiconnect.Picture {
+	return ankiconnect.Picture{
+		URL: url,
+		Filename: fmt.Sprintf("read-chinese-%v-%v.wav",
+			field,
+			time.Now().UnixMilli()),
+		Fields: []string{
+			field,
+		},
+	}
+}
+
+func (a *ankiInterface) updateFieldAudio(noteId int64, sentence bool) error {
 	currentMapping, err := a.getConfiguredMapping()
 	if err != nil {
-		return "", err
+		return err
 	}
-	ankiFields := ankiconnect.Fields{}
-	if fields.Word != "" {
-		ankiFields[currentMapping.Hanzi] = fields.Word
+
+	note, err := a.GetAnkiNote(noteId)
+	if err != nil {
+		return err
 	}
+	var field string
+	var text string
+	if sentence {
+		field = currentMapping.SentenceAudio
+		text = note.Fields.Sentence
+	} else {
+		field = currentMapping.HanziAudio
+		text = note.Fields.Word
+	}
+
+	audio, err := a.createAudio(text, field)
+	if err != nil {
+		return err
+	}
+
+	update := ankiconnect.UpdateNote{
+		Id: noteId,
+		Fields: ankiconnect.Fields{
+			field: "",
+		},
+		Audio: []ankiconnect.Audio{audio},
+	}
+
+	restErr := a.anki.Notes.Update(update)
+	if restErr != nil {
+		return toError(restErr)
+	}
+
+	return nil
+}
+
+func (a *ankiInterface) UpdateSentenceAudio(noteId int64) error {
+	return a.updateFieldAudio(noteId, true)
+}
+
+func (a *ankiInterface) UpdateWordAudio(noteId int64) error {
+	return a.updateFieldAudio(noteId, false)
+}
+
+func (a *ankiInterface) UpdateNoteFields(noteId int64, fields Fields) error {
+	currentMapping, err := a.getConfiguredMapping()
+	if err != nil {
+		return err
+	}
+
+	update := ankiconnect.UpdateNote{
+		Id:      noteId,
+		Picture: []ankiconnect.Picture{},
+	}
+
+	// If there are no fields updated (ie only images added)
+	// update will throw nonsense error, and so we need to
+	// at least set the word (which should always be safe)
+	ankiFields := ankiconnect.Fields{
+		currentMapping.Hanzi: fields.Word,
+	}
+
 	if fields.Sentence != "" {
+		// TODO: if there was a 'Sentence Translation' field of some sort
+		// It needs to be changed. Also TODO generate our own translations?
 		ankiFields[currentMapping.ExampleSentence] = fields.Sentence
+		if a.userSettings.AnkiConfig.GenerateSentenceAudio {
+			audio, err := a.createAudio(fields.Sentence, currentMapping.SentenceAudio)
+			if err != nil {
+				return err
+			}
+			update.Audio = []ankiconnect.Audio{audio}
+			// Clear the previous field data
+			ankiFields[currentMapping.SentenceAudio] = ""
+		}
 	}
 	if fields.EnglishDefn != "" {
 		ankiFields[currentMapping.EnglishDefinition] = fields.EnglishDefn
@@ -370,19 +465,25 @@ func (a *ankiInterface) UpdateNoteFields(noteID int64, fields Fields) (string, e
 	if fields.Pinyin != "" {
 		ankiFields[currentMapping.Pinyin] = fields.Pinyin
 	}
-	// TODO include new audio and images
-	update := ankiconnect.UpdateNote{
-		Id:     noteID,
-		Fields: ankiFields,
+	for _, image := range fields.Images {
+		// Only upload images that have a url.
+		// If they are base64 it means they should already be in anki?
+		// TODO need to also delete old base64 images that have been removed
+		if len(image.Url) > 0 {
+			update.Picture = append(update.Picture,
+				a.createImage(image.Url, currentMapping.Images))
+		}
 	}
+
+	update.Fields = ankiFields
+
 	restErr := a.anki.Notes.Update(update)
 	if restErr != nil {
-		return "", toError(restErr)
+		return toError(restErr)
 	}
 
 	// TODO clear flag if needed
-
-	return "success", nil
+	return nil
 }
 
 func (a *ankiInterface) ImportAnkiKeywords() error {
@@ -431,6 +532,7 @@ type ProblemCard struct {
 	Word     string   `json:"Word"`
 	Problems Problems `json:"Problems"`
 	Notes    string   `json:"Notes"`
+	NoteId   int64    `json:"NoteId"`
 }
 
 func (a *ankiInterface) LoadProblemCards() ([]ProblemCard, error) {
@@ -496,6 +598,7 @@ func (a *ankiInterface) LoadProblemCards() ([]ProblemCard, error) {
 				problemCard = ProblemCard{
 					Word:     word.Value,
 					Problems: Problems{},
+					NoteId:   id.NoteId,
 				}
 
 				notes, ok := id.Fields[currentMapping.Notes]

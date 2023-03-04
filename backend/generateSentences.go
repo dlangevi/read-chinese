@@ -71,6 +71,20 @@ func (g *Generator) isT1Sentence(sentence []Token) (bool, string) {
 	return true, firstUnknown
 }
 
+func (g *Generator) passesKnownCheck(sentence []Token, word string) bool {
+	foundWord := false
+	for _, token := range sentence {
+		if word == token.Data {
+			foundWord = true
+		}
+		if token.IsWord && !g.known.isKnown(token.Data) {
+			return false
+		}
+	}
+
+	return foundWord
+}
+
 func (g *Generator) isT1Candidate(sentence []Token, word string) bool {
 	for _, token := range sentence {
 		if token.IsWord && word != token.Data && !g.known.isWellKnown(token.Data) {
@@ -212,22 +226,44 @@ func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]Sentenc
 
 	books, _ := g.bookLibrary.GetSomeBooks(bookIds...)
 	sentences := []Sentence{}
-	for _, book := range books {
-		g.mapLock.RLock()
-		t1Segmented, ok := g.sentenceCache[book.Title]
-		g.mapLock.RUnlock()
-		if !ok {
-			// Here we are in a weird state where a book has been added but not processed
-			return nil, errors.New("Book missing from sentenceCache, please restart")
 
+	if g.known.isKnown(word) {
+		// Have to do a slower lookup in completly known sentences
+		for _, book := range books {
+			bookSentences, ok := g.bookCache[book.Title]
+			if !ok {
+				// Here we are in a weird state where a book has been added but not
+				// processed
+				return nil, errors.New("Book missing from sentenceCache, please restart")
+			}
+			for _, sentence := range bookSentences {
+				if g.passesKnownCheck(sentence, word) {
+					sentences = append(sentences, Sentence{
+						Sentence: toString(sentence),
+						Source:   book.Title,
+					})
+				}
+			}
 		}
-		t1Sentences, ok := t1Segmented[word]
-		if ok {
-			for _, sentence := range t1Sentences {
-				sentences = append(sentences, Sentence{
-					Sentence: toString(sentence),
-					Source:   book.Title,
-				})
+	} else {
+
+		for _, book := range books {
+			g.mapLock.RLock()
+			t1Segmented, ok := g.sentenceCache[book.Title]
+			g.mapLock.RUnlock()
+			if !ok {
+				// Here we are in a weird state where a book has been added but not
+				// processed
+				return nil, errors.New("Book missing from sentenceCache, please restart")
+			}
+			t1Sentences, ok := t1Segmented[word]
+			if ok {
+				for _, sentence := range t1Sentences {
+					sentences = append(sentences, Sentence{
+						Sentence: toString(sentence),
+						Source:   book.Title,
+					})
+				}
 			}
 		}
 	}

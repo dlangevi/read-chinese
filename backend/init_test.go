@@ -1,7 +1,6 @@
 package backend
 
 import (
-	"context"
 	"log"
 	"os"
 	"path"
@@ -37,14 +36,9 @@ func TestMain(m *testing.M) {
 }
 
 func createBackend(dbPath string) *Backend {
-	ctx := context.Background()
-	runtime, err := StartBackend(&ctx, dbPath, "./testdata/example_metadata.json")
+	runtime := NewBackend(dbPath, "./testdata/example_metadata.json")
 	// TODO lol this saves an actual dictionary in my user config
 	runtime.Dictionaries.AddMigakuDictionary("example",
 		"./testdata/example_dict.json", "english")
-	if err != nil {
-		log.Println(err)
-		os.Exit(1)
-	}
 	return runtime
 }

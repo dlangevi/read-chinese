@@ -10,17 +10,17 @@
     >
       <label
         class="label cursor-pointer justify-start gap-2"
-        :for="def.definition"
+        :for="def.definition + i"
       >
         <input
-          :id="def.definition"
+          :id="def.definition + i"
           v-model="selectedDefs"
           class="checkbox"
           :value="def"
           type="checkbox"
           name="definitions"
         >
-        <span v-html="'[' + def.pronunciation + '] ' + def.definition" />
+        {{ formatDefinition(def) }}
       </label>
     </div>
   </div>
@@ -34,20 +34,36 @@ import { getUserSettings } from '@/lib/userSettings';
 import type { backend } from '@wailsjs/models';
 
 import { GetDefinitionsForWord } from '@wailsjs/backend/Dictionaries';
-import { useCardManager } from '@/stores/CardManager';
+import { useCardManager, formatDefinition } from '@/stores/CardManager';
 
 const UserSettings = getUserSettings();
 const cardManager = useCardManager();
 
 const definitions = ref<backend.DictionaryDefinition[]>([]);
 const selectedDefs = ref<backend.DictionaryDefinition[]>([]);
+let allowUpdate = false;
 
 const props = defineProps<{
   chinese?: boolean
   english?: boolean
 }>();
 
+function updateDefinition(definitions: backend.DictionaryDefinition[]) {
+  cardManager.updateDefinition(definitions,
+    props.english ? 'english' : 'chinese');
+}
+
+async function calculateDefault() {
+  if (definitions.value.length === 1) {
+    selectedDefs.value.push(...definitions.value);
+    updateDefinition(definitions.value);
+  }
+}
+
 watch(selectedDefs, async () => {
+  if (!allowUpdate) {
+    return;
+  }
   updateDefinition(selectedDefs.value);
   if (props.english
     ? UserSettings.CardCreation.AutoAdvanceEnglish
@@ -57,29 +73,35 @@ watch(selectedDefs, async () => {
   }
 });
 
-function updateDefinition(definitions: backend.DictionaryDefinition[]) {
-  cardManager.updateDefinition(definitions,
-    props.english ? 'english' : 'chinese');
-}
-
-async function calculateDefault() {
-  if (definitions.value.length === 1) {
-    updateDefinition(definitions.value);
-  }
-}
-
 onBeforeMount(async () => {
-  definitions.value = await GetDefinitionsForWord(
+  const originalDefinitions =
+    props.english
+      ? cardManager.originalValues?.englishDefn
+      : cardManager.originalValues?.chineseDefn;
+  if (originalDefinitions) {
+    selectedDefs.value.push(...originalDefinitions);
+    definitions.value.push(...originalDefinitions);
+  }
+
+  definitions.value.push(...(await GetDefinitionsForWord(
     cardManager.word,
     props.english ? 'english' : 'chinese',
-  );
+  )).filter((def) => {
+    return !definitions.value.some(
+      (other) => {
+        return def.definition === other.definition &&
+        def.pronunciation === other.pronunciation;
+      },
+    );
+  }));
 
-  if (props.english
+  if (!originalDefinitions && props.english
     ? UserSettings.CardCreation.PopulateEnglish
     : UserSettings.CardCreation.PopulateChinese
   ) {
     calculateDefault();
   }
+  allowUpdate = true;
 });
 
 </script>

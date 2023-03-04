@@ -49,3 +49,11 @@ export function LoadTemplate() {
 export function UpdateNoteFields(arg1, arg2) {
   return window['go']['backend']['ankiInterface']['UpdateNoteFields'](arg1, arg2);
 }
+
+export function UpdateSentenceAudio(arg1) {
+  return window['go']['backend']['ankiInterface']['UpdateSentenceAudio'](arg1);
+}
+
+export function UpdateWordAudio(arg1) {
+  return window['go']['backend']['ankiInterface']['UpdateWordAudio'](arg1);
+}

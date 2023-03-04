@@ -100,6 +100,7 @@ async function init() {
   app.use(router);
   app.use(pinia);
   app.config.errorHandler = (err, instance, info) => {
+    console.error(err);
     console.log(err, instance, info);
     messageApi.error(`${err}`);
   };
