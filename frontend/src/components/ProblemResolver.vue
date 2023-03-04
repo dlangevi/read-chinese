@@ -19,6 +19,7 @@ import { backend } from '@wailsjs/models';
 import {
   UpdateSentenceAudio,
   UpdateWordAudio,
+  UpdatePinyin,
 } from '@wailsjs/backend/ankiInterface';
 import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
 
@@ -56,20 +57,22 @@ async function processAction(button: ButtonInfo, index : number) {
 onBeforeMount(() => {
   const problems : backend.Problems =
     props.params.data.Problems;
-  // TODO allow for multiple buttons
-  if (problems.MissingImage ||
-    problems.MissingSentence ||
-    problems.Flagged) {
-    buttons.value.push({
-      text: 'Open Editor',
-      action: addToQueue,
-    });
-  }
+
+  // We always want to give the option to
+  // open the card editor. This covers both
+  // problems.MissingImage and problems.MissingSentence
+  buttons.value.push({
+    text: 'Open Editor',
+    action: addToQueue,
+  });
+
   if (problems.MissingPinyin) {
-    // Generate pinyin
-    // If the card editor is used, this will be handled there
-    // Otherwise ??? todo. We can look it up from the local
-    // dictionary probably something like guess pinyin
+    // call the backend to add pinyin to the card
+    buttons.value.push({
+      text: 'Generate Pinyin',
+      action: () =>
+        UpdatePinyin(props.params.data.NoteId),
+    });
   }
   if (problems.MissingSentenceAudio) {
     // call the backend to add audio to the card

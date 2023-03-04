@@ -2,34 +2,48 @@
   <with-sidebar>
     <template #sidebar>
       <div>
-        <p>Filtered problem cards: </p>
-        <div>
-          <settings-checkbox
-            v-for="([initial, setting]) in
-              getDisplayable(UserSettings.CardManagement)"
-            :key="setting.name"
-            :setting="setting"
-            :initial-value="initial"
-          />
+        <h3 class="text-lg font-semibold">Useful searches: </h3>
+        <div class="m-4 flex flex-col gap-4">
+          <button
+            v-for="search,key in searches"
+            :key="key"
+            class="btn-primary btn-sm btn"
+            @click="setSearch(search)"
+          >
+            Load {{ key }}
+          </button>
         </div>
       </div>
       <div class="border-2 p-2 text-center">
-        {{ rowData.length }} total 'problem' cards
-      </div>
-      <div class="border-2 p-2 text-center">
-        {{ visibleRows }} cards after filter
+        Found {{ rowData.length }} cards
       </div>
     </template>
-    <div class="container m-4 mx-auto flex h-full flex-col px-4">
+    <div class="flex h-full flex-col gap-4 p-4">
+      <div class="mx-auto flex w-5/6 flex-col">
+        <div class="input-group">
+          <input
+            v-model="currentSearch"
+            type="text"
+            prefix="foo"
+            placeholder="Input a search as if this were the anki browse window"
+            class="input-primary input w-full"
+          >
+          <button class="btn" @click="doSearch()">Search</button>
+        </div>
+        <div
+          class="ml-auto before:ml-0.5
+        before:text-red-500 before:content-['*']"
+        >
+          Note all searches will be prefixed with
+          <span class="font-mono text-secondary">{{ searchPrefix }}</span>
+        </div>
+      </div>
       <ag-grid-vue
-        class="ag-theme-alpine mx-auto h-full
+        class="ag-theme-alpine mx-auto
         w-5/6 grow text-xl"
         :get-row-id="getRowId"
         :column-defs="columnDefs"
         :row-data="rowData"
-        :is-external-filter-present="isExternalFilterPresent"
-        :does-external-filter-pass="doesExternalFilterPass"
-        @filter-changed="filterChanged"
         @grid-ready="onGridReady"
       />
     </div>
@@ -40,72 +54,41 @@
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridVue } from 'ag-grid-vue3';
-import { onBeforeMount, ref, onUnmounted, watch } from 'vue';
+import { ref, onUnmounted } from 'vue';
 import {
-  getDisplayable,
   getUserSettings,
 } from '@/lib/userSettings';
 import ProblemResolver from '@/components/ProblemResolver.vue';
 import type {
-  GetRowIdParams, GridApi,
-  GridReadyEvent, ColDef, ICellRendererParams, RowNode,
+  GetRowIdParams,
+  GridReadyEvent, ColDef, ICellRendererParams,
 } from 'ag-grid-community';
 import { LoadProblemCards } from '@wailsjs/backend/ankiInterface';
 import { backend } from '@wailsjs/models';
 import WithSidebar from '@/layouts/WithSidebar.vue';
-import SettingsCheckbox
-  from '@/components/SettingsWidgets/SettingsCheckbox.vue';
 
 const UserSettings = getUserSettings();
-const CardManagement = UserSettings.CardManagement;
+const AnkiConfig = UserSettings.AnkiConfig;
 const getRowId = (params:GetRowIdParams) => params.data.Word;
 
-// Will be set on grid ready
-const gridApi = ref<GridApi>();
-const visibleRows = ref(0);
-function filterChanged() {
-  if (gridApi.value) {
-    visibleRows.value = gridApi.value.getModel().getRowCount();
-  }
-}
-watch(() => ([
-  CardManagement.ProblemFlagged,
-  CardManagement.ProblemMissingImage,
-  CardManagement.ProblemMissingSentence,
-  CardManagement.ProblemMissingSentenceAudio,
-  CardManagement.ProblemMissingWordAudio,
-  CardManagement.ProblemMissingPinyin,
-]), () => {
-  gridApi.value?.onFilterChanged();
-  if (gridApi.value) {
-    visibleRows.value = gridApi.value.getModel().getRowCount();
-  }
-},
+const activeModel = AnkiConfig.ActiveModel;
+const currentMapping = AnkiConfig.ModelMappings[AnkiConfig.ActiveModel];
+const activeDeck = AnkiConfig.ActiveDeck;
+const currentSearch = ref('');
 
-);
-
-function isExternalFilterPresent() {
-  return true;
-}
-
-function doesExternalFilterPass(node: RowNode) {
-  const problems : backend.Problems = node.data.Problems;
-  const ProblemFlagged = CardManagement.ProblemFlagged;
-  const ProblemMissingImage = CardManagement.ProblemMissingImage;
-  const ProblemMissingSentence = CardManagement.ProblemMissingSentence;
-  const ProblemMissingSentenceAudio =
-    CardManagement.ProblemMissingSentenceAudio;
-  const ProblemMissingWordAudio = CardManagement.ProblemMissingWordAudio;
-  const ProblemMissingPinyin = CardManagement.ProblemMissingPinyin;
-
-  const passes = (ProblemFlagged && problems.Flagged) ||
-     (ProblemMissingImage && problems.MissingImage) ||
-     (ProblemMissingSentence && problems.MissingSentence) ||
-     (ProblemMissingSentenceAudio && problems.MissingSentenceAudio) ||
-     (ProblemMissingWordAudio && problems.MissingWordAudio) ||
-     (ProblemMissingPinyin && problems.MissingPinyin);
-  return passes;
-}
+const searchPrefix = `deck:${activeDeck} note:${activeModel}`;
+const searches = {
+  Flagged: '-flag:0',
+  'Missing Sentence': `"${currentMapping.exampleSentence}:"`,
+  'Missing Sentence Audio': `-"${
+    currentMapping.exampleSentence
+  }:" "${
+    currentMapping.sentenceAudio
+  }:"`,
+  'Missing Image': `"${currentMapping.images}:"`,
+  'Missing Hanzi Audio': `"${currentMapping.hanziAudio}:"`,
+  'Missing Pinyin': `"${currentMapping.pinyin}:"`,
+};
 
 const columnDefs:ColDef[] = [
   {
@@ -115,7 +98,7 @@ const columnDefs:ColDef[] = [
     cellClass: 'text-xl',
   },
   {
-    headerName: 'problem',
+    headerName: 'Detected Problems',
     field: 'Problems',
     sort: 'desc',
     cellClass: 'text-xl',
@@ -136,7 +119,7 @@ const columnDefs:ColDef[] = [
   },
   {
     headerName: '',
-    field: 'Fix the problem',
+    field: 'problemResolver',
     width: 200,
     cellClass: 'flex flex-row-reverse items-center',
     cellRenderer: ProblemResolver,
@@ -146,7 +129,6 @@ const columnDefs:ColDef[] = [
 let resizeCallback: () => void;
 function onGridReady(params:GridReadyEvent) {
   params.api.sizeColumnsToFit();
-  gridApi.value = params.api;
   resizeCallback = () => {
     setTimeout(() => {
       params.api.sizeColumnsToFit();
@@ -161,8 +143,12 @@ onUnmounted(() => {
 });
 
 const rowData = ref<backend.ProblemCard[]>([]);
-onBeforeMount(async () => {
-  rowData.value = await LoadProblemCards();
-  gridApi.value?.onFilterChanged();
-});
+async function setSearch(search : string) {
+  currentSearch.value = search;
+  doSearch();
+}
+
+async function doSearch() {
+  rowData.value = await LoadProblemCards(currentSearch.value);
+}
 </script>

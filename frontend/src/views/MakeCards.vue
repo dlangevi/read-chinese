@@ -1,29 +1,20 @@
 <template>
-  <div
-    class="
-           container
-           mx-auto
-           flex
-           h-full
-           w-3/4
-           flex-col
-           gap-2
-           px-4"
-  >
-    <input
-      type="text"
-      placeholder="Input here (using 汉字 for now)"
-      class="input-primary input mt-4 w-full"
-      @input="onUpdateSearchBox"
-    >
-    <ag-grid-vue
-      class="ag-theme-alpine mx-auto mt-2 mb-4
-        h-full w-full grow text-xl"
-      :get-row-id="getRowId"
-      :column-defs="columnDefs"
-      :row-data="rowData"
-      @grid-ready="onGridReady"
-    />
+  <div class="mx-auto px-4">
+    <div class="flex h-full flex-col gap-4 p-4">
+      <input
+        type="text"
+        placeholder="Input here (using 汉字 for now)"
+        class="input-primary input mx-auto w-3/4"
+        @input="onUpdateSearchBox"
+      >
+      <ag-grid-vue
+        class="ag-theme-alpine mx-auto w-3/4 grow text-xl"
+        :get-row-id="getRowId"
+        :column-defs="columnDefs"
+        :row-data="rowData"
+        @grid-ready="onGridReady"
+      />
+    </div>
   </div>
 </template>
 

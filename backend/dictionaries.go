@@ -180,10 +180,16 @@ func (d *Dictionaries) getDefaultDefinition(word string) string {
 }
 
 func (d *Dictionaries) getPinyin(word string) string {
-	proniciations := d.PrimaryDict.GetPronuciations(word)
-	// TODO look into go-funk if more occasion for this stuff arrises
+	pronuciationMap := map[string]struct{}{}
+	for _, dict := range d.Dictionaries {
+		proniciations := dict.Dictionary.GetPronuciations(word)
+		for _, pronuciation := range proniciations {
+			pronuciationMap[pronuciation] = struct{}{}
+		}
+	}
+
 	pinyin := []string{}
-	for _, pronuciation := range proniciations {
+	for pronuciation := range pronuciationMap {
 		pinyin = append(pinyin, pronuciation)
 	}
 

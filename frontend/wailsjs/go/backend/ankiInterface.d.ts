@@ -8,8 +8,6 @@ export function CreateAnkiNote(arg1:backend.Fields,arg2:Array<string>):Promise<E
 
 export function GetAnkiNote(arg1:number):Promise<backend.RawAnkiNote>;
 
-export function GetAnkiNoteSkeleton(arg1:string):Promise<backend.RawAnkiNote>;
-
 export function HealthCheck():Promise<string>;
 
 export function ImportAnkiKeywords():Promise<Error>;
@@ -20,11 +18,13 @@ export function LoadModelFields(arg1:string):Promise<Array<string>>;
 
 export function LoadModels():Promise<Array<string>>;
 
-export function LoadProblemCards():Promise<Array<backend.ProblemCard>>;
+export function LoadProblemCards(arg1:string):Promise<Array<backend.ProblemCard>>;
 
 export function LoadTemplate():Promise<Error>;
 
 export function UpdateNoteFields(arg1:number,arg2:backend.Fields):Promise<Error>;
+
+export function UpdatePinyin(arg1:number):Promise<Error>;
 
 export function UpdateSentenceAudio(arg1:number):Promise<Error>;
 

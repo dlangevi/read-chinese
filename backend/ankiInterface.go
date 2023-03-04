@@ -3,6 +3,7 @@ package backend
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -23,14 +24,14 @@ type Fields struct {
 
 type (
 	AnkiInterface interface {
-		GetAnkiNoteSkeleton(word string) RawAnkiNote
 		CreateAnkiNote(fields Fields, tags []string) error
 		GetAnkiNote(word int64) (RawAnkiNote, error)
 		UpdateNoteFields(noteID int64, fields Fields) error
 		UpdateSentenceAudio(noteId int64) error
 		UpdateWordAudio(noteId int64) error
+		UpdatePinyin(noteId int64) error
 		ImportAnkiKeywords() error
-		LoadProblemCards() ([]ProblemCard, error)
+		LoadProblemCards(query string) ([]ProblemCard, error)
 		HealthCheck() string
 		ConfigurationCheck() (string, error)
 		LoadTemplate() error
@@ -60,14 +61,6 @@ func NewAnkiInterface(backend *Backend, userSettings *UserConfig, known *KnownWo
 type RawAnkiNote struct {
 	NoteId int64  `json:"noteId"`
 	Fields Fields `json:"fields"`
-}
-
-func (a *ankiInterface) GetAnkiNoteSkeleton(word string) RawAnkiNote {
-	return RawAnkiNote{
-		Fields: Fields{
-			Word: word,
-		},
-	}
 }
 
 func (a *ankiInterface) HealthCheck() string {
@@ -424,6 +417,29 @@ func (a *ankiInterface) UpdateWordAudio(noteId int64) error {
 	return a.updateFieldAudio(noteId, false)
 }
 
+func (a *ankiInterface) UpdatePinyin(noteId int64) error {
+	note, err := a.GetAnkiNote(noteId)
+	if err != nil {
+		return err
+	}
+
+	word := note.Fields.Word
+	if word == "" {
+		return errors.New("Hanzi not set for card")
+	}
+	pinyin := a.backend.Dictionaries.getPinyin(word)
+	// TODO in this case generate it char by char?
+	if pinyin == "" {
+		return errors.New("Could not figure out pinyin")
+
+	}
+
+	return a.UpdateNoteFields(noteId, Fields{
+		Word:   word,
+		Pinyin: pinyin,
+	})
+}
+
 func (a *ankiInterface) UpdateNoteFields(noteId int64, fields Fields) error {
 	currentMapping, err := a.getConfiguredMapping()
 	if err != nil {
@@ -535,88 +551,74 @@ type ProblemCard struct {
 	NoteId   int64    `json:"NoteId"`
 }
 
-func (a *ankiInterface) LoadProblemCards() ([]ProblemCard, error) {
-	problemCardsMap := map[int64]ProblemCard{}
+func (a *ankiInterface) LoadProblemCards(query string) ([]ProblemCard, error) {
 	problemCards := []ProblemCard{}
 	currentMapping, err := a.getConfiguredMapping()
 	if err != nil {
 		return problemCards, err
 	}
 
-	// For each query, get the noteIds. Add them all to the map
-	// with problems
-
-	type ProblemCase struct {
-		Query  string
-		Setter func(*Problems)
-	}
-
 	currentDeck := a.userSettings.AnkiConfig.ActiveDeck
+	currentNote := a.userSettings.AnkiConfig.ActiveModel
+	prefixedQuery := fmt.Sprintf(`"deck:%v" "note:%v" (%v)`,
+		currentDeck, currentNote, query)
 
-	checks := []ProblemCase{
-		{ // Cards Flagged by the user
-			Query:  fmt.Sprintf("deck:%v -flag:0", currentDeck),
-			Setter: func(p *Problems) { p.Flagged = true },
-		},
-		{ // Missing Example Sentence
-			Query:  fmt.Sprintf("deck:%v %v:", currentDeck, currentMapping.ExampleSentence),
-			Setter: func(p *Problems) { p.MissingSentence = true },
-		},
-		{ // Has Sentence, but missing Sentence Audio
-			Query: fmt.Sprintf("deck:%v -%v: %v:", currentDeck,
-				currentMapping.ExampleSentence, currentMapping.SentenceAudio),
-			Setter: func(p *Problems) { p.MissingSentenceAudio = true },
-		},
-		{ // Missing Image
-			Query:  fmt.Sprintf("deck:%v %v:", currentDeck, currentMapping.Images),
-			Setter: func(p *Problems) { p.MissingImage = true },
-		},
-		{ // Missing HanziAudio
-			Query:  fmt.Sprintf("deck:%v %v:", currentDeck, currentMapping.HanziAudio),
-			Setter: func(p *Problems) { p.MissingWordAudio = true },
-		},
-		{ // Missing Pinyin TODO: check for ugly pinyin? eg: ni3hao3
-			Query:  fmt.Sprintf("deck:%v %v:", currentDeck, currentMapping.Pinyin),
-			Setter: func(p *Problems) { p.MissingPinyin = true },
-		},
+	log.Println(prefixedQuery)
+	notes, restErr := a.anki.Notes.Get(prefixedQuery)
+	if restErr != nil {
+		return nil, toError(restErr)
 	}
 
-	for _, check := range checks {
-		// Todo switch out Get for Search + Lookup if we want to speed it up
-		ids, restErr := a.anki.Notes.Get(check.Query)
-		if restErr != nil {
-			return nil, toError(restErr)
+	for _, note := range *notes {
+		word, ok := note.Fields[currentMapping.Hanzi]
+		if !ok {
+			return nil, errors.New("Hanzi not found")
+		}
+		problemCard := ProblemCard{
+			Word:     word.Value,
+			Problems: Problems{},
+			NoteId:   note.NoteId,
+		}
+		p := &problemCard.Problems
+
+		// TODO do we need to mark
+		// 	Setter: func(p *Problems) { p.Flagged = true },
+
+		// Missing Example Sentence
+		sentence, ok := note.Fields[currentMapping.ExampleSentence]
+		if !ok || sentence.Value == "" {
+			p.MissingSentence = true
 		}
 
-		for _, id := range *ids {
-			word, ok := id.Fields[currentMapping.Hanzi]
-			if !ok {
-				return nil, errors.New("Hanzi not found")
-			}
-			problemCard, exists := problemCardsMap[id.NoteId]
-			if !exists {
-				problemCard = ProblemCard{
-					Word:     word.Value,
-					Problems: Problems{},
-					NoteId:   id.NoteId,
-				}
-
-				notes, ok := id.Fields[currentMapping.Notes]
-				if ok {
-					problemCard.Notes = notes.Value
-				}
-			}
-			check.Setter(&problemCard.Problems)
-			problemCardsMap[id.NoteId] = problemCard
+		// Missing Sentence Audio
+		sentenceAudio, ok := note.Fields[currentMapping.SentenceAudio]
+		if !p.MissingSentence && (!ok || sentenceAudio.Value == "") {
+			p.MissingSentenceAudio = true
 		}
 
-	}
+		// Missing Image
+		images, ok := note.Fields[currentMapping.Images]
+		if !ok || images.Value == "" {
+			p.MissingImage = true
+		}
 
-	// Big lookup on all selected Note ids to map to the word in the field
-	// For now just do
+		// Missing HanziAudio
+		hanziAudio, ok := note.Fields[currentMapping.HanziAudio]
+		if !ok || hanziAudio.Value == "" {
+			p.MissingWordAudio = true
+		}
 
-	// Finally map to array since wails cant do the needed ts stuff
-	for _, problemCard := range problemCardsMap {
+		// Missing Pinyin TODO: check for ugly pinyin? eg: ni3hao3
+		pinyin, ok := note.Fields[currentMapping.Pinyin]
+		if !ok || pinyin.Value == "" {
+			p.MissingPinyin = true
+		}
+
+		notes, ok := note.Fields[currentMapping.Notes]
+		if ok {
+			problemCard.Notes = notes.Value
+		}
+
 		problemCards = append(problemCards, problemCard)
 	}
 

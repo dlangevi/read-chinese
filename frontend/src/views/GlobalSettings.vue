@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto px-4">
+  <div class="mx-auto px-4">
     <div
       v-for="(contents, section, index) in sections"
       :key="index"

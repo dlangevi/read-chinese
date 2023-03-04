@@ -14,10 +14,6 @@ export function GetAnkiNote(arg1) {
   return window['go']['backend']['ankiInterface']['GetAnkiNote'](arg1);
 }
 
-export function GetAnkiNoteSkeleton(arg1) {
-  return window['go']['backend']['ankiInterface']['GetAnkiNoteSkeleton'](arg1);
-}
-
 export function HealthCheck() {
   return window['go']['backend']['ankiInterface']['HealthCheck']();
 }
@@ -38,8 +34,8 @@ export function LoadModels() {
   return window['go']['backend']['ankiInterface']['LoadModels']();
 }
 
-export function LoadProblemCards() {
-  return window['go']['backend']['ankiInterface']['LoadProblemCards']();
+export function LoadProblemCards(arg1) {
+  return window['go']['backend']['ankiInterface']['LoadProblemCards'](arg1);
 }
 
 export function LoadTemplate() {
@@ -48,6 +44,10 @@ export function LoadTemplate() {
 
 export function UpdateNoteFields(arg1, arg2) {
   return window['go']['backend']['ankiInterface']['UpdateNoteFields'](arg1, arg2);
+}
+
+export function UpdatePinyin(arg1) {
+  return window['go']['backend']['ankiInterface']['UpdatePinyin'](arg1);
 }
 
 export function UpdateSentenceAudio(arg1) {

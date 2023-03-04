@@ -4,5 +4,7 @@ module.exports = {
   content: [
     './src/**/*.{ts,js,vue}',
   ],
-  plugins: [require('daisyui')],
+  plugins: [
+    require('daisyui'),
+  ],
 };
