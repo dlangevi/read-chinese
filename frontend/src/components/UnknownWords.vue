@@ -20,15 +20,22 @@ import MarkLearned from '@/components/MarkLearned.vue';
 import AddToCardQueue from '@/components/AddToCardQueue.vue';
 import { getUserSettings } from '@/lib/userSettings';
 import type { GetRowIdParams, GridReadyEvent, ColDef } from 'ag-grid-community';
-import { backend } from '@wailsjs/models';
 import { GetDefinitions } from '@wailsjs/backend/Dictionaries';
+import {
+  GetBookFrequencies,
+  GetFavoriteFrequencies,
+} from '@wailsjs/backend/bookLibrary';
+import { GetOccurances } from '@wailsjs/backend/KnownWords';
 import type { WordDefinitions } from '@/lib/brokenTypes';
+
+import { useCardQueue } from '@/stores/CardQueue';
 
 const UserSettings = getUserSettings();
 
 const props = defineProps<{
-  words: backend.UnknownWordEntry[],
+  words: string[],
   bookFilter?: number,
+  frequencySource?: string,
 }>();
 
 const getRowId = (params:GetRowIdParams) => params.data.word;
@@ -87,17 +94,52 @@ const columnDefs:ColDef[] = [
 
 const rowData = ref<any[]>([]);
 watch(() => props.words, async () => {
-  const justWords = props.words.map((word) => word.word);
-  const definitions : WordDefinitions = await GetDefinitions(justWords);
-  props.words.forEach((row) => {
-    const word = row.word;
+  updateWords();
+});
+
+async function updateWords() {
+  const definitions : WordDefinitions = await GetDefinitions(props.words);
+  let occurances : {
+    [key:string] :number
+  } = {};
+  if (props.bookFilter) {
+    occurances = await GetBookFrequencies(props.bookFilter);
+  } else if (props.frequencySource === 'favorites') {
+    occurances = await GetFavoriteFrequencies();
+  } else {
+    occurances = await GetOccurances(props.words);
+  }
+  rowData.value = props.words.map((word) => {
+    const row:any = {};
     const definition = definitions[word];
+    row.word = word;
     if (definition) {
       row.definition = definition.definition;
       row.pinyin = definition.pronunciation;
     }
+    row.occurance = occurances[word];
+    return row;
   });
-  rowData.value = props.words;
+}
+
+const store = useCardQueue();
+defineExpose({
+  enqueueTopRows: async function (n : number) {
+    const sorted = rowData.value.slice();
+    sorted.sort((a, b) => {
+      if (a.occurance === undefined || b.occurance === undefined) {
+        return 0;
+      }
+      if (a.occurance > b.occurance) {
+        return -1;
+      }
+      return 1;
+    });
+    const topWords = sorted.slice(0, n);
+    topWords.forEach((word) => {
+      store.addWord({ word: word.word });
+    });
+  },
 });
 
 let resizeCallback: () => void;
@@ -117,17 +159,7 @@ onUnmounted(() => {
 });
 
 onBeforeMount(async () => {
-  const justWords = props.words.map((word) => word.word);
-  const definitions : WordDefinitions = await GetDefinitions(justWords);
-  props.words.forEach((row) => {
-    const word = row.word;
-    const definition = definitions[word];
-    if (definition) {
-      row.definition = definition.definition;
-      row.pinyin = definition.pronunciation;
-    }
-  });
-  rowData.value = props.words;
+  updateWords();
 });
 
 </script>

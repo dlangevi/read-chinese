@@ -16,7 +16,7 @@ export function GetDefinitionsForWord(arg1:string,arg2:string):Promise<Array<bac
 
 export function GetDictionaryInfo():Promise<backend.DictionaryInfoMap>;
 
-export function GetPossibleWords(arg1:string):Promise<Array<backend.UnknownWordEntry>>;
+export function GetPossibleWords(arg1:string):Promise<Array<string>>;
 
 export function HealthCheck():Promise<string>;
 

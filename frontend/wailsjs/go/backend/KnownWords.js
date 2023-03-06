@@ -10,6 +10,10 @@ export function AddWords(arg1) {
   return window['go']['backend']['KnownWords']['AddWords'](arg1);
 }
 
+export function GetOccurances(arg1) {
+  return window['go']['backend']['KnownWords']['GetOccurances'](arg1);
+}
+
 export function GetUnknownHskWords(arg1, arg2) {
   return window['go']['backend']['KnownWords']['GetUnknownHskWords'](arg1, arg2);
 }

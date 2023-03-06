@@ -164,13 +164,6 @@ func (d *Dictionaries) GetDefinitionsForWord(word string, language string) []Dic
 	return answers
 }
 
-type UnknownWordEntry struct {
-	Word       string `json:"word"`
-	Occurance  int    `json:"occurance,omitempty"`
-	Definition string `json:"definition,omitempty"`
-	Pinyin     string `json:"pinyin,omitempty"`
-}
-
 func (d *Dictionaries) getDefaultDefinition(word string) string {
 	terms := d.PrimaryDict.GetDefinitions(word)
 	if len(terms) == 0 {
@@ -196,7 +189,8 @@ func (d *Dictionaries) getPinyin(word string) string {
 	return strings.Join(pinyin, ", ")
 }
 
-// TODO this passing back and forth of UnknownWordEntry feels clunky
+// Wails auto typescript generation fails on this so use WordDefinitions
+// To avoid issues
 type WordDefinitions map[string]DictionaryDefinition
 
 func (d *Dictionaries) GetDefinitions(words []string) WordDefinitions {
@@ -210,16 +204,9 @@ func (d *Dictionaries) GetDefinitions(words []string) WordDefinitions {
 	return entries
 }
 
-func (d *Dictionaries) GetPossibleWords(partial string) []UnknownWordEntry {
+func (d *Dictionaries) GetPossibleWords(partial string) []string {
 	words := d.PrimaryDict.GetPartialMatches(partial)
-	unknown := []UnknownWordEntry{}
-	// TODO filter out known
-	for _, word := range words {
-		unknown = append(unknown, UnknownWordEntry{
-			Word: word,
-		})
-	}
-	return unknown
+	return words
 }
 
 func (d *Dictionaries) IsInDictionary(word string) bool {

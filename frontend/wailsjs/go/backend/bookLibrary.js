@@ -18,12 +18,20 @@ export function GetBook(arg1) {
   return window['go']['backend']['bookLibrary']['GetBook'](arg1);
 }
 
+export function GetBookFrequencies(arg1) {
+  return window['go']['backend']['bookLibrary']['GetBookFrequencies'](arg1);
+}
+
 export function GetBooks() {
   return window['go']['backend']['bookLibrary']['GetBooks']();
 }
 
 export function GetDetailedBooks(arg1) {
   return window['go']['backend']['bookLibrary']['GetDetailedBooks'](arg1);
+}
+
+export function GetFavoriteFrequencies() {
+  return window['go']['backend']['bookLibrary']['GetFavoriteFrequencies']();
 }
 
 export function GetSomeBooks(arg1) {

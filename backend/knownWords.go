@@ -255,10 +255,20 @@ func (known *KnownWords) isKnownChar(char rune) bool {
 	return ok
 }
 
+func (known *KnownWords) GetOccurances(words []string) map[string]int {
+	occurances := map[string]int{}
+	for _, word := range words {
+		// Its fine if occurance is just 0
+		occurance, _ := known.frequency[word]
+		occurances[word] = occurance
+	}
+	return occurances
+}
+
 //go:embed assets/HSK
 var hskWords embed.FS
 
-func (known *KnownWords) GetUnknownHskWords(version string, level int) ([]UnknownWordEntry, error) {
+func (known *KnownWords) GetUnknownHskWords(version string, level int) ([]string, error) {
 	// ensure string == 2.0 or 3.0
 	// ensure level == 1 - 6
 	hskPath := path.Join(
@@ -267,7 +277,7 @@ func (known *KnownWords) GetUnknownHskWords(version string, level int) ([]Unknow
 		version,
 		fmt.Sprintf(`L%v.txt`, level),
 	)
-	rows := []UnknownWordEntry{}
+	rows := []string{}
 
 	fileBytes, err := hskWords.ReadFile(hskPath)
 	if err != nil {
@@ -281,11 +291,7 @@ func (known *KnownWords) GetUnknownHskWords(version string, level int) ([]Unknow
 		trimmed = strings.Trim(trimmed, "\uFEFF")
 		if !known.isKnown(trimmed) && len(trimmed) > 0 {
 			// Its fine if occurance is just 0
-			occurance, _ := known.frequency[trimmed]
-			rows = append(rows, UnknownWordEntry{
-				Word:      trimmed,
-				Occurance: occurance,
-			})
+			rows = append(rows, trimmed)
 		}
 	}
 	return rows, nil

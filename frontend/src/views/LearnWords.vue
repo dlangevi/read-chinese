@@ -75,9 +75,11 @@
         <p>For now lets just mark learned words you already know 好不好?</p>
       </div>
       <unknown-words
+        ref="unknownWordsRef"
         class="m-4 mx-auto h-full w-5/6 grow"
         show-definitions
         :words="words"
+        :frequency-source="frequencySource"
       />
     </div>
   </with-sidebar>
@@ -87,7 +89,6 @@
 import WithSidebar from '@/layouts/WithSidebar.vue';
 import ImportCsv from '@/components/ImportCsv.vue';
 import { watch, ref, onBeforeMount } from 'vue';
-import { backend } from '@wailsjs/models';
 import {
   LearningTarget,
   LearningTargetFavorites,
@@ -100,7 +101,6 @@ import UnknownWords from '../components/UnknownWords.vue';
 import { useLoader } from '@/lib/loading';
 import { GetPossibleWords } from '@wailsjs/backend/Dictionaries';
 
-import { useCardQueue } from '@/stores/CardQueue';
 import { getUserSettings } from '@/lib/userSettings';
 const UserSettings = getUserSettings();
 
@@ -112,6 +112,8 @@ const levels = ref<HskLevel[]>([1, 2, 3, 4, 5, 6]);
 const selectedLevel = ref<HskLevel>(1);
 const selectedVersion = ref(false);
 const active = ref(false);
+const unknownWordsRef = ref();
+
 watch(selectedVersion, () => {
   if (selectedVersion.value) {
     version.value = '3.0';
@@ -132,22 +134,27 @@ const sources = [
   'search',
 ];
 
-const words = ref<backend.UnknownWordEntry[]>([]);
+const words = ref<string[]>([]);
 const gridSource = ref('all books');
+const frequencySource = ref('');
 const searchBox = ref('');
 async function changeSource() {
   const newSource = gridSource.value;
   if (newSource === 'all books') {
     words.value = await LearningTarget();
+    frequencySource.value = '';
   } else if (newSource === 'favorites') {
     words.value = await LearningTargetFavorites();
+    frequencySource.value = 'favorites';
   } else if (newSource === 'hsk') {
     loadHsk();
+    frequencySource.value = '';
   }
 }
 
 onBeforeMount(async () => {
   words.value = await LearningTarget();
+  frequencySource.value = '';
 });
 
 const loader = useLoader();
@@ -166,22 +173,8 @@ async function loadHsk() {
   words.value = await GetUnknownHskWords(ver, lvl);
 }
 
-const store = useCardQueue();
-async function makeCards() {
-  const sorted = words.value.slice();
-  sorted.sort((a, b) => {
-    if (a.occurance === undefined || b.occurance === undefined) {
-      return 0;
-    }
-    if (a.occurance > b.occurance) {
-      return -1;
-    }
-    return 1;
-  });
-  const topWords = sorted.slice(0, 50);
-  topWords.forEach((word) => {
-    store.addWord({ word: word.word });
-  });
+function makeCards() {
+  unknownWordsRef.value.enqueueTopRows(50);
 }
 
 async function onUpdateSearchBox() {

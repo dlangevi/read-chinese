@@ -35,11 +35,11 @@ type (
 		RecalculateBooks() error
 
 		// Get the words in the library that occure the most often
-		LearningTarget() []WordOccuranceRow
+		LearningTarget() []string
 		// Get the words in the library that occure the most often in favorite books
-		LearningTargetFavorites() []WordOccuranceRow
+		LearningTargetFavorites() []string
 		// Get the words in a specific book that occure the most often
-		LearningTargetBook(bookId int) []WordOccuranceRow
+		LearningTargetBook(bookId int) []string
 		TopUnknownWords(bookId int, numWords int) []string
 		computeKnownCharacters(book *Book) error
 		TotalRead() (int, error)
@@ -371,17 +371,62 @@ func (b *bookLibrary) HealthCheck() (string, error) {
 
 }
 
-func (b *bookLibrary) LearningTarget() []WordOccuranceRow {
-	words := []WordOccuranceRow{}
-	err := b.db.Select(&words, `
+func (b *bookLibrary) GetFavoriteFrequencies() (map[string]int, error) {
+	frequencies := []WordOccuranceRow{}
+	frequencyMap := map[string]int{}
+	err := b.db.Select(&frequencies, `
     SELECT word, sum(count) as occurance FROM frequency 
+    WHERE EXISTS (
+      SELECT bookId
+      FROM books
+      WHERE books.bookId==frequency.book
+      AND books.favorite==true
+    )
+    GROUP BY word
+    ORDER BY occurance DESC
+    `)
+
+	if err != nil {
+		return frequencyMap, err
+	}
+
+	for _, frequency := range frequencies {
+		frequencyMap[frequency.Word] = frequency.Occurance
+	}
+	return frequencyMap, nil
+}
+
+func (b *bookLibrary) GetBookFrequencies(bookId int) (map[string]int, error) {
+	frequencies := []WordOccuranceRow{}
+	frequencyMap := map[string]int{}
+	err := b.db.Select(&frequencies, `
+    SELECT word, count as occurance FROM frequency 
+    WHERE book = $1
+    GROUP BY word
+    ORDER BY occurance DESC
+    `, bookId)
+
+	if err != nil {
+		return frequencyMap, err
+	}
+
+	for _, frequency := range frequencies {
+		frequencyMap[frequency.Word] = frequency.Occurance
+	}
+	return frequencyMap, nil
+}
+
+func (b *bookLibrary) LearningTarget() []string {
+	words := []string{}
+	err := b.db.Select(&words, `
+    SELECT word FROM frequency 
     WHERE NOT EXISTS (
         SELECT word
         FROM words
         WHERE words.word==frequency.word
     ) 
     GROUP BY word
-    ORDER BY occurance DESC
+    ORDER BY sum(count) DESC
     LIMIT 200
     `)
 	if err != nil {
@@ -392,10 +437,10 @@ func (b *bookLibrary) LearningTarget() []WordOccuranceRow {
 	return words
 }
 
-func (b *bookLibrary) LearningTargetFavorites() []WordOccuranceRow {
-	words := []WordOccuranceRow{}
+func (b *bookLibrary) LearningTargetFavorites() []string {
+	words := []string{}
 	err := b.db.Select(&words, `
-    SELECT word, sum(count) as occurance FROM frequency 
+    SELECT word FROM frequency 
     WHERE NOT EXISTS (
         SELECT word
         FROM words
@@ -407,7 +452,7 @@ func (b *bookLibrary) LearningTargetFavorites() []WordOccuranceRow {
       AND books.favorite==true
     )
     GROUP BY word
-    ORDER BY occurance DESC
+    ORDER BY sum(count) DESC
     LIMIT 200
     `)
 	if err != nil {
@@ -418,10 +463,10 @@ func (b *bookLibrary) LearningTargetFavorites() []WordOccuranceRow {
 	return words
 }
 
-func (b *bookLibrary) LearningTargetBook(bookId int) []WordOccuranceRow {
-	words := []WordOccuranceRow{}
+func (b *bookLibrary) LearningTargetBook(bookId int) []string {
+	words := []string{}
 	err := b.db.Select(&words, `
-    SELECT word, sum(count) as occurance FROM frequency 
+    SELECT word FROM frequency 
     WHERE NOT EXISTS (
         SELECT word
         FROM words
@@ -429,7 +474,7 @@ func (b *bookLibrary) LearningTargetBook(bookId int) []WordOccuranceRow {
     ) 
     AND book = $1
     GROUP BY word
-    ORDER BY occurance DESC
+    ORDER BY count DESC
     LIMIT 200
     `, bookId)
 	if err != nil {

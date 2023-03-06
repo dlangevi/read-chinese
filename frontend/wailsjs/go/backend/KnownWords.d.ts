@@ -6,7 +6,9 @@ export function AddWord(arg1:string,arg2:number):Promise<Error>;
 
 export function AddWords(arg1:Array<backend.WordEntry>):Promise<Error>;
 
-export function GetUnknownHskWords(arg1:string,arg2:number):Promise<Array<backend.UnknownWordEntry>>;
+export function GetOccurances(arg1:Array<string>):Promise<{[key: string]: number}>;
+
+export function GetUnknownHskWords(arg1:string,arg2:number):Promise<Array<string>>;
 
 export function GetWordStats():Promise<backend.WordStats>;
 

@@ -10,19 +10,23 @@ export function DeleteBook(arg1:number):Promise<Error>;
 
 export function GetBook(arg1:number):Promise<backend.Book>;
 
+export function GetBookFrequencies(arg1:number):Promise<{[key: string]: number}>;
+
 export function GetBooks():Promise<Array<backend.Book>>;
 
 export function GetDetailedBooks(arg1:string):Promise<Array<backend.Book>>;
+
+export function GetFavoriteFrequencies():Promise<{[key: string]: number}>;
 
 export function GetSomeBooks(arg1:Array<number>):Promise<Array<backend.Book>>;
 
 export function HealthCheck():Promise<string>;
 
-export function LearningTarget():Promise<Array<backend.WordOccuranceRow>>;
+export function LearningTarget():Promise<Array<string>>;
 
-export function LearningTargetBook(arg1:number):Promise<Array<backend.WordOccuranceRow>>;
+export function LearningTargetBook(arg1:number):Promise<Array<string>>;
 
-export function LearningTargetFavorites():Promise<Array<backend.WordOccuranceRow>>;
+export function LearningTargetFavorites():Promise<Array<string>>;
 
 export function RecalculateBooks():Promise<Error>;
 

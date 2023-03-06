@@ -24,7 +24,6 @@
           <input
             v-model="currentSearch"
             type="text"
-            prefix="foo"
             placeholder="Input a search as if this were the anki browse window"
             class="input-primary input w-full"
           >
