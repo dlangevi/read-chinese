@@ -8,7 +8,6 @@ import BookLibrary from '@/views/BookLibrary.vue';
 import UserStats from '@/views/UserStats.vue';
 import WordLists from '@/views/WordLists.vue';
 import FlashCards from '@/views/FlashCards.vue';
-import MakeCards from '@/views/MakeCards.vue';
 import BookStats from '@/views/BookStats.vue';
 
 import App from './App.vue';
@@ -54,11 +53,6 @@ const router = createRouter({
       path: '/FlashCards',
       name: 'FlashCards',
       component: FlashCards,
-    },
-    {
-      path: '/MakeCards',
-      name: 'MakeCards',
-      component: MakeCards,
     },
     {
       path: '/book/:bookId',

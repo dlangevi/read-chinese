@@ -74,13 +74,15 @@ watch(selectedDefs, async () => {
 });
 
 onBeforeMount(async () => {
-  const originalDefinitions =
-    props.english
-      ? cardManager.originalValues?.englishDefn
-      : cardManager.originalValues?.chineseDefn;
-  if (originalDefinitions) {
-    selectedDefs.value.push(...originalDefinitions);
-    definitions.value.push(...originalDefinitions);
+  if (cardManager.originalValues) {
+    const originalDefinitions =
+      props.english
+        ? cardManager.originalValues.englishDefn
+        : cardManager.originalValues.chineseDefn;
+    if (originalDefinitions) {
+      selectedDefs.value.push(...originalDefinitions);
+      definitions.value.push(...originalDefinitions);
+    }
   }
 
   definitions.value.push(...(await GetDefinitionsForWord(
@@ -95,9 +97,10 @@ onBeforeMount(async () => {
     );
   }));
 
-  if (!originalDefinitions && props.english
-    ? UserSettings.CardCreation.PopulateEnglish
-    : UserSettings.CardCreation.PopulateChinese
+  if (!cardManager.originalValues &&
+      (props.english
+        ? UserSettings.CardCreation.PopulateEnglish
+        : UserSettings.CardCreation.PopulateChinese)
   ) {
     calculateDefault();
   }

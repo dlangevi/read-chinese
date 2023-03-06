@@ -79,6 +79,7 @@ const currentSearch = ref('');
 const searchPrefix = `deck:${activeDeck} note:${activeModel}`;
 const searches = {
   Flagged: '-flag:0',
+  Suspended: 'is:suspended',
   'Missing Sentence': `"${currentMapping.exampleSentence}:"`,
   'Missing Sentence Audio': `-"${
     currentMapping.exampleSentence
@@ -88,6 +89,7 @@ const searches = {
   'Missing Image': `"${currentMapping.images}:"`,
   'Missing Hanzi Audio': `"${currentMapping.hanziAudio}:"`,
   'Missing Pinyin': `"${currentMapping.pinyin}:"`,
+  'Long Sentence': `"${currentMapping.exampleSentence}:re:^.{40,}$"`,
 };
 
 const columnDefs:ColDef[] = [

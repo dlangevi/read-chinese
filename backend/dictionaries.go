@@ -210,10 +210,16 @@ func (d *Dictionaries) GetDefinitions(words []string) WordDefinitions {
 	return entries
 }
 
-func (d *Dictionaries) GetPossibleWords(partial string) WordDefinitions {
+func (d *Dictionaries) GetPossibleWords(partial string) []UnknownWordEntry {
 	words := d.PrimaryDict.GetPartialMatches(partial)
+	unknown := []UnknownWordEntry{}
 	// TODO filter out known
-	return d.GetDefinitions(words)
+	for _, word := range words {
+		unknown = append(unknown, UnknownWordEntry{
+			Word: word,
+		})
+	}
+	return unknown
 }
 
 func (d *Dictionaries) IsInDictionary(word string) bool {

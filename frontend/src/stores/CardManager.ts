@@ -204,9 +204,10 @@ export const useCardManager = defineStore('CardManager', {
         const firstStep = this.steps.find(
           (step) => keySteps.includes(step));
         if (!firstStep) {
-          throw new Error('Somehow keySteps did not have any valid steps');
+          this.currentStep = StepsEnum.SENTENCE;
+        } else {
+          this.currentStep = firstStep;
         }
-        this.currentStep = firstStep;
       } else {
         this.currentStep = StepsEnum.SENTENCE;
       }

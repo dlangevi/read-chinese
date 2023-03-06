@@ -18,6 +18,15 @@
           </option>
         </select>
       </div>
+      <div v-if="gridSource=='search'">
+        <input
+          v-model="searchBox"
+          type="text"
+          placeholder="Input here (using 汉字 for now)"
+          class="input-primary input mx-auto w-full"
+          @input="onUpdateSearchBox"
+        >
+      </div>
       <div
         v-if="gridSource=='hsk'"
         class="flex place-content-between"
@@ -89,6 +98,7 @@ import {
 import { ImportAnkiKeywords } from '@wailsjs/backend/ankiInterface';
 import UnknownWords from '../components/UnknownWords.vue';
 import { useLoader } from '@/lib/loading';
+import { GetPossibleWords } from '@wailsjs/backend/Dictionaries';
 
 import { useCardQueue } from '@/stores/CardQueue';
 import { getUserSettings } from '@/lib/userSettings';
@@ -119,10 +129,12 @@ const sources = [
   'all books',
   'favorites',
   'hsk',
+  'search',
 ];
 
 const words = ref<backend.UnknownWordEntry[]>([]);
 const gridSource = ref('all books');
+const searchBox = ref('');
 async function changeSource() {
   const newSource = gridSource.value;
   if (newSource === 'all books') {
@@ -170,6 +182,12 @@ async function makeCards() {
   topWords.forEach((word) => {
     store.addWord({ word: word.word });
   });
+}
+
+async function onUpdateSearchBox() {
+  if (searchBox.value.length !== 0) {
+    words.value = await GetPossibleWords(searchBox.value);
+  }
 }
 
 </script>

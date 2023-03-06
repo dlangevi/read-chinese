@@ -77,7 +77,7 @@ watch(sentence, async () => {
 
 onBeforeMount(async () => {
   const originalSentence = cardManager.originalValues?.sentence;
-  if (originalSentence) {
+  if (originalSentence?.sentence) {
     sentence.value = originalSentence;
     originalSentences.value.push(originalSentence);
   }
@@ -93,8 +93,8 @@ onBeforeMount(async () => {
         (other) => sen.sentence === other.sentence);
     });
   }
-  // filter out repeats (TODO do this be passing a negative filter to
-  // GetSentencesForWord ?)
+
+  // filter out repeats
   const unfilteredAll = await GetSentencesForWord(cardManager.word, []);
   allSentences.value = unfilteredAll.filter((sen) => {
     return ![...sentences.value, ...originalSentences.value].some(

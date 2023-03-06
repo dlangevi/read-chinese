@@ -71,6 +71,9 @@ func convertToTone(word string) (string, error) {
 
 // For now we just worry about the format we expect from cc-cedict
 func ToStandardPinyin(pinyin string) string {
+	if pinyin == "" {
+		return pinyin
+	}
 	pinyin = strings.Replace(pinyin, "u:", "ü", -1)
 	pinyinSlice := strings.Split(pinyin, " ")
 

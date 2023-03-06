@@ -3,7 +3,6 @@ package backend
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -557,13 +556,18 @@ func (a *ankiInterface) LoadProblemCards(query string) ([]ProblemCard, error) {
 	if err != nil {
 		return problemCards, err
 	}
-
 	currentDeck := a.userSettings.AnkiConfig.ActiveDeck
 	currentNote := a.userSettings.AnkiConfig.ActiveModel
-	prefixedQuery := fmt.Sprintf(`"deck:%v" "note:%v" (%v)`,
-		currentDeck, currentNote, query)
 
-	log.Println(prefixedQuery)
+	trimmed := strings.TrimSpace(query)
+	var prefixedQuery string
+	if trimmed == "" {
+		prefixedQuery = fmt.Sprintf(`"deck:%v" "note:%v"`, currentDeck, currentNote)
+	} else {
+		prefixedQuery = fmt.Sprintf(`"deck:%v" "note:%v" (%v)`,
+			currentDeck, currentNote, trimmed)
+	}
+
 	notes, restErr := a.anki.Notes.Get(prefixedQuery)
 	if restErr != nil {
 		return nil, toError(restErr)

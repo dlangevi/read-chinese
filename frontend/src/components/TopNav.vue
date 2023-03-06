@@ -29,8 +29,6 @@
 <script lang="ts" setup>
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
-import { getUserSettings } from '@/lib/userSettings';
-const UserSettings = getUserSettings();
 const route = useRoute();
 
 type listEntry = {
@@ -41,10 +39,7 @@ type listEntry = {
 
 const navigation = computed(() => [
   { name: 'BookLibrary', href: '/BookLibrary' },
-  ...(UserSettings.meta.EnableExperimental
-    ? [{ name: 'Manage FlashCards', href: '/FlashCards' },
-      { name: 'Create FlashCards', href: '/MakeCards' }]
-    : []),
+  { name: 'Manage FlashCards', href: '/FlashCards' },
   { name: 'Wordlists', href: '/WordLists' },
   { name: 'Stats', href: '/Stats' },
   { name: 'Settings', href: '/Settings' },
