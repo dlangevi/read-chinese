@@ -38,9 +38,9 @@ type listEntry = {
 };
 
 const navigation = computed(() => [
-  { name: 'BookLibrary', href: '/BookLibrary' },
-  { name: 'Manage FlashCards', href: '/FlashCards' },
-  { name: 'Wordlists', href: '/WordLists' },
+  { name: 'Book Library', href: '/BookLibrary' },
+  { name: 'Manage Current Flashcards', href: '/FlashCards' },
+  { name: 'Create New Flashcards', href: '/LearnWords' },
   { name: 'Stats', href: '/Stats' },
   { name: 'Settings', href: '/Settings' },
 ].map((item:listEntry) => {

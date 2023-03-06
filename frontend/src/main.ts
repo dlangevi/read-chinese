@@ -6,7 +6,7 @@ import GlobalSettings from '@/views/GlobalSettings.vue';
 import Welcome from '@/views/Welcome.vue';
 import BookLibrary from '@/views/BookLibrary.vue';
 import UserStats from '@/views/UserStats.vue';
-import WordLists from '@/views/WordLists.vue';
+import LearnWords from '@/views/LearnWords.vue';
 import FlashCards from '@/views/FlashCards.vue';
 import BookStats from '@/views/BookStats.vue';
 
@@ -45,9 +45,9 @@ const router = createRouter({
       component: UserStats,
     },
     {
-      path: '/WordLists',
-      name: 'WordLists',
-      component: WordLists,
+      path: '/LearnWords',
+      name: 'LearnWords',
+      component: LearnWords,
     },
     {
       path: '/FlashCards',
