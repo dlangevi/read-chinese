@@ -9,9 +9,6 @@ type Dictionaries struct {
 	PrimaryDictName string
 	PrimaryDict     Dictionary
 	Dictionaries    map[string]UserDictionary
-	userSettings    *UserConfig
-	known           *KnownWords
-	Segmentation    *Segmentation
 	backend         *Backend
 }
 
@@ -22,16 +19,12 @@ type UserDictionary struct {
 
 func NewDictionaries(
 	backend *Backend,
-	userSettings *UserConfig,
-	known *KnownWords,
 ) *Dictionaries {
 	dicts := &Dictionaries{
-		backend:      backend,
-		userSettings: userSettings,
-		known:        known,
+		backend: backend,
 	}
 	dicts.loadDictionaries()
-	primaryName := userSettings.DictionariesConfig.PrimaryDict
+	primaryName := backend.UserSettings.DictionariesConfig.PrimaryDict
 	dicts.PrimaryDictName = primaryName
 	// TODO this could fail
 	dicts.PrimaryDict = dicts.Dictionaries[primaryName].Dictionary
@@ -48,12 +41,12 @@ func (d *Dictionaries) HealthCheck() string {
 
 // Is this the way to do a reference loop?
 func (d *Dictionaries) PassSegmentation(s *Segmentation) {
-	d.Segmentation = s
+	d.backend.Segmentation = s
 }
 
 func (d *Dictionaries) loadDictionaries() error {
 	d.Dictionaries = map[string]UserDictionary{}
-	for name, dict := range d.userSettings.DictionariesConfig.Dicts {
+	for name, dict := range d.backend.UserSettings.DictionariesConfig.Dicts {
 		newDict, err := FromSavedDictionary(dict.Path)
 		if err != nil {
 			return err
@@ -63,7 +56,7 @@ func (d *Dictionaries) loadDictionaries() error {
 			dict.Language,
 		}
 	}
-	primaryName := d.userSettings.DictionariesConfig.PrimaryDict
+	primaryName := d.backend.UserSettings.DictionariesConfig.PrimaryDict
 	d.PrimaryDictName = primaryName
 	primaryDict, ok := d.Dictionaries[primaryName]
 	if !ok {
@@ -77,8 +70,8 @@ func (d *Dictionaries) loadDictionaries() error {
 	} else {
 		d.PrimaryDict = primaryDict.Dictionary
 	}
-	if d.Segmentation != nil {
-		err := d.Segmentation.ReloadJieba(d)
+	if d.backend.Segmentation != nil {
+		err := d.backend.Segmentation.ReloadJieba(d)
 		if err != nil {
 			return err
 		}
@@ -95,7 +88,7 @@ func (d *Dictionaries) AddCedict() {
 	}
 	savedPath := ConfigDir("userDicts", "cc-cedict")
 	SaveDictionary(dictionary, savedPath)
-	d.userSettings.SaveDict("cc-cedict", savedPath, "english")
+	d.backend.UserSettings.SaveDict("cc-cedict", savedPath, "english")
 	d.loadDictionaries()
 }
 
@@ -104,12 +97,12 @@ func (d *Dictionaries) AddMigakuDictionary(name string, path string, language st
 	dictionary, _ := FromMigakuJsonFormat(path)
 	savedPath := ConfigDir("userDicts", name)
 	SaveDictionary(dictionary, savedPath)
-	d.userSettings.SaveDict(name, savedPath, language)
+	d.backend.UserSettings.SaveDict(name, savedPath, language)
 	d.loadDictionaries()
 }
 
 func (d *Dictionaries) DeleteDictionary(name string) {
-	d.userSettings.DeleteDict(name)
+	d.backend.UserSettings.DeleteDict(name)
 	delete(d.Dictionaries, name)
 }
 
@@ -123,7 +116,7 @@ func (d *Dictionaries) SetPrimaryDict(name string) {
 	}
 
 	d.PrimaryDict = primary.Dictionary
-	d.userSettings.SetPrimaryDict(name)
+	d.backend.UserSettings.SetPrimaryDict(name)
 }
 
 type DictionaryInfoMap map[string]DictionaryInfo
@@ -140,7 +133,7 @@ func (d *Dictionaries) ExportDictionaryInfo() DictionaryInfo {
 
 func (d *Dictionaries) GetDictionaryInfo() DictionaryInfoMap {
 	dictInfoMap := DictionaryInfoMap{}
-	for name, dict := range d.userSettings.DictionariesConfig.Dicts {
+	for name, dict := range d.backend.UserSettings.DictionariesConfig.Dicts {
 		dictInfoMap[name] = DictionaryInfo{
 			Name:      name,
 			Path:      dict.Path,

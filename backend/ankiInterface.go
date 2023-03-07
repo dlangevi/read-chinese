@@ -43,17 +43,13 @@ type ankiInterface struct {
 	backend      *Backend
 	anki         *ankiconnect.Client
 	textToSpeech *TextToSpeech
-	userSettings *UserConfig
-	known        *KnownWords
 }
 
-func NewAnkiInterface(backend *Backend, userSettings *UserConfig, known *KnownWords) *ankiInterface {
+func NewAnkiInterface(backend *Backend) *ankiInterface {
 	return &ankiInterface{
 		backend:      backend,
 		anki:         ankiconnect.NewClient(),
-		textToSpeech: NewTextToSpeach(userSettings),
-		userSettings: userSettings,
-		known:        known,
+		textToSpeech: NewTextToSpeach(backend.UserSettings),
 	}
 }
 
@@ -76,7 +72,7 @@ func (a *ankiInterface) ConfigurationCheck() (string, error) {
 	if restErr != nil {
 		return "", toError(restErr)
 	}
-	if !slices.Contains(*decks, a.userSettings.AnkiConfig.ActiveDeck) {
+	if !slices.Contains(*decks, a.backend.UserSettings.AnkiConfig.ActiveDeck) {
 		return "Active Deck does exist in Anki", nil
 	}
 
@@ -85,7 +81,7 @@ func (a *ankiInterface) ConfigurationCheck() (string, error) {
 	if restErr != nil {
 		return "", toError(restErr)
 	}
-	activeModel := a.userSettings.AnkiConfig.ActiveModel
+	activeModel := a.backend.UserSettings.AnkiConfig.ActiveModel
 	if !slices.Contains(*models, activeModel) {
 		return "Chose Note type does exist in Anki", nil
 	}
@@ -96,7 +92,7 @@ func (a *ankiInterface) ConfigurationCheck() (string, error) {
 	if restErr != nil {
 		return "", toError(restErr)
 	}
-	fieldsConfig := a.userSettings.GetMapping(activeModel)
+	fieldsConfig := a.backend.UserSettings.GetMapping(activeModel)
 
 	allEmpty := true
 	for fieldName, value := range map[string]string{
@@ -131,8 +127,8 @@ func (a *ankiInterface) ConfigurationCheck() (string, error) {
 
 func (a *ankiInterface) getConfiguredMapping() (FieldsMapping, error) {
 
-	currentModel := a.userSettings.AnkiConfig.ActiveModel
-	currentSettings := a.userSettings.GetMapping(currentModel)
+	currentModel := a.backend.UserSettings.AnkiConfig.ActiveModel
+	currentSettings := a.backend.UserSettings.GetMapping(currentModel)
 	// Required fields are:
 	// Hanzi: yes
 	// ExampleSentence: yes
@@ -181,14 +177,14 @@ func (a *ankiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 		})
 		return nil
 	}
-	if a.userSettings.AnkiConfig.GenerateTermAudio {
+	if a.backend.UserSettings.AnkiConfig.GenerateTermAudio {
 		err := addAudio(fields.Word, currentMapping.HanziAudio)
 		if err != nil {
 			return err
 		}
 	}
 	// dont generate if sentence is empty
-	if a.userSettings.AnkiConfig.GenerateSentenceAudio && len(fields.Sentence) > 0 {
+	if a.backend.UserSettings.AnkiConfig.GenerateSentenceAudio && len(fields.Sentence) > 0 {
 		err := addAudio(fields.Sentence, currentMapping.SentenceAudio)
 		if err != nil {
 			return err
@@ -244,12 +240,12 @@ func (a *ankiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 	}
 
 	note := ankiconnect.Note{
-		DeckName:  a.userSettings.AnkiConfig.ActiveDeck,
-		ModelName: a.userSettings.AnkiConfig.ActiveModel,
+		DeckName:  a.backend.UserSettings.AnkiConfig.ActiveDeck,
+		ModelName: a.backend.UserSettings.AnkiConfig.ActiveModel,
 		Fields:    noteFields,
 		Tags:      tags,
 		Options: &ankiconnect.Options{
-			AllowDuplicate: a.userSettings.AnkiConfig.AllowDuplicates,
+			AllowDuplicate: a.backend.UserSettings.AnkiConfig.AllowDuplicates,
 		},
 		Audio:   audio,
 		Picture: pictures,
@@ -259,7 +255,7 @@ func (a *ankiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 		return toError(restErr)
 	}
 
-	a.known.AddWord(fields.Word, 0)
+	a.backend.KnownWords.AddWord(fields.Word, 0)
 
 	return nil
 }
@@ -461,7 +457,7 @@ func (a *ankiInterface) UpdateNoteFields(noteId int64, fields Fields) error {
 		// TODO: if there was a 'Sentence Translation' field of some sort
 		// It needs to be changed. Also TODO generate our own translations?
 		ankiFields[currentMapping.ExampleSentence] = fields.Sentence
-		if a.userSettings.AnkiConfig.GenerateSentenceAudio {
+		if a.backend.UserSettings.AnkiConfig.GenerateSentenceAudio {
 			audio, err := a.createAudio(fields.Sentence, currentMapping.SentenceAudio)
 			if err != nil {
 				return err
@@ -511,7 +507,7 @@ func (a *ankiInterface) ImportAnkiKeywords() error {
 		return err
 	}
 	cards, restErr := a.anki.Cards.Get(
-		fmt.Sprintf(`"deck:%v"`, a.userSettings.AnkiConfig.ActiveDeck))
+		fmt.Sprintf(`"deck:%v"`, a.backend.UserSettings.AnkiConfig.ActiveDeck))
 	if restErr != nil {
 		return toError(restErr)
 	}
@@ -524,7 +520,7 @@ func (a *ankiInterface) ImportAnkiKeywords() error {
 			Interval: card.Interval,
 		})
 	}
-	return a.known.AddWords(words)
+	return a.backend.KnownWords.AddWords(words)
 }
 
 type FlaggedCard struct {
@@ -556,8 +552,8 @@ func (a *ankiInterface) LoadProblemCards(query string) ([]ProblemCard, error) {
 	if err != nil {
 		return problemCards, err
 	}
-	currentDeck := a.userSettings.AnkiConfig.ActiveDeck
-	currentNote := a.userSettings.AnkiConfig.ActiveModel
+	currentDeck := a.backend.UserSettings.AnkiConfig.ActiveDeck
+	currentNote := a.backend.UserSettings.AnkiConfig.ActiveModel
 
 	trimmed := strings.TrimSpace(query)
 	var prefixedQuery string

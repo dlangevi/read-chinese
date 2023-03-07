@@ -84,6 +84,7 @@ func NewBackend(
 	ran := userSettings.GetTimesRan()
 	log.Printf("Ran %v times", ran)
 
+	// The order of setup may be important
 	backend := &Backend{
 		sqlPath:      sqlPath,
 		metadataPath: metadataPath,
@@ -94,8 +95,8 @@ func NewBackend(
 		ImageClient: NewImageClient(userSettings),
 	}
 
-	backend.Dictionaries = NewDictionaries(backend, userSettings, backend.KnownWords)
-	backend.AnkiInterface = NewAnkiInterface(backend, userSettings, backend.KnownWords)
+	backend.Dictionaries = NewDictionaries(backend)
+	backend.AnkiInterface = NewAnkiInterface(backend)
 
 	err = UnloadJiebaDicts()
 	if err != nil {
@@ -106,10 +107,10 @@ func NewBackend(
 		log.Fatal(err)
 	}
 
-	backend.BookLibrary = NewBookLibrary(backend, db, s, backend.KnownWords)
+	backend.BookLibrary = NewBookLibrary(backend, db)
 	backend.Segmentation = s
-	backend.Generator = NewGenerator(userSettings, s, backend.BookLibrary, backend.KnownWords)
-	backend.Calibre = NewCalibre(backend, backend.BookLibrary, backend.Generator)
+	backend.Generator = NewGenerator(backend)
+	backend.Calibre = NewCalibre(backend)
 
 	return backend
 }

@@ -52,10 +52,8 @@ type (
 
 	// bookLibrary implements bookLibrary
 	bookLibrary struct {
-		backend      *Backend
-		db           *sqlx.DB
-		segmentation *Segmentation
-		known        *KnownWords
+		backend *Backend
+		db      *sqlx.DB
 	}
 
 	Book struct {
@@ -113,14 +111,10 @@ func NewBookStats() BookStats {
 func NewBookLibrary(
 	b *Backend,
 	db *sqlx.DB,
-	s *Segmentation,
-	known *KnownWords,
 ) *bookLibrary {
 	return &bookLibrary{
-		backend:      b,
-		db:           db,
-		segmentation: s,
-		known:        known,
+		backend: b,
+		db:      db,
 	}
 }
 
@@ -149,7 +143,7 @@ func (b *bookLibrary) RecalculateBooks() error {
 	for _, book := range books {
 		log.Println("Processing:", book.Title, "...")
 		filepath := book.Filepath
-		sentences, wordTable, err := b.segmentation.SegmentFullText(filepath)
+		sentences, wordTable, err := b.backend.Segmentation.SegmentFullText(filepath)
 		if err != nil {
 			return err
 		}
@@ -189,7 +183,7 @@ func (b *bookLibrary) AddBook(
 	if err != nil {
 		return 0, err
 	}
-	sentences, wordTable, err := b.segmentation.SegmentFullText(filepath)
+	sentences, wordTable, err := b.backend.Segmentation.SegmentFullText(filepath)
 	if err != nil {
 		return 0, err
 	}
@@ -572,13 +566,13 @@ func (b *bookLibrary) computeKnownCharacters(book *Book) error {
 		uniqueWords[row.Word] = true
 		for _, char := range row.Word {
 			uniqueCharacters[char] = true
-			if b.known.isKnownChar(char) {
+			if b.backend.KnownWords.isKnownChar(char) {
 				knownCharacters += row.Count
 			} else {
 				allKnown = false
 			}
 		}
-		if b.known.isKnown(row.Word) || allKnown {
+		if b.backend.KnownWords.isKnown(row.Word) || allKnown {
 			probablyKnownWords += row.Count
 		}
 	}

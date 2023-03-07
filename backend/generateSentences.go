@@ -10,35 +10,26 @@ import (
 )
 
 type Generator struct {
-	userSettings  *UserConfig
-	segmentation  *Segmentation
-	bookLibrary   BookLibrary
-	known         *KnownWords
 	sentenceCache map[string]SentenceCache
 	cacheComplete bool
 	mapLock       *sync.RWMutex
 	cacheLock     *sync.Mutex
 	bookCache     map[string][]TokenizedSentence
+	backend       *Backend
 }
 
 type SentenceCache = map[string][]TokenizedSentence
 
 func NewGenerator(
-	userSettings *UserConfig,
-	s *Segmentation,
-	b BookLibrary,
-	known *KnownWords,
+	backend *Backend,
 ) *Generator {
 	generator := Generator{
-		userSettings:  userSettings,
-		segmentation:  s,
-		bookLibrary:   b,
-		known:         known,
 		sentenceCache: map[string]SentenceCache{},
 		cacheComplete: false,
 		mapLock:       &sync.RWMutex{},
 		cacheLock:     &sync.Mutex{},
 		bookCache:     map[string][]TokenizedSentence{},
+		backend:       backend,
 	}
 	go generator.GenerateSentenceTable()
 	return &generator
@@ -57,7 +48,7 @@ func (g *Generator) isT1Sentence(sentence []Token) (bool, string) {
 	haventFoundAnyYet := true
 	firstUnknown := ""
 	for _, token := range sentence {
-		if token.IsWord && !g.known.isWellKnown(token.Data) {
+		if token.IsWord && !g.backend.KnownWords.isWellKnown(token.Data) {
 			if haventFoundAnyYet {
 				haventFoundAnyYet = false
 				firstUnknown = token.Data
@@ -77,7 +68,7 @@ func (g *Generator) passesKnownCheck(sentence []Token, word string) bool {
 		if word == token.Data {
 			foundWord = true
 		}
-		if token.IsWord && !g.known.isKnown(token.Data) {
+		if token.IsWord && !g.backend.KnownWords.isKnown(token.Data) {
 			return false
 		}
 	}
@@ -87,7 +78,7 @@ func (g *Generator) passesKnownCheck(sentence []Token, word string) bool {
 
 func (g *Generator) isT1Candidate(sentence []Token, word string) bool {
 	for _, token := range sentence {
-		if token.IsWord && word != token.Data && !g.known.isWellKnown(token.Data) {
+		if token.IsWord && word != token.Data && !g.backend.KnownWords.isWellKnown(token.Data) {
 			return false
 		}
 	}
@@ -148,7 +139,7 @@ func (g *Generator) GenerateSentenceTable() error {
 	defer g.cacheLock.Unlock()
 	defer duration(track("Full Generate"))
 	numSentences := 0
-	books, _ := g.bookLibrary.GetSomeBooks()
+	books, _ := g.backend.BookLibrary.GetSomeBooks()
 	g.sentenceCache = map[string]SentenceCache{}
 	var wg sync.WaitGroup
 	for _, book := range books {
@@ -165,7 +156,7 @@ func (g *Generator) GenerateSentenceTable() error {
 
 func (g *Generator) UpdateSentenceTable(newWord string) error {
 	defer duration(track("New Word Generate"))
-	books, _ := g.bookLibrary.GetSomeBooks()
+	books, _ := g.backend.BookLibrary.GetSomeBooks()
 
 	var wg sync.WaitGroup
 	for _, book := range books {
@@ -224,10 +215,10 @@ func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]Sentenc
 	g.cacheLock.Lock()
 	defer g.cacheLock.Unlock()
 
-	books, _ := g.bookLibrary.GetSomeBooks(bookIds...)
+	books, _ := g.backend.BookLibrary.GetSomeBooks(bookIds...)
 	sentences := []Sentence{}
 
-	if g.known.isKnown(word) {
+	if g.backend.KnownWords.isKnown(word) {
 		// Have to do a slower lookup in completly known sentences
 		for _, book := range books {
 			bookSentences, ok := g.bookCache[book.Title]
@@ -267,7 +258,7 @@ func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]Sentenc
 			}
 		}
 	}
-	idealLength := g.userSettings.SentenceGenerationConfig.IdealSentenceLength
+	idealLength := g.backend.UserSettings.SentenceGenerationConfig.IdealSentenceLength
 	rankSentences(sentences, idealLength)
 	min := math.Min(float64(len(sentences)), 8)
 	sentences = sentences[0:int(min)]

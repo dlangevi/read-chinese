@@ -8,16 +8,12 @@ import (
 )
 
 type Calibre struct {
-	backend     *Backend
-	bookLibrary BookLibrary
-	generator   *Generator
+	backend *Backend
 }
 
-func NewCalibre(backend *Backend, b BookLibrary, g *Generator) *Calibre {
+func NewCalibre(backend *Backend) *Calibre {
 	return &Calibre{
-		backend:     backend,
-		bookLibrary: b,
-		generator:   g,
+		backend: backend,
 	}
 }
 
@@ -63,7 +59,7 @@ func (c *Calibre) ImportCalibreBooks() error {
 	c.backend.setupProgress("Processing calibre books", len(books))
 	for _, book := range books {
 		log.Println("Trying", book.Author, book.Title)
-		exists, err := c.bookLibrary.BookExists(book.Author, book.Title)
+		exists, err := c.backend.BookLibrary.BookExists(book.Author, book.Title)
 		if err != nil {
 			log.Println("error ", err)
 			return err
@@ -72,17 +68,17 @@ func (c *Calibre) ImportCalibreBooks() error {
 			log.Println("Potential new book", book.Author, book.Title)
 			for _, format := range book.Formats {
 				if strings.HasSuffix(format, ".txt") {
-					bookId, err := c.bookLibrary.AddBook(book.Author, book.Title, book.Cover, format)
+					bookId, err := c.backend.BookLibrary.AddBook(book.Author, book.Title, book.Cover, format)
 					if err != nil {
 						log.Println("error ", err)
 						return err
 					}
-					book, err := c.bookLibrary.GetBook(bookId)
+					book, err := c.backend.BookLibrary.GetBook(bookId)
 					if err != nil {
 						log.Println("error ", err)
 						return err
 					}
-					c.generator.GenerateSentenceTableForBook(book)
+					c.backend.Generator.GenerateSentenceTableForBook(book)
 
 					break
 				}
