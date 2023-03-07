@@ -39,12 +39,13 @@ import { SettingsSharp, CloseCircleSharp } from '@vicons/ionicons5';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
 import { ComponentTable, getUserSettings } from '@/lib/userSettings';
+import { backend } from '@wailsjs/models';
 
 const UserSettings = getUserSettings();
 const CardCreation = UserSettings.CardCreation;
 
-function getValue(key :string) {
-  return CardCreation[key as keyof typeof CardCreation] as boolean;
+function getValue(key : keyof backend.CardCreationConfig) {
+  return CardCreation[key];
 }
 const cardSettingsModal = ref(false);
 </script>

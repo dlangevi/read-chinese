@@ -232,7 +232,13 @@ const nextAction = computed(() => {
 });
 function recheck() {
   Object.values(checks).forEach(async (check) => {
-    check.checkResult = await check.checkAction();
+    check.checkAction()
+      .then(result => {
+        check.checkResult = result;
+      })
+      .catch(errMsg => {
+        check.checkResult = errMsg;
+      });
   });
 }
 recheck();
