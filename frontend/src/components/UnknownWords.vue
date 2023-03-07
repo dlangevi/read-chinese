@@ -26,7 +26,7 @@ import {
   GetFavoriteFrequencies,
 } from '@wailsjs/backend/bookLibrary';
 import { GetOccurances } from '@wailsjs/backend/KnownWords';
-import type { WordDefinitions } from '@/lib/brokenTypes';
+import type { WordDefinitions, UnknownWordRow } from '@/lib/types';
 
 import { useCardQueue } from '@/stores/CardQueue';
 
@@ -92,7 +92,7 @@ const columnDefs:ColDef[] = [
   },
 ];
 
-const rowData = ref<any[]>([]);
+const rowData = ref<UnknownWordRow[]>([]);
 watch(() => props.words, async () => {
   updateWords();
 });
@@ -110,9 +110,8 @@ async function updateWords() {
     occurances = await GetOccurances(props.words);
   }
   rowData.value = props.words.map((word) => {
-    const row:any = {};
+    const row : UnknownWordRow = { word };
     const definition = definitions[word];
-    row.word = word;
     if (definition) {
       row.definition = definition.definition;
       row.pinyin = definition.pronunciation;

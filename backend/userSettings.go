@@ -30,7 +30,6 @@ type (
 		LibraryConfig LibraryConfig `json:"BookLibrary"`
 
 		// Card Management
-		CardManagementConfig CardManagementConfig `json:"CardManagement"`
 	}
 
 	MetaSettings struct {
@@ -96,15 +95,6 @@ type (
 		OnlyFavorites bool `json:"OnlyFavorites"`
 		HideRead      bool `json:"HideRead"`
 	}
-
-	CardManagementConfig struct {
-		ProblemFlagged              bool `json:"ProblemFlagged"`
-		ProblemMissingImage         bool `json:"ProblemMissingImage"`
-		ProblemMissingSentence      bool `json:"ProblemMissingSentence"`
-		ProblemMissingSentenceAudio bool `json:"ProblemMissingSentenceAudio"`
-		ProblemMissingWordAudio     bool `json:"ProblemMissingWordAudio"`
-		ProblemMissingPinyin        bool `json:"ProblemMissingPinyin"`
-	}
 )
 
 func defaultConfig(path string) *UserConfig {
@@ -166,15 +156,6 @@ func defaultConfig(path string) *UserConfig {
 		LibraryConfig: LibraryConfig{
 			OnlyFavorites: false,
 			HideRead:      false,
-		},
-
-		CardManagementConfig: CardManagementConfig{
-			ProblemFlagged:              true,
-			ProblemMissingImage:         true,
-			ProblemMissingSentence:      true,
-			ProblemMissingSentenceAudio: true,
-			ProblemMissingWordAudio:     true,
-			ProblemMissingPinyin:        true,
 		},
 	}
 }

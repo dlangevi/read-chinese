@@ -10,23 +10,24 @@
 <script lang="ts" setup>
 import { useCardQueue } from '@/stores/CardQueue';
 import type { ICellRendererParams } from 'ag-grid-community';
+import type { UnknownWordRow } from '@/lib/types';
 
 const props = defineProps<{
-  params: ICellRendererParams,
+  params: ICellRendererParams<UnknownWordRow>,
 }>();
 
 const store = useCardQueue();
 async function addToQueue() {
   const rowData = props.params.data;
-  // For now while there are mixed columns
-  const word = rowData.word || rowData.Word;
-  store.addWord({ word },
-    () => {
-      props.params.api.applyTransaction({
-        remove: [rowData],
-      });
-    },
-    props.params.context?.bookId);
+  if (rowData) {
+    store.addWord({ word: rowData.word },
+      () => {
+        props.params.api.applyTransaction({
+          remove: [rowData],
+        });
+      },
+      props.params.context?.bookId);
+  }
 }
 
 </script>

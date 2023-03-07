@@ -13,7 +13,7 @@ import ModelManager
   from '@/components/SettingsWidgets/ModelManager.vue';
 import SettingsSlider
   from '@/components/SettingsWidgets/SettingsSlider.vue';
-import type { backend } from '@wailsjs/models';
+import { backend } from '@wailsjs/models';
 
 import {
   SetUserSetting,
@@ -22,36 +22,40 @@ import {
   GetUserSettings,
 } from '@wailsjs/backend/UserConfig';
 
-export type UserSetting = {
+type SettingsSetter<Type> = (arg1: string, arg2: Type) => Promise<void>
+
+type SettingsWidgets =
+  typeof SettingsCheckbox |
+  typeof SettingsTextbox |
+  typeof SettingsSelector |
+  typeof DictionariesList |
+  typeof ModelManager |
+  typeof SettingsSlider
+
+export type UserSetting<T> = {
   name:string;
   label:string;
   tooltip?:string;
-  type:any;
-  write:any;
-  dataSource?: () => Promise<any>;
+  type?: SettingsWidgets;
+  write: (arg: T) => Promise<void>;
+  dataSource?: () => Promise<string[]>;
 };
 
-type UserConfigDisplay = {
-  [K in keyof backend.UserConfig]: {
-    [P in keyof backend.UserConfig[K]]?: UserSetting
-  }
-}
-
 export let updateSettings = async () => {};
-function settingsObject(
+function settingsObject<Type>(
   name:string,
   label:string,
   tooltip:string|undefined,
-  widgetType:any,
-  setter:any,
-):UserSetting {
-  const option:UserSetting = {
+  widgetType:SettingsWidgets,
+  setter:SettingsSetter<Type>,
+):UserSetting<Type> {
+  const option:UserSetting<Type> = {
     name,
     label,
     tooltip,
     type: widgetType,
-    write: async function write(newValue:any) {
-      console.log('writing', name, newValue);
+    write: async function write(newValue: Type) {
+      // TODO this is the one part I need to iron out
       await setter(name, newValue);
       await updateSettings();
     },
@@ -64,14 +68,13 @@ function selector(
   label:string,
   dataSource: () => Promise<string[]>,
   tooltip?:string,
-):UserSetting {
-  const option:UserSetting = {
+):UserSetting<string> {
+  const option:UserSetting<string> = {
     name,
     label,
     tooltip,
     type: SettingsSelector,
     write: async function write(newValue:string) {
-      console.log('writing', name, newValue);
       await SetUserSetting(name, newValue);
       await updateSettings();
     },
@@ -122,199 +125,177 @@ function slider(
   );
 }
 
-function loadSettings(settings : UserSetting[]) {
-  const options :{ [label:string]:UserSetting } = {};
-  settings.forEach((setting) => {
-    if (setting.name !== undefined) {
-      options[setting.name] = setting;
-    }
-  });
-  return options;
+type UserConfigDisplay = {
+  [K in keyof backend.UserConfig]: {
+    [P in keyof backend.UserConfig[K]]?:
+    UserSetting<backend.UserConfig[K][P]>
+  }
 }
 
-export const ComponentTable = loadSettings([
-  selector(
-    'Theme',
-    'Select Theme',
-    async function () {
-      return [
-        'light', 'dark', 'cupcake',
-        'bumblebee', 'emerald', 'corporate',
-        'synthwave', 'retro', 'cyberpunk',
-        'valentine', 'halloween', 'garden',
-        'forest', 'aqua', 'lofi', 'pastel',
-        'fantasy', 'wireframe', 'black',
-        'luxury', 'dracula', 'cmyk',
-        'autumn', 'business', 'acid',
-        'lemonade', 'night', 'coffee', 'winter',
-      ];
-    },
-  ),
-  checkBox(
-    'EnableExperimental',
-    'Enable Experimental Features',
-    'Only do this if you are me',
-  ),
-  selector(
-    'ActiveDeck',
-    'Active Anki Deck',
-    LoadDecks,
-  ),
-  selector(
-    'ActiveModel',
-    'Active Anki Model',
-    LoadModels,
-  ),
-  checkBox(
-    'AutoAdvanceSentence',
-    'Auto advance after sentence selection',
-    'After picking a sentence, move to the next step',
-  ),
-  checkBox(
-    'PopulateEnglish',
-    'Auto fill english definitions',
-    'If only one definition exists, auto select it',
-  ),
-  checkBox(
-    'PopulateChinese',
-    'Auto fill chinese definitions',
-    'If only one definition exists, auto select it',
-  ),
-  checkBox(
-    'AutoAdvanceEnglish',
-    'Auto advance after english definition selection',
-    'After picking an english definition, move to the next step',
-  ),
-  checkBox(
-    'AutoAdvanceChinese',
-    'Auto advance after chinese definition selection',
-    'After picking a chinese definition, move to the next step',
-  ),
-  checkBox(
-    'AutoAdvanceImage',
-    'Auto advance after image selection',
-    'After picking a image, move to the next step',
-  ),
-  checkBox(
-    'AutoAdvanceCard',
-    'Create card once all fields have been filled',
-    'Create card once all fields have been filled',
-  ),
-  {
-    name: 'Dicts',
-    label: 'Dictionaries',
-    type: DictionariesList,
-  } as UserSetting,
-  checkBox(
-    'ShowDefinitions',
-    'Show Definitions',
-    'Show the definitions for words in various tables',
-  ),
-  checkBox(
-    'EnableChinese',
-    'Use Chinese definitions',
-    'Allow flashcards to use chinese ' +
+export const ComponentTable : UserConfigDisplay = {
+  meta: {
+    EnableExperimental: checkBox(
+      'EnableExperimental',
+      'Enable Experimental Features',
+      'Only do this if you are me',
+    ),
+    Theme: selector(
+      'Theme',
+      'Select Theme',
+      async function () {
+        return [
+          'light', 'dark', 'cupcake',
+          'bumblebee', 'emerald', 'corporate',
+          'synthwave', 'retro', 'cyberpunk',
+          'valentine', 'halloween', 'garden',
+          'forest', 'aqua', 'lofi', 'pastel',
+          'fantasy', 'wireframe', 'black',
+          'luxury', 'dracula', 'cmyk',
+          'autumn', 'business', 'acid',
+          'lemonade', 'night', 'coffee', 'winter',
+        ];
+      },
+    ),
+  },
+  CardCreation: {
+    AutoAdvanceSentence: checkBox(
+      'AutoAdvanceSentence',
+      'Auto advance after sentence selection',
+      'After picking a sentence, move to the next step',
+    ),
+
+    PopulateEnglish: checkBox(
+      'PopulateEnglish',
+      'Auto fill english definitions',
+      'If only one definition exists, auto select it',
+    ),
+    PopulateChinese: checkBox(
+      'PopulateChinese',
+      'Auto fill chinese definitions',
+      'If only one definition exists, auto select it',
+    ),
+    AutoAdvanceEnglish: checkBox(
+      'AutoAdvanceEnglish',
+      'Auto advance after english definition selection',
+      'After picking an english definition, move to the next step',
+    ),
+    AutoAdvanceChinese: checkBox(
+      'AutoAdvanceChinese',
+      'Auto advance after chinese definition selection',
+      'After picking a chinese definition, move to the next step',
+    ),
+    AutoAdvanceImage: checkBox(
+      'AutoAdvanceImage',
+      'Auto advance after image selection',
+      'After picking a image, move to the next step',
+    ),
+    AutoAdvanceCard: checkBox(
+      'AutoAdvanceCard',
+      'Create card once all fields have been filled',
+      'Create card once all fields have been filled',
+    ),
+
+  },
+  AnkiConfig: {
+
+    ActiveDeck: selector(
+      'ActiveDeck',
+      'Active Anki Deck',
+      LoadDecks,
+    ),
+    ActiveModel: selector(
+      'ActiveModel',
+      'Active Anki Model',
+      LoadModels,
+    ),
+
+    ModelMappings: {
+      name: 'ModelMappings',
+      label: 'ModelManager',
+      type: ModelManager,
+    } as UserSetting<{ [key: string]: backend.FieldsMapping }>,
+
+    AllowDuplicates: checkBox(
+      'AllowDuplicates',
+      'Allow Duplicates',
+    ),
+    GenerateTermAudio: checkBox(
+      'GenerateTermAudio',
+      'Auto generate audio for keyword',
+    ),
+    GenerateSentenceAudio: checkBox(
+      'GenerateSentenceAudio',
+      'Auto generate audio for example sentence',
+    ),
+
+    AzureApiKey: textBox(
+      'AzureApiKey',
+      'Azure Audio Api Key',
+      'Setup an free azure tts account and put your key here',
+    ),
+    AzureImageApiKey: textBox(
+      'AzureImageApiKey',
+      'Azure Image Api Key',
+      'Setup an free azure bing search and put your key here',
+    ),
+
+    AddProgramTag: checkBox(
+      'AddProgramTag',
+      'Add read-chinese tag',
+    ),
+    AddBookTag: checkBox(
+      'AddBookTag',
+      'Add source book title tag',
+    ),
+  },
+  Dictionaries: {
+    Dicts: {
+      name: 'Dicts',
+      label: 'Dictionaries',
+      type: DictionariesList,
+    } as UserSetting<{ [key: string]: backend.Dict }>,
+
+    ShowDefinitions: checkBox(
+      'ShowDefinitions',
+      'Show Definitions',
+      'Show the definitions for words in various tables',
+    ),
+    EnableChinese: checkBox(
+      'EnableChinese',
+      'Use Chinese definitions',
+      'Allow flashcards to use chinese ' +
       'definitions instead of just english ones',
-  ),
-  slider(
-    'KnownInterval',
-    'Time before a word is considered "known"',
-    'How long of an interval in anki before a word is ' +
+    ),
+  },
+  SentenceGeneration: {
+
+    KnownInterval: slider(
+      'KnownInterval',
+      'Time before a word is considered "known"',
+      'How long of an interval in anki before a word is ' +
       ' included in generated sentences',
-  ),
-  slider(
-    'IdealSentenceLength',
-    'Ideal Sentence Length"',
-    'What the ideal sentence length you want to be selected from books',
-  ),
-  {
-    name: 'ModelMappings',
-    label: 'ModelManager',
-    type: ModelManager,
-  } as UserSetting,
-  checkBox(
-    'AddProgramTag',
-    'Add read-chinese tag',
-  ),
-  checkBox(
-    'AddBookTag',
-    'Add source book title tag',
-  ),
-  checkBox(
-    'AllowDuplicates',
-    'Allow Duplicates',
-  ),
-  checkBox(
-    'GenerateTermAudio',
-    'Auto generate audio for keyword',
-  ),
-  checkBox(
-    'GenerateSentenceAudio',
-    'Auto generate audio for example sentence',
-  ),
-  textBox(
-    'AzureApiKey',
-    'Azure Audio Api Key',
-    'Setup an free azure tts account and put your key here',
-  ),
-  textBox(
-    'AzureImageApiKey',
-    'Azure Image Api Key',
-    'Setup an free azure bing search and put your key here',
-  ),
-  checkBox(
-    'OnlyFavorites',
-    'Only show favorited books',
-  ),
-  checkBox(
-    'HideRead',
-    'Hide read books',
-  ),
-  checkBox(
-    'ProblemFlagged',
-    'Flagged Cards',
-  ),
-  checkBox(
-    'ProblemMissingImage',
-    'Missing Images',
-  ),
-  checkBox(
-    'ProblemMissingSentence',
-    'Missing Sentence',
-  ),
-  checkBox(
-    'ProblemMissingSentenceAudio',
-    'Missing Sentence Audio',
-  ),
-  checkBox(
-    'ProblemMissingWordAudio',
-    'Missing Word Audio',
-  ),
-  checkBox(
-    'ProblemMissingPinyin',
-    'Missing Pinyin',
-  ),
-]);
+    ),
+    IdealSentenceLength: slider(
+      'IdealSentenceLength',
+      'Ideal Sentence Length"',
+      'What the ideal sentence length you want to be selected from books',
+    ),
+  },
+  BookLibrary: {
 
-export const DisplayTable: UserConfigDisplay = {
-  meta: {},
+    OnlyFavorites: checkBox(
+      'OnlyFavorites',
+      'Only show favorited books',
+    ),
+    HideRead: checkBox(
+      'HideRead',
+      'Hide read books',
+    ),
+  },
+  // TODO filter this from the type
   convertValues: {},
-  CardCreation: {},
-  AnkiConfig: {},
-  Dictionaries: {},
-  SentenceGeneration: {},
-  BookLibrary: {},
-  CardManagement: {},
-};
 
-export function getDisplayable(obj: {[key:string]:any})
-  : [any, UserSetting][] {
-  return Object.entries(obj).filter(([key, _]) => {
-    return key in ComponentTable;
-  }).map(([key, value]) => {
-    return [value, ComponentTable[key]];
-  });
-}
+};
 
 export async function generateUserSettings() {
   const settings = reactive(await GetUserSettings());

@@ -2,12 +2,12 @@
   <with-sidebar>
     <template #sidebar>
       <settings-checkbox
-        :setting="ComponentTable.OnlyFavorites"
+        :setting="ComponentTable.BookLibrary.OnlyFavorites"
         :initial-value="UserSettings.BookLibrary.OnlyFavorites"
       />
 
       <settings-checkbox
-        :setting="ComponentTable.HideRead"
+        :setting="ComponentTable.BookLibrary.HideRead"
         :initial-value="UserSettings.BookLibrary.HideRead"
       />
       <button

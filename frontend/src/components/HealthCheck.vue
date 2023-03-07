@@ -87,11 +87,11 @@
         @click.stop
       >
         <settings-selector
-          :setting="ComponentTable.ActiveDeck"
+          :setting="ComponentTable.AnkiConfig.ActiveDeck"
           :initial-value="UserSettings.AnkiConfig.ActiveDeck"
         />
         <settings-selector
-          :setting="ComponentTable.ActiveModel"
+          :setting="ComponentTable.AnkiConfig.ActiveModel"
           :initial-value="UserSettings.AnkiConfig.ActiveModel"
         />
 

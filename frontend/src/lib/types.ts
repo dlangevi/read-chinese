@@ -15,3 +15,11 @@ export type DictionaryInfoMap = {
 export type WordDefinitions = {
   [word:string] : backend.DictionaryDefinition
 }
+
+// Other shared types
+export type UnknownWordRow = {
+  word: string
+  pinyin?: string
+  occurance?: number
+  definition?: string
+}

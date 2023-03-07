@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-auto px-4">
+  <div class="mx-auto w-4/5 px-4">
     <div
       v-for="(contents, section, index) in sections"
       :key="index"
@@ -19,11 +19,11 @@
       >
         <component
           :is="content.type"
-          v-for="([initial, content]) in contents"
-          :key="content.name"
+          v-for="([name, content]) in contents"
+          :key="name"
           :class="[{'bg-sky-500': props.highlight === content.name}]"
           :setting="content"
-          :initial-value="initial"
+          :initial-value="getInitialValue(section, name)"
         />
       </div>
     </div>
@@ -32,8 +32,9 @@
 
 <script lang="ts" setup>
 import {
-  getUserSettings, getDisplayable,
+  ComponentTable, getUserSettings,
 } from '@/lib/userSettings';
+import { backend } from '@wailsjs/models';
 
 const props = defineProps<{
   highlight?: string,
@@ -41,16 +42,23 @@ const props = defineProps<{
 
 const UserSettings = getUserSettings();
 
+function getInitialValue(section: string, value: string) {
+  const segment = UserSettings[section as keyof backend.UserConfig];
+  const segvalue : unknown = segment[value as keyof typeof segment];
+  return segvalue;
+}
+
+// TODO the way the initial value is looked up is not goo
 const sections = {
-  GeneralSettings:
-    getDisplayable(UserSettings.meta),
-  CardCreationSettings:
-    getDisplayable(UserSettings.CardCreation),
-  AnkiSettings:
-    getDisplayable(UserSettings.AnkiConfig),
-  DictionarySettings:
-    getDisplayable(UserSettings.Dictionaries),
+  meta:
+    Object.entries(ComponentTable.meta),
+  CardCreation:
+     Object.entries(ComponentTable.CardCreation),
+  AnkiConfig:
+    Object.entries(ComponentTable.AnkiConfig),
+  Dictionaries:
+     Object.entries(ComponentTable.Dictionaries),
   SentenceGeneration:
-    getDisplayable(UserSettings.SentenceGeneration),
+    Object.entries(ComponentTable.SentenceGeneration),
 };
 </script>

@@ -177,28 +177,6 @@ export namespace backend {
 	        this.AutoAdvanceCard = source["AutoAdvanceCard"];
 	    }
 	}
-	export class CardManagementConfig {
-	    ProblemFlagged: boolean;
-	    ProblemMissingImage: boolean;
-	    ProblemMissingSentence: boolean;
-	    ProblemMissingSentenceAudio: boolean;
-	    ProblemMissingWordAudio: boolean;
-	    ProblemMissingPinyin: boolean;
-	
-	    static createFrom(source: any = {}) {
-	        return new CardManagementConfig(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.ProblemFlagged = source["ProblemFlagged"];
-	        this.ProblemMissingImage = source["ProblemMissingImage"];
-	        this.ProblemMissingSentence = source["ProblemMissingSentence"];
-	        this.ProblemMissingSentenceAudio = source["ProblemMissingSentenceAudio"];
-	        this.ProblemMissingWordAudio = source["ProblemMissingWordAudio"];
-	        this.ProblemMissingPinyin = source["ProblemMissingPinyin"];
-	    }
-	}
 	export class Dict {
 	    Path: string;
 	    Language: string;
@@ -392,10 +370,10 @@ export namespace backend {
 	    }
 	}
 	export class ProblemCard {
-	    Word: string;
-	    Problems: Problems;
-	    Notes: string;
-	    NoteId: number;
+	    word: string;
+	    problems: Problems;
+	    notes: string;
+	    noteId: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new ProblemCard(source);
@@ -403,10 +381,10 @@ export namespace backend {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.Word = source["Word"];
-	        this.Problems = this.convertValues(source["Problems"], Problems);
-	        this.Notes = source["Notes"];
-	        this.NoteId = source["NoteId"];
+	        this.word = source["word"];
+	        this.problems = this.convertValues(source["problems"], Problems);
+	        this.notes = source["notes"];
+	        this.noteId = source["noteId"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -496,7 +474,6 @@ export namespace backend {
 	    Dictionaries: DictionaryConfig;
 	    SentenceGeneration: SentenceGenerationConfig;
 	    BookLibrary: LibraryConfig;
-	    CardManagement: CardManagementConfig;
 	
 	    static createFrom(source: any = {}) {
 	        return new UserConfig(source);
@@ -510,7 +487,6 @@ export namespace backend {
 	        this.Dictionaries = this.convertValues(source["Dictionaries"], DictionaryConfig);
 	        this.SentenceGeneration = this.convertValues(source["SentenceGeneration"], SentenceGenerationConfig);
 	        this.BookLibrary = this.convertValues(source["BookLibrary"], LibraryConfig);
-	        this.CardManagement = this.convertValues(source["CardManagement"], CardManagementConfig);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

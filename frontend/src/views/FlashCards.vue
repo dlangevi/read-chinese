@@ -68,7 +68,7 @@ import WithSidebar from '@/layouts/WithSidebar.vue';
 
 const UserSettings = getUserSettings();
 const AnkiConfig = UserSettings.AnkiConfig;
-const getRowId = (params:GetRowIdParams) => params.data.Word;
+const getRowId = (params:GetRowIdParams) => params.data.word;
 
 const activeModel = AnkiConfig.ActiveModel;
 const currentMapping = AnkiConfig.ModelMappings[AnkiConfig.ActiveModel];
@@ -94,13 +94,13 @@ const searches = {
 const columnDefs:ColDef[] = [
   {
     headerName: 'word',
-    field: 'Word',
+    field: 'word',
     suppressSizeToFit: true,
     cellClass: 'text-xl',
   },
   {
     headerName: 'Detected Problems',
-    field: 'Problems',
+    field: 'problems',
     sort: 'desc',
     cellClass: 'text-xl',
     autoHeight: true,
@@ -110,8 +110,8 @@ const columnDefs:ColDef[] = [
         .map(([key, _]) => {
           return key;
         });
-      if (params.data.Notes) {
-        issues.push(`UserNote: ${params.data.Notes}`);
+      if (params.data.notes) {
+        issues.push(`UserNote: ${params.data.notes}`);
       }
       return `<ul>
       ${issues.map(issue => { return '<li>' + issue + '</li>'; }).join('')}

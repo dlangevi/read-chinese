@@ -544,10 +544,10 @@ type Problems struct {
 }
 
 type ProblemCard struct {
-	Word     string   `json:"Word"`
-	Problems Problems `json:"Problems"`
-	Notes    string   `json:"Notes"`
-	NoteId   int64    `json:"NoteId"`
+	Word     string   `json:"word"`
+	Problems Problems `json:"problems"`
+	Notes    string   `json:"notes"`
+	NoteId   int64    `json:"noteId"`
 }
 
 func (a *ankiInterface) LoadProblemCards(query string) ([]ProblemCard, error) {

@@ -24,7 +24,7 @@ import {
 import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
 
 const props = defineProps<{
-  params: ICellRendererParams,
+  params: ICellRendererParams<backend.ProblemCard>,
 }>();
 
 type ButtonInfo = {
@@ -41,9 +41,11 @@ watch(buttons, () => {
   }
   if (buttons.value.length === 0) {
     const rowData = props.params.data;
-    props.params.api.applyTransaction({
-      remove: [rowData],
-    });
+    if (rowData) {
+      props.params.api.applyTransaction({
+        remove: [rowData],
+      });
+    }
   }
 }, {
   deep: true,
@@ -55,8 +57,8 @@ async function processAction(button: ButtonInfo, index : number) {
 }
 
 onBeforeMount(() => {
-  const problems : backend.Problems =
-    props.params.data.Problems;
+  const problemCard = props.params.data as backend.ProblemCard;
+  const problems : backend.Problems = problemCard.problems;
 
   // We always want to give the option to
   // open the card editor. This covers both
@@ -71,7 +73,7 @@ onBeforeMount(() => {
     buttons.value.push({
       text: 'Generate Pinyin',
       action: () =>
-        UpdatePinyin(props.params.data.NoteId),
+        UpdatePinyin(problemCard.noteId),
     });
   }
   if (problems.MissingSentenceAudio) {
@@ -79,7 +81,7 @@ onBeforeMount(() => {
     buttons.value.push({
       text: 'Generate Sentence Audio',
       action: () =>
-        UpdateSentenceAudio(props.params.data.NoteId),
+        UpdateSentenceAudio(problemCard.noteId),
     });
   }
   if (problems.MissingWordAudio) {
@@ -87,7 +89,7 @@ onBeforeMount(() => {
     buttons.value.push({
       text: 'Generate Word Audio',
       action: () =>
-        UpdateWordAudio(props.params.data.NoteId),
+        UpdateWordAudio(problemCard.noteId),
     });
   }
   finishedLoad = true;
@@ -97,8 +99,8 @@ const store = useCardQueue();
 async function addToQueue() : Promise<void> {
   let editComplete = false;
 
-  const problems : backend.Problems =
-    props.params.data.Problems;
+  const problemCard = props.params.data as backend.ProblemCard;
+  const problems : backend.Problems = problemCard.problems;
 
   const keySteps : StepsEnum[] = [];
   if (problems.MissingImage) {
@@ -108,23 +110,21 @@ async function addToQueue() : Promise<void> {
     keySteps.push(StepsEnum.SENTENCE);
   }
 
-  const rowData = props.params.data;
-  const word = rowData.word || rowData.Word;
-
   store.addWord({
-    word,
-    sourceCardId: props.params.data.NoteId,
+    word: problemCard.word,
+    sourceCardId: problemCard.noteId,
     keySteps,
   }, () => {
     editComplete = true;
   });
 
+  // TODO this is hacky, but the chain of callbacks gets lost currently
   return new Promise((resolve, _reject) => {
     const checkVariable = () => {
       if (editComplete) {
         resolve(undefined);
       } else {
-        setTimeout(checkVariable, 100); // Check again in 100ms
+        setTimeout(checkVariable, 100);
       }
     };
     checkVariable();

@@ -159,9 +159,7 @@ async function submit() {
   // If there is a note id, we need to update a note
   // and not create a new one (can we do this in the backend?)
   if (cardManager.noteId) {
-    console.log(cardManager.noteId, cardValues);
     await UpdateNoteFields(cardManager.noteId, cardValues);
-    console.log('after update');
   } else {
     const tags : string[] = [];
     if (UserSettings.AnkiConfig.AddBookTag) {

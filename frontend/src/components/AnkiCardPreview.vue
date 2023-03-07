@@ -1,5 +1,8 @@
 <template>
-  <div class="card flex flex-col gap-4 border-4 border-base-300 p-4">
+  <div
+    class="card flex h-[58vh] flex-col gap-4
+  overflow-auto border-4 border-base-300 p-4"
+  >
     <h2 class="text-xl font-bold">
       Hanzi: {{ cardManager.word }}
     </h2>
@@ -13,29 +16,25 @@
       <h2 class="text-l inline font-bold">
         Definition:
       </h2>
-      <!-- Definitions can have html formatting in them -->
-      <p>
-        <span
-          v-for="definition in cardManager.englishDefn"
-          :key="definition.definition"
-        >
-          {{ formatDefinition(definition) }}
-          <br>
-        </span>
-      </p>
+      <div
+        v-for="definition in cardManager.englishDefn"
+        :key="definition.definition"
+      >
+        {{ formatDefinition(definition) }}
+        <br>
+      </div>
     </div>
     <div v-if="cardManager.steps.includes(StepsEnum.CHINESE)">
       <h2 class="text-l inline font-bold">
         ChineseDefinition:
       </h2>
-      <p>
-        <span
-          v-for="definition in cardManager.chineseDefn"
-          :key="definition.definition"
-        >
-          {{ formatDefinition(definition) }}
-        </span>
-      </p>
+      <div
+        v-for="definition in cardManager.chineseDefn"
+        :key="definition.definition"
+      >
+        {{ formatDefinition(definition) }}
+        <br>
+      </div>
     </div>
     <div v-if="cardManager.steps.includes(StepsEnum.IMAGE)">
       <h2 class="text-l inline font-bold">
@@ -64,7 +63,4 @@ import {
 } from '@/stores/CardManager';
 
 const cardManager = useCardManager();
-
-defineEmits(['change-step']);
-
 </script>

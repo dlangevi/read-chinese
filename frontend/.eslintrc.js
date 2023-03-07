@@ -29,6 +29,7 @@ module.exports = {
     '@typescript-eslint/indent': ['error', 2],
     '@typescript-eslint/no-unused-vars':
       ['error', { argsIgnorePattern: '_', vars: 'local' }],
+    '@typescript-eslint/no-explicit-any': 'error',
     'no-param-reassign': 'off',
     'no-await-in-loop': 'off',
     // TODO get this to work

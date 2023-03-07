@@ -45,7 +45,7 @@ export class LoadingApi {
     return this.progressText.value;
   }
 
-  async withLoader(func:() => Promise<any>) {
+  async withLoader(func:() => Promise<void | Error>) {
     // These will be set the the backend later
     this.progressText.value = '';
     this.progressTotalSteps.value = 1;
