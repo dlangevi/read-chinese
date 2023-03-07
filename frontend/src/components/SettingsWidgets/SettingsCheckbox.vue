@@ -1,19 +1,19 @@
 <template>
   <div class="flex items-center gap-4">
-    <input
-      :id="setting.value"
-      v-model="isChecked"
-      type="checkbox"
-      class="checkbox-primary checkbox"
-      :label="setting.label"
-      :disabled="setting.disabled"
-      @input="submitChange"
-    >
-    <!-- TODO how to align the label vertically? -->
     <label
-      class="flex-1"
+      class="flex items-center gap-4"
       :for="setting.value"
     >
+      <input
+        :id="setting.value"
+        v-model="isChecked"
+        type="checkbox"
+        class="checkbox-primary checkbox"
+        :label="setting.label"
+        :disabled="setting.disabled"
+        @input="submitChange"
+      >
+      <!-- TODO how to align the label vertically? -->
       {{ setting.label }}
     </label>
     <div
