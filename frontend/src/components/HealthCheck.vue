@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <div v-if="firstRoundDone">
+    <div v-if="stillChecking">
       Loading ...
     </div>
     <div v-else-if="allComplete">
@@ -13,9 +13,9 @@
         </h2>
         <div
           class="btn-primary btn"
-          @click="nextAction"
+          @click="firstFailure?.buttonAction"
         >
-          {{ nextActionText }}
+          {{ firstFailure?.buttonText }}
         </div>
       </div>
       <ul class="list-outside list-disc space-y-2">
@@ -24,7 +24,7 @@
           :key="check.description"
           class="items-center space-x-2"
         >
-          <span :class="{ 'line-through': check.checkResult == ''}">
+          <span :class="{ 'line-through': check.passes}">
             {{ check.description }}
           </span>
         </li>
@@ -82,7 +82,7 @@
       @click="() => ankiConfigure = false"
     >
       <div
-        v-if="checks.AnkiAvaliable.checkResult === ''"
+        v-if="checks.AnkiAvaliable.passes"
         class="modal-box flex w-4/5 max-w-full flex-col gap-4"
         @click.stop
       >
@@ -104,145 +104,121 @@
 <script lang="ts" setup>
 import { onBeforeUnmount, watch, reactive, computed, ref } from 'vue';
 import { BrowserOpenURL } from '@runtime/runtime';
+import { ComponentTable, getUserSettings } from '@/lib/userSettings';
+import { useLoader } from '@/lib/loading';
+
 import { HealthCheck as bookHealth } from '@wailsjs/backend/bookLibrary';
 import { HealthCheck as dictHealth } from '@wailsjs/backend/Dictionaries';
+import { ImportCalibreBooks } from '@wailsjs/backend/Calibre';
 import {
   HealthCheck as ankiHealth,
   ConfigurationCheck as ankiConfigured,
 } from '@wailsjs/backend/ankiInterface';
-import { ImportCalibreBooks } from '@wailsjs/backend/Calibre';
+
 import SettingsSelector from
   '@/components/SettingsWidgets/SettingsSelector.vue';
 import DictionariesList
   from '@/components/SettingsWidgets/DictionariesList.vue';
 import ModelManager
   from '@/components/SettingsWidgets/ModelManager.vue';
-import { ComponentTable, getUserSettings } from '@/lib/userSettings';
-import { useLoader } from '@/lib/loading';
+
 const loader = useLoader();
 const UserSettings = getUserSettings();
 const ankiInfo = ref(false);
 const dictInfo = ref(false);
 const ankiConfigure = ref(false);
 
-const checks = reactive({
+type HealthCheckInfo = {
+  buttonText: string,
+  description: string
+  checkAction: () => Promise<Error>,
+  buttonAction: () => void,
+  passes?: boolean,
+  checkResult?: string,
+}
+
+const checks = reactive<{
+  Dictionary: HealthCheckInfo,
+  BookLibrary: HealthCheckInfo,
+  AnkiAvaliable: HealthCheckInfo,
+  AnkiConfigured: HealthCheckInfo,
+}>({
   Dictionary: {
+    buttonText: 'Add dictionary',
     description: 'Have at least one Dictionary installed',
     checkAction: dictHealth,
-    checkResult: 'not checked yet',
-    buttonText: 'Add dictionary',
     buttonAction: () => { dictInfo.value = true; },
   },
   BookLibrary: {
+    buttonText: 'Sync Calibre',
     description: 'Import at least one book',
     checkAction: bookHealth,
-    checkResult: 'not checked yet',
-    buttonText: 'Sync Calibre',
-    buttonAction: async () => {
-      await loader.withLoader(ImportCalibreBooks);
-    },
+    buttonAction: async () => { loader.withLoader(ImportCalibreBooks); },
   },
   AnkiAvaliable: {
+    buttonText: 'How to setup Anki',
     description: 'Anki is avaliable through anki-connect',
     checkAction: ankiHealth,
-    checkResult: 'not checked yet',
-    buttonText: 'How to setup Anki',
     buttonAction: () => { ankiInfo.value = true; },
   },
   AnkiConfigured: {
-    description: 'Configure the names of anki fields',
-    // Currently only I use this so its true because of
-    // hardcoded anki settings
-    checkAction: async () => {
-      const health = await ankiHealth();
-      if (health !== '') {
-        return health;
-      } else {
-        return ankiConfigured();
-      }
-    },
-    checkResult: 'not checked yet',
     buttonText: 'Configure Anki',
+    description: 'Configure the names of anki fields',
+    checkAction: async () => {
+      await ankiHealth();
+      return ankiConfigured();
+    },
     buttonAction: () => { ankiConfigure.value = true; },
   },
 });
 
 watch(
-  () => checks.Dictionary.checkResult,
+  () => [
+    checks.Dictionary.passes,
+    checks.AnkiAvaliable.passes,
+    checks.AnkiConfigured.passes,
+  ],
   () => {
-    console.log('checkResult changed');
-    if (checks.Dictionary.checkResult === '') {
+    if (checks.Dictionary.passes) {
       dictInfo.value = false;
     }
-  });
-watch(
-  () => checks.AnkiAvaliable.checkResult,
-  () => {
-    console.log('checkResult changed');
-    if (checks.AnkiAvaliable.checkResult === '') {
+    if (checks.AnkiAvaliable.passes) {
       ankiInfo.value = false;
     }
-  });
-watch(
-  () => checks.AnkiConfigured.checkResult,
-  () => {
-    console.log('checkResult changed');
-    if (checks.AnkiConfigured.checkResult === '') {
+    if (checks.AnkiConfigured.passes) {
       ankiConfigure.value = false;
     }
   });
 
 const allComplete = computed(() => {
-  return Object.values(checks).every(check => check.checkResult === '');
-});
-const firstRoundDone = computed(() => {
-  return Object.values(checks).some(
-    check => check.checkResult === 'not checked yet');
+  return Object.values(checks).every(
+    check => check.passes);
 });
 
-const nextActionText = computed(() => {
-  if (checks.Dictionary.checkResult !== '') {
-    return checks.Dictionary.buttonText;
-  }
-  if (checks.BookLibrary.checkResult !== '') {
-    return checks.BookLibrary.buttonText;
-  }
-  if (checks.AnkiAvaliable.checkResult !== '') {
-    return checks.AnkiAvaliable.buttonText;
-  }
-  if (checks.AnkiConfigured.checkResult !== '') {
-    return checks.AnkiConfigured.buttonText;
-  }
-  return 'error';
+const firstFailure = computed(() => {
+  return Object.values(checks).find(
+    check => check.passes !== true);
 });
-const nextAction = computed(() => {
-  if (checks.Dictionary.checkResult !== '') {
-    return checks.Dictionary.buttonAction;
-  }
-  if (checks.BookLibrary.checkResult !== '') {
-    return checks.BookLibrary.buttonAction;
-  }
-  if (checks.AnkiAvaliable.checkResult !== '') {
-    return checks.AnkiAvaliable.buttonAction;
-  }
-  if (checks.AnkiConfigured.checkResult !== '') {
-    return checks.AnkiConfigured.buttonAction;
-  }
-  return () => {};
+
+const stillChecking = computed(() => {
+  return Object.values(checks).some(
+    check => check.passes === undefined);
 });
+
 function recheck() {
   Object.values(checks).forEach(async (check) => {
     check.checkAction()
-      .then(result => {
-        check.checkResult = result;
-      })
+      .then(() => { check.passes = true; })
       .catch(errMsg => {
+        check.passes = false;
         check.checkResult = errMsg;
       });
   });
 }
+
 recheck();
 const checkInterval = setInterval(recheck, 1000);
+
 onBeforeUnmount(() => {
   clearInterval(checkInterval);
 });

@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"errors"
 	"log"
 	"strings"
 )
@@ -32,11 +33,11 @@ func NewDictionaries(
 	return dicts
 }
 
-func (d *Dictionaries) HealthCheck() string {
+func (d *Dictionaries) HealthCheck() error {
 	if len(d.Dictionaries) == 0 {
-		return "User has no dictionaries"
+		return errors.New("User has no dictionaries")
 	}
-	return ""
+	return nil
 }
 
 // Is this the way to do a reference loop?

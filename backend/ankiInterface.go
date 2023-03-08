@@ -31,8 +31,8 @@ type (
 		UpdatePinyin(noteId int64) error
 		ImportAnkiKeywords() error
 		LoadProblemCards(query string) ([]ProblemCard, error)
-		HealthCheck() string
-		ConfigurationCheck() (string, error)
+		HealthCheck() error
+		ConfigurationCheck() error
 		LoadTemplate() error
 		LoadModels() ([]string, error)
 		LoadModelFields(model string) ([]string, error)
@@ -58,39 +58,39 @@ type RawAnkiNote struct {
 	Fields Fields `json:"fields"`
 }
 
-func (a *ankiInterface) HealthCheck() string {
+func (a *ankiInterface) HealthCheck() error {
 	restErr := a.anki.Ping()
 	if restErr != nil {
-		return "Could not connect to Anki"
+		return errors.New("Could not connect to Anki")
 	}
-	return ""
+	return nil
 }
 
-func (a *ankiInterface) ConfigurationCheck() (string, error) {
+func (a *ankiInterface) ConfigurationCheck() error {
 	// ActiveDeck needs to be a real deck
 	decks, restErr := a.anki.Decks.GetAll()
 	if restErr != nil {
-		return "", toError(restErr)
+		return toError(restErr)
 	}
 	if !slices.Contains(*decks, a.backend.UserSettings.AnkiConfig.ActiveDeck) {
-		return "Active Deck does exist in Anki", nil
+		return errors.New("Active Deck does exist in Anki")
 	}
 
 	// ActiveModel needs to be a real model
 	models, restErr := a.anki.Models.GetAll()
 	if restErr != nil {
-		return "", toError(restErr)
+		return toError(restErr)
 	}
 	activeModel := a.backend.UserSettings.AnkiConfig.ActiveModel
 	if !slices.Contains(*models, activeModel) {
-		return "Chose Note type does exist in Anki", nil
+		return errors.New("Chose Note type does exist in Anki")
 	}
 
 	// CardConfiguration needs to exists and have certian fields
 	// and those fields all need to be real fields
 	currentModelFields, restErr := a.anki.Models.GetFields(activeModel)
 	if restErr != nil {
-		return "", toError(restErr)
+		return toError(restErr)
 	}
 	fieldsConfig := a.backend.UserSettings.GetMapping(activeModel)
 
@@ -110,19 +110,19 @@ func (a *ankiInterface) ConfigurationCheck() (string, error) {
 		if value == "" {
 			continue
 		} else if !slices.Contains(*currentModelFields, value) {
-			return fmt.Sprintf(
+			return fmt.Errorf(
 				"Configured field for %v : (%v) does not exist",
-				fieldName, value), nil
+				fieldName, value)
 		} else {
 			allEmpty = false
 		}
 	}
 
 	if allEmpty {
-		return "No fields have been configured for current model", nil
+		return errors.New("No fields have been configured for current model")
 	}
 
-	return "", nil
+	return nil
 }
 
 func (a *ankiInterface) getConfiguredMapping() (FieldsMapping, error) {

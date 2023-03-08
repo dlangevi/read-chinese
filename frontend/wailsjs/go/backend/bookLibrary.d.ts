@@ -20,7 +20,7 @@ export function GetFavoriteFrequencies():Promise<{[key: string]: number}>;
 
 export function GetSomeBooks(arg1:Array<number>):Promise<Array<backend.Book>>;
 
-export function HealthCheck():Promise<string>;
+export function HealthCheck():Promise<Error>;
 
 export function LearningTarget():Promise<Array<string>>;
 

@@ -81,11 +81,15 @@ async function init() {
 
   router.beforeEach(async (to) => {
     console.log(to.name);
-    const passes = await HealthCheck();
-    if (passes !== '' && to.name !== 'Welcome') {
-      messageApi.error('Fix your problems before you can play');
-      return '/Welcome';
+    if (to.name === 'Welcome') {
+      return;
     }
+    return HealthCheck().then(() => {
+
+    }).catch((errMsg) => {
+      messageApi.error(`Fix your problems before you can play ${errMsg}`);
+      return '/Welcome';
+    });
   });
 
   app.provide(MessageApiKey, messageApi);

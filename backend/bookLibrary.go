@@ -29,7 +29,7 @@ type (
 		GetDetailedBooks(path string) ([]Book, error)
 		// Check if book already exists in collection
 		BookExists(author string, title string) (bool, error)
-		HealthCheck() (string, error)
+		HealthCheck() error
 
 		// Resegement books
 		RecalculateBooks() error
@@ -348,21 +348,20 @@ func (b *bookLibrary) BookExists(author string, title string) (bool, error) {
 	return exists, err
 }
 
-func (b *bookLibrary) HealthCheck() (string, error) {
+func (b *bookLibrary) HealthCheck() error {
 	var exists bool
 	err := b.db.QueryRow(`SELECT exists (
     SELECT bookId 
     FROM books 
   )`).Scan(&exists)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	if !exists {
-		return "User has 0 books", nil
+		return errors.New("User has 0 books")
 	}
-	return "", nil
-
+	return nil
 }
 
 func (b *bookLibrary) GetFavoriteFrequencies() (map[string]int, error) {
