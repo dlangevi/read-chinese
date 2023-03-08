@@ -14,7 +14,6 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 - [ ] write dev install guide 
 - [ ] Import from multiple anki decks
 - [ ] update image / audio when editing card
-- [ ] card maintenance (search for missing image, audio, etc)
 - [ ] unflag anki cards on edit
 - [ ] 90% test coverage for go code
 - [ ] linux scrollbars dont work in webview
@@ -30,6 +29,7 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 - [ ] free edit of card fields
 
 ### DONE
+- [x] card maintenance (search for missing image, audio, etc)
 - [x] push premade card format to anki for new users
 - [x] allow mapping output to arbitrary anki note / deck format
 - [x] create startup health checks that prepares user for starting to mine 

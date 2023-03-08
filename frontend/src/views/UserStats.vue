@@ -25,7 +25,7 @@
         </div>
       </div>
     </div>
-    <div class="h-full w-4/5">
+    <div class="h-full w-4/5 p-4">
       <Line class="" :data="data" :options="options" />
     </div>
   </div>
