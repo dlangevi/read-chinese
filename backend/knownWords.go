@@ -8,8 +8,10 @@ import (
 	"log"
 	"os"
 	"path"
+	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -295,4 +297,78 @@ func (known *KnownWords) GetUnknownHskWords(version string, level int) ([]string
 		}
 	}
 	return rows, nil
+}
+
+//	type StatsInfo {
+//	  WordsStats
+//
+// }
+type TimeQuery struct {
+	Day             string `json:"day"`
+	Known           int    `json:"known"`
+	KnownCharacters int    `json:"knownCharacters"`
+}
+
+func (known *KnownWords) GetStatsInfo() ([]TimeQuery, error) {
+	// TODO maybe this can be cached?
+	type TimeQuerySql struct {
+		Word      string    `db:"word"`
+		LearnedOn time.Time `db:"created_at"`
+	}
+	timesData := []TimeQuerySql{}
+	err := known.db.Select(&timesData, `
+  SELECT
+      word, created_at
+  FROM words
+  `)
+	if err != nil {
+		return nil, err
+	}
+
+	charMap := map[rune]time.Time{}
+	dateMap := map[string]int{}
+	dateCharMap := map[string]int{}
+
+	for _, data := range timesData {
+		for _, c := range data.Word {
+			prevTime, ok := charMap[c]
+			if !ok {
+				charMap[c] = data.LearnedOn
+			} else if prevTime.After(data.LearnedOn) {
+				charMap[c] = data.LearnedOn
+			}
+		}
+		fmtTime := data.LearnedOn.Format("2006年01月02日")
+		current := dateMap[fmtTime]
+		dateMap[fmtTime] = current + 1
+	}
+
+	for _, learnedOn := range charMap {
+		fmtTime := learnedOn.Format("2006年01月02日")
+		current := dateCharMap[fmtTime]
+		dateCharMap[fmtTime] = current + 1
+	}
+
+	times := []TimeQuery{}
+	for date, num := range dateMap {
+		knownChar := dateCharMap[date]
+		times = append(times, TimeQuery{
+			Day:             date,
+			Known:           num,
+			KnownCharacters: knownChar,
+		})
+	}
+	sort.Slice(times, func(a, b int) bool {
+		return (times[a].Day <= times[b].Day)
+	})
+
+	cumluative := 0
+	cumulativeChar := 0
+	for i := range times {
+		cumluative += times[i].Known
+		cumulativeChar += times[i].KnownCharacters
+		times[i].Known = cumluative
+		times[i].KnownCharacters = cumulativeChar
+	}
+	return times, nil
 }

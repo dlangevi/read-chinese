@@ -467,6 +467,22 @@ export namespace backend {
 	        this.KnownInterval = source["KnownInterval"];
 	    }
 	}
+	export class TimeQuery {
+	    day: string;
+	    known: number;
+	    knownCharacters: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new TimeQuery(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.day = source["day"];
+	        this.known = source["known"];
+	        this.knownCharacters = source["knownCharacters"];
+	    }
+	}
 	export class UserSettings {
 	    meta: MetaSettings;
 	    CardCreation: CardCreationConfig;

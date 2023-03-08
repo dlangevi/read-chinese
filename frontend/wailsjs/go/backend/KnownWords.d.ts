@@ -8,6 +8,8 @@ export function AddWords(arg1:Array<backend.WordEntry>):Promise<Error>;
 
 export function GetOccurances(arg1:Array<string>):Promise<{[key: string]: number}>;
 
+export function GetStatsInfo():Promise<Array<backend.TimeQuery>>;
+
 export function GetUnknownHskWords(arg1:string,arg2:number):Promise<Array<string>>;
 
 export function GetWordStats():Promise<backend.WordStats>;

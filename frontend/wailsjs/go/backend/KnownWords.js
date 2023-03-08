@@ -14,6 +14,10 @@ export function GetOccurances(arg1) {
   return window['go']['backend']['KnownWords']['GetOccurances'](arg1);
 }
 
+export function GetStatsInfo() {
+  return window['go']['backend']['KnownWords']['GetStatsInfo']();
+}
+
 export function GetUnknownHskWords(arg1, arg2) {
   return window['go']['backend']['KnownWords']['GetUnknownHskWords'](arg1, arg2);
 }
