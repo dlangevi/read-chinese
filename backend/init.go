@@ -16,7 +16,7 @@ type Backend struct {
 	ctx context.Context
 
 	// Primary data layer
-	UserSettings *UserConfig
+	UserSettings *UserSettings
 	DB           *sqlx.DB
 
 	// Independent Libraries
@@ -75,7 +75,15 @@ func NewBackend(
 	if err != nil {
 		log.Fatal(err)
 	}
-	userSettings, err := LoadMetadata(metadataPath)
+
+	// The order of setup may be important
+	backend := &Backend{
+		sqlPath:      sqlPath,
+		metadataPath: metadataPath,
+		DB:           db,
+	}
+
+	userSettings, err := LoadMetadata(metadataPath, backend)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -84,17 +92,9 @@ func NewBackend(
 	ran := userSettings.GetTimesRan()
 	log.Printf("Ran %v times", ran)
 
-	// The order of setup may be important
-	backend := &Backend{
-		sqlPath:      sqlPath,
-		metadataPath: metadataPath,
-		UserSettings: userSettings,
-		DB:           db,
-
-		KnownWords:  NewKnownWords(db, userSettings),
-		ImageClient: NewImageClient(userSettings),
-	}
-
+	backend.UserSettings = userSettings
+	backend.KnownWords = NewKnownWords(db, userSettings)
+	backend.ImageClient = NewImageClient(userSettings)
 	backend.Dictionaries = NewDictionaries(backend)
 	backend.AnkiInterface = NewAnkiInterface(backend)
 

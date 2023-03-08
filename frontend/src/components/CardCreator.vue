@@ -164,7 +164,9 @@ async function submit() {
     const tags : string[] = [];
     if (UserSettings.AnkiConfig.AddBookTag) {
       if (cardManager.sentenceSource) {
-        tags.push(cardManager.sentenceSource);
+        // Spaces cause multiple tags to be entered
+        const bookTag = cardManager.sentenceSource.replaceAll(/\s+/g, '-');
+        tags.push(bookTag);
       }
     }
     if (UserSettings.AnkiConfig.AddProgramTag) {

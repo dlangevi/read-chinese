@@ -16,11 +16,11 @@ type TextToSpeech struct {
 	httpClient   *resty.Client
 	currentVoice int
 	voices       []string
-	userSettings *UserConfig
+	userSettings *UserSettings
 }
 
 func NewTextToSpeach(
-	userSettings *UserConfig,
+	userSettings *UserSettings,
 ) *TextToSpeech {
 	client := &TextToSpeech{
 		httpClient:   resty.New(),

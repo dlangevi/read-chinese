@@ -63,7 +63,7 @@ import {
   SetMapping,
   GetMapping,
   GetUserSettings,
-} from '@wailsjs/backend/UserConfig';
+} from '@wailsjs/backend/UserSettings';
 import {
   backend,
 } from '@wailsjs/models';

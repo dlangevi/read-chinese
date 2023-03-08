@@ -28,11 +28,11 @@ type ImageResponse struct {
 
 type ImageClient struct {
 	httpClient   *resty.Client
-	userSettings *UserConfig
+	userSettings *UserSettings
 }
 
 func NewImageClient(
-	userSettings *UserConfig,
+	userSettings *UserSettings,
 ) *ImageClient {
 	client := &ImageClient{
 		httpClient:   resty.New(),

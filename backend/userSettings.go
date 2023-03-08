@@ -7,10 +7,13 @@ import (
 	"log"
 	"os"
 	"reflect"
+
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type (
-	UserConfig struct {
+	UserSettings struct {
+		backend *Backend
 		// Meta fields
 		Meta MetaSettings `json:"meta"`
 
@@ -97,8 +100,8 @@ type (
 	}
 )
 
-func defaultConfig(path string) *UserConfig {
-	return &UserConfig{
+func defaultConfig(path string) *UserSettings {
+	return &UserSettings{
 		Meta: MetaSettings{
 			path:               path,
 			EnableExperimental: false,
@@ -160,7 +163,7 @@ func defaultConfig(path string) *UserConfig {
 	}
 }
 
-func getValue(settings *UserConfig, field string) interface{} {
+func getValue(settings *UserSettings, field string) interface{} {
 	value := reflect.ValueOf(settings).Elem()
 
 	for i := 0; i < value.NumField(); i++ {
@@ -178,7 +181,7 @@ func getValue(settings *UserConfig, field string) interface{} {
 	return nil
 }
 
-func setValue(settings *UserConfig, field string, newValue interface{}) error {
+func setValue(settings *UserSettings, field string, newValue interface{}) error {
 	value := reflect.ValueOf(settings).Elem()
 
 	for i := 0; i < value.NumField(); i++ {
@@ -206,8 +209,9 @@ func setValue(settings *UserConfig, field string, newValue interface{}) error {
 	return fmt.Errorf("field %s not found", field)
 }
 
-func LoadMetadata(path string) (*UserConfig, error) {
+func LoadMetadata(path string, backend *Backend) (*UserSettings, error) {
 	userSettings := defaultConfig(path)
+	userSettings.backend = backend
 
 	if _, err := os.Stat(path); err == nil {
 		// metadata already exists, read from it
@@ -225,11 +229,11 @@ func LoadMetadata(path string) (*UserConfig, error) {
 	return userSettings, nil
 }
 
-func (m *UserConfig) GetUserSettings() UserConfig {
+func (m *UserSettings) GetUserSettings() UserSettings {
 	return *m
 }
 
-func (m *UserConfig) saveMetadata() error {
+func (m *UserSettings) saveMetadata() error {
 	path := m.Meta.path
 	str, err := json.MarshalIndent(m, "", "  ")
 	if err != nil {
@@ -239,42 +243,44 @@ func (m *UserConfig) saveMetadata() error {
 		return err
 	}
 
-	// runtime.EventsEmit(*m.ctx, "UpdatedConfig", m)
+	if m.backend.ctx != nil {
+		runtime.EventsEmit(m.backend.ctx, "UpdatedConfig", m)
+	}
 	return nil
 }
 
-func (m *UserConfig) UpdateTimesRan() {
+func (m *UserSettings) UpdateTimesRan() {
 	m.Meta.Ran += 1
 	m.saveMetadata()
 }
 
-func (m *UserConfig) GetTimesRan() int {
+func (m *UserSettings) GetTimesRan() int {
 	return m.Meta.Ran
 }
 
-func (m *UserConfig) SetUserSetting(key string, val string) {
+func (m *UserSettings) SetUserSetting(key string, val string) {
 	setUserSetting(m, key, val)
 	m.saveMetadata()
 }
 
-func (m *UserConfig) SetUserSettingBool(key string, val bool) {
+func (m *UserSettings) SetUserSettingBool(key string, val bool) {
 	setUserSetting(m, key, val)
 	m.saveMetadata()
 }
 
-func (m *UserConfig) SetUserSettingInt(key string, val int) {
+func (m *UserSettings) SetUserSettingInt(key string, val int) {
 	setUserSetting(m, key, val)
 	m.saveMetadata()
 }
 
-func setUserSetting[T int | string | bool](m *UserConfig, key string, val T) {
+func setUserSetting[T int | string | bool](m *UserSettings, key string, val T) {
 	err := setValue(m, key, val)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (m *UserConfig) SaveDict(name string, dictPath string, language string) {
+func (m *UserSettings) SaveDict(name string, dictPath string, language string) {
 	m.DictionariesConfig.Dicts[name] = Dict{
 		Path:     dictPath,
 		Language: language,
@@ -282,18 +288,18 @@ func (m *UserConfig) SaveDict(name string, dictPath string, language string) {
 	m.saveMetadata()
 }
 
-func (m *UserConfig) DeleteDict(name string) {
+func (m *UserSettings) DeleteDict(name string) {
 	delete(m.DictionariesConfig.Dicts, name)
 	m.saveMetadata()
 }
 
-func (m *UserConfig) SetPrimaryDict(dictName string) {
+func (m *UserSettings) SetPrimaryDict(dictName string) {
 	// TODO Make sure its a real dict
 	m.DictionariesConfig.PrimaryDict = dictName
 	m.saveMetadata()
 }
 
-func (m *UserConfig) GetMapping(modelName string) FieldsMapping {
+func (m *UserSettings) GetMapping(modelName string) FieldsMapping {
 	mapping, ok := m.AnkiConfig.ModelMappings[modelName]
 	if !ok {
 		return FieldsMapping{}
@@ -301,19 +307,19 @@ func (m *UserConfig) GetMapping(modelName string) FieldsMapping {
 	return mapping
 }
 
-func (m *UserConfig) SetMapping(modelName string, mapping FieldsMapping) error {
+func (m *UserSettings) SetMapping(modelName string, mapping FieldsMapping) error {
 	m.AnkiConfig.ModelMappings[modelName] = mapping
 	m.saveMetadata()
 	return nil
 }
 
-func (m *UserConfig) DeleteMapping(modelName string) error {
+func (m *UserSettings) DeleteMapping(modelName string) error {
 	delete(m.AnkiConfig.ModelMappings, modelName)
 	m.saveMetadata()
 	return nil
 }
 
-func (m *UserConfig) ExportMapping() FieldsMapping {
+func (m *UserSettings) ExportMapping() FieldsMapping {
 	return FieldsMapping{}
 
 }

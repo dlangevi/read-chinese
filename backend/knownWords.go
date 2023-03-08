@@ -20,11 +20,11 @@ type KnownWords struct {
 	characters   map[rune]bool
 	frequency    map[string]int
 	db           *sqlx.DB
-	userSettings *UserConfig
+	userSettings *UserSettings
 }
 
 func NewKnownWords(db *sqlx.DB,
-	userSettings *UserConfig,
+	userSettings *UserSettings,
 ) *KnownWords {
 	known := &KnownWords{
 		words:        map[string]int64{},

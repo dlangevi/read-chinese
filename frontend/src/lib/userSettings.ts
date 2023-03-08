@@ -14,13 +14,14 @@ import ModelManager
 import SettingsSlider
   from '@/components/SettingsWidgets/SettingsSlider.vue';
 import { backend } from '@wailsjs/models';
+import { EventsOn } from '../../wailsjs/runtime/runtime';
 
 import {
   SetUserSetting,
   SetUserSettingBool,
   SetUserSettingInt,
   GetUserSettings,
-} from '@wailsjs/backend/UserConfig';
+} from '@wailsjs/backend/UserSettings';
 
 type SettingsSetter<Type> = (arg1: string, arg2: Type) => Promise<void>
 
@@ -41,7 +42,6 @@ export type UserSetting<T> = {
   dataSource?: () => Promise<string[]>;
 };
 
-export let updateSettings = async () => {};
 function settingsObject<Type>(
   name:string,
   label:string,
@@ -55,9 +55,7 @@ function settingsObject<Type>(
     tooltip,
     type: widgetType,
     write: async function write(newValue: Type) {
-      // TODO this is the one part I need to iron out
       await setter(name, newValue);
-      await updateSettings();
     },
   };
   return option;
@@ -76,7 +74,6 @@ function selector(
     type: SettingsSelector,
     write: async function write(newValue:string) {
       await SetUserSetting(name, newValue);
-      await updateSettings();
     },
     dataSource,
   };
@@ -126,9 +123,9 @@ function slider(
 }
 
 type UserConfigDisplay = {
-  [K in keyof backend.UserConfig]: {
-    [P in keyof backend.UserConfig[K]]?:
-    UserSetting<backend.UserConfig[K][P]>
+  [K in keyof backend.UserSettings]: {
+    [P in keyof backend.UserSettings[K]]?:
+    UserSetting<backend.UserSettings[K][P]>
   }
 }
 
@@ -163,7 +160,6 @@ export const ComponentTable : UserConfigDisplay = {
       'Auto advance after sentence selection',
       'After picking a sentence, move to the next step',
     ),
-
     PopulateEnglish: checkBox(
       'PopulateEnglish',
       'Auto fill english definitions',
@@ -194,10 +190,8 @@ export const ComponentTable : UserConfigDisplay = {
       'Create card once all fields have been filled',
       'Create card once all fields have been filled',
     ),
-
   },
   AnkiConfig: {
-
     ActiveDeck: selector(
       'ActiveDeck',
       'Active Anki Deck',
@@ -208,13 +202,11 @@ export const ComponentTable : UserConfigDisplay = {
       'Active Anki Model',
       LoadModels,
     ),
-
     ModelMappings: {
       name: 'ModelMappings',
       label: 'ModelManager',
       type: ModelManager,
     } as UserSetting<{ [key: string]: backend.FieldsMapping }>,
-
     AllowDuplicates: checkBox(
       'AllowDuplicates',
       'Allow Duplicates',
@@ -227,7 +219,6 @@ export const ComponentTable : UserConfigDisplay = {
       'GenerateSentenceAudio',
       'Auto generate audio for example sentence',
     ),
-
     AzureApiKey: textBox(
       'AzureApiKey',
       'Azure Audio Api Key',
@@ -238,7 +229,6 @@ export const ComponentTable : UserConfigDisplay = {
       'Azure Image Api Key',
       'Setup an free azure bing search and put your key here',
     ),
-
     AddProgramTag: checkBox(
       'AddProgramTag',
       'Add read-chinese tag',
@@ -254,7 +244,6 @@ export const ComponentTable : UserConfigDisplay = {
       label: 'Dictionaries',
       type: DictionariesList,
     } as UserSetting<{ [key: string]: backend.Dict }>,
-
     ShowDefinitions: checkBox(
       'ShowDefinitions',
       'Show Definitions',
@@ -268,7 +257,6 @@ export const ComponentTable : UserConfigDisplay = {
     ),
   },
   SentenceGeneration: {
-
     KnownInterval: slider(
       'KnownInterval',
       'Time before a word is considered "known"',
@@ -282,7 +270,6 @@ export const ComponentTable : UserConfigDisplay = {
     ),
   },
   BookLibrary: {
-
     OnlyFavorites: checkBox(
       'OnlyFavorites',
       'Only show favorited books',
@@ -300,12 +287,8 @@ export const ComponentTable : UserConfigDisplay = {
 export async function generateUserSettings() {
   const settings = reactive(await GetUserSettings());
 
-  updateSettings = async () => {
-    // TODO this is a hacky way to update settings.
-    // It should be set locally and not have to do these syncs
-    // as they can end up having things out of sync in the front
-    // end
-    const newSettings = await GetUserSettings();
+  // Still not 100% happy with this
+  EventsOn('UpdatedConfig', (newSettings: backend.UserSettings) => {
     Object.entries(newSettings).forEach(([key, subList]) => {
       if (key === 'convertValues') {
         return;
@@ -323,7 +306,7 @@ export async function generateUserSettings() {
         }
       });
     });
-  };
+  });
 
   return settings;
 }

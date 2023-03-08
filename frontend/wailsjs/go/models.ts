@@ -467,7 +467,7 @@ export namespace backend {
 	        this.KnownInterval = source["KnownInterval"];
 	    }
 	}
-	export class UserConfig {
+	export class UserSettings {
 	    meta: MetaSettings;
 	    CardCreation: CardCreationConfig;
 	    AnkiConfig: AnkiConfig;
@@ -476,7 +476,7 @@ export namespace backend {
 	    BookLibrary: LibraryConfig;
 	
 	    static createFrom(source: any = {}) {
-	        return new UserConfig(source);
+	        return new UserSettings(source);
 	    }
 	
 	    constructor(source: any = {}) {

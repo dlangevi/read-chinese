@@ -43,7 +43,7 @@ const props = defineProps<{
 const UserSettings = getUserSettings();
 
 function getInitialValue(section: string, value: string) {
-  const segment = UserSettings[section as keyof backend.UserConfig];
+  const segment = UserSettings[section as keyof backend.UserSettings];
   const segvalue : unknown = segment[value as keyof typeof segment];
   return segvalue;
 }

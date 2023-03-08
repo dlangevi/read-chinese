@@ -12,7 +12,7 @@ export function GetMapping(arg1:string):Promise<backend.FieldsMapping>;
 
 export function GetTimesRan():Promise<number>;
 
-export function GetUserSettings():Promise<backend.UserConfig>;
+export function GetUserSettings():Promise<backend.UserSettings>;
 
 export function SaveDict(arg1:string,arg2:string,arg3:string):Promise<void>;
 
