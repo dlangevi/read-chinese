@@ -9,7 +9,11 @@
   {{ChineseDefinition}}
 </div>
 
-<div id="english" class="definition"></div>
+<div id="english" class="definition">
+</div>
+<div id="englishSrc" class="hide">
+	{{EnglishDefinition}}
+</div>
 
 <div class="image">
   {{Images}}
@@ -20,6 +24,9 @@
 </div>
 
 <div id="translation" class="sentence small"></div>
+<div id="translationSrc" class="hide">
+	{{SentenceTranslation}}
+</div>
 
 <div class="audio">
   {{HanziAudio}} {{SentenceAudio}}
@@ -31,6 +38,9 @@ function insertIfNonEmpty(dest, contents) {
     const elem = document.getElementById(dest);
     elem.innerHTML = contents
   }
+}
+function getContent(srcId) {
+	return document.getElementById(srcId).textContent;
 }
 
 function hintify(dest, contents, hintText) {
@@ -58,17 +68,18 @@ function hintify(dest, contents, hintText) {
   }
 }
 
-exampleSentence = '{{ExampleSentence}}';
-englishDefinition = '{{EnglishDefinition}}';
-chineseDefinition = '{{ChineseDefinition}}';
+englishDefinition = getContent("englishSrc");
+chineseDefinition = getContent("chinese");
 
 if (chineseDefinition.length > 0) {
-  hintify('english', englishDefinition,
+  insertIfNonEmpty("chinese", chineseDefinition);
+  hintify("english", englishDefinition,
           'Show English Definition')
 } else {
-  insertIfNonEmpty('english', englishDefinition);
+  insertIfNonEmpty("english", englishDefinition);
 }
 
-hintify('translation', '{{SentenceTranslation}}',
-        'Show Translation');
+insertIfNonEmpty("sentence", exampleSentence);
+hintify("translation", getContent("translationSrc"),
+          'Show Translation');
 </script>

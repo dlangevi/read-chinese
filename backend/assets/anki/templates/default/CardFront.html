@@ -2,6 +2,11 @@
 
 <div id="sentence" class="sentence"></div>
 
+<div class="hide">
+	<div id="sentenceSrc">{{ExampleSentence}}</div>
+	<div id="hanziSrc">{{Hanzi}}</div>
+</div>
+
 <script>
 function insertIfNonEmpty(dest, contents) {
   if (contents.length > 0) {
@@ -9,16 +14,19 @@ function insertIfNonEmpty(dest, contents) {
     elem.innerHTML = contents
   }
 }
+function getContent(srcId) {
+	return document.getElementById(srcId).textContent;
+}
 
-sentence = '{{ExampleSentence}}';
-hanzi = '{{Hanzi}}'
+sentence = getContent("sentenceSrc");
+hanzi = getContent("hanziSrc");
 
 if (sentence.length > 0) {
-  var yellowHanzi = hanzi.fontcolor('yellow');
+  var yellowHanzi = hanzi.fontcolor("yellow");
   var highlighted = sentence.replaceAll(hanzi, yellowHanzi);
-  document.getElementById('sentence').innerHTML = highlighted;
+  document.getElementById("sentence").innerHTML = highlighted;
 }
 else {
-  insertIfNonEmpty('hanzi', hanzi);
+  insertIfNonEmpty("hanzi", hanzi);
 }
 </script>
