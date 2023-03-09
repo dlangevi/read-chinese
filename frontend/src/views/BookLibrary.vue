@@ -11,19 +11,19 @@
         :initial-value="UserSettings.BookLibrary.HideRead"
       />
       <button
-        class="btn-primary btn-sm btn"
+        class="btn-primary btn"
         @click="syncCalibre"
       >
         Sync Calibre
       </button>
       <button
-        class="btn-primary btn-sm btn"
+        class="btn-primary btn"
         @click="exportBooks"
       >
         Export Book Stats
       </button>
       <button
-        class="btn-primary btn-sm btn"
+        class="btn-primary btn"
         @click="recalculateBooks"
       >
         Resegment Books

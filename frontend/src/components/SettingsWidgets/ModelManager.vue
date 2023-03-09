@@ -2,17 +2,8 @@
   <div class="col-span-3 row-span-2 flex flex-col gap-4">
     <div class="flex flex-wrap gap-4">
       <h2 class="text-2xl">
-        Configure Anki mappings:
+        Anki mappings for: {{ UserSettings.AnkiConfig.ActiveModel }}
       </h2>
-      <select v-model="currentModel" class="select-primary select">
-        <option
-          v-for="model in models"
-          :key="model"
-          :value="model"
-        >
-          {{ model }}
-        </option>
-      </select>
       <div class="btn-primary btn" @click="saveMapping">
         Save current mapping
       </div>
@@ -62,11 +53,13 @@ import {
 import {
   SetMapping,
   GetMapping,
-  GetUserSettings,
 } from '@wailsjs/backend/UserSettings';
 import {
   backend,
 } from '@wailsjs/models';
+
+import { getUserSettings } from '@/lib/userSettings';
+const UserSettings = getUserSettings();
 
 async function generateModel() {
   // call go backend
@@ -80,49 +73,36 @@ const filteredFields = computed((): FieldsMapKey[] => {
     return key !== 'firstField';
   }).map((key) => {
     return key as FieldsMapKey;
-    // return key as keyof backend.FieldsMapping;
   });
 });
 const models = ref<string[]>([]);
 const modelFields = ref<string[]>([]);
-const currentModel = ref('');
+const currentModel = computed(() => UserSettings.AnkiConfig.ActiveModel);
 const containsDefault = computed(
   () => models.value.includes('read-chinese-note'),
 );
 
-watch(fields, () => {
-  console.log(fields.value);
-});
+watch(
+  () => UserSettings.AnkiConfig.ActiveModel,
+  async (activeModel) => {
+    loadModel(activeModel);
+  });
 
-watch(currentModel, async () => {
-  if (currentModel.value !== '') {
-    fields.value = await GetMapping(currentModel.value);
-    modelFields.value = await LoadModelFields(currentModel.value);
+async function loadModel(activeModel : string) {
+  if (activeModel !== '') {
+    fields.value = await GetMapping(activeModel);
+    modelFields.value = await LoadModelFields(activeModel);
     fields.value.firstField = modelFields.value[0];
   }
-});
+}
 
 function saveMapping() {
-  console.log(currentModel.value, fields.value);
   SetMapping(currentModel.value, fields.value);
 }
 
 async function fetchModels() {
   return LoadModels().then(async (loaded) => {
-    if (loaded !== undefined) {
-      models.value = loaded;
-
-      // Ideally we would pass the usersettings in somehow
-      // But this works for now
-      const userSettings = await GetUserSettings();
-      const activeModel = userSettings.AnkiConfig.ActiveModel;
-      if (loaded.includes(activeModel)) {
-        currentModel.value = activeModel;
-      }
-    } else {
-      console.log('Failed to fetch data for selector');
-      setTimeout(fetchModels, 1000);
-    }
+    models.value = loaded;
   }).catch((err) => {
     console.log(err);
     setTimeout(fetchModels, 1000);
@@ -131,5 +111,6 @@ async function fetchModels() {
 
 onBeforeMount(async () => {
   await fetchModels();
+  loadModel(UserSettings.AnkiConfig.ActiveModel);
 });
 </script>
