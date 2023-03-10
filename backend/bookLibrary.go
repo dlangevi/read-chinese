@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"sort"
 	"strconv"
 
 	"github.com/jmoiron/sqlx"
@@ -28,6 +29,7 @@ type (
 		// Get all books
 		GetBooks() ([]Book, error)
 		GetDetailedBooks(path string) ([]Book, error)
+		GetBookGraph(bookId int64) ([]BookKnownQuery, error)
 		// Check if book already exists in collection
 		BookExists(author string, title string) (bool, error)
 		HealthCheck() error
@@ -91,7 +93,7 @@ type (
 
 	WordOccuranceRow struct {
 		Word      string `json:"word" db:"word"`
-		Occurance int    `json:"occurance" db:"occurance"`
+		Occurance int64  `json:"occurance" db:"occurance"`
 	}
 )
 
@@ -352,6 +354,52 @@ func (b *bookLibrary) GetDetailedBooks(path string) ([]Book, error) {
 	return books, nil
 }
 
+type BookKnownQuery struct {
+	Day      string `json:"day"`
+	knownInt int64
+	Known    float64 `json:"known"`
+}
+
+func (b *bookLibrary) GetBookGraph(bookId int64) ([]BookKnownQuery, error) {
+	frequencies, err := b.GetBookFrequencies(bookId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Map from day to how many words you learned on that day
+	dateMap := map[string]int64{}
+
+	for word, data := range b.backend.KnownWords.words {
+		fmtTime := data.LearnedOn.Format("2006年01月02日")
+		wordFreq := frequencies[word]
+		dateMap[fmtTime] += wordFreq
+	}
+
+	times := []BookKnownQuery{}
+	for date, num := range dateMap {
+		times = append(times, BookKnownQuery{
+			Day:      date,
+			knownInt: num,
+		})
+	}
+
+	sort.Slice(times, func(a, b int) bool {
+		return (times[a].Day <= times[b].Day)
+	})
+
+	totalWords, err := getTotalWords(b.db, bookId)
+	if err != nil {
+		return nil, err
+	}
+	var cumulative int64 = 0
+	for i := range times {
+		cumulative += times[i].knownInt
+		times[i].Known = (float64(cumulative) / float64(totalWords) * 100)
+	}
+
+	return times, nil
+}
+
 func (b *bookLibrary) BookExists(author string, title string) (bool, error) {
 	var exists bool
 	err := b.db.QueryRow(`SELECT exists (
@@ -379,9 +427,9 @@ func (b *bookLibrary) HealthCheck() error {
 	return nil
 }
 
-func (b *bookLibrary) GetFavoriteFrequencies() (map[string]int, error) {
+func (b *bookLibrary) GetFavoriteFrequencies() (map[string]int64, error) {
 	frequencies := []WordOccuranceRow{}
-	frequencyMap := map[string]int{}
+	frequencyMap := map[string]int64{}
 	err := b.db.Select(&frequencies, `
     SELECT word, sum(count) as occurance FROM frequency 
     WHERE EXISTS (
@@ -404,9 +452,9 @@ func (b *bookLibrary) GetFavoriteFrequencies() (map[string]int, error) {
 	return frequencyMap, nil
 }
 
-func (b *bookLibrary) GetBookFrequencies(bookId int) (map[string]int, error) {
+func (b *bookLibrary) GetBookFrequencies(bookId int64) (map[string]int64, error) {
 	frequencies := []WordOccuranceRow{}
-	frequencyMap := map[string]int{}
+	frequencyMap := map[string]int64{}
 	err := b.db.Select(&frequencies, `
     SELECT word, count as occurance FROM frequency 
     WHERE book = $1

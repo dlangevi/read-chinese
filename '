@@ -19,6 +19,7 @@ import (
 
 type WordData struct {
 	Interval  int64
+	Frequency int64
 	LearnedOn time.Time
 }
 
@@ -374,12 +375,12 @@ func (known *KnownWords) GetStatsInfo() ([]TimeQuery, error) {
 		return (times[a].Day <= times[b].Day)
 	})
 
-	cumulative := 0
+	cumluative := 0
 	cumulativeChar := 0
 	for i := range times {
-		cumulative += times[i].Known
+		cumluative += times[i].Known
 		cumulativeChar += times[i].KnownCharacters
-		times[i].Known = cumulative
+		times[i].Known = cumluative
 		times[i].KnownCharacters = cumulativeChar
 	}
 	return times, nil

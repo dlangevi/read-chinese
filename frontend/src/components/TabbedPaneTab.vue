@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isActive" :title="title">
+  <div v-if="isActive" :tab-title="tabTitle" class="h-full">
     <slot />
   </div>
 </template>
@@ -11,13 +11,13 @@ const activeTab = inject('activeTab');
 const isActive = ref(true);
 
 const props = defineProps({
-  title: {
+  tabTitle: {
     type: String,
-    default: 'TabbedPaneTab',
+    required: true,
   },
 });
 
 watch(activeTab, () => {
-  isActive.value = activeTab.value === props.title;
+  isActive.value = activeTab.value === props.tabTitle;
 });
 </script>

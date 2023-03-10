@@ -1,16 +1,16 @@
 <template>
-  <div>
+  <div class="h-full">
     <div class="tabs tabs-boxed mb-4">
       <a
         v-for="(tab, i) in tabs"
-        :key="tab.title"
+        :key="tab.getAttribute('tab-title') as string"
         :class="['tab', {'tab-active': i == selected}]"
         @click="selectTab(i)"
       >
-        {{ tab.title }}
+        {{ tab.getAttribute('tab-title') }}
       </a>
     </div>
-    <div ref="children">
+    <div ref="children" class="h-full">
       <slot />
     </div>
   </div>
@@ -36,6 +36,6 @@ onMounted(() => {
 
 function selectTab(i:number) {
   selected.value = i;
-  activeTab.value = tabs.value[i].title;
+  activeTab.value = tabs.value[i].getAttribute('tab-title') as string;
 }
 </script>

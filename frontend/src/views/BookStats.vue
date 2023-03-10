@@ -1,10 +1,11 @@
 <template>
   <div
+    ref="styleRef"
     class="flex"
     has-sider
   >
     <div
-      class="basis-1/4"
+      class="h-full basis-1/4"
       bordered
       content-style="padding: 24px;"
     >
@@ -14,75 +15,92 @@
         :alt="book.title"
       >
     </div>
-    <div class="grow basis-3/4">
+    <div class="flex h-full grow basis-3/4 flex-col">
       <div
-        class="p-4"
+        class="flex place-items-center p-4"
         bordered
       >
-        <p class="text-3xl">{{ book.author }} - {{ book.title }}</p>
+        <h2 class="text-3xl">{{ book.author }} - {{ book.title }}</h2>
+        <div class="flex grow place-content-end">
+          <button
+            class="btn-primary btn"
+            @click="makeFlashCards"
+          >
+            Make flash cards
+          </button>
+        </div>
       </div>
-      <div class="p-8">
-        <tabbed-pane>
+      <div class="grow p-8">
+        <tabbed-pane class="h-full">
           <tabbed-pane-tab
             name="Stats"
-            title="Stats"
+            tab-title="Stats"
           >
-            <div class="stats shadow">
-              <div class="stat place-items-center">
-                <div class="stat-title"> Known </div>
-                <div class="stat-value"> {{ known.toFixed(2) }}% </div>
-              </div>
-              <div class="stat place-items-center">
-                <div class="stat-title"> Can Read </div>
-                <div class="stat-value"> {{ likelyKnown.toFixed(2) }}% </div>
-              </div>
-              <div class="stat place-items-center">
-                <div class="stat-title"> Known Characters </div>
-                <div class="stat-value">
-                  {{ knownCharacters.toFixed(2) }}%
+            <div class="flex h-full gap-4">
+              <div class="flex w-1/2 flex-col gap-4">
+                <div class="stats shadow">
+                  <div
+                    v-for="val, title in {
+                      'Total Words': stats?.totalWords,
+                      'Total Characters': stats?.totalCharacters,
+                      'Unique Characters': stats?.uniqueCharacters,
+                      'Unique Words': stats?.uniqueWords,
+                    }"
+                    :key="title"
+                    class="stat place-items-center"
+                  >
+                    <div class="stat-title"> {{ title }} </div>
+                    <div class="stat-value"> {{ val }} </div>
+                  </div>
                 </div>
+
+                <div class="stats shadow">
+                  <div
+                    v-for="val, title in {
+                      Known: known.toFixed(2),
+                      'Can Read': likelyKnown.toFixed(2),
+                      'Known Characters': knownCharacters.toFixed(2),
+                    }"
+                    :key="title"
+                    class="stat place-items-center"
+                  >
+                    <div class="stat-title"> {{ title }} </div>
+                    <div class="stat-value"> {{ val }}% </div>
+                  </div>
+                </div>
+
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Target</th>
+                      <th>Needed Words</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="pair in targetPairs"
+                      :key="pair.target"
+                      :label="pair.target"
+                      :value="pair.words"
+                    >
+                      <td>{{ pair.target }}</td>
+                      <td>{{ pair.words }}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <div class="stat place-items-center">
-                <div class="stat-title"> Total Words </div>
-                <div class="stat-value"> {{ stats?.totalWords }} </div>
-              </div>
-              <div class="stat place-items-center">
-                <div class="stat-title"> Total Characters </div>
-                <div class="stat-value"> {{ stats?.totalCharacters }} </div>
-              </div>
-              <div class="stat place-items-center">
-                <div class="stat-title"> Unique Characters </div>
-                <div class="stat-value"> {{ stats?.uniqueCharacters }} </div>
-              </div>
-              <div class="stat place-items-center">
-                <div class="stat-title"> Unique Words </div>
-                <div class="stat-value"> {{ stats?.uniqueWords }} </div>
+              <div class="h-3/4 w-1/2">
+                <Line
+                  v-if="loaded"
+                  :data="data"
+                  :options="options"
+                />
               </div>
             </div>
-
-            <table class="table w-full">
-              <thead>
-                <tr>
-                  <th>Target</th>
-                  <th>Needed Words</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="pair in targetPairs"
-                  :key="pair.target"
-                  :label="pair.target"
-                  :value="pair.words"
-                >
-                  <td>{{ pair.target }}</td>
-                  <td>{{ pair.words }}</td>
-                </tr>
-              </tbody>
-            </table>
           </tabbed-pane-tab>
           <tabbed-pane-tab
             name="UnknownWords"
-            title="View Unknown Words"
+            tab-title="View Unknown Words"
           >
             <unknown-words
               class="h-96"
@@ -91,19 +109,6 @@
             />
           </tabbed-pane-tab>
         </tabbed-pane>
-      </div>
-      <div
-        class="p-4"
-        bordered
-      >
-        <div class="flex place-content-end">
-          <button
-            class="btn-primary btn"
-            @click="makeFlashCards"
-          >
-            Make flash cards
-          </button>
-        </div>
       </div>
     </div>
   </div>
@@ -117,14 +122,44 @@ import { useCardQueue } from '@/stores/CardQueue';
 import { backend } from '@wailsjs/models';
 import { EventsOn, EventsOff } from '../../wailsjs/runtime/runtime';
 import {
-  onUnmounted, onBeforeMount, ref, computed,
+  onUnmounted, onMounted, ref, computed,
 } from 'vue';
+
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import type { ChartData } from 'chart.js';
+import { Line } from 'vue-chartjs';
 
 import {
   TopUnknownWords,
   LearningTargetBook,
+  GetBookGraph,
   GetBook,
 } from '@wailsjs/backend/bookLibrary';
+
+// TODO this is jank and global
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+);
+
+const options = {
+  responsive: true,
+  maintainAspectRatio: false,
+};
 
 const props = defineProps({
   bookId: {
@@ -144,6 +179,11 @@ const targetPairs = ref<{
   target: number,
   words: number,
 }[]>([]);
+const data = ref<ChartData<'line'>>({
+  datasets: [],
+});
+const loaded = ref(false);
+const styleRef = ref<HTMLElement | null>(null);
 
 async function loadBook() {
   book.value = await GetBook(props.bookId);
@@ -168,9 +208,29 @@ async function loadBook() {
     { target: e, words: needToKnow[i] }));
 }
 
-onBeforeMount(async () => {
+onMounted(async () => {
+  if (!styleRef.value) {
+    console.error('styleref not there');
+    return;
+  }
   await loadBook();
   words.value = await LearningTargetBook(book.value.bookId);
+  const rawdata = await GetBookGraph(book.value.bookId);
+  const style = getComputedStyle(styleRef.value);
+  const primary = `hsl(${style.getPropertyValue('--p')}`;
+  data.value = {
+    labels: rawdata.map(d => d.day),
+    datasets: [{
+      label: 'Percent known over time',
+      backgroundColor: primary,
+      borderColor: primary,
+      pointRadius: 0,
+      tension: 0.5,
+      data: rawdata.map(d => d.known),
+    }],
+  };
+  loaded.value = true;
+
   EventsOn('AddedWord', async () => {
     loadBook();
   });

@@ -152,6 +152,20 @@ export namespace backend {
 		    return a;
 		}
 	}
+	export class BookKnownQuery {
+	    day: string;
+	    known: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new BookKnownQuery(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.day = source["day"];
+	        this.known = source["known"];
+	    }
+	}
 	
 	export class CalibreBook {
 	    authors: string;

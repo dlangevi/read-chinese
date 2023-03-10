@@ -22,6 +22,10 @@ export function GetBookFrequencies(arg1) {
   return window['go']['backend']['bookLibrary']['GetBookFrequencies'](arg1);
 }
 
+export function GetBookGraph(arg1) {
+  return window['go']['backend']['bookLibrary']['GetBookGraph'](arg1);
+}
+
 export function GetBooks() {
   return window['go']['backend']['bookLibrary']['GetBooks']();
 }

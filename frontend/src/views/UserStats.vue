@@ -26,7 +26,12 @@
       </div>
     </div>
     <div class="h-full w-4/5 p-4">
-      <Line v-if="loaded" :data="data" :options="options" />
+      <Line
+        v-if="loaded"
+        :data="data"
+        :options="options"
+        :plugins="plugins"
+      />
     </div>
   </div>
 </template>
@@ -46,7 +51,6 @@ import {
 } from 'chart.js';
 import type { ChartData } from 'chart.js';
 import { Line } from 'vue-chartjs';
-// import type { ChartProps } from 'vue-chartjs';
 import { ref, onMounted } from 'vue';
 
 ChartJS.register(
@@ -58,6 +62,18 @@ ChartJS.register(
   Tooltip,
   Legend,
 );
+const options = {
+  responsive: true,
+};
+const plugins = [
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+];
 
 const styleRef = ref<HTMLElement | null>(null);
 
@@ -102,9 +118,5 @@ onMounted(async () => {
   };
   loaded.value = true;
 });
-
-const options = {
-  responsive: true,
-};
 
 </script>

@@ -12,6 +12,8 @@ export function GetBook(arg1:number):Promise<backend.Book>;
 
 export function GetBookFrequencies(arg1:number):Promise<{[key: string]: number}>;
 
+export function GetBookGraph(arg1:number):Promise<Array<backend.BookKnownQuery>>;
+
 export function GetBooks():Promise<Array<backend.Book>>;
 
 export function GetDetailedBooks(arg1:string):Promise<Array<backend.Book>>;
