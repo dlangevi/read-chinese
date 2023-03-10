@@ -153,6 +153,28 @@ export namespace backend {
 		}
 	}
 	
+	export class CalibreBook {
+	    authors: string;
+	    cover: string;
+	    formats: string[];
+	    id: number;
+	    title: string;
+	    exists: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new CalibreBook(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.authors = source["authors"];
+	        this.cover = source["cover"];
+	        this.formats = source["formats"];
+	        this.id = source["id"];
+	        this.title = source["title"];
+	        this.exists = source["exists"];
+	    }
+	}
 	export class CardCreationConfig {
 	    AutoAdvanceSentence: boolean;
 	    PopulateEnglish: boolean;

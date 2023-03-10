@@ -7,7 +7,7 @@
       Import from CSV
     </button>
 
-    <Teleport to="body">
+    <Teleport to="#app-root">
       <div
         :class="['modal', {'modal-open': importCsvModal}]"
         @click="() => importCsvModal = false"

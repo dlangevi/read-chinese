@@ -12,6 +12,7 @@ import (
 	"strconv"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type (
@@ -134,6 +135,15 @@ func copyCover(author string, title string, coverPath string) (string, error) {
 	return subpath, err
 }
 
+func (b *bookLibrary) emitBooks() error {
+	books, err := b.GetSomeBooks()
+	if err != nil {
+		return err
+	}
+	runtime.EventsEmit(b.backend.ctx, "BooksUpdated", books)
+	return nil
+}
+
 func (b *bookLibrary) RecalculateBooks() error {
 	books, err := b.GetBooks()
 	if err != nil {
@@ -165,6 +175,7 @@ func (b *bookLibrary) RecalculateBooks() error {
 		b.backend.progress()
 	}
 
+	b.emitBooks()
 	return nil
 }
 
@@ -196,6 +207,7 @@ func (b *bookLibrary) AddBook(
 	}
 	_, err = saveWordTable(b.db, int(bookId), wordTable)
 	// This can be nil
+	b.emitBooks()
 	return bookId, err
 }
 
@@ -225,7 +237,9 @@ func (b *bookLibrary) DeleteBook(bookId int64) error {
 		tx.Rollback()
 		return err
 	}
-	return tx.Commit()
+	err = tx.Commit()
+	b.emitBooks()
+	return err
 }
 
 // Returns details for single book, with extra stats
@@ -673,6 +687,7 @@ func (b *bookLibrary) SetFavorite(bookId int64, isFavorite bool) error {
   UPDATE books 
   SET favorite = ?1 
   WHERE bookId = ?2`, isFavorite, bookId)
+	b.emitBooks()
 	return err
 }
 
@@ -681,6 +696,7 @@ func (b *bookLibrary) SetRead(bookId int64, isRead bool) error {
   UPDATE books 
   SET has_read = ?1 
   WHERE bookId = ?2`, isRead, bookId)
+	b.emitBooks()
 	return err
 }
 

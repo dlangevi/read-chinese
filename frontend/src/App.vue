@@ -1,6 +1,6 @@
 <template>
   <div
-    id="app"
+    id="app-root"
     class="overflow-hide text-base-content"
     :data-theme="UserSettings.meta.Theme"
   >
@@ -45,7 +45,7 @@ const route = useRoute();
 </script>
 
 <style>
-#app {
+#app-root {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

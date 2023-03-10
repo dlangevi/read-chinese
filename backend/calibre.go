@@ -1,7 +1,9 @@
 package backend
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"log"
 	"os/exec"
 	"strings"
@@ -28,34 +30,41 @@ type CalibreBook struct {
 	Formats []string `json:"formats"`
 	Id      int64    `json:"id"`
 	Title   string   `json:"title"`
+	Exists  bool     `json:"exists"`
 }
 
-func getCalibreBooks() ([]CalibreBook, error) {
+func (c *Calibre) GetCalibreBooks() ([]CalibreBook, error) {
 	books := []CalibreBook{}
 	// TODO have user specify calibre dictionary (optional)
 	calibre := exec.Command("calibredb", "list",
 		"--for-machine",
 		"--fields", "cover,authors,title,formats")
-	output, err := calibre.Output()
+
+	var stdout, stderr bytes.Buffer
+	calibre.Stdout = &stdout
+	calibre.Stderr = &stderr
+	err := calibre.Run()
+	if err != nil {
+		return books, errors.New(stderr.String())
+	}
+	err = json.Unmarshal(stdout.Bytes(), &books)
 	if err != nil {
 		return books, err
 	}
-	err = json.Unmarshal(output, &books)
-	if err != nil {
-		return books, err
+
+	for i := range books {
+		exists, err := c.backend.BookLibrary.BookExists(
+			books[i].Author, books[i].Title)
+		if err != nil {
+			return nil, err
+		}
+		books[i].Exists = exists
 	}
 
 	return books, nil
 }
 
-func (c *Calibre) ImportCalibreBooks() error {
-	log.Println("Loading calibre")
-	books, err := getCalibreBooks()
-	if err != nil {
-		log.Println("Failed", err)
-		return err
-	}
-
+func (c *Calibre) ImportCalibreBooks(books []CalibreBook) error {
 	c.backend.setupProgress("Processing calibre books", len(books))
 	for _, book := range books {
 		log.Println("Trying", book.Author, book.Title)

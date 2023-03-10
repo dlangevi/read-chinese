@@ -11,12 +11,14 @@
         <h2 class="text-2xl font-extrabold text-white">
           Before Getting Started
         </h2>
-        <div
-          class="btn-primary btn"
+        <button
+          class="
+          btn-primary
+          btn"
           @click="firstFailure?.buttonAction"
         >
           {{ firstFailure?.buttonText }}
-        </div>
+        </button>
       </div>
       <ul class="list-outside list-disc space-y-2">
         <li
@@ -98,6 +100,17 @@
         <model-manager />
       </div>
     </div>
+    <div
+      :class="['modal', {'modal-open': bookImport}]"
+      @click="() => bookImport = false"
+    >
+      <div
+        class="modal-box flex w-4/5 max-w-full flex-col gap-4"
+        @click.stop
+      >
+        <book-importer />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -105,11 +118,9 @@
 import { onBeforeUnmount, watch, reactive, computed, ref } from 'vue';
 import { BrowserOpenURL } from '@runtime/runtime';
 import { ComponentTable, getUserSettings } from '@/lib/userSettings';
-import { useLoader } from '@/lib/loading';
 
 import { HealthCheck as bookHealth } from '@wailsjs/backend/bookLibrary';
 import { HealthCheck as dictHealth } from '@wailsjs/backend/Dictionaries';
-import { ImportCalibreBooks } from '@wailsjs/backend/Calibre';
 import {
   HealthCheck as ankiHealth,
   ConfigurationCheck as ankiConfigured,
@@ -117,15 +128,18 @@ import {
 
 import SettingsSelector from
   '@/components/SettingsWidgets/SettingsSelector.vue';
+import BookImporter from
+  '@/components/BookImporter.vue';
+
 import DictionariesList
   from '@/components/SettingsWidgets/DictionariesList.vue';
 import ModelManager
   from '@/components/SettingsWidgets/ModelManager.vue';
 
-const loader = useLoader();
 const UserSettings = getUserSettings();
 const ankiInfo = ref(false);
 const dictInfo = ref(false);
+const bookImport = ref(false);
 const ankiConfigure = ref(false);
 
 type HealthCheckInfo = {
@@ -153,7 +167,7 @@ const checks = reactive<{
     buttonText: 'Sync Calibre',
     description: 'Import at least one book',
     checkAction: bookHealth,
-    buttonAction: async () => { loader.withLoader(ImportCalibreBooks); },
+    buttonAction: async () => { bookImport.value = true; },
   },
   AnkiAvaliable: {
     buttonText: 'How to setup Anki',
@@ -177,10 +191,14 @@ watch(
     checks.Dictionary.passes,
     checks.AnkiAvaliable.passes,
     checks.AnkiConfigured.passes,
+    checks.BookLibrary.passes,
   ],
   () => {
     if (checks.Dictionary.passes) {
       dictInfo.value = false;
+    }
+    if (checks.BookLibrary.passes) {
+      bookImport.value = false;
     }
     if (checks.AnkiAvaliable.passes) {
       ankiInfo.value = false;

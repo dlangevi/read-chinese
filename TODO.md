@@ -6,14 +6,12 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 
 #### Still Intend to Do
 - [ ] more compact library table view
-- [ ] interactive workflow for importing from calibre
 - [ ] add new book (without needing calibre)
 - [ ] use calibre (if possible) to convert from epub etc to txt file
 - [ ] chinese voice picker
 - [ ] View and edit known words
 - [ ] write dev install guide 
 - [ ] Import from multiple anki decks
-- [ ] update image / audio when editing card
 - [ ] unflag anki cards on edit
 - [ ] 90% test coverage for go code
 - [ ] linux scrollbars dont work in webview
@@ -29,6 +27,8 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 - [ ] free edit of card fields
 
 ### DONE
+- [x] interactive workflow for importing from calibre
+- [x] update image / audio when editing card
 - [x] card maintenance (search for missing image, audio, etc)
 - [x] push premade card format to anki for new users
 - [x] allow mapping output to arbitrary anki note / deck format

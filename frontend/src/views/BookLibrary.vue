@@ -10,12 +10,7 @@
         :setting="ComponentTable.BookLibrary.HideRead"
         :initial-value="UserSettings.BookLibrary.HideRead"
       />
-      <button
-        class="btn-primary btn"
-        @click="syncCalibre"
-      >
-        Sync Calibre
-      </button>
+      <book-importer />
       <button
         class="btn-primary btn"
         @click="exportBooks"
@@ -54,11 +49,12 @@
 
 <script lang="ts" setup>
 import {
-  onBeforeMount, ref, computed, Ref,
+  onUnmounted, onBeforeMount, ref, computed, Ref,
 } from 'vue';
 import BookCard from '@/components/BookCard.vue';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
+import BookImporter from '@/components/BookImporter.vue';
 import { getUserSettings, ComponentTable } from '@/lib/userSettings';
 import { backend } from '@wailsjs/models';
 import { SaveFile } from '@wailsjs/backend/Backend';
@@ -66,14 +62,10 @@ import {
   GetBooks, GetDetailedBooks,
   RecalculateBooks,
 } from '@wailsjs/backend/bookLibrary';
-import { ImportCalibreBooks } from '@wailsjs/backend/Calibre';
 import { useLoader } from '@/lib/loading';
 import WithSidebar from '@/layouts/WithSidebar.vue';
+import { EventsOn } from '../../wailsjs/runtime/runtime';
 const loader = useLoader();
-
-async function syncCalibre() {
-  return loader.withLoader(ImportCalibreBooks);
-}
 
 async function exportBooks() {
   const filename = await SaveFile();
@@ -106,7 +98,18 @@ const favoriteFilter = computed(
       });
   });
 
+let cancelUpdater = () => {};
 onBeforeMount(async () => {
   books.value = await GetBooks();
+  cancelUpdater = EventsOn('BooksUpdated', (newBooks : backend.Book[]) => {
+    console.log('books updated', newBooks);
+    books.value = newBooks;
+  });
+  console.log('cancleUpdater', cancelUpdater);
+});
+
+onUnmounted(async () => {
+  console.log('calling cancleUpdater', cancelUpdater);
+  // cancelUpdater();
 });
 </script>
