@@ -95,6 +95,7 @@ func (c *Calibre) ImportCalibreBooks(books []CalibreBook) error {
 		} else {
 			log.Println("It exists")
 		}
+		c.backend.KnownWords.syncFrequency()
 		c.backend.progress()
 	}
 	return nil

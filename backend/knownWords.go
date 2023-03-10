@@ -14,26 +14,27 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type KnownWords struct {
 	// For now just map word to interval
-	words        map[string]int64
-	characters   map[rune]bool
-	frequency    map[string]int
-	db           *sqlx.DB
-	userSettings *UserSettings
+	words      map[string]int64
+	characters map[rune]bool
+	frequency  map[string]int
+	db         *sqlx.DB
+	backend    *Backend
 }
 
 func NewKnownWords(db *sqlx.DB,
-	userSettings *UserSettings,
+	backend *Backend,
 ) *KnownWords {
 	known := &KnownWords{
-		words:        map[string]int64{},
-		characters:   map[rune]bool{},
-		frequency:    map[string]int{},
-		db:           db,
-		userSettings: userSettings,
+		words:      map[string]int64{},
+		characters: map[rune]bool{},
+		frequency:  map[string]int{},
+		db:         db,
+		backend:    backend,
 	}
 	known.syncWords()
 	known.syncFrequency()
@@ -116,7 +117,9 @@ func (known *KnownWords) AddWord(word string, age int64) error {
 		return err
 	}
 	known.words[word] = age
-	return tx.Commit()
+	err = tx.Commit()
+	runtime.EventsEmit(known.backend.ctx, "AddedWord")
+	return err
 }
 
 type WordEntry struct {
@@ -244,7 +247,8 @@ func (known *KnownWords) ImportCSVWords(path string) error {
 
 func (known *KnownWords) isWellKnown(word string) bool {
 	interval, ok := known.words[word]
-	return ok && interval >= int64(known.userSettings.SentenceGenerationConfig.KnownInterval)
+	return ok && interval >= int64(
+		known.backend.UserSettings.SentenceGenerationConfig.KnownInterval)
 }
 
 func (known *KnownWords) isKnown(word string) bool {

@@ -30,31 +30,33 @@
             <div class="stats shadow">
               <div class="stat place-items-center">
                 <div class="stat-title"> Known </div>
-                <div class="stat-value"> {{ known }}% </div>
+                <div class="stat-value"> {{ known.toFixed(2) }}% </div>
               </div>
               <div class="stat place-items-center">
                 <div class="stat-title"> Can Read </div>
-                <div class="stat-value"> {{ likelyKnown }}% </div>
+                <div class="stat-value"> {{ likelyKnown.toFixed(2) }}% </div>
               </div>
               <div class="stat place-items-center">
                 <div class="stat-title"> Known Characters </div>
-                <div class="stat-value"> {{ knownCharacters }}% </div>
+                <div class="stat-value">
+                  {{ knownCharacters.toFixed(2) }}%
+                </div>
               </div>
               <div class="stat place-items-center">
                 <div class="stat-title"> Total Words </div>
-                <div class="stat-value"> {{ totalWords }} </div>
+                <div class="stat-value"> {{ stats?.totalWords }} </div>
               </div>
               <div class="stat place-items-center">
                 <div class="stat-title"> Total Characters </div>
-                <div class="stat-value"> {{ totalCharacters }} </div>
+                <div class="stat-value"> {{ stats?.totalCharacters }} </div>
               </div>
               <div class="stat place-items-center">
                 <div class="stat-title"> Unique Characters </div>
-                <div class="stat-value"> {{ uniqueCharacters }} </div>
+                <div class="stat-value"> {{ stats?.uniqueCharacters }} </div>
               </div>
               <div class="stat place-items-center">
                 <div class="stat-title"> Unique Words </div>
-                <div class="stat-value"> {{ uniqueWords }} </div>
+                <div class="stat-value"> {{ stats?.uniqueWords }} </div>
               </div>
             </div>
 
@@ -112,7 +114,11 @@ import TabbedPane from '@/layouts/TabbedPane.vue';
 import TabbedPaneTab from '@/components/TabbedPaneTab.vue';
 import UnknownWords from '@/components/UnknownWords.vue';
 import { useCardQueue } from '@/stores/CardQueue';
-import type { backend } from '@wailsjs/models';
+import { backend } from '@wailsjs/models';
+import { EventsOn, EventsOff } from '../../wailsjs/runtime/runtime';
+import {
+  onUnmounted, onBeforeMount, ref, computed,
+} from 'vue';
 
 import {
   TopUnknownWords,
@@ -127,26 +133,52 @@ const props = defineProps({
   },
 });
 
-const book:backend.Book = await GetBook(props.bookId);
-const words = await LearningTargetBook(book.bookId);
-const { stats } = book;
+const words = ref<string[]>([]);
+const book = ref<backend.Book>(backend.Book.createFrom());
+const stats = computed(() => book.value.stats);
 
-const known = (
-  (stats.totalKnownWords / stats.totalWords) * 100).toFixed(2);
-const likelyKnown = (
-  (stats.probablyKnownWords / stats.totalWords) * 100).toFixed(2);
-const knownCharacters = (
-  (stats.knownCharacters / stats.totalCharacters) * 100).toFixed(2);
+const known = ref(0);
+const likelyKnown = ref(0);
+const knownCharacters = ref(0);
+const targetPairs = ref<{
+  target: number,
+  words: number,
+}[]>([]);
 
-const {
-  totalWords, totalCharacters,
-  uniqueWords, uniqueCharacters,
-} = book.stats;
-const firstTarget = stats.needToKnow.findIndex((n) => n !== 0);
-const targets = stats.targets.slice(firstTarget, firstTarget + 3);
-const needToKnow = stats.needToKnow.slice(firstTarget, firstTarget + 3);
-const targetPairs = targets.map((e, i) => (
-  { target: e, words: needToKnow[i] }));
+async function loadBook() {
+  book.value = await GetBook(props.bookId);
+  const { stats } = book.value;
+
+  known.value = (
+    (stats.totalKnownWords / stats.totalWords) * 100);
+  likelyKnown.value = (
+    (stats.probablyKnownWords / stats.totalWords) * 100);
+  knownCharacters.value = (
+    (stats.knownCharacters / stats.totalCharacters) * 100);
+
+  const firstTarget = stats.needToKnow.findIndex((n) => n !== 0);
+
+  const targets = stats.targets.slice(
+    firstTarget, firstTarget + 3);
+
+  const needToKnow = stats.needToKnow.slice(
+    firstTarget, firstTarget + 3);
+
+  targetPairs.value = targets.map((e, i) => (
+    { target: e, words: needToKnow[i] }));
+}
+
+onBeforeMount(async () => {
+  await loadBook();
+  words.value = await LearningTargetBook(book.value.bookId);
+  EventsOn('AddedWord', async () => {
+    loadBook();
+  });
+});
+
+onUnmounted(() => {
+  EventsOff('AddedWord');
+});
 
 const store = useCardQueue();
 async function makeFlashCards() {

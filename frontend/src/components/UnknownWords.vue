@@ -94,10 +94,12 @@ const columnDefs:ColDef[] = [
 
 const rowData = ref<UnknownWordRow[]>([]);
 watch(() => props.words, async () => {
+  console.log(props.words);
   updateWords();
 });
 
 async function updateWords() {
+  console.log(props.words);
   const definitions : WordDefinitions = await GetDefinitions(props.words);
   let occurances : {
     [key:string] :number

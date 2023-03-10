@@ -64,7 +64,7 @@ import {
 } from '@wailsjs/backend/bookLibrary';
 import { useLoader } from '@/lib/loading';
 import WithSidebar from '@/layouts/WithSidebar.vue';
-import { EventsOn } from '../../wailsjs/runtime/runtime';
+import { EventsOn, EventsOff } from '../../wailsjs/runtime/runtime';
 const loader = useLoader();
 
 async function exportBooks() {
@@ -98,18 +98,14 @@ const favoriteFilter = computed(
       });
   });
 
-let cancelUpdater = () => {};
 onBeforeMount(async () => {
   books.value = await GetBooks();
-  cancelUpdater = EventsOn('BooksUpdated', (newBooks : backend.Book[]) => {
-    console.log('books updated', newBooks);
+  EventsOn('BooksUpdated', (newBooks : backend.Book[]) => {
     books.value = newBooks;
   });
-  console.log('cancleUpdater', cancelUpdater);
 });
 
 onUnmounted(async () => {
-  console.log('calling cancleUpdater', cancelUpdater);
-  // cancelUpdater();
+  EventsOff('BooksUpdated');
 });
 </script>

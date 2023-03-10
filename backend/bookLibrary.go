@@ -175,6 +175,7 @@ func (b *bookLibrary) RecalculateBooks() error {
 		b.backend.progress()
 	}
 
+	b.backend.KnownWords.syncFrequency()
 	b.emitBooks()
 	return nil
 }

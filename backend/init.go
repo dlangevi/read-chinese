@@ -86,7 +86,7 @@ func NewBackend(
 	log.Printf("Ran %v times", ran)
 
 	backend.UserSettings = userSettings
-	backend.KnownWords = NewKnownWords(db, userSettings)
+	backend.KnownWords = NewKnownWords(db, backend)
 	backend.ImageClient = NewImageClient(userSettings)
 	backend.Dictionaries = NewDictionaries(backend)
 	backend.AnkiInterface = NewAnkiInterface(backend)
