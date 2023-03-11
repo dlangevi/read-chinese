@@ -40,7 +40,7 @@ function insertIfNonEmpty(dest, contents) {
   }
 }
 function getContent(srcId) {
-	return document.getElementById(srcId).textContent;
+	return document.getElementById(srcId).innerHTML;
 }
 
 function hintify(dest, contents, hintText) {
@@ -71,7 +71,7 @@ function hintify(dest, contents, hintText) {
 englishDefinition = getContent("englishSrc");
 chineseDefinition = getContent("chinese");
 
-if (chineseDefinition.length > 0) {
+if (chineseDefinition.trim().length > 0) {
   insertIfNonEmpty("chinese", chineseDefinition);
   hintify("english", englishDefinition,
           'Show English Definition')
