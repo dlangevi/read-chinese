@@ -57,7 +57,6 @@ func (i *ImageClient) SearchImages(query string) ([]ImageInfo, error) {
 		SetQueryParams(map[string]string{
 			"q":          query,
 			"count":      "30",
-			"imageType":  "AnimatedGif",
 			"safeSearch": "Strict",
 		}).
 		SetResult(result).
