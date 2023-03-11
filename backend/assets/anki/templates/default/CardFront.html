@@ -15,7 +15,7 @@ function insertIfNonEmpty(dest, contents) {
   }
 }
 function getContent(srcId) {
-	return document.getElementById(srcId).innerHTML;
+	return document.getElementById(srcId).innerHTML.trim();
 }
 
 sentence = getContent("sentenceSrc");
