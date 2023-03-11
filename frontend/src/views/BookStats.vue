@@ -2,20 +2,15 @@
   <div
     ref="styleRef"
     class="flex"
-    has-sider
   >
-    <div
-      class="h-full basis-1/4"
-      bordered
-      content-style="padding: 24px;"
-    >
+    <div class="h-full w-1/4 p-4">
       <img
         class="w-auto rounded"
         :src="'/' + book.cover"
         :alt="book.title"
       >
     </div>
-    <div class="flex h-full grow basis-3/4 flex-col">
+    <div class="flex h-full w-3/4 flex-col">
       <div
         class="flex place-items-center p-4"
         bordered
@@ -103,7 +98,7 @@
             tab-title="View Unknown Words"
           >
             <unknown-words
-              class="h-96"
+              class="h-4/5"
               :words="words"
               :book-filter="bookId"
             />
