@@ -10,16 +10,24 @@ const (
 	IMAGEURI = "https://api.bing.microsoft.com"
 )
 
+type ThumbnailInfo struct {
+	Width  int64 `json:"width"`
+	Height int64 `json:"height"`
+}
+
 // The format Azure responds in
 type AzureImageInfo struct {
-	Name         string
-	ThumbnailUrl string `json:"thumbnailUrl"`
+	Name          string
+	ThumbnailUrl  string
+	ThumbnailInfo ThumbnailInfo `json:"thumbnail"`
 }
 
 type ImageInfo struct {
-	Name      string `json:"name,omitempty"`
-	Url       string `json:"url,omitempty"`
-	ImageData string `json:"imageData,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Url         string `json:"url,omitempty"`
+	ImageData   string `json:"imageData,omitempty"`
+	ImageWidth  int64  `json:"imageWidth,omitEmpty"`
+	ImageHeight int64  `json:"imageHeight,omitEmpty"`
 }
 
 type ImageResponse struct {
@@ -48,22 +56,24 @@ func (i *ImageClient) SearchImages(query string) ([]ImageInfo, error) {
 		SetHeader("Ocp-Apim-Subscription-Key", i.userSettings.AnkiConfig.AzureImageApiKey).
 		SetQueryParams(map[string]string{
 			"q":          query,
-			"count":      "6",
-			"imageType":  "Photo",
+			"count":      "30",
+			"imageType":  "AnimatedGif",
 			"safeSearch": "Strict",
 		}).
 		SetResult(result).
 		Get("/v7.0/images/search")
-	// TODO need some better way of error detection
-	if len(result.Value) != 6 {
+		// TODO need some better way of error detection
+	if len(result.Value) != 30 {
 		err = errors.New(fmt.Sprintf("Something failed with imageSearch %v", rsp))
 	}
 
 	imageInfo := []ImageInfo{}
 	for _, image := range result.Value {
 		imageInfo = append(imageInfo, ImageInfo{
-			Name: image.Name,
-			Url:  image.ThumbnailUrl,
+			Name:        image.Name,
+			Url:         image.ThumbnailUrl,
+			ImageWidth:  image.ThumbnailInfo.Width,
+			ImageHeight: image.ThumbnailInfo.Height,
 		})
 	}
 

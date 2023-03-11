@@ -1,8 +1,14 @@
 package backend
 
 import (
+	"bytes"
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"strings"
 	"time"
 
@@ -264,6 +270,22 @@ func toError(restErr *restError.RestErr) error {
 	return errors.New(fmt.Sprintf("%v, %v", restErr.Error, restErr.Message))
 }
 
+func getImageSize(base64String string) (width int, height int, err error) {
+	// Decode base64 string into bytes
+	imageBytes, err := base64.StdEncoding.DecodeString(base64String)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	// Read image dimensions from byte array
+	img, _, err := image.DecodeConfig(bytes.NewReader(imageBytes))
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return img.Width, img.Height, nil
+}
+
 func (a *ankiInterface) GetAnkiNote(noteId int64) (RawAnkiNote, error) {
 	currentMapping, err := a.getConfiguredMapping()
 	if err != nil {
@@ -310,12 +332,19 @@ func (a *ankiInterface) GetAnkiNote(noteId int64) (RawAnkiNote, error) {
 		}
 		f(doc)
 		for _, name := range imageNames {
-			image, err := a.anki.Media.RetrieveMediaFile(name)
-			if err != nil {
-				return RawAnkiNote{}, toError(err)
+			image, restErr := a.anki.Media.RetrieveMediaFile(name)
+			if restErr != nil {
+				return RawAnkiNote{}, toError(restErr)
 			}
+			width, height, err := getImageSize(*image)
+			if err != nil {
+				return RawAnkiNote{}, err
+			}
+
 			images = append(images, ImageInfo{
-				ImageData: *image,
+				ImageData:   *image,
+				ImageWidth:  int64(width),
+				ImageHeight: int64(height),
 			})
 		}
 

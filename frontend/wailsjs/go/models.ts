@@ -299,6 +299,8 @@ export namespace backend {
 	    name?: string;
 	    url?: string;
 	    imageData?: string;
+	    imageWidth: number;
+	    imageHeight: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new ImageInfo(source);
@@ -309,6 +311,8 @@ export namespace backend {
 	        this.name = source["name"];
 	        this.url = source["url"];
 	        this.imageData = source["imageData"];
+	        this.imageWidth = source["imageWidth"];
+	        this.imageHeight = source["imageHeight"];
 	    }
 	}
 	export class Fields {
