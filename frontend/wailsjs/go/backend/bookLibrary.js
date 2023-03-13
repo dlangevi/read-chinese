@@ -14,6 +14,10 @@ export function DeleteBook(arg1) {
   return window['go']['backend']['bookLibrary']['DeleteBook'](arg1);
 }
 
+export function ExportDetailedBooks(arg1) {
+  return window['go']['backend']['bookLibrary']['ExportDetailedBooks'](arg1);
+}
+
 export function GetBook(arg1) {
   return window['go']['backend']['bookLibrary']['GetBook'](arg1);
 }
@@ -26,20 +30,16 @@ export function GetBookGraph(arg1) {
   return window['go']['backend']['bookLibrary']['GetBookGraph'](arg1);
 }
 
-export function GetBooks() {
-  return window['go']['backend']['bookLibrary']['GetBooks']();
+export function GetBooks(arg1) {
+  return window['go']['backend']['bookLibrary']['GetBooks'](arg1);
 }
 
-export function GetDetailedBooks(arg1) {
-  return window['go']['backend']['bookLibrary']['GetDetailedBooks'](arg1);
+export function GetDetailedBooks() {
+  return window['go']['backend']['bookLibrary']['GetDetailedBooks']();
 }
 
 export function GetFavoriteFrequencies() {
   return window['go']['backend']['bookLibrary']['GetFavoriteFrequencies']();
-}
-
-export function GetSomeBooks(arg1) {
-  return window['go']['backend']['bookLibrary']['GetSomeBooks'](arg1);
 }
 
 export function HealthCheck() {

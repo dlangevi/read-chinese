@@ -36,10 +36,10 @@
                 <div class="stats shadow">
                   <div
                     v-for="val, title in {
-                      'Total Words': stats?.totalWords,
-                      'Total Characters': stats?.totalCharacters,
-                      'Unique Characters': stats?.uniqueCharacters,
-                      'Unique Words': stats?.uniqueWords,
+                      'Total Words': book.totalWords,
+                      'Total Characters': book.totalCharacters,
+                      'Unique Characters': book.uniqueCharacters,
+                      'Unique Words': book.uniqueWords,
                     }"
                     :key="title"
                     class="stat place-items-center"
@@ -117,7 +117,7 @@ import { useCardQueue } from '@/stores/CardQueue';
 import { backend } from '@wailsjs/models';
 import { EventsOn, EventsOff } from '../../wailsjs/runtime/runtime';
 import {
-  onUnmounted, onMounted, ref, computed,
+  onUnmounted, onMounted, ref,
 } from 'vue';
 
 import {
@@ -165,8 +165,6 @@ const props = defineProps({
 
 const words = ref<string[]>([]);
 const book = ref<backend.Book>(backend.Book.createFrom());
-const stats = computed(() => book.value.stats);
-
 const known = ref(0);
 const likelyKnown = ref(0);
 const knownCharacters = ref(0);
@@ -185,11 +183,11 @@ async function loadBook() {
   const { stats } = book.value;
 
   known.value = (
-    (stats.totalKnownWords / stats.totalWords) * 100);
+    (stats.totalKnownWords / book.value.totalWords) * 100);
   likelyKnown.value = (
-    (stats.probablyKnownWords / stats.totalWords) * 100);
+    (stats.probablyKnownWords / book.value.totalWords) * 100);
   knownCharacters.value = (
-    (stats.knownCharacters / stats.totalCharacters) * 100);
+    (stats.knownCharacters / book.value.totalCharacters) * 100);
 
   const firstTarget = stats.needToKnow.findIndex((n) => n !== 0);
 

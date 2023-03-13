@@ -8,19 +8,19 @@ export function BookExists(arg1:string,arg2:string):Promise<boolean>;
 
 export function DeleteBook(arg1:number):Promise<Error>;
 
+export function ExportDetailedBooks(arg1:string):Promise<Error>;
+
 export function GetBook(arg1:number):Promise<backend.Book>;
 
 export function GetBookFrequencies(arg1:number):Promise<{[key: string]: number}>;
 
 export function GetBookGraph(arg1:number):Promise<Array<backend.BookKnownQuery>>;
 
-export function GetBooks():Promise<Array<backend.Book>>;
+export function GetBooks(arg1:Array<number>):Promise<Array<backend.Book>>;
 
-export function GetDetailedBooks(arg1:string):Promise<Array<backend.Book>>;
+export function GetDetailedBooks():Promise<Array<backend.Book>>;
 
 export function GetFavoriteFrequencies():Promise<{[key: string]: number}>;
-
-export function GetSomeBooks(arg1:Array<number>):Promise<Array<backend.Book>>;
 
 export function HealthCheck():Promise<Error>;
 

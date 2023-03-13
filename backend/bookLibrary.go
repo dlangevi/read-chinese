@@ -11,6 +11,7 @@ import (
 	"path"
 	"sort"
 	"strconv"
+	"sync"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -19,17 +20,16 @@ import (
 type (
 	BookLibrary interface {
 		// Add book to collection of books
-		AddBook(author string, title string, cover string, filepath string) (int64, error)
+		AddBook(author string, title string, cover string, filepath string) (int, error)
 		// Delete book from book collection
-		DeleteBook(bookId int64) error
+		DeleteBook(bookId int) error
 		// Get a book by its unique identifier
-		GetBook(bookId int64) (Book, error)
-		// Get a list of books by their unique identifiers
-		GetSomeBooks(bookIds ...int64) ([]Book, error)
+		GetBook(bookId int) (Book, error)
 		// Get all books
-		GetBooks() ([]Book, error)
-		GetDetailedBooks(path string) ([]Book, error)
-		GetBookGraph(bookId int64) ([]BookKnownQuery, error)
+		GetBooks(bookIds ...int) ([]Book, error)
+		GetDetailedBooks() ([]Book, error)
+		ExportDetailedBooks(path string) error
+		GetBookGraph(bookId int) ([]BookKnownQuery, error)
 		// Check if book already exists in collection
 		BookExists(author string, title string) (bool, error)
 		HealthCheck() error
@@ -44,13 +44,12 @@ type (
 		// Get the words in a specific book that occure the most often
 		LearningTargetBook(bookId int) []string
 		TopUnknownWords(bookId int, numWords int) []string
-		computeKnownCharacters(book *Book) error
 		TotalRead() (int, error)
 
 		// Mark book as a favorite
-		SetFavorite(bookId int64, isFavorite bool) error
+		SetFavorite(bookId int, isFavorite bool) error
 		// Mark book as having been read
-		SetRead(bookId int64, isRead bool) error
+		SetRead(bookId int, isRead bool) error
 	}
 
 	// bookLibrary implements bookLibrary
@@ -64,20 +63,22 @@ type (
 		Title         string         `db:"title" json:"title"`
 		Cover         string         `db:"cover" json:"cover"`
 		Filepath      string         `db:"filepath" json:"filepath"`
-		BookId        int64          `db:"bookId" json:"bookId"`
+		BookId        int            `db:"bookId" json:"bookId"`
 		Favorite      bool           `db:"favorite" json:"favorite"`
 		SegmentedFile sql.NullString `db:"segmented_file"`
 		HasRead       bool           `db:"has_read" json:"hasRead"`
-		Stats         BookStats      `json:"stats"`
+
+		TotalWords       int `db:"totalwords" json:"totalWords"`
+		UniqueWords      int `db:"uniquewords" json:"uniqueWords"`
+		TotalCharacters  int `db:"totalcharacters" json:"totalCharacters"`
+		UniqueCharacters int `db:"uniquecharacters" json:"uniqueCharacters"`
+
+		Stats BookStats `json:"stats"`
 	}
 
 	BookStats struct {
 		ProbablyKnownWords int   `json:"probablyKnownWords"`
 		KnownCharacters    int   `json:"knownCharacters"`
-		UniqueCharacters   int   `json:"uniqueCharacters"`
-		UniqueWords        int   `json:"uniqueWords"`
-		TotalCharacters    int   `json:"totalCharacters"`
-		TotalWords         int   `json:"totalWords"`
 		TotalKnownWords    int   `json:"totalKnownWords"`
 		Targets            []int `json:"targets"`
 		TargetOccurances   []int `json:"targetOccurances"`
@@ -93,7 +94,7 @@ type (
 
 	WordOccuranceRow struct {
 		Word      string `json:"word" db:"word"`
-		Occurance int64  `json:"occurance" db:"occurance"`
+		Occurance int    `json:"occurance" db:"occurance"`
 	}
 )
 
@@ -101,14 +102,11 @@ func NewBookStats() BookStats {
 	return BookStats{
 		ProbablyKnownWords: 0,
 		KnownCharacters:    0,
-		TotalCharacters:    0,
-		TotalWords:         0,
 		TotalKnownWords:    0,
 		Targets:            []int{},
 		TargetOccurances:   []int{},
 		NeedToKnow:         []int{},
 	}
-
 }
 
 func NewBookLibrary(
@@ -138,7 +136,7 @@ func copyCover(author string, title string, coverPath string) (string, error) {
 }
 
 func (b *bookLibrary) emitBooks() error {
-	books, err := b.GetSomeBooks()
+	books, err := b.GetBooks()
 	if err != nil {
 		return err
 	}
@@ -155,25 +153,11 @@ func (b *bookLibrary) RecalculateBooks() error {
 	for _, book := range books {
 		log.Println("Processing:", book.Title, "...")
 		filepath := book.Filepath
-		sentences, wordTable, err := b.backend.Segmentation.SegmentFullText(filepath)
-		if err != nil {
-			return err
-		}
 
-		cacheLocation := getSegmentationPath(book.Title, book.Author)
-		err = saveCacheFile(b.db, int(book.BookId), sentences, cacheLocation)
-		if err != nil {
-			return err
-		}
+		b.computeBookSqlData(
+			filepath, int(book.BookId),
+			book.Title, book.Author)
 
-		err = deleteWordTable(b.db, int(book.BookId))
-		if err != nil {
-			return err
-		}
-		_, err = saveWordTable(b.db, int(book.BookId), wordTable)
-		if err != nil {
-			return err
-		}
 		b.backend.progress()
 	}
 
@@ -186,7 +170,7 @@ func (b *bookLibrary) AddBook(
 	author string,
 	title string,
 	cover string,
-	filepath string) (int64, error) {
+	filepath string) (int, error) {
 
 	// If there is a problem copying cover maybe that is not a big deal?
 	cover, err := copyCover(author, title, cover)
@@ -197,24 +181,49 @@ func (b *bookLibrary) AddBook(
 	if err != nil {
 		return 0, err
 	}
-	sentences, wordTable, err := b.backend.Segmentation.SegmentFullText(filepath)
+
+	err = b.computeBookSqlData(filepath, int(bookId), title, author)
 	if err != nil {
 		return 0, err
+	}
+
+	b.emitBooks()
+	return bookId, nil
+}
+
+func (b *bookLibrary) computeBookSqlData(
+	filepath string, bookId int,
+	title string, author string) error {
+
+	sentences, wordTable, err := b.backend.Segmentation.SegmentFullText(filepath)
+	if err != nil {
+		return err
+	}
+
+	// Compute some unchanging stats based off of segmentation
+	err = saveBookCalculated(b.db, bookId, wordTable)
+	if err != nil {
+		return err
 	}
 
 	// Compute WordTable and Save it
 	cacheLocation := getSegmentationPath(title, author)
-	err = saveCacheFile(b.db, int(bookId), sentences, cacheLocation)
+	err = saveCacheFile(b.db, bookId, sentences, cacheLocation)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	_, err = saveWordTable(b.db, int(bookId), wordTable)
-	// This can be nil
-	b.emitBooks()
-	return bookId, err
+
+	err = deleteWordTable(b.db, bookId)
+	if err != nil {
+		return err
+	}
+
+	_, err = saveWordTable(b.db, bookId, wordTable)
+
+	return nil
 }
 
-func addBookToDb(db *sqlx.DB, author string, title string, cover string, filepath string) (int64, error) {
+func addBookToDb(db *sqlx.DB, author string, title string, cover string, filepath string) (int, error) {
 	res, err := db.Exec(`
   INSERT INTO books (author, title, cover, filepath)
   VALUES ($1, $2, $3, $4)
@@ -222,10 +231,11 @@ func addBookToDb(db *sqlx.DB, author string, title string, cover string, filepat
 	if err != nil {
 		return 0, err
 	}
-	return res.LastInsertId()
+	id, err := res.LastInsertId()
+	return int(id), err
 }
 
-func (b *bookLibrary) DeleteBook(bookId int64) error {
+func (b *bookLibrary) DeleteBook(bookId int) error {
 	tx, err := b.db.Begin()
 	if err != nil {
 		return err
@@ -246,8 +256,8 @@ func (b *bookLibrary) DeleteBook(bookId int64) error {
 }
 
 // Returns details for single book, with extra stats
-func (b *bookLibrary) GetBook(bookId int64) (Book, error) {
-	books, err := b.GetSomeBooks(bookId)
+func (b *bookLibrary) GetBook(bookId int) (Book, error) {
+	books, err := b.getBooks(bookId)
 	if err != nil {
 		return Book{}, err
 	}
@@ -255,13 +265,13 @@ func (b *bookLibrary) GetBook(bookId int64) (Book, error) {
 		return Book{}, errors.New("Book did not exist")
 	}
 	book := books[0]
-	b.computeKnownCharacters(&book)
+	b.computeItAll(&book)
 	computeWordTargets(b.db, &book)
 
 	return book, nil
 }
 
-func getBooks(db *sqlx.DB, bookIds ...int64) ([]Book, error) {
+func (b *bookLibrary) getBooks(bookIds ...int) ([]Book, error) {
 	books := []Book{}
 	var args []interface{}
 	var err error
@@ -274,7 +284,11 @@ func getBooks(db *sqlx.DB, bookIds ...int64) ([]Book, error) {
     bookId,
     favorite,
     segmented_file,
-    has_read
+    has_read,
+    totalwords,
+    uniquewords,
+    totalcharacters,
+    uniquecharacters
   FROM books`
 	if len(bookIds) != 0 {
 		query = fmt.Sprintf(`%v WHERE bookId in (?)`, query)
@@ -283,36 +297,58 @@ func getBooks(db *sqlx.DB, bookIds ...int64) ([]Book, error) {
 			return books, err
 		}
 	}
-	err = db.Select(&books, query, args...)
+	err = b.db.Select(&books, query, args...)
 	if err != nil {
 		return books, err
 	}
-	return books, nil
-}
-
-func (b *bookLibrary) GetSomeBooks(bookIds ...int64) ([]Book, error) {
-	books, _ := getBooks(b.db, bookIds...)
 	for index := range books {
 		book := &books[index]
 		book.Stats = NewBookStats()
-		// For now, only these are needed by BookCard
-		book.Stats.TotalKnownWords, _ = getKnownWords(b.db, book.BookId)
-		book.Stats.TotalWords, _ = getTotalWords(b.db, book.BookId)
 	}
 	return books, nil
 }
 
 // Returns summary of all books
-func (b *bookLibrary) GetBooks() ([]Book, error) {
-	return b.GetSomeBooks()
+func (b *bookLibrary) GetBooks(bookIds ...int) ([]Book, error) {
+	defer duration(track("GetBooks"))
+	books, err := b.getBooks(bookIds...)
+	if err != nil {
+		return nil, err
+	}
+	for index := range books {
+		book := &books[index]
+		// For now, only these are needed by BookCard
+		book.Stats.TotalKnownWords, _ = getKnownWords(b.db, book.BookId)
+	}
+	return books, nil
 }
 
-func (b *bookLibrary) GetDetailedBooks(path string) ([]Book, error) {
-	books, _ := getBooks(b.db)
+func (b *bookLibrary) GetDetailedBooks() ([]Book, error) {
+	defer duration(track("GetDetailedBooks"))
+	books, _ := b.getBooks()
+
+	var wg sync.WaitGroup
+	for index := range books {
+		book := &books[index]
+		book.Stats = NewBookStats()
+		wg.Add(1)
+		go func(book *Book) {
+			defer wg.Done()
+			b.computeItAll(book)
+			// If we want this
+			computeWordTargets(b.db, book)
+		}(book)
+	}
+	wg.Wait()
+	return books, nil
+}
+
+func (b *bookLibrary) ExportDetailedBooks(path string) error {
+	books, _ := b.GetDetailedBooks()
 
 	f, err := os.Create(path)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer f.Close()
 	writer := csv.NewWriter(f)
@@ -330,19 +366,13 @@ func (b *bookLibrary) GetDetailedBooks(path string) ([]Book, error) {
 
 	for index := range books {
 		book := &books[index]
-		book.Stats = NewBookStats()
-		// For now, only these are needed by BookCard
-		book.Stats.TotalKnownWords, _ = getKnownWords(b.db, book.BookId)
-		book.Stats.TotalWords, _ = getTotalWords(b.db, book.BookId)
-		b.computeKnownCharacters(book)
-		computeWordTargets(b.db, book)
 		writer.Write([]string{
 			book.Author,
 			book.Title,
-			strconv.Itoa(book.Stats.UniqueCharacters),
-			strconv.Itoa(book.Stats.UniqueWords),
-			strconv.Itoa(book.Stats.TotalCharacters),
-			strconv.Itoa(book.Stats.TotalWords),
+			strconv.Itoa(book.UniqueCharacters),
+			strconv.Itoa(book.UniqueWords),
+			strconv.Itoa(book.TotalCharacters),
+			strconv.Itoa(book.TotalWords),
 			strconv.Itoa(book.Stats.KnownCharacters),
 			strconv.Itoa(book.Stats.ProbablyKnownWords),
 			strconv.Itoa(book.Stats.TotalKnownWords),
@@ -351,23 +381,23 @@ func (b *bookLibrary) GetDetailedBooks(path string) ([]Book, error) {
 
 	writer.Flush()
 
-	return books, nil
+	return nil
 }
 
 type BookKnownQuery struct {
 	Day      string `json:"day"`
-	knownInt int64
+	knownInt int
 	Known    float64 `json:"known"`
 }
 
-func (b *bookLibrary) GetBookGraph(bookId int64) ([]BookKnownQuery, error) {
+func (b *bookLibrary) GetBookGraph(bookId int) ([]BookKnownQuery, error) {
 	frequencies, err := b.GetBookFrequencies(bookId)
 	if err != nil {
 		return nil, err
 	}
 
 	// Map from day to how many words you learned on that day
-	dateMap := map[string]int64{}
+	dateMap := map[string]int{}
 
 	for word, data := range b.backend.KnownWords.words {
 		fmtTime := data.LearnedOn.Format("2006年01月02日")
@@ -391,7 +421,7 @@ func (b *bookLibrary) GetBookGraph(bookId int64) ([]BookKnownQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	var cumulative int64 = 0
+	var cumulative int = 0
 	for i := range times {
 		cumulative += times[i].knownInt
 		times[i].Known = (float64(cumulative) / float64(totalWords) * 100)
@@ -427,9 +457,9 @@ func (b *bookLibrary) HealthCheck() error {
 	return nil
 }
 
-func (b *bookLibrary) GetFavoriteFrequencies() (map[string]int64, error) {
+func (b *bookLibrary) GetFavoriteFrequencies() (map[string]int, error) {
 	frequencies := []WordOccuranceRow{}
-	frequencyMap := map[string]int64{}
+	frequencyMap := map[string]int{}
 	err := b.db.Select(&frequencies, `
     SELECT word, sum(count) as occurance FROM frequency 
     WHERE EXISTS (
@@ -452,9 +482,9 @@ func (b *bookLibrary) GetFavoriteFrequencies() (map[string]int64, error) {
 	return frequencyMap, nil
 }
 
-func (b *bookLibrary) GetBookFrequencies(bookId int64) (map[string]int64, error) {
+func (b *bookLibrary) GetBookFrequencies(bookId int) (map[string]int, error) {
 	frequencies := []WordOccuranceRow{}
-	frequencyMap := map[string]int64{}
+	frequencyMap := map[string]int{}
 	err := b.db.Select(&frequencies, `
     SELECT word, count as occurance FROM frequency 
     WHERE book = $1
@@ -564,7 +594,7 @@ func (b *bookLibrary) TopUnknownWords(bookId int, numWords int) []string {
 
 }
 
-func getKnownWords(db *sqlx.DB, bookId int64) (int, error) {
+func getKnownWords(db *sqlx.DB, bookId int) (int, error) {
 	var known sql.NullInt64
 	err := db.QueryRow(`
     SELECT SUM(count) as known 
@@ -576,16 +606,16 @@ func getKnownWords(db *sqlx.DB, bookId int64) (int, error) {
         WHERE words.word==frequency.word
     )`, bookId).Scan(&known)
 	if err != nil {
-		log.Println("Error with getKnownWords", err)
+		return 0, err
 	}
 	if known.Valid {
-		return int(known.Int64), err
+		return int(known.Int64), nil
 	} else {
-		return 0, err
+		return 0, errors.New("getKnownWords known NullInt is not valid")
 	}
 }
 
-func getTotalWords(db *sqlx.DB, bookId int64) (int, error) {
+func getTotalWords(db *sqlx.DB, bookId int) (int, error) {
 	var total sql.NullInt64
 	err := db.QueryRow(`
     SELECT SUM(count) as known 
@@ -602,47 +632,52 @@ func getTotalWords(db *sqlx.DB, bookId int64) (int, error) {
 	}
 }
 
-func (b *bookLibrary) computeKnownCharacters(book *Book) error {
+func (b *bookLibrary) computeItAll(book *Book) error {
 	words := []struct {
 		Word  string
 		Count int
 	}{}
 
+	// Get the word list once
 	err := b.db.Select(&words, `
     SELECT word, count 
     FROM frequency 
     WHERE book = $1
+    ORDER BY count DESC
     `, book.BookId)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
-	var probablyKnownWords = 0
-	var knownCharacters = 0
-	var totalCharacters = 0
-	var uniqueWords = map[string]bool{}
-	var uniqueCharacters = map[rune]bool{}
-	for _, row := range words {
-		totalCharacters += len([]rune(row.Word)) * row.Count
-		allKnown := true
-		uniqueWords[row.Word] = true
-		for _, char := range row.Word {
-			uniqueCharacters[char] = true
-			if b.backend.KnownWords.isKnownChar(char) {
-				knownCharacters += row.Count
-			} else {
-				allKnown = false
+
+	// Compute everything at once
+	for rowIndex := range words {
+		row := &words[rowIndex]
+		totalCharacters := row.Count * int(len([]rune(row.Word)))
+
+		// If we know the word we can do some stuff quickly
+		if b.backend.KnownWords.isKnown(row.Word) {
+			book.Stats.TotalKnownWords += row.Count
+			book.Stats.ProbablyKnownWords += row.Count
+			book.Stats.KnownCharacters += totalCharacters
+		} else {
+			allKnown := true
+			for _, char := range row.Word {
+				if b.backend.KnownWords.isKnownChar(char) {
+					book.Stats.KnownCharacters += row.Count
+				} else {
+					allKnown = false
+				}
+			}
+			if allKnown {
+				book.Stats.ProbablyKnownWords += row.Count
 			}
 		}
-		if b.backend.KnownWords.isKnown(row.Word) || allKnown {
-			probablyKnownWords += row.Count
-		}
 	}
-	book.Stats.UniqueCharacters = len(uniqueCharacters)
-	book.Stats.UniqueWords = len(uniqueWords)
-	book.Stats.ProbablyKnownWords = probablyKnownWords
-	book.Stats.KnownCharacters = knownCharacters
-	book.Stats.TotalCharacters = totalCharacters
+	// TODO
+	// Targets            []int
+	// TargetOccurances   []int
+	// NeedToKnow         []int
+
 	return nil
 }
 
@@ -674,11 +709,11 @@ func computeWordTargets(db *sqlx.DB, book *Book) error {
 	targetOccurances := []int{}
 	needToKnow := []int{}
 	for _, target := range targets {
-		targetOccurance := int(float64(target*book.Stats.TotalWords) / 100)
-		targetOccurances = append(targetOccurances, int(targetOccurance))
+		targetOccurance := int(float64(target*book.TotalWords) / 100)
+		targetOccurances = append(targetOccurances, targetOccurance)
 
 		soFar := book.Stats.TotalKnownWords
-		needToLearn := 0
+		needToLearn := int(0)
 		for _, row := range words {
 			if soFar > targetOccurance {
 				break
@@ -731,7 +766,7 @@ func (b *bookLibrary) TotalReadChars() (int, error) {
 	}
 }
 
-func (b *bookLibrary) SetFavorite(bookId int64, isFavorite bool) error {
+func (b *bookLibrary) SetFavorite(bookId int, isFavorite bool) error {
 	_, err := b.db.Exec(`
   UPDATE books 
   SET favorite = ?1 
@@ -740,7 +775,7 @@ func (b *bookLibrary) SetFavorite(bookId int64, isFavorite bool) error {
 	return err
 }
 
-func (b *bookLibrary) SetRead(bookId int64, isRead bool) error {
+func (b *bookLibrary) SetRead(bookId int, isRead bool) error {
 	_, err := b.db.Exec(`
   UPDATE books 
   SET has_read = ?1 
@@ -837,6 +872,37 @@ func saveWordTable(db *sqlx.DB, bookId int, frequencyTable FrequencyTable) (sql.
 	}
 	err = tx.Commit()
 	return res, err
+}
+
+func saveBookCalculated(db *sqlx.DB, bookId int, frequencyTable FrequencyTable) error {
+	var uniqueCharacters = map[rune]bool{}
+	totalWords := 0
+	uniqueWords := len(frequencyTable)
+	totalCharacters := 0
+	for word, count := range frequencyTable {
+		totalWords += count
+		totalCharacters += len([]rune(word)) * count
+		for _, char := range word {
+			uniqueCharacters[char] = true
+		}
+	}
+	_, err := db.Exec(`
+  UPDATE books 
+  SET totalcharacters = ?1,
+      totalwords = ?2,
+      uniquecharacters = ?3,
+      uniquewords = ?4
+  WHERE bookId = ?5`,
+		totalCharacters,
+		totalWords,
+		len(uniqueCharacters),
+		uniqueWords,
+		bookId)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // TODO might want to run the segementation preloadWords on

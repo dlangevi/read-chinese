@@ -139,7 +139,7 @@ func (g *Generator) GenerateSentenceTable() error {
 	defer g.cacheLock.Unlock()
 	defer duration(track("Full Generate"))
 	numSentences := 0
-	books, _ := g.backend.BookLibrary.GetSomeBooks()
+	books, _ := g.backend.BookLibrary.GetBooks()
 	g.sentenceCache = map[string]SentenceCache{}
 	var wg sync.WaitGroup
 	for _, book := range books {
@@ -156,7 +156,7 @@ func (g *Generator) GenerateSentenceTable() error {
 
 func (g *Generator) UpdateSentenceTable(newWord string) error {
 	defer duration(track("New Word Generate"))
-	books, _ := g.backend.BookLibrary.GetSomeBooks()
+	books, _ := g.backend.BookLibrary.GetBooks()
 
 	var wg sync.WaitGroup
 	for _, book := range books {
@@ -210,12 +210,12 @@ type Sentence struct {
 }
 
 // This can still be optimized a ton
-func (g *Generator) GetSentencesForWord(word string, bookIds []int64) ([]Sentence, error) {
+func (g *Generator) GetSentencesForWord(word string, bookIds []int) ([]Sentence, error) {
 	defer duration(track("Get Sentences"))
 	g.cacheLock.Lock()
 	defer g.cacheLock.Unlock()
 
-	books, _ := g.backend.BookLibrary.GetSomeBooks(bookIds...)
+	books, _ := g.backend.BookLibrary.GetBooks(bookIds...)
 	sentences := []Sentence{}
 
 	if g.backend.KnownWords.isKnown(word) {

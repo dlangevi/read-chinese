@@ -81,10 +81,6 @@ export namespace backend {
 	export class BookStats {
 	    probablyKnownWords: number;
 	    knownCharacters: number;
-	    uniqueCharacters: number;
-	    uniqueWords: number;
-	    totalCharacters: number;
-	    totalWords: number;
 	    totalKnownWords: number;
 	    targets: number[];
 	    targetOccurances: number[];
@@ -98,10 +94,6 @@ export namespace backend {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.probablyKnownWords = source["probablyKnownWords"];
 	        this.knownCharacters = source["knownCharacters"];
-	        this.uniqueCharacters = source["uniqueCharacters"];
-	        this.uniqueWords = source["uniqueWords"];
-	        this.totalCharacters = source["totalCharacters"];
-	        this.totalWords = source["totalWords"];
 	        this.totalKnownWords = source["totalKnownWords"];
 	        this.targets = source["targets"];
 	        this.targetOccurances = source["targetOccurances"];
@@ -116,6 +108,10 @@ export namespace backend {
 	    bookId: number;
 	    favorite: boolean;
 	    hasRead: boolean;
+	    totalWords: number;
+	    uniqueWords: number;
+	    totalCharacters: number;
+	    uniqueCharacters: number;
 	    stats: BookStats;
 	
 	    static createFrom(source: any = {}) {
@@ -131,6 +127,10 @@ export namespace backend {
 	        this.bookId = source["bookId"];
 	        this.favorite = source["favorite"];
 	        this.hasRead = source["hasRead"];
+	        this.totalWords = source["totalWords"];
+	        this.uniqueWords = source["uniqueWords"];
+	        this.totalCharacters = source["totalCharacters"];
+	        this.uniqueCharacters = source["uniqueCharacters"];
 	        this.stats = this.convertValues(source["stats"], BookStats);
 	    }
 	

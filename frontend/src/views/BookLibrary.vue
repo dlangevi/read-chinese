@@ -59,8 +59,8 @@ import { getUserSettings, ComponentTable } from '@/lib/userSettings';
 import { backend } from '@wailsjs/models';
 import { SaveFile } from '@wailsjs/backend/Backend';
 import {
-  GetBooks, GetDetailedBooks,
-  RecalculateBooks,
+  GetDetailedBooks,
+  RecalculateBooks, ExportDetailedBooks,
 } from '@wailsjs/backend/bookLibrary';
 import { useLoader } from '@/lib/loading';
 import WithSidebar from '@/layouts/WithSidebar.vue';
@@ -69,7 +69,7 @@ const loader = useLoader();
 
 async function exportBooks() {
   const filename = await SaveFile();
-  return GetDetailedBooks(filename);
+  return ExportDetailedBooks(filename);
 }
 
 async function recalculateBooks() {
@@ -92,14 +92,15 @@ const favoriteFilter = computed(
         if (!onlyFavorites) return true;
         return book.favorite;
       }).sort((bookA, bookB) => {
-        const aKnown = (bookA.stats.totalKnownWords / bookA.stats.totalWords);
-        const bKnown = (bookB.stats.totalKnownWords / bookB.stats.totalWords);
+        const aKnown = (bookA.stats.totalKnownWords / bookA.totalWords);
+        const bKnown = (bookB.stats.totalKnownWords / bookB.totalWords);
         return bKnown - aKnown;
       });
   });
 
 onBeforeMount(async () => {
-  books.value = await GetBooks();
+  books.value = await GetDetailedBooks();
+  console.log(books.value);
   EventsOn('BooksUpdated', (newBooks : backend.Book[]) => {
     books.value = newBooks;
   });

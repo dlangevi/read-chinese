@@ -91,7 +91,7 @@ function deleteBook() {
 }
 
 const known = (
-  (props.book.stats.totalKnownWords / props.book.stats.totalWords) * 100
+  (props.book.stats.totalKnownWords / props.book.totalWords) * 100
 );
 
 function bookBigMode() {
