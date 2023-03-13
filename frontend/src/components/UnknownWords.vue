@@ -30,6 +30,8 @@ import type { WordDefinitions, UnknownWordRow } from '@/lib/types';
 
 import { useCardQueue } from '@/stores/CardQueue';
 
+import { EventsOn, EventsOff } from '../../wailsjs/runtime/runtime';
+
 const UserSettings = getUserSettings();
 
 const props = defineProps<{
@@ -165,14 +167,20 @@ function onGridReady(params:GridReadyEvent) {
   };
   window.addEventListener('resize', resizeCallback);
   params.api.sizeColumnsToFit();
+  EventsOn('AddedWord', (word : string) => {
+    // TODO this might end up being slow, or could have
+    // problems if markknown is spam clicked
+    rowData.value = rowData.value.filter(
+      (row) => row.word !== word);
+  });
 }
 
 onUnmounted(() => {
   window.removeEventListener('resize', resizeCallback);
+  EventsOff('AddedWord');
 });
 
 onBeforeMount(async () => {
   updateWords();
 });
-
 </script>

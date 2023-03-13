@@ -130,7 +130,7 @@ func (known *KnownWords) AddWord(word string, age int64) error {
 		LearnedOn: time.Now(),
 	}
 	err = tx.Commit()
-	runtime.EventsEmit(known.backend.ctx, "AddedWord")
+	runtime.EventsEmit(known.backend.ctx, "AddedWord", word)
 	return err
 }
 
