@@ -249,6 +249,11 @@ export const ComponentTable : UserConfigDisplay = {
       'Show Definitions',
       'Show the definitions for words in various tables',
     ),
+    ShowPinyin: checkBox(
+      'ShowPinyin',
+      'Show Pinyin',
+      'Show the Pinyin for words in various tables',
+    ),
     EnableChinese: checkBox(
       'EnableChinese',
       'Use Chinese definitions',

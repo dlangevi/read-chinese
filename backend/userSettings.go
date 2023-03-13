@@ -86,6 +86,7 @@ type (
 		Dicts           map[string]Dict `json:"Dicts"`
 		PrimaryDict     string          `json:"PrimaryDict"`
 		ShowDefinitions bool            `json:"ShowDefinitions"`
+		ShowPinyin      bool            `json:"ShowPinyin"`
 		EnableChinese   bool            `json:"EnableChinese"`
 	}
 
@@ -150,6 +151,7 @@ func defaultConfig(path string) *UserSettings {
 			Dicts:           map[string]Dict{},
 			PrimaryDict:     "",
 			ShowDefinitions: true,
+			ShowPinyin:      true,
 			EnableChinese:   false,
 		},
 

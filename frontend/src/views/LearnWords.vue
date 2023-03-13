@@ -159,7 +159,7 @@ onBeforeMount(async () => {
 
 const loader = useLoader();
 async function importAnki() {
-  return loader.withLoader(ImportAnkiKeywords);
+  return loader.withLoader(ImportAnkiKeywords, false);
 }
 
 async function loadHsk() {

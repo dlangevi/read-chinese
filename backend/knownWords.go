@@ -145,7 +145,6 @@ func (known *KnownWords) AddWords(words []WordEntry) error {
 	newWords := []WordEntry{}
 	needsUpdate := []WordEntry{}
 	alreadySeen := map[string]int64{}
-	log.Println("Adding", len(words), "words")
 
 	for _, word := range words {
 		// Doing this ensures no duplicates are added
@@ -202,6 +201,7 @@ func (known *KnownWords) AddWords(words []WordEntry) error {
 		tx.Rollback()
 		return err
 	}
+
 	for _, word := range newWords {
 		known.words[word.Word] = WordData{
 			Interval:  word.Interval,

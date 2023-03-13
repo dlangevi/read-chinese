@@ -5,17 +5,19 @@ import { EventsOn } from '../../wailsjs/runtime/runtime';
 export class LoadingApi {
   displayText = ref('loading ...');
   active = ref(false);
+  showProgressRef = ref(true);
   progressText = ref('');
   progressTotalSteps = ref(1);
   progressCurrentStep = ref(0);
 
   constructor() {
     EventsOn('setupProgress', (message: string, steps: number) => {
+      this.progressCurrentStep.value = 0;
       this.progressText.value = message;
       this.progressTotalSteps.value = steps;
     });
-    EventsOn('progress', () => {
-      this.progressCurrentStep.value += 1;
+    EventsOn('progress', (n:number) => {
+      this.progressCurrentStep.value += n;
     });
   }
 
@@ -27,6 +29,10 @@ export class LoadingApi {
     const steps = this.progressTotalSteps.value;
     const current = this.progressCurrentStep.value;
     return (current * 100 / steps).toFixed(0);
+  }
+
+  get showProgress() {
+    return this.showProgressRef.value;
   }
 
   get progressSteps() {
@@ -45,12 +51,14 @@ export class LoadingApi {
     return this.progressText.value;
   }
 
-  async withLoader(func:() => Promise<void | Error>) {
+  async withLoader(func:() => Promise<void | Error>,
+    showProgress = true) {
     // These will be set the the backend later
     this.progressText.value = '';
     this.progressTotalSteps.value = 1;
     this.progressCurrentStep.value = 0;
 
+    this.showProgressRef.value = showProgress;
     this.active.value = true;
     const ret = await func();
     this.active.value = false;

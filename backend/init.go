@@ -188,5 +188,9 @@ func (b *Backend) setupProgress(
 }
 
 func (b *Backend) progress() {
-	runtime.EventsEmit(b.ctx, "progress")
+	runtime.EventsEmit(b.ctx, "progress", 1)
+}
+
+func (b *Backend) progressN(n int) {
+	runtime.EventsEmit(b.ctx, "progress", n)
 }

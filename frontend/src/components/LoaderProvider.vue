@@ -53,10 +53,14 @@
                 <span class="sr-only">Loading...</span>
               </div>
             </div>
-            <div class="text-base-content">
+            <div
+              v-if="api.showProgress"
+              class="text-base-content"
+            >
               {{ api.progressPercent }}%
             </div>
             <progress
+              v-if="api.showProgress"
               class="progress progress-accent w-56"
               :value="api.progressCurrent"
               :max="api.progressSteps"

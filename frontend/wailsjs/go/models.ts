@@ -231,6 +231,7 @@ export namespace backend {
 	    Dicts: {[key: string]: Dict};
 	    PrimaryDict: string;
 	    ShowDefinitions: boolean;
+	    ShowPinyin: boolean;
 	    EnableChinese: boolean;
 	
 	    static createFrom(source: any = {}) {
@@ -242,6 +243,7 @@ export namespace backend {
 	        this.Dicts = this.convertValues(source["Dicts"], Dict, true);
 	        this.PrimaryDict = source["PrimaryDict"];
 	        this.ShowDefinitions = source["ShowDefinitions"];
+	        this.ShowPinyin = source["ShowPinyin"];
 	        this.EnableChinese = source["EnableChinese"];
 	    }
 	

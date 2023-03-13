@@ -530,7 +530,7 @@ func (a *ankiInterface) ImportAnkiKeywords() error {
 
 	// Not able to do a good progress bar but this is
 	// fine for now
-	a.backend.setupProgress("Loading ankikey words", 1)
+	a.backend.setupProgress("Loading words from anki", 1)
 	currentMapping, err := a.getConfiguredMapping()
 	if err != nil {
 		return err

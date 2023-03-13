@@ -58,9 +58,14 @@ const columnDefs:ColDef[] = [
     width: 100,
     cellClass: [
       'border-2',
-      'text-opacity-0',
       'text-base-content',
-      'hover:text-opacity-100',
+      ...(UserSettings.Dictionaries.ShowPinyin
+        ? [
+        ]
+        : [
+          'text-opacity-0',
+          'hover:text-opacity-100',
+        ]),
     ],
   },
   {
@@ -70,14 +75,21 @@ const columnDefs:ColDef[] = [
     width: 50,
     minWidth: 50,
   },
-  ...(UserSettings.Dictionaries.ShowDefinitions
-    ? [
-      {
-        headerName: 'definition',
-        field: 'definition',
-        minWidth: 400,
-      }]
-    : []),
+  {
+    headerName: 'definition',
+    field: 'definition',
+    minWidth: 400,
+    cellClass: [
+      'text-base-content',
+      ...(UserSettings.Dictionaries.ShowDefinitions
+        ? [
+        ]
+        : [
+          'text-opacity-0',
+          'hover:text-opacity-100',
+        ]),
+    ],
+  },
   {
     headerName: '',
     field: 'markButton',
