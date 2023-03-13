@@ -59,7 +59,7 @@ const columnDefs:ColDef[] = [
     cellClass: [
       'border-2',
       'text-opacity-0',
-      'text-black',
+      'text-base-content',
       'hover:text-opacity-100',
     ],
   },

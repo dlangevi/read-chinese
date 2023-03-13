@@ -54,10 +54,17 @@ func (i *ImageClient) SearchImages(query string) ([]ImageInfo, error) {
 	result := &ImageResponse{}
 	rsp, err := i.httpClient.R().
 		SetHeader("Ocp-Apim-Subscription-Key", i.userSettings.AnkiConfig.AzureImageApiKey).
+		// TODO look into region filtering
+		// SetHeader("Accept-Language", "zh").
 		SetQueryParams(map[string]string{
 			"q":          query,
 			"count":      "30",
 			"safeSearch": "Strict",
+			"imageType":  "Photo",
+			"setLang":    "zh-hans",
+			"cc":         "zh-CN",
+			// "mkt":        "zh-CN",
+
 		}).
 		SetResult(result).
 		Get("/v7.0/images/search")
