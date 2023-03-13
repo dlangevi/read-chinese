@@ -69,7 +69,7 @@ const columnDefs:ColDef[] = [
     ],
   },
   {
-    headerName: 'occurance',
+    headerName: '#',
     field: 'occurance',
     sort: 'desc',
     width: 50,
