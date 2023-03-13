@@ -21,8 +21,5 @@ async function markKnown() {
   // Keep with the convention of 10000 == user has claimed to known a word
   await AddWord(rowData.word, 10000);
   UpdateSentenceTable(rowData.word);
-  props.params.api.applyTransaction({
-    remove: [rowData],
-  });
 }
 </script>

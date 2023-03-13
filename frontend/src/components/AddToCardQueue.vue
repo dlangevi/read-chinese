@@ -21,11 +21,7 @@ async function addToQueue() {
   const rowData = props.params.data;
   if (rowData) {
     store.addWord({ word: rowData.word },
-      () => {
-        props.params.api.applyTransaction({
-          remove: [rowData],
-        });
-      },
+      () => {},
       props.params.context?.bookId);
   }
 }
