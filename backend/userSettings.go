@@ -97,6 +97,8 @@ type (
 	LibraryConfig struct {
 		OnlyFavorites bool `json:"OnlyFavorites"`
 		HideRead      bool `json:"HideRead"`
+		// If only go had proper enum
+		DisplayTable bool `json:"DisplayTable"`
 	}
 )
 
@@ -159,6 +161,7 @@ func defaultConfig(path string) *UserSettings {
 		LibraryConfig: LibraryConfig{
 			OnlyFavorites: false,
 			HideRead:      false,
+			DisplayTable:  false,
 		},
 	}
 }

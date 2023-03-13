@@ -10,6 +10,10 @@
         :setting="ComponentTable.BookLibrary.HideRead"
         :initial-value="UserSettings.BookLibrary.HideRead"
       />
+      <settings-checkbox
+        :setting="ComponentTable.BookLibrary.DisplayTable"
+        :initial-value="UserSettings.BookLibrary.DisplayTable"
+      />
       <book-importer />
       <button
         class="btn-primary btn"
@@ -30,18 +34,25 @@
       </h2>
       <p>Click on a book to start making flashcards.</p>
     </div>
-    <div
-      v-if="books.length > 0"
-      class="m-8 grid grid-cols-4 gap-12"
-    >
+    <div v-if="books.length > 0">
+      <book-table
+        v-if="UserSettings.BookLibrary.DisplayTable"
+        :books="favoriteFilter"
+      />
+
       <div
-        v-for="book in favoriteFilter"
-        :key="book.bookId"
+        v-else
+        class="m-8 grid grid-cols-4 gap-12"
       >
-        <book-card
-          class="h-[700px]"
-          :book="book"
-        />
+        <div
+          v-for="book in favoriteFilter"
+          :key="book.bookId"
+        >
+          <book-card
+            class="h-[700px]"
+            :book="book"
+          />
+        </div>
       </div>
     </div>
   </with-sidebar>
@@ -52,6 +63,7 @@ import {
   onUnmounted, onBeforeMount, ref, computed, Ref,
 } from 'vue';
 import BookCard from '@/components/BookCard.vue';
+import BookTable from '@/components/BookTable.vue';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
 import BookImporter from '@/components/BookImporter.vue';

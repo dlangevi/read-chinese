@@ -278,6 +278,10 @@ export const ComponentTable : UserConfigDisplay = {
       'HideRead',
       'Hide read books',
     ),
+    DisplayTable: checkBox(
+      'DisplayTable',
+      'Show as a table',
+    ),
   },
   // TODO filter this from the type
   convertValues: {},

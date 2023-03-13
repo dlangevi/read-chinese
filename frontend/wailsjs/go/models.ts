@@ -360,6 +360,7 @@ export namespace backend {
 	export class LibraryConfig {
 	    OnlyFavorites: boolean;
 	    HideRead: boolean;
+	    DisplayTable: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new LibraryConfig(source);
@@ -369,6 +370,7 @@ export namespace backend {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.OnlyFavorites = source["OnlyFavorites"];
 	        this.HideRead = source["HideRead"];
+	        this.DisplayTable = source["DisplayTable"];
 	    }
 	}
 	export class MetaSettings {
