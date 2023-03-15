@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="UserSettings.AzureConfig.AzureApiKey"
-    class="col-span-3 row-span-2 flex items-center gap-4"
+    class="col-span-3 row-span-2 flex flex-col gap-2"
   >
     <div
       :class="['modal', {'modal-open': voicePickerModal}]"
@@ -82,46 +82,49 @@
         </div>
       </div>
     </div>
-    <div class="flex w-full gap-4">
-      <table class="table w-9/12 flex-col gap-4">
-        <thead>
-          <tr>
-            <th>Voice</th>
-            <th>Style</th>
-            <th>Role</th>
-            <th>Speed</th>
-            <th>Pitch</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="voice in UserSettings.AzureConfig.VoiceList"
-            :key="voice.Voice"
-          >
-            <td> {{ voice.Voice }} </td>
-            <td> {{ voice.SpeakingStyle }} </td>
-            <td> {{ voice.RolePlay }} </td>
-            <td> {{ displaySpeed(voice.Speed) }} </td>
-            <td> {{ displayPitch(voice.Pitch) }} </td>
-            <td>
-              <button
-                class="btn-error btn-sm btn"
-                @click="removeVoice(voice)"
-              >
-                Remove Voice
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="flex items-center gap-4">
+      <div class="grow text-2xl">
+        Voices
+      </div>
       <button
         class="btn-secondary btn w-1/4"
         @click="voicePickerModal = true"
       >
-        Add Voice
+        Add New Voice
       </button>
     </div>
+    <table class="table flex-col gap-4">
+      <thead>
+        <tr>
+          <th>Voice</th>
+          <th>Style</th>
+          <th>Role</th>
+          <th>Speed</th>
+          <th>Pitch</th>
+          <th />
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="voice in UserSettings.AzureConfig.VoiceList"
+          :key="voice.Voice"
+        >
+          <td> {{ voice.Voice }} </td>
+          <td> {{ voice.SpeakingStyle }} </td>
+          <td> {{ voice.RolePlay }} </td>
+          <td> {{ displaySpeed(voice.Speed) }} </td>
+          <td> {{ displayPitch(voice.Pitch) }} </td>
+          <td>
+            <button
+              class="btn-error btn-sm btn"
+              @click="removeVoice(voice)"
+            >
+              Remove Voice
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 

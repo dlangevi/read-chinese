@@ -1,5 +1,5 @@
 <template>
-  <div class="col-span-3 row-span-2">
+  <div class="col-span-3 row-span-2 flex flex-col gap-2">
     <div
       :class="['modal', {'modal-open': addDictModal}]"
       @click="() => addDictModal = false"
@@ -45,76 +45,87 @@
         </div>
       </div>
     </div>
-    <div class="grid grid-cols-3 gap-2 text-2xl">
-      <div class="col-span-3 flex items-center gap-4">
-        <div class="grow">
-          Dictionaries
-        </div>
-        <div class="flex flex-col gap-2">
-          <div class="flex items-center gap-2">
-            <button class="btn-secondary btn justify-end" @click="addCedict">
-              Add Default Dict
-            </button>
-            <div
-              class="tooltip tooltip-left"
-              data-tip="Downloads CC-Cedict"
-            >
-              <information-circle class="h-6 w-6" />
-            </div>
+    <div class="flex items-center gap-4">
+      <div class="grow text-2xl">
+        Dictionaries
+      </div>
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <button class="btn-secondary btn justify-end" @click="addCedict">
+            Add Default Dict
+          </button>
+          <div
+            class="tooltip tooltip-left"
+            data-tip="Downloads CC-Cedict"
+          >
+            <information-circle class="h-6 w-6" />
           </div>
-          <div class="flex items-center gap-2">
-            <button class="btn-secondary btn" @click="addDictionary">
-              Add Custom Dictionary
-            </button>
-            <div
-              class="tooltip tooltip-left"
-              data-tip="Import your own json dictionary"
-            >
-              <information-circle class="h-6 w-6" />
-            </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="btn-secondary btn" @click="addDictionary">
+            Add Custom Dictionary
+          </button>
+          <div
+            class="tooltip tooltip-left"
+            data-tip="Import your own json dictionary"
+          >
+            <information-circle class="h-6 w-6" />
           </div>
         </div>
       </div>
     </div>
-    <div class="col-span-3 row-span-2">
-      <div
-        v-for="(dict, name) in dicts"
-        :key="name"
-      >
-        <div class="divider" />
-        <div
-          :class="['grid grid-cols-4',
-                   {'bg-primary': dict.isPrimary}
-          ]"
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Primary</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Path</th>
+          <th />
+          <th />
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="(dict, name) in dicts"
+          :key="name"
         >
-          <div :class="['col-span-3 flex gap-3']">
-            <div> Name: {{ dict.name }} </div>
-            <div> Type: {{ dict.type }} </div>
-            <div> Path: {{ dict.path }} </div>
-          </div>
-          <div class="grid gap-4">
+          <td class="">
+            <star
+              v-if="dict.isPrimary"
+              class="inline h-6 w-6"
+            />
+          </td>
+          <td class="">
+            {{ dict.name }}
+          </td>
+          <td> {{ dict.type }} </td>
+          <td> {{ dict.path }} </td>
+          <td>
             <button
               class="btn-secondary btn"
               @click="makePrimary(name as string)"
             >
               Make Primary
             </button>
+          </td>
+          <td>
             <button
               class="btn-secondary btn"
               @click="deleteDict(name as string)"
             >
               Delete
             </button>
-          </div>
-        </div>
-      </div>
-    </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onBeforeMount, ref } from 'vue';
-import { InformationCircle } from '@vicons/ionicons5';
+import { InformationCircle, Star } from '@vicons/ionicons5';
 
 import {
   GetDictionaryInfo,
