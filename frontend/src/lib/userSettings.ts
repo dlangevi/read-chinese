@@ -11,6 +11,8 @@ import DictionariesList
   from '@/components/SettingsWidgets/DictionariesList.vue';
 import ModelManager
   from '@/components/SettingsWidgets/ModelManager.vue';
+import VoicePicker
+  from '@/components/SettingsWidgets/VoicePicker.vue';
 import SettingsSlider
   from '@/components/SettingsWidgets/SettingsSlider.vue';
 import { backend } from '@wailsjs/models';
@@ -31,7 +33,8 @@ type SettingsWidgets =
   typeof SettingsSelector |
   typeof DictionariesList |
   typeof ModelManager |
-  typeof SettingsSlider
+  typeof SettingsSlider |
+  typeof VoicePicker
 
 export type UserSetting<T> = {
   name:string;
@@ -211,6 +214,16 @@ export const ComponentTable : UserConfigDisplay = {
       'AllowDuplicates',
       'Allow Duplicates',
     ),
+    AddProgramTag: checkBox(
+      'AddProgramTag',
+      'Add read-chinese tag',
+    ),
+    AddBookTag: checkBox(
+      'AddBookTag',
+      'Add source book title tag',
+    ),
+  },
+  AzureConfig: {
     GenerateTermAudio: checkBox(
       'GenerateTermAudio',
       'Auto generate audio for keyword',
@@ -229,14 +242,11 @@ export const ComponentTable : UserConfigDisplay = {
       'Azure Image Api Key',
       'Setup an free azure bing search and put your key here',
     ),
-    AddProgramTag: checkBox(
-      'AddProgramTag',
-      'Add read-chinese tag',
-    ),
-    AddBookTag: checkBox(
-      'AddBookTag',
-      'Add source book title tag',
-    ),
+    VoiceList: {
+      name: 'VoiceList',
+      label: 'Voices',
+      type: VoicePicker,
+    } as UserSetting< backend.Voice[] >,
   },
   Dictionaries: {
     Dicts: {

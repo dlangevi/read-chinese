@@ -84,14 +84,14 @@ func TestSelectBooks(t *testing.T) {
 	bar2, _ := addBookToDb(testRuntime.DB, "foo", "bar2", "cover", "location")
 	bar3, _ := addBookToDb(testRuntime.DB, "foo", "bar3", "cover", "location")
 
-	someBooks, err := getBooks(testRuntime.DB)
+	someBooks, err := books.GetBooks()
 	if err != nil {
 		t.Errorf("Failed to get all books %v", err)
 	}
 	if len(someBooks) < 3 {
 		t.Errorf("Not enough all books %v", len(someBooks))
 	}
-	someBooks, err = getBooks(testRuntime.DB, bar1, bar2, bar3)
+	someBooks, err = books.GetBooks(bar1, bar2, bar3)
 	if err != nil {
 		t.Errorf("Failed to get 3 books %v", err)
 	}

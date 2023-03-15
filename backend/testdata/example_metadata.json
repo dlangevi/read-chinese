@@ -1,7 +1,7 @@
 {
   "meta": {
     "EnableExperimental": false,
-    "Ran": 49,
+    "Ran": 91,
     "Theme": "emerald"
   },
   "CardCreation": {
@@ -44,11 +44,14 @@
     },
     "AddProgramTag": true,
     "AddBookTag": true,
-    "AllowDuplicates": true,
+    "AllowDuplicates": true
+  },
+  "AzureConfig": {
     "GenerateTermAudio": false,
     "GenerateSentenceAudio": false,
     "AzureApiKey": "",
-    "AzureImageApiKey": ""
+    "AzureImageApiKey": "",
+    "VoiceList": []
   },
   "Dictionaries": {
     "Dicts": {
@@ -59,6 +62,7 @@
     },
     "PrimaryDict": "example",
     "ShowDefinitions": true,
+    "ShowPinyin": true,
     "EnableChinese": false
   },
   "SentenceGeneration": {
@@ -67,14 +71,7 @@
   },
   "BookLibrary": {
     "OnlyFavorites": false,
-    "HideRead": false
-  },
-  "CardManagement": {
-    "ProblemFlagged": true,
-    "ProblemMissingImage": true,
-    "ProblemMissingSentence": true,
-    "ProblemMissingSentenceAudio": true,
-    "ProblemMissingWordAudio": true,
-    "ProblemMissingPinyin": true
+    "HideRead": false,
+    "DisplayTable": false
   }
 }

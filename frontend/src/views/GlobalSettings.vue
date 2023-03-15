@@ -56,6 +56,8 @@ const sections = {
      Object.entries(ComponentTable.CardCreation),
   AnkiConfig:
     Object.entries(ComponentTable.AnkiConfig),
+  AzureConfig:
+    Object.entries(ComponentTable.AzureConfig),
   Dictionaries:
      Object.entries(ComponentTable.Dictionaries),
   SentenceGeneration:

@@ -10,7 +10,7 @@ import (
 
 func TestDefault(t *testing.T) {
 	tmpMetaData := path.Join(os.TempDir(), "metadata.json")
-	userSettings, _ := LoadMetadata(tmpMetaData)
+	userSettings, _ := LoadMetadata(tmpMetaData, testRuntime)
 
 	settingName := "EnableChinese"
 	setting := userSettings.DictionariesConfig.EnableChinese

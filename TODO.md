@@ -7,13 +7,13 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 #### Still Intend to Do
 - [ ] add new book (without needing calibre)
 - [ ] use calibre (if possible) to convert from epub etc to txt file
-- [ ] chinese voice picker
 - [ ] View and edit known words
 - [ ] write dev install guide 
-- [ ] Import from multiple anki decks
-- [ ] unflag anki cards on edit
 
 #### Ideas to Explore / Deprioritized Ideas
+- [ ] unflag anki cards on edit
+- [ ] Import from multiple anki decks
+- [ ] more control over what voice is used for which purpose
 - [ ] 90% test coverage for go code
 - [ ] linux scrollbars dont work in webview
 - [ ] create bootstrap flow that installs free books
@@ -26,6 +26,7 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 - [ ] free edit of card fields
 
 ### DONE
+- [x] chinese voice picker
 - [x] more compact library table view
 - [x] interactive workflow for importing from calibre
 - [x] update image / audio when editing card

@@ -110,6 +110,7 @@ func main() {
 			backendObj.KnownWords,
 			backendObj.UserSettings,
 			backendObj.ImageClient,
+			backendObj.TextToSpeech,
 			backendObj.Dictionaries,
 			backendObj.Generator,
 			backendObj.AnkiInterface,

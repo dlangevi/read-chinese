@@ -46,16 +46,14 @@ type (
 )
 
 type ankiInterface struct {
-	backend      *Backend
-	anki         *ankiconnect.Client
-	textToSpeech *TextToSpeech
+	backend *Backend
+	anki    *ankiconnect.Client
 }
 
 func NewAnkiInterface(backend *Backend) *ankiInterface {
 	return &ankiInterface{
-		backend:      backend,
-		anki:         ankiconnect.NewClient(),
-		textToSpeech: NewTextToSpeach(backend.UserSettings),
+		backend: backend,
+		anki:    ankiconnect.NewClient(),
 	}
 }
 
@@ -168,7 +166,7 @@ func (a *ankiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 	pictures := []ankiconnect.Picture{}
 
 	addAudio := func(field string, dest string) error {
-		audio64, err := a.textToSpeech.Synthesize(field)
+		audio64, err := a.backend.TextToSpeech.Synthesize(field)
 		if err != nil {
 			return err
 		}
@@ -183,14 +181,14 @@ func (a *ankiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 		})
 		return nil
 	}
-	if a.backend.UserSettings.AnkiConfig.GenerateTermAudio {
+	if a.backend.UserSettings.AzureConfig.GenerateTermAudio {
 		err := addAudio(fields.Word, currentMapping.HanziAudio)
 		if err != nil {
 			return err
 		}
 	}
 	// dont generate if sentence is empty
-	if a.backend.UserSettings.AnkiConfig.GenerateSentenceAudio && len(fields.Sentence) > 0 {
+	if a.backend.UserSettings.AzureConfig.GenerateSentenceAudio && len(fields.Sentence) > 0 {
 		err := addAudio(fields.Sentence, currentMapping.SentenceAudio)
 		if err != nil {
 			return err
@@ -364,7 +362,7 @@ func (a *ankiInterface) GetAnkiNote(noteId int64) (RawAnkiNote, error) {
 }
 
 func (a *ankiInterface) createAudio(text string, field string) (ankiconnect.Audio, error) {
-	audio64, err := a.textToSpeech.Synthesize(text)
+	audio64, err := a.backend.TextToSpeech.Synthesize(text)
 	if err != nil {
 		return ankiconnect.Audio{}, err
 	}
@@ -486,7 +484,7 @@ func (a *ankiInterface) UpdateNoteFields(noteId int64, fields Fields) error {
 		// TODO: if there was a 'Sentence Translation' field of some sort
 		// It needs to be changed. Also TODO generate our own translations?
 		ankiFields[currentMapping.ExampleSentence] = fields.Sentence
-		if a.backend.UserSettings.AnkiConfig.GenerateSentenceAudio {
+		if a.backend.UserSettings.AzureConfig.GenerateSentenceAudio {
 			audio, err := a.createAudio(fields.Sentence, currentMapping.SentenceAudio)
 			if err != nil {
 				return err

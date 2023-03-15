@@ -20,7 +20,8 @@ type Backend struct {
 	DB           *sqlx.DB
 
 	// Independent Libraries
-	ImageClient *ImageClient
+	ImageClient  *ImageClient
+	TextToSpeech *TextToSpeech
 
 	// Libraries required by other Libraries
 	BookLibrary   BookLibrary
@@ -88,6 +89,7 @@ func NewBackend(
 	backend.UserSettings = userSettings
 	backend.KnownWords = NewKnownWords(db, backend)
 	backend.ImageClient = NewImageClient(userSettings)
+	backend.TextToSpeech = NewTextToSpeach(userSettings)
 	backend.Dictionaries = NewDictionaries(backend)
 	backend.AnkiInterface = NewAnkiInterface(backend)
 
@@ -184,13 +186,19 @@ func (wc *ReportedDownload) Write(p []byte) (int, error) {
 func (b *Backend) setupProgress(
 	message string,
 	steps int) {
-	runtime.EventsEmit(b.ctx, "setupProgress", message, steps)
+	if b.ctx != nil {
+		runtime.EventsEmit(b.ctx, "setupProgress", message, steps)
+	}
 }
 
 func (b *Backend) progress() {
-	runtime.EventsEmit(b.ctx, "progress", 1)
+	if b.ctx != nil {
+		runtime.EventsEmit(b.ctx, "progress", 1)
+	}
 }
 
 func (b *Backend) progressN(n int) {
-	runtime.EventsEmit(b.ctx, "progress", n)
+	if b.ctx != nil {
+		runtime.EventsEmit(b.ctx, "progress", n)
+	}
 }

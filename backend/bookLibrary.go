@@ -140,7 +140,10 @@ func (b *bookLibrary) emitBooks() error {
 	if err != nil {
 		return err
 	}
-	runtime.EventsEmit(b.backend.ctx, "BooksUpdated", books)
+
+	if b.backend.ctx != nil {
+		runtime.EventsEmit(b.backend.ctx, "BooksUpdated", books)
+	}
 	return nil
 }
 

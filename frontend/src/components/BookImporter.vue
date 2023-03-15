@@ -36,7 +36,7 @@
                     :key="book.id"
                     class="hover"
                   >
-                    <th :id="'bookId' + book.id">
+                    <td :id="'bookId' + book.id">
                       <label>
                         <input
                           v-model="selectedBooks"
@@ -45,7 +45,7 @@
                           :value="book"
                         >
                       </label>
-                    </th>
+                    </td>
                     <td>{{ book.title }}</td>
                     <td>{{ book.authors }}</td>
                     <td>{{ getFormats(book.formats) }}</td>

@@ -32,7 +32,7 @@ func TestGenerate(t *testing.T) {
 	os.Remove(tempDb)
 	defer os.Remove(tempDb)
 	myBackend := createBackend(tempDb)
-	bookIds := []int64{1}
+	bookIds := []int{1}
 	_, err := myBackend.BookLibrary.AddBook("张天翼", "秃秃大王", "fake.jpg", "testdata/example_book.txt")
 	myBackend.Generator.GenerateSentenceTable()
 	if err != nil {

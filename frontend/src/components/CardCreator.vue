@@ -134,7 +134,7 @@ store.$subscribe(async (_, state) => {
     // TODO have some check which makes sure the image api has
     // a correct key
     options.hasImageApi =
-      UserSettings.AnkiConfig.AzureImageApiKey !== '';
+      UserSettings.AzureConfig.AzureImageApiKey !== '';
     // TODO called twice for some reason
     cardManager.loadCard(options);
   }

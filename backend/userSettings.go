@@ -23,6 +23,9 @@ type (
 		// Anki / Card generation
 		AnkiConfig AnkiConfig `json:"AnkiConfig"`
 
+		// Azure Settings
+		AzureConfig AzureConfig `json:"AzureConfig"`
+
 		// Dictionaries
 		DictionariesConfig DictionaryConfig `json:"Dictionaries"`
 
@@ -64,17 +67,22 @@ type (
 		Images            string `json:"images"`
 		Notes             string `json:"notes"`
 	}
+
 	AnkiConfig struct {
-		ActiveDeck            string                   `json:"ActiveDeck"`
-		ActiveModel           string                   `json:"ActiveModel"`
-		ModelMappings         map[string]FieldsMapping `json:"ModelMappings"`
-		AddProgramTag         bool                     `json:"AddProgramTag"`
-		AddBookTag            bool                     `json:"AddBookTag"`
-		AllowDuplicates       bool                     `json:"AllowDuplicates"`
-		GenerateTermAudio     bool                     `json:"GenerateTermAudio"`
-		GenerateSentenceAudio bool                     `json:"GenerateSentenceAudio"`
-		AzureApiKey           string                   `json:"AzureApiKey"`
-		AzureImageApiKey      string                   `json:"AzureImageApiKey"`
+		ActiveDeck      string                   `json:"ActiveDeck"`
+		ActiveModel     string                   `json:"ActiveModel"`
+		ModelMappings   map[string]FieldsMapping `json:"ModelMappings"`
+		AddProgramTag   bool                     `json:"AddProgramTag"`
+		AddBookTag      bool                     `json:"AddBookTag"`
+		AllowDuplicates bool                     `json:"AllowDuplicates"`
+	}
+
+	AzureConfig struct {
+		GenerateTermAudio     bool    `json:"GenerateTermAudio"`
+		GenerateSentenceAudio bool    `json:"GenerateSentenceAudio"`
+		AzureApiKey           string  `json:"AzureApiKey"`
+		AzureImageApiKey      string  `json:"AzureImageApiKey"`
+		VoiceList             []Voice `json:"VoiceList"`
 	}
 
 	Dict struct {
@@ -138,13 +146,37 @@ func defaultConfig(path string) *UserSettings {
 					Notes:             "Notes",
 				},
 			},
-			AddProgramTag:         true,
-			AddBookTag:            true,
-			AllowDuplicates:       true,
+			AddProgramTag:   true,
+			AddBookTag:      true,
+			AllowDuplicates: true,
+		},
+
+		AzureConfig: AzureConfig{
 			GenerateTermAudio:     false,
 			GenerateSentenceAudio: false,
 			AzureApiKey:           "",
 			AzureImageApiKey:      "",
+			VoiceList: []Voice{
+				{
+					Locale:   "zh-CN",
+					Voice:    "zh-CN-YunxiNeural",
+					RolePlay: "Narrator",
+				},
+				{
+					Locale: "zh-CN",
+					Voice:  "zh-CN-XiaochenNeural",
+				},
+				{
+					Locale:        "zh-CN",
+					Voice:         "zh-CN-YunxiNeural",
+					SpeakingStyle: "narration-relaxed",
+					RolePlay:      "Boy",
+				},
+				{
+					Locale: "zh-CN",
+					Voice:  "zh-CN-XiaoshuangNeural",
+				},
+			},
 		},
 
 		DictionariesConfig: DictionaryConfig{
@@ -320,6 +352,24 @@ func (m *UserSettings) SetMapping(modelName string, mapping FieldsMapping) error
 
 func (m *UserSettings) DeleteMapping(modelName string) error {
 	delete(m.AnkiConfig.ModelMappings, modelName)
+	m.saveMetadata()
+	return nil
+}
+
+func (m *UserSettings) AddVoice(voice Voice) error {
+	m.AzureConfig.VoiceList = append(m.AzureConfig.VoiceList, voice)
+	m.saveMetadata()
+	return nil
+}
+
+func (m *UserSettings) RemoveVoice(voice Voice) error {
+	voiceList := []Voice{}
+	for _, currentVoice := range m.AzureConfig.VoiceList {
+		if voice != currentVoice {
+			voiceList = append(voiceList, currentVoice)
+		}
+	}
+	m.AzureConfig.VoiceList = voiceList
 	m.saveMetadata()
 	return nil
 }
