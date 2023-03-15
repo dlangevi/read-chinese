@@ -43,7 +43,6 @@ import type {
 import { GetWordsGrid } from '@wailsjs/backend/knownWords';
 import { backend } from '@wailsjs/models';
 import DeleteLearned from '@/components/DeleteLearned.vue';
-import { EventsOn, EventsOff } from '../../wailsjs/runtime/runtime';
 import ImportCsv from '@/components/ImportCsv.vue';
 import { ImportAnkiKeywords } from '@wailsjs/backend/ankiInterface';
 import { useLoader } from '@/lib/loading';
@@ -70,6 +69,9 @@ const columnDefs:ColDef[] = [
     field: 'Interval',
     sort: 'desc',
     sortable: true,
+    comparator: (_a, _b, rowA, rowB) => {
+      return rowA.data.Interval - rowB.data.Interval;
+    },
     cellClass: 'text-xl',
     valueGetter: (params: ValueGetterParams<backend.WordGridRow>) => {
       const interval = params.data?.Interval;
@@ -116,19 +118,10 @@ const rowData = ref<backend.WordGridRow[]>([]);
 
 onBeforeMount(() => {
   loadData();
-  EventsOn('DeletedWord', (word : string) => {
-    // TODO this might end up being slow, or could have
-    // problems if markknown is spam clicked
-    console.log('before', rowData.value);
-    rowData.value = rowData.value.filter(
-      (row) => row.Word !== word);
-    console.log('after', rowData.value);
-  });
 });
 
 onUnmounted(() => {
   window.removeEventListener('resize', resizeCallback);
-  EventsOff('DeletedWord');
 });
 
 async function loadData() {

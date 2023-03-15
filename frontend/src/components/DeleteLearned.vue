@@ -25,6 +25,10 @@ async function deleteKnown() {
     return;
   }
   await DeleteWord(rowData.Word);
+  props.params.api.applyTransaction({
+    remove: [rowData],
+  });
+
   UpdateSentenceTable(rowData.Word);
 }
 </script>
