@@ -663,6 +663,24 @@ export namespace backend {
 	}
 	
 	
+	export class WordGridRow {
+	    Word: string;
+	    Interval: number;
+	    LearnedOn: string;
+	    InDict: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new WordGridRow(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Word = source["Word"];
+	        this.Interval = source["Interval"];
+	        this.LearnedOn = source["LearnedOn"];
+	        this.InDict = source["InDict"];
+	    }
+	}
 	export class WordStats {
 	    words: number;
 	    characters: number;

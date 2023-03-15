@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { GetWordStats, GetStatsInfo } from '@wailsjs/backend/KnownWords';
+import { GetWordStats, GetStatsInfo } from '@wailsjs/backend/knownWords';
 import { TotalRead, TotalReadChars } from '@wailsjs/backend/bookLibrary';
 import {
   Chart as ChartJS,

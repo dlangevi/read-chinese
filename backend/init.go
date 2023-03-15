@@ -25,7 +25,7 @@ type Backend struct {
 
 	// Libraries required by other Libraries
 	BookLibrary   BookLibrary
-	KnownWords    *KnownWords
+	KnownWords    KnownWords
 	Dictionaries  *Dictionaries
 	AnkiInterface AnkiInterface
 

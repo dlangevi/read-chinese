@@ -25,7 +25,7 @@ import {
   GetBookFrequencies,
   GetFavoriteFrequencies,
 } from '@wailsjs/backend/bookLibrary';
-import { GetOccurances } from '@wailsjs/backend/KnownWords';
+import { GetOccurances } from '@wailsjs/backend/knownWords';
 import type { WordDefinitions, UnknownWordRow } from '@/lib/types';
 
 import { useCardQueue } from '@/stores/CardQueue';

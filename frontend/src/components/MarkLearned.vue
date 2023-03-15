@@ -9,7 +9,7 @@
 
 <script lang="ts" setup>
 import type { ICellRendererParams } from 'ag-grid-community';
-import { AddWord } from '@wailsjs/backend/KnownWords';
+import { AddWord } from '@wailsjs/backend/knownWords';
 import {
   UpdateSentenceTable,
 } from '@wailsjs/backend/Generator';

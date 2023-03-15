@@ -34,7 +34,7 @@
 <script lang="ts" setup>
 import {
   ImportCSVWords,
-} from '@wailsjs/backend/KnownWords';
+} from '@wailsjs/backend/knownWords';
 import { FilePicker } from '@wailsjs/backend/Backend';
 import { ref } from 'vue';
 

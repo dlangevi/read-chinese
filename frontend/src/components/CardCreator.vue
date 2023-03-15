@@ -96,7 +96,7 @@ import EditDefinition from
   '@/components/CardCreatorSteps/EditDefinition.vue';
 import { StepsEnum } from '@/components/CardCreatorSteps/StepsEnum';
 
-import { AddWord } from '@wailsjs/backend/KnownWords';
+import { AddWord } from '@wailsjs/backend/knownWords';
 import {
   CreateAnkiNote,
   UpdateNoteFields,

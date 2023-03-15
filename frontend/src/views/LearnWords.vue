@@ -95,7 +95,7 @@ import {
 } from '@wailsjs/backend/bookLibrary';
 import {
   GetUnknownHskWords,
-} from '@wailsjs/backend/KnownWords';
+} from '@wailsjs/backend/knownWords';
 import { ImportAnkiKeywords } from '@wailsjs/backend/ankiInterface';
 import UnknownWords from '../components/UnknownWords.vue';
 import { useLoader } from '@/lib/loading';

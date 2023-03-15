@@ -9,6 +9,7 @@ import UserStats from '@/views/UserStats.vue';
 import LearnWords from '@/views/LearnWords.vue';
 import FlashCards from '@/views/FlashCards.vue';
 import BookStats from '@/views/BookStats.vue';
+import KnownWords from '@/views/KnownWords.vue';
 
 import App from './App.vue';
 
@@ -48,6 +49,11 @@ const router = createRouter({
       path: '/LearnWords',
       name: 'LearnWords',
       component: LearnWords,
+    },
+    {
+      path: '/KnownWords',
+      name: 'KnownWords',
+      component: KnownWords,
     },
     {
       path: '/FlashCards',

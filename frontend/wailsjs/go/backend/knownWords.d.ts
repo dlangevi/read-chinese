@@ -14,4 +14,16 @@ export function GetUnknownHskWords(arg1:string,arg2:number):Promise<Array<string
 
 export function GetWordStats():Promise<backend.WordStats>;
 
+export function GetWords():Promise<backend.Words>;
+
+export function GetWordsGrid():Promise<Array<backend.WordGridRow>>;
+
 export function ImportCSVWords(arg1:string):Promise<Error>;
+
+export function IsKnown(arg1:string):Promise<boolean>;
+
+export function IsKnownChar(arg1:number):Promise<boolean>;
+
+export function IsWellKnown(arg1:string):Promise<boolean>;
+
+export function SyncFrequency():Promise<void>;

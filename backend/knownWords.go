@@ -17,24 +17,67 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-type WordData struct {
-	Interval  int64
-	LearnedOn time.Time
-}
+type (
+	KnownWords interface {
+		GetWordStats() WordStats
+		AddWord(word string, age int64) error
+		AddWords(words []WordEntry) error
+		ImportCSVWords(path string) error
+		GetOccurances(words []string) map[string]int64
+		GetUnknownHskWords(version string, level int) ([]string, error)
+		GetStatsInfo() ([]TimeQuery, error)
+		GetWords() Words
+		GetWordsGrid() []WordGridRow
+		IsKnown(word string) bool
+		IsWellKnown(word string) bool
+		IsKnownChar(char rune) bool
+		SyncFrequency()
+	}
 
-type KnownWords struct {
-	// For now just map word to interval
-	words      map[string]WordData
-	characters map[rune]bool
-	frequency  map[string]int64
-	db         *sqlx.DB
-	backend    *Backend
-}
+	Words map[string]WordData
+
+	WordGridRow struct {
+		Word      string `json:"Word"`
+		Interval  int64  `json:"Interval"`
+		LearnedOn string `json:"LearnedOn"`
+		InDict    bool   `json:"InDict"`
+	}
+
+	WordData struct {
+		Interval  int64
+		LearnedOn time.Time
+	}
+
+	knownWords struct {
+		// For now just map word to interval
+		words      map[string]WordData
+		characters map[rune]bool
+		frequency  map[string]int64
+		db         *sqlx.DB
+		backend    *Backend
+	}
+
+	WordStats struct {
+		Words      int `json:"words"`
+		Characters int `json:"characters"`
+	}
+
+	WordEntry struct {
+		Word     string `db:"word"`
+		Interval int64  `db:"interval"`
+	}
+
+	TimeQuery struct {
+		Day             string `json:"day"`
+		Known           int    `json:"known"`
+		KnownCharacters int    `json:"knownCharacters"`
+	}
+)
 
 func NewKnownWords(db *sqlx.DB,
 	backend *Backend,
-) *KnownWords {
-	known := &KnownWords{
+) *knownWords {
+	known := &knownWords{
 		words:      map[string]WordData{},
 		characters: map[rune]bool{},
 		frequency:  map[string]int64{},
@@ -42,11 +85,11 @@ func NewKnownWords(db *sqlx.DB,
 		backend:    backend,
 	}
 	known.syncWords()
-	known.syncFrequency()
+	known.SyncFrequency()
 	return known
 }
 
-func (known *KnownWords) syncWords() {
+func (known *knownWords) syncWords() {
 	type WordRow struct {
 		Word      string
 		Interval  int64
@@ -71,7 +114,25 @@ func (known *KnownWords) syncWords() {
 	}
 }
 
-func (known *KnownWords) syncFrequency() {
+func (known *knownWords) GetWords() Words {
+	return known.words
+}
+
+func (known *knownWords) GetWordsGrid() []WordGridRow {
+	wordRows := []WordGridRow{}
+	for word, wordData := range known.words {
+		wordRows = append(wordRows, WordGridRow{
+			Word:      word,
+			Interval:  wordData.Interval,
+			LearnedOn: wordData.LearnedOn.Format("2006年01月02日"),
+			InDict:    known.backend.Dictionaries.IsInDictionary(word),
+		})
+	}
+
+	return wordRows
+}
+
+func (known *knownWords) SyncFrequency() {
 	type WordRow struct {
 		Word  string
 		Count int64
@@ -90,12 +151,7 @@ func (known *KnownWords) syncFrequency() {
 	}
 }
 
-type WordStats struct {
-	Words      int `json:"words"`
-	Characters int `json:"characters"`
-}
-
-func (known *KnownWords) GetWordStats() WordStats {
+func (known *knownWords) GetWordStats() WordStats {
 	return WordStats{
 		len(known.words),
 		len(known.characters),
@@ -103,7 +159,7 @@ func (known *KnownWords) GetWordStats() WordStats {
 }
 
 // TODO have the updated_at automatically update
-func (known *KnownWords) AddWord(word string, age int64) error {
+func (known *knownWords) AddWord(word string, age int64) error {
 	tx, err := known.db.Beginx()
 	if err != nil {
 		return err
@@ -136,14 +192,9 @@ func (known *KnownWords) AddWord(word string, age int64) error {
 	return err
 }
 
-type WordEntry struct {
-	Word     string `db:"word"`
-	Interval int64  `db:"interval"`
-}
-
 // TODO make this faster if possible
 // TODO chunk in batches of 5000 words
-func (known *KnownWords) AddWords(words []WordEntry) error {
+func (known *knownWords) AddWords(words []WordEntry) error {
 	newWords := []WordEntry{}
 	needsUpdate := []WordEntry{}
 	alreadySeen := map[string]int64{}
@@ -155,7 +206,7 @@ func (known *KnownWords) AddWords(words []WordEntry) error {
 			log.Println("Duplicate words: ", word.Word)
 		} else {
 			alreadySeen[word.Word] = word.Interval
-			if !known.isKnown(word.Word) {
+			if !known.IsKnown(word.Word) {
 				newWords = append(newWords, word)
 			} else {
 				currentInterval := known.words[word.Word]
@@ -224,7 +275,7 @@ func (known *KnownWords) AddWords(words []WordEntry) error {
 	return nil
 }
 
-func (known *KnownWords) ImportCSVWords(path string) error {
+func (known *knownWords) ImportCSVWords(path string) error {
 	csvFile, err := os.Open(path)
 	if err != nil {
 		return err
@@ -270,23 +321,23 @@ func (known *KnownWords) ImportCSVWords(path string) error {
 	return known.AddWords(words)
 }
 
-func (known *KnownWords) isWellKnown(word string) bool {
+func (known *knownWords) IsWellKnown(word string) bool {
 	interval, ok := known.words[word]
 	return ok && interval.Interval >= int64(
 		known.backend.UserSettings.SentenceGenerationConfig.KnownInterval)
 }
 
-func (known *KnownWords) isKnown(word string) bool {
+func (known *knownWords) IsKnown(word string) bool {
 	_, ok := known.words[word]
 	return ok
 }
 
-func (known *KnownWords) isKnownChar(char rune) bool {
+func (known *knownWords) IsKnownChar(char rune) bool {
 	_, ok := known.characters[char]
 	return ok
 }
 
-func (known *KnownWords) GetOccurances(words []string) map[string]int64 {
+func (known *knownWords) GetOccurances(words []string) map[string]int64 {
 	occurances := map[string]int64{}
 	for _, word := range words {
 		// Its fine if occurance is just 0
@@ -299,7 +350,7 @@ func (known *KnownWords) GetOccurances(words []string) map[string]int64 {
 //go:embed assets/HSK
 var hskWords embed.FS
 
-func (known *KnownWords) GetUnknownHskWords(version string, level int) ([]string, error) {
+func (known *knownWords) GetUnknownHskWords(version string, level int) ([]string, error) {
 	// ensure string == 2.0 or 3.0
 	// ensure level == 1 - 6
 	hskPath := path.Join(
@@ -320,7 +371,7 @@ func (known *KnownWords) GetUnknownHskWords(version string, level int) ([]string
 	for _, word := range words {
 		trimmed := strings.TrimSpace(word)
 		trimmed = strings.Trim(trimmed, "\uFEFF")
-		if !known.isKnown(trimmed) && len(trimmed) > 0 {
+		if !known.IsKnown(trimmed) && len(trimmed) > 0 {
 			// Its fine if occurance is just 0
 			rows = append(rows, trimmed)
 		}
@@ -328,17 +379,7 @@ func (known *KnownWords) GetUnknownHskWords(version string, level int) ([]string
 	return rows, nil
 }
 
-//	type StatsInfo {
-//	  WordsStats
-//
-// }
-type TimeQuery struct {
-	Day             string `json:"day"`
-	Known           int    `json:"known"`
-	KnownCharacters int    `json:"knownCharacters"`
-}
-
-func (known *KnownWords) GetStatsInfo() ([]TimeQuery, error) {
+func (known *knownWords) GetStatsInfo() ([]TimeQuery, error) {
 	charMap := map[rune]time.Time{}
 	dateMap := map[string]int{}
 	dateCharMap := map[string]int{}

@@ -164,7 +164,7 @@ func (b *bookLibrary) RecalculateBooks() error {
 		b.backend.progress()
 	}
 
-	b.backend.KnownWords.syncFrequency()
+	b.backend.KnownWords.SyncFrequency()
 	b.emitBooks()
 	return nil
 }
@@ -402,7 +402,7 @@ func (b *bookLibrary) GetBookGraph(bookId int) ([]BookKnownQuery, error) {
 	// Map from day to how many words you learned on that day
 	dateMap := map[string]int{}
 
-	for word, data := range b.backend.KnownWords.words {
+	for word, data := range b.backend.KnownWords.GetWords() {
 		fmtTime := data.LearnedOn.Format("2006年01月02日")
 		wordFreq := frequencies[word]
 		dateMap[fmtTime] += wordFreq
@@ -658,14 +658,14 @@ func (b *bookLibrary) computeItAll(book *Book) error {
 		totalCharacters := row.Count * int(len([]rune(row.Word)))
 
 		// If we know the word we can do some stuff quickly
-		if b.backend.KnownWords.isKnown(row.Word) {
+		if b.backend.KnownWords.IsKnown(row.Word) {
 			book.Stats.TotalKnownWords += row.Count
 			book.Stats.ProbablyKnownWords += row.Count
 			book.Stats.KnownCharacters += totalCharacters
 		} else {
 			allKnown := true
 			for _, char := range row.Word {
-				if b.backend.KnownWords.isKnownChar(char) {
+				if b.backend.KnownWords.IsKnownChar(char) {
 					book.Stats.KnownCharacters += row.Count
 				} else {
 					allKnown = false

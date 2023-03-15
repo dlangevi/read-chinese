@@ -48,7 +48,7 @@ func (g *Generator) isT1Sentence(sentence []Token) (bool, string) {
 	haventFoundAnyYet := true
 	firstUnknown := ""
 	for _, token := range sentence {
-		if token.IsWord && !g.backend.KnownWords.isWellKnown(token.Data) {
+		if token.IsWord && !g.backend.KnownWords.IsWellKnown(token.Data) {
 			if haventFoundAnyYet {
 				haventFoundAnyYet = false
 				firstUnknown = token.Data
@@ -68,7 +68,7 @@ func (g *Generator) passesKnownCheck(sentence []Token, word string) bool {
 		if word == token.Data {
 			foundWord = true
 		}
-		if token.IsWord && !g.backend.KnownWords.isKnown(token.Data) {
+		if token.IsWord && !g.backend.KnownWords.IsKnown(token.Data) {
 			return false
 		}
 	}
@@ -78,7 +78,7 @@ func (g *Generator) passesKnownCheck(sentence []Token, word string) bool {
 
 func (g *Generator) isT1Candidate(sentence []Token, word string) bool {
 	for _, token := range sentence {
-		if token.IsWord && word != token.Data && !g.backend.KnownWords.isWellKnown(token.Data) {
+		if token.IsWord && word != token.Data && !g.backend.KnownWords.IsWellKnown(token.Data) {
 			return false
 		}
 	}
@@ -218,7 +218,7 @@ func (g *Generator) GetSentencesForWord(word string, bookIds []int) ([]Sentence,
 	books, _ := g.backend.BookLibrary.GetBooks(bookIds...)
 	sentences := []Sentence{}
 
-	if g.backend.KnownWords.isKnown(word) {
+	if g.backend.KnownWords.IsKnown(word) {
 		// Have to do a slower lookup in completly known sentences
 		for _, book := range books {
 			bookSentences, ok := g.bookCache[book.Title]
