@@ -29,9 +29,7 @@
 <script lang="ts" setup>
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
-import { getUserSettings } from '@/lib/userSettings';
 const route = useRoute();
-const UserSettings = getUserSettings();
 
 type listEntry = {
   name: string,
@@ -43,9 +41,7 @@ const navigation = computed(() => [
   { name: 'Book Library', href: '/BookLibrary' },
   { name: 'Manage Current Flashcards', href: '/FlashCards' },
   { name: 'Create New Flashcards', href: '/LearnWords' },
-  ...(UserSettings.meta.EnableExperimental
-    ? [{ name: 'View Known Words', href: '/KnownWords' }]
-    : []),
+  { name: 'View Known Words', href: '/KnownWords' },
   { name: 'Stats', href: '/Stats' },
   { name: 'Settings', href: '/Settings' },
 ].map((item:listEntry) => {

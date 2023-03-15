@@ -6,6 +6,8 @@ export function AddWord(arg1:string,arg2:number):Promise<Error>;
 
 export function AddWords(arg1:Array<backend.WordEntry>):Promise<Error>;
 
+export function DeleteWord(arg1:string):Promise<Error>;
+
 export function GetOccurances(arg1:Array<string>):Promise<{[key: string]: number}>;
 
 export function GetStatsInfo():Promise<Array<backend.TimeQuery>>;

@@ -56,10 +56,6 @@
       <button class="btn-primary btn" @click="makeCards">
         Make Cards
       </button>
-      <button class="btn-primary btn" @click="importAnki">
-        Sync from Anki
-      </button>
-      <import-csv v-if="UserSettings.meta.EnableExperimental" />
       <div
         v-if="gridSource=='hsk'"
         class="border-2 p-2 text-center"
@@ -87,7 +83,6 @@
 
 <script lang="ts" setup>
 import WithSidebar from '@/layouts/WithSidebar.vue';
-import ImportCsv from '@/components/ImportCsv.vue';
 import { watch, ref, onBeforeMount } from 'vue';
 import {
   LearningTarget,
@@ -96,13 +91,8 @@ import {
 import {
   GetUnknownHskWords,
 } from '@wailsjs/backend/knownWords';
-import { ImportAnkiKeywords } from '@wailsjs/backend/ankiInterface';
 import UnknownWords from '../components/UnknownWords.vue';
-import { useLoader } from '@/lib/loading';
 import { GetPossibleWords } from '@wailsjs/backend/Dictionaries';
-
-import { getUserSettings } from '@/lib/userSettings';
-const UserSettings = getUserSettings();
 
 type HskVersion = '2.0' | '3.0';
 type HskLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -156,11 +146,6 @@ onBeforeMount(async () => {
   words.value = await LearningTarget();
   frequencySource.value = '';
 });
-
-const loader = useLoader();
-async function importAnki() {
-  return loader.withLoader(ImportAnkiKeywords, false);
-}
 
 async function loadHsk() {
   active.value = true;

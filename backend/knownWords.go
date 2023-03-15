@@ -22,6 +22,7 @@ type (
 		GetWordStats() WordStats
 		AddWord(word string, age int64) error
 		AddWords(words []WordEntry) error
+		DeleteWord(word string) error
 		ImportCSVWords(path string) error
 		GetOccurances(words []string) map[string]int64
 		GetUnknownHskWords(version string, level int) ([]string, error)
@@ -190,6 +191,27 @@ func (known *knownWords) AddWord(word string, age int64) error {
 		runtime.EventsEmit(known.backend.ctx, "AddedWord", word)
 	}
 	return err
+}
+
+func (known *knownWords) DeleteWord(word string) error {
+	res, err := known.db.Exec(`
+    DELETE FROM words
+    WHERE word=$1`, word)
+	if err != nil {
+		return err
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows != 1 {
+		return fmt.Errorf("Word was not deleted: %s %d", word, rows)
+	}
+	delete(known.words, word)
+	if known.backend.ctx != nil {
+		runtime.EventsEmit(known.backend.ctx, "DeletedWord", word)
+	}
+	return nil
 }
 
 // TODO make this faster if possible
