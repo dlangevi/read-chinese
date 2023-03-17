@@ -1,5 +1,11 @@
 <template>
-  <div class="">
+  <div
+    :class="[
+      'rounded-lg',
+      {'bg-base-100': !allComplete },
+      'p-4'
+    ]"
+  >
     <div v-if="stillChecking">
       Loading ...
     </div>
@@ -8,7 +14,7 @@
     </div>
     <div v-else>
       <div class="flex gap-4">
-        <h2 class="text-2xl font-extrabold text-white">
+        <h2 class="text-2xl font-extrabold text-base-content">
           Before Getting Started
         </h2>
         <button
@@ -20,7 +26,7 @@
           {{ firstFailure?.buttonText }}
         </button>
       </div>
-      <ul class="list-outside list-disc space-y-2">
+      <ul class="list-inside list-disc space-y-2">
         <li
           v-for="check in checks"
           :key="check.description"
@@ -28,6 +34,10 @@
         >
           <span :class="{ 'line-through': check.passes}">
             {{ check.description }}
+            <span
+              v-if="!check.passes"
+              class="font-bold text-error"
+            >({{ check.checkResult }})</span>
           </span>
         </li>
       </ul>
@@ -179,8 +189,11 @@ const checks = reactive<{
     buttonText: 'Configure Anki',
     description: 'Configure the names of anki fields',
     checkAction: async () => {
-      await ankiHealth();
-      return ankiConfigured();
+      if (checks.AnkiAvaliable.passes) {
+        return ankiConfigured();
+      } else {
+        throw checks.AnkiAvaliable.checkResult;
+      }
     },
     buttonAction: () => { ankiConfigure.value = true; },
   },
