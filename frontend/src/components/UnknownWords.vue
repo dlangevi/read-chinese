@@ -106,14 +106,13 @@ const columnDefs:ColDef[] = [
   },
 ];
 
+let resizeCallback: () => void;
 const rowData = ref<UnknownWordRow[]>([]);
 watch(() => props.words, async () => {
-  console.log(props.words);
   updateWords();
 });
 
 async function updateWords() {
-  console.log(props.words);
   const definitions : WordDefinitions = await GetDefinitions(props.words);
   let occurances : {
     [key:string] :number
@@ -135,6 +134,7 @@ async function updateWords() {
     row.occurance = occurances[word];
     return row;
   });
+  resizeCallback();
 }
 
 const store = useCardQueue();
@@ -157,16 +157,14 @@ defineExpose({
   },
 });
 
-let resizeCallback: () => void;
 function onGridReady(params:GridReadyEvent) {
-  params.api.sizeColumnsToFit();
   resizeCallback = () => {
     setTimeout(() => {
       params.api.sizeColumnsToFit();
-    });
+    }, 10);
   };
   window.addEventListener('resize', resizeCallback);
-  params.api.sizeColumnsToFit();
+  resizeCallback();
   EventsOn('AddedWord', (word : string) => {
     // TODO this might end up being slow, or could have
     // problems if markknown is spam clicked
