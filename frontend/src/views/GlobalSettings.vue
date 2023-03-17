@@ -1,21 +1,25 @@
 <template>
-  <div class="mx-auto w-4/5 px-4">
+  <div class="flex flex-col gap-4 p-4">
     <div
       v-for="(contents, section, index) in sections"
       :key="index"
-      class="m-4 grid grid-cols-4 justify-start
-      gap-4 border-2 border-base-300 p-4"
+      class="
+      mx-auto
+      flex
+      w-4/5
+      border-2
+      border-base-300
+      p-4"
     >
-      <div class="m-4 text-2xl font-extrabold">
+      <div class="m-4 w-1/6 text-2xl font-extrabold">
         {{ section }}
       </div>
       <div
-        class="col-span-3
-               grid
+        class="grid
+               w-5/6
                grid-flow-row
                grid-cols-3
-               justify-start
-               gap-6"
+               gap-4"
       >
         <component
           :is="content.type"

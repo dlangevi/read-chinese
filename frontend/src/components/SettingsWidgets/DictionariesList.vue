@@ -5,7 +5,7 @@
       @click="() => addDictModal = false"
     >
       <div
-        class="modal-box relative w-1/2 max-w-5xl"
+        class="modal-box relative w-1/2 "
         @click.stop
       >
         <div>

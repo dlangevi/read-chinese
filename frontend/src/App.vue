@@ -18,7 +18,7 @@
           <Suspense>
             <router-view
               :key="route.fullPath"
-              :class="['w-screen overflow-scroll',
+              :class="['w-screen overflow-auto',
                        {'h-[calc(100vh-4rem)]': route.fullPath !== '/Welcome'},
                        {'h-100vh': route.fullPath === '/Welcome'}
               ]"

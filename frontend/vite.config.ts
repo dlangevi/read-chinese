@@ -15,6 +15,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
+      external: 'chart.js',
       output: {
         entryFileNames: 'assets/[name].js',
         chunkFileNames: 'assets/[name].js',

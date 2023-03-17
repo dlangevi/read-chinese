@@ -18,8 +18,7 @@
     </label>
     <div
       v-if="setting.tooltip"
-      class="tooltip tooltip-right
-      "
+      class="tooltip tooltip-top"
       :data-tip="setting.tooltip"
     >
       <information-circle class="h-6 w-6" />
