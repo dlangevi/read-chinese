@@ -232,6 +232,7 @@ func (known *knownWords) SetLearnedDate(word string, date time.Time) error {
 		return err
 	}
 	wordData.LearnedOn = date
+	known.words[word] = wordData
 	return nil
 
 }

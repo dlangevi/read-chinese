@@ -26,6 +26,7 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 - [ ] free edit of card fields
 
 ### DONE
+- [x] import learnedOn data from anki
 - [x] chinese voice picker
 - [x] more compact library table view
 - [x] interactive workflow for importing from calibre
