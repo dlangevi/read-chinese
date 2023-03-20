@@ -49,6 +49,10 @@ type (
 type ankiInterface struct {
 	backend *Backend
 	anki    *ankiconnect.Client
+	// Some save values since windows anki api causes issues
+	// when continuously loading these
+	decks  []string
+	models []string
 }
 
 func NewAnkiInterface(backend *Backend) *ankiInterface {
@@ -73,21 +77,29 @@ func (a *ankiInterface) HealthCheck() error {
 
 func (a *ankiInterface) ConfigurationCheck() error {
 	// ActiveDeck needs to be a real deck
-	decks, restErr := a.anki.Decks.GetAll()
-	if restErr != nil {
-		return toError(restErr)
+	if len(a.decks) == 0 {
+
+		decks, restErr := a.anki.Decks.GetAll()
+		if restErr != nil {
+			return toError(restErr)
+		}
+		a.decks = *decks
+
 	}
-	if !slices.Contains(*decks, a.backend.UserSettings.AnkiConfig.ActiveDeck) {
+	if !slices.Contains(a.decks, a.backend.UserSettings.AnkiConfig.ActiveDeck) {
 		return errors.New("Active Deck does exist in Anki")
 	}
 
-	// ActiveModel needs to be a real model
-	models, restErr := a.anki.Models.GetAll()
-	if restErr != nil {
-		return toError(restErr)
+	if len(a.models) == 0 {
+		// ActiveModel needs to be a real model
+		models, restErr := a.anki.Models.GetAll()
+		if restErr != nil {
+			return toError(restErr)
+		}
+		a.models = *models
 	}
 	activeModel := a.backend.UserSettings.AnkiConfig.ActiveModel
-	if !slices.Contains(*models, activeModel) {
+	if !slices.Contains(a.models, activeModel) {
 		return errors.New("Chose Note type does exist in Anki")
 	}
 
@@ -611,7 +623,7 @@ func (a *ankiInterface) ImportAnkiReviewData() error {
 		if ok && wordOk && !dbWord.ManuallyDated {
 			asATime := time.UnixMilli(earliestReview)
 			difference := asATime.Sub(dbWord.LearnedOn)
-			days := int(difference.Seconds() / 86400)
+			days := int(difference.Abs().Seconds() / 86400)
 			if days > 0 {
 				err := a.backend.KnownWords.SetLearnedDate(cardWord.Value, asATime)
 				if err != nil {
