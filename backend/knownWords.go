@@ -3,6 +3,7 @@ package backend
 import (
 	"embed"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -23,6 +24,7 @@ type (
 		AddWord(word string, age int64) error
 		AddWords(words []WordEntry) error
 		DeleteWord(word string) error
+		SetLearnedDate(word string, date time.Time) error
 		ImportCSVWords(path string) error
 		GetOccurances(words []string) map[string]int64
 		GetUnknownHskWords(version string, level int) ([]string, error)
@@ -45,8 +47,9 @@ type (
 	}
 
 	WordData struct {
-		Interval  int64
-		LearnedOn time.Time
+		Interval      int64
+		LearnedOn     time.Time
+		ManuallyDated bool
 	}
 
 	knownWords struct {
@@ -92,13 +95,14 @@ func NewKnownWords(db *sqlx.DB,
 
 func (known *knownWords) syncWords() {
 	type WordRow struct {
-		Word      string
-		Interval  int64
-		LearnedOn time.Time `db:"created_at"`
+		Word          string
+		Interval      int64
+		LearnedOn     time.Time `db:"learnedOn"`
+		ManuallyDated bool      `db:"manuallyDated"`
 	}
 	words := []WordRow{}
 	err := known.db.Select(&words, `
-    SELECT word, interval, created_at
+    SELECT word, interval, learnedOn, manuallyDated
     FROM words
   `)
 	if err != nil {
@@ -106,8 +110,9 @@ func (known *knownWords) syncWords() {
 	}
 	for _, word := range words {
 		known.words[word.Word] = WordData{
-			Interval:  word.Interval,
-			LearnedOn: word.LearnedOn,
+			Interval:      word.Interval,
+			LearnedOn:     word.LearnedOn,
+			ManuallyDated: word.ManuallyDated,
 		}
 		for _, char := range word.Word {
 			known.characters[char] = true
@@ -159,7 +164,6 @@ func (known *knownWords) GetWordStats() WordStats {
 	}
 }
 
-// TODO have the updated_at automatically update
 func (known *knownWords) AddWord(word string, age int64) error {
 	tx, err := known.db.Beginx()
 	if err != nil {
@@ -174,17 +178,17 @@ func (known *knownWords) AddWord(word string, age int64) error {
 	}
 	_, err = tx.Exec(`
   UPDATE words 
-  SET interval=$2, 
-      updated_at = CURRENT_TIMESTAMP 
-  WHERE word="$1"
-  `, word, age)
+  SET interval=$1
+  WHERE word="$2"
+  `, age, word)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 	known.words[word] = WordData{
-		Interval:  age,
-		LearnedOn: time.Now(),
+		Interval:      age,
+		LearnedOn:     time.Now(),
+		ManuallyDated: false,
 	}
 	err = tx.Commit()
 	if known.backend.ctx != nil {
@@ -212,6 +216,24 @@ func (known *knownWords) DeleteWord(word string) error {
 		runtime.EventsEmit(known.backend.ctx, "DeletedWord", word)
 	}
 	return nil
+}
+
+func (known *knownWords) SetLearnedDate(word string, date time.Time) error {
+	wordData, ok := known.words[word]
+	if !ok {
+		return errors.New("Not a word")
+	}
+	_, err := known.db.Exec(`
+    UPDATE words 
+    SET learnedOn=$1
+    WHERE word=$2`, date.Format("2006-01-02 15:04:05"),
+		word)
+	if err != nil {
+		return err
+	}
+	wordData.LearnedOn = date
+	return nil
+
 }
 
 // TODO make this faster if possible
@@ -255,8 +277,7 @@ func (known *knownWords) AddWords(words []WordEntry) error {
 
 	stmt, err := tx.Preparex(`
     UPDATE words 
-    SET interval=$1, 
-        updated_at=CURRENT_TIMESTAMP 
+    SET interval=$1
     WHERE word=$2`,
 	)
 	if err != nil {
@@ -279,8 +300,9 @@ func (known *knownWords) AddWords(words []WordEntry) error {
 
 	for _, word := range newWords {
 		known.words[word.Word] = WordData{
-			Interval:  word.Interval,
-			LearnedOn: time.Now(),
+			Interval:      word.Interval,
+			LearnedOn:     time.Now(),
+			ManuallyDated: false,
 		}
 		for _, char := range word.Word {
 			known.characters[char] = true

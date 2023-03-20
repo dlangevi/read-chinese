@@ -18,6 +18,9 @@
       <button class="btn-primary btn" @click="importAnki">
         Sync from Anki
       </button>
+      <button class="btn-primary btn" @click="importAnkiReviews">
+        Sync dates from Anki
+      </button>
       <import-csv v-if="UserSettings.meta.EnableExperimental" />
     </div>
     <ag-grid-vue
@@ -44,7 +47,10 @@ import { GetWordsGrid } from '@wailsjs/backend/knownWords';
 import { backend } from '@wailsjs/models';
 import DeleteLearned from '@/components/DeleteLearned.vue';
 import ImportCsv from '@/components/ImportCsv.vue';
-import { ImportAnkiKeywords } from '@wailsjs/backend/ankiInterface';
+import {
+  ImportAnkiKeywords,
+  ImportAnkiReviewData,
+} from '@wailsjs/backend/ankiInterface';
 import { useLoader } from '@/lib/loading';
 import { getUserSettings } from '@/lib/userSettings';
 const UserSettings = getUserSettings();
@@ -54,6 +60,10 @@ const getRowId = (params:GetRowIdParams) => params.data.Word;
 const loader = useLoader();
 async function importAnki() {
   return loader.withLoader(ImportAnkiKeywords, false);
+}
+
+async function importAnkiReviews() {
+  return loader.withLoader(ImportAnkiReviewData, false);
 }
 
 const columnDefs:ColDef[] = [

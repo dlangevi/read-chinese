@@ -36,6 +36,7 @@ type (
 		UpdateWordAudio(noteId int64) error
 		UpdatePinyin(noteId int64) error
 		ImportAnkiKeywords() error
+		ImportAnkiReviewData() error
 		LoadProblemCards(query string) ([]ProblemCard, error)
 		HealthCheck() error
 		ConfigurationCheck() error
@@ -524,19 +525,29 @@ func (a *ankiInterface) UpdateNoteFields(noteId int64, fields Fields) error {
 	return nil
 }
 
+func (a *ankiInterface) loadAnkiKeywords() (*[]ankiconnect.ResultCardsInfo, error) {
+	cards, restErr := a.anki.Cards.Get(
+		fmt.Sprintf(`"deck:%v"`, a.backend.UserSettings.AnkiConfig.ActiveDeck))
+	if restErr != nil {
+		return nil, toError(restErr)
+	}
+
+	return cards, nil
+}
+
 func (a *ankiInterface) ImportAnkiKeywords() error {
 
 	// Not able to do a good progress bar but this is
 	// fine for now
 	a.backend.setupProgress("Loading words from anki", 1)
-	currentMapping, err := a.getConfiguredMapping()
+	cards, err := a.loadAnkiKeywords()
 	if err != nil {
 		return err
 	}
-	cards, restErr := a.anki.Cards.Get(
-		fmt.Sprintf(`"deck:%v"`, a.backend.UserSettings.AnkiConfig.ActiveDeck))
-	if restErr != nil {
-		return toError(restErr)
+
+	currentMapping, err := a.getConfiguredMapping()
+	if err != nil {
+		return err
 	}
 
 	words := []WordEntry{}
@@ -548,6 +559,68 @@ func (a *ankiInterface) ImportAnkiKeywords() error {
 		})
 	}
 	return a.backend.KnownWords.AddWords(words)
+}
+
+func (a *ankiInterface) ImportAnkiReviewData() error {
+	a.backend.setupProgress("Loading words from anki", 1)
+	currentMapping, err := a.getConfiguredMapping()
+	if err != nil {
+		return err
+	}
+
+	// In the future this would probably be better
+	// reviews, restErr := a.anki.Cards.GetReviews(
+	// 	fmt.Sprintf(`"deck:%v"`, a.backend.UserSettings.AnkiConfig.ActiveDeck))
+
+	// Hopefully they are not using Anki before 1970
+	reviews, restErr := a.anki.Decks.GetReviewsAfter(
+		a.backend.UserSettings.AnkiConfig.ActiveDeck, time.Unix(0, 0))
+
+	if restErr != nil {
+		return toError(restErr)
+	}
+	printTimes := 10
+
+	// Get earliest Review for each card
+	earliestReviews := map[int64]int64{}
+	for _, review := range *reviews {
+		if printTimes > 0 {
+			printTimes -= 1
+			fmt.Println(review.ReviewTime, time.UnixMilli(review.ReviewTime))
+
+		}
+		earliestReview, ok := earliestReviews[review.CardID]
+		if !ok || review.ReviewTime < earliestReview {
+			earliestReviews[review.CardID] = review.ReviewTime
+		}
+	}
+
+	cards, err := a.loadAnkiKeywords()
+	if err != nil {
+		return err
+	}
+
+	myWords := a.backend.KnownWords.GetWords()
+	for i := range *cards {
+		card := (*cards)[i]
+		cardId := card.CardId
+		cardWord := card.Fields[currentMapping.Hanzi]
+		dbWord, wordOk := myWords[cardWord.Value]
+
+		earliestReview, ok := earliestReviews[cardId]
+		if ok && wordOk && !dbWord.ManuallyDated {
+			asATime := time.UnixMilli(earliestReview)
+			difference := asATime.Sub(dbWord.LearnedOn)
+			days := int(difference.Seconds() / 86400)
+			if days > 0 {
+				err := a.backend.KnownWords.SetLearnedDate(cardWord.Value, asATime)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
 }
 
 type FlaggedCard struct {

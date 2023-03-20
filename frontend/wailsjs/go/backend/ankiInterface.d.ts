@@ -12,6 +12,8 @@ export function HealthCheck():Promise<Error>;
 
 export function ImportAnkiKeywords():Promise<Error>;
 
+export function ImportAnkiReviewData():Promise<Error>;
+
 export function LoadDecks():Promise<Array<string>>;
 
 export function LoadModelFields(arg1:string):Promise<Array<string>>;

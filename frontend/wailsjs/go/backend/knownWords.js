@@ -54,6 +54,10 @@ export function IsWellKnown(arg1) {
   return window['go']['backend']['knownWords']['IsWellKnown'](arg1);
 }
 
+export function SetLearnedDate(arg1, arg2) {
+  return window['go']['backend']['knownWords']['SetLearnedDate'](arg1, arg2);
+}
+
 export function SyncFrequency() {
   return window['go']['backend']['knownWords']['SyncFrequency']();
 }

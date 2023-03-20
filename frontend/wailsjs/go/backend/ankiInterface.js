@@ -22,6 +22,10 @@ export function ImportAnkiKeywords() {
   return window['go']['backend']['ankiInterface']['ImportAnkiKeywords']();
 }
 
+export function ImportAnkiReviewData() {
+  return window['go']['backend']['ankiInterface']['ImportAnkiReviewData']();
+}
+
 export function LoadDecks() {
   return window['go']['backend']['ankiInterface']['LoadDecks']();
 }

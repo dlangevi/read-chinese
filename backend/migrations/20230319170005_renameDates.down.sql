@@ -1,0 +1,2 @@
+ALTER TABLE "words" RENAME COLUMN "learnedOn" TO "created_at";
+ALTER TABLE "words" ADD COLUMN "updated_at" DATETIME DEFAULT CURRENT_TIMESTAMP;

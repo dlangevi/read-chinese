@@ -6,7 +6,12 @@ import (
 
 // Current test actually queries my anki database
 func TestAnki(t *testing.T) {
-	// anki := NewAnkiInterface()
+	anki := NewAnkiInterface(testRuntime)
+	err := anki.ImportAnkiReviewData()
+	if err != nil {
+		t.Error(err)
+	}
+	t.Error("ya")
 	// note, err := anki.GetAnkiNote("将")
 	//
 	//	if err != nil {
