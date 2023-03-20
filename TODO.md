@@ -7,7 +7,6 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 #### Still Intend to Do
 - [ ] add new book (without needing calibre)
 - [ ] use calibre (if possible) to convert from epub etc to txt file
-- [ ] View and edit known words
 - [ ] write dev install guide 
 
 #### Ideas to Explore / Deprioritized Ideas
@@ -27,6 +26,7 @@ Think of the todos as just ideas I would like to optimistically work to, and not
 
 ### DONE
 - [x] import learnedOn data from anki
+- [x] View and edit known words
 - [x] chinese voice picker
 - [x] more compact library table view
 - [x] interactive workflow for importing from calibre
