@@ -249,10 +249,10 @@ func (a *ankiInterface) CreateAnkiNote(fields Fields, tags []string) error {
 
 	firstField := currentMapping.FirstField
 	// If your first field is something else then ???
-	if firstField != currentMapping.Hanzi ||
-		firstField != currentMapping.ExampleSentence ||
-		firstField != currentMapping.EnglishDefinition ||
-		firstField != currentMapping.ChineseDefinition {
+	if !(firstField == currentMapping.Hanzi ||
+		firstField == currentMapping.ExampleSentence ||
+		firstField == currentMapping.EnglishDefinition ||
+		firstField == currentMapping.ChineseDefinition) {
 		noteFields[currentMapping.FirstField] = fmt.Sprint(time.Now().UnixMilli())
 	}
 
