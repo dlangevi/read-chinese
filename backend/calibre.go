@@ -77,18 +77,11 @@ func (c *Calibre) ImportCalibreBooks(books []CalibreBook) error {
 			log.Println("Potential new book", book.Author, book.Title)
 			for _, format := range book.Formats {
 				if strings.HasSuffix(format, ".txt") {
-					bookId, err := c.backend.BookLibrary.AddBook(book.Author, book.Title, book.Cover, format)
+					_, err := c.backend.BookLibrary.AddBook(book.Author, book.Title, book.Cover, format)
 					if err != nil {
 						log.Println("error ", err)
 						return err
 					}
-					book, err := c.backend.BookLibrary.GetBook(bookId)
-					if err != nil {
-						log.Println("error ", err)
-						return err
-					}
-					c.backend.Generator.GenerateSentenceTableForBook(book)
-
 					break
 				}
 			}

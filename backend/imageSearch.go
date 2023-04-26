@@ -19,7 +19,16 @@ type ThumbnailInfo struct {
 type AzureImageInfo struct {
 	Name          string
 	ThumbnailUrl  string
+	Width         int64
+	Height        int64
+	ContentUrl    string
 	ThumbnailInfo ThumbnailInfo `json:"thumbnail"`
+}
+
+type CoverImage struct {
+	Url         string `json:"url,omitempty"`
+	ImageWidth  int64  `json:"imageWidth,omitEmpty"`
+	ImageHeight int64  `json:"imageHeight,omitEmpty"`
 }
 
 type ImageInfo struct {
@@ -52,7 +61,7 @@ func NewImageClient(
 func (i *ImageClient) SearchImages(query string) ([]ImageInfo, error) {
 	i.httpClient.SetBaseURL(IMAGEURI)
 	result := &ImageResponse{}
-	rsp, err := i.httpClient.R().
+	_, err := i.httpClient.R().
 		SetHeader("Ocp-Apim-Subscription-Key",
 			i.userSettings.AzureConfig.AzureImageApiKey).
 		// TODO look into region filtering
@@ -70,8 +79,8 @@ func (i *ImageClient) SearchImages(query string) ([]ImageInfo, error) {
 		SetResult(result).
 		Get("/v7.0/images/search")
 		// TODO need some better way of error detection
-	if len(result.Value) != 30 {
-		err = errors.New(fmt.Sprintf("Something failed with imageSearch %v", rsp))
+	if len(result.Value) < 10 {
+		err = errors.New(fmt.Sprintf("Something failed with imageSearch %v", len(result.Value)))
 	}
 
 	imageInfo := []ImageInfo{}
@@ -81,6 +90,41 @@ func (i *ImageClient) SearchImages(query string) ([]ImageInfo, error) {
 			Url:         image.ThumbnailUrl,
 			ImageWidth:  image.ThumbnailInfo.Width,
 			ImageHeight: image.ThumbnailInfo.Height,
+		})
+	}
+
+	return imageInfo, err
+
+}
+
+func (i *ImageClient) SearchBookCovers(author string, title string) ([]CoverImage, error) {
+	i.httpClient.SetBaseURL(IMAGEURI)
+	result := &ImageResponse{}
+	query := fmt.Sprintf("%s-%s", author, title)
+	_, err := i.httpClient.R().
+		SetHeader("Ocp-Apim-Subscription-Key",
+			i.userSettings.AzureConfig.AzureImageApiKey).
+		SetQueryParams(map[string]string{
+			"q":          query,
+			"count":      "15",
+			"safeSearch": "Strict",
+			"imageType":  "Photo",
+			"setLang":    "zh-hans",
+			"cc":         "zh-CN",
+		}).
+		SetResult(result).
+		Get("/v7.0/images/search")
+		// TODO need some better way of error detection
+	if len(result.Value) != 15 {
+		err = errors.New(fmt.Sprintf("Something failed with imageSearch %v", len(result.Value)))
+	}
+
+	imageInfo := []CoverImage{}
+	for _, image := range result.Value {
+		imageInfo = append(imageInfo, CoverImage{
+			Url:         image.ContentUrl,
+			ImageWidth:  image.Width,
+			ImageHeight: image.Height,
 		})
 	}
 

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -66,6 +67,7 @@ func NewTextToSpeach(
 		userSettings: userSettings,
 	}
 	client.httpClient.SetBaseURL(ENDPOINT)
+	client.httpClient.SetTimeout(time.Second * 5)
 	return client
 }
 func (tts *TextToSpeech) ExportVoice() TTSVoice {

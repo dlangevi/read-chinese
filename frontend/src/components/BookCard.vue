@@ -8,9 +8,17 @@
   >
     <figure>
       <img
+        v-if="book.cover"
         class="m-auto max-h-full grow rounded object-contain"
         :src="'/' + book.cover"
         :alt="book.title"
+        @click="bookBigMode"
+      >
+      <img
+        v-else
+        class="m-auto max-h-full grow rounded object-contain"
+        src="../assets/empty-book.jpg"
+        alt="Default image"
         @click="bookBigMode"
       >
     </figure>

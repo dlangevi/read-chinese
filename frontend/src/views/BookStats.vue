@@ -5,9 +5,16 @@
   >
     <div class="h-full w-1/4 p-4">
       <img
+        v-if="book.cover"
         class="w-auto rounded"
         :src="'/' + book.cover"
         :alt="book.title"
+      >
+      <img
+        v-else
+        class="w-auto rounded"
+        src="../assets/empty-book.jpg"
+        alt="Default image"
       >
     </div>
     <div class="flex h-full w-3/4 flex-col">

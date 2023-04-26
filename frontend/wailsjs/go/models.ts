@@ -265,6 +265,22 @@ export namespace backend {
 	        this.AutoAdvanceCard = source["AutoAdvanceCard"];
 	    }
 	}
+	export class CoverImage {
+	    url?: string;
+	    imageWidth: number;
+	    imageHeight: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new CoverImage(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.url = source["url"];
+	        this.imageWidth = source["imageWidth"];
+	        this.imageHeight = source["imageHeight"];
+	    }
+	}
 	export class Dict {
 	    Path: string;
 	    Language: string;

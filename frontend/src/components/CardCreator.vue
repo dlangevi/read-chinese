@@ -146,10 +146,10 @@ function onClose() {
   return false;
 }
 
-watch(() => cardManager.ready, () => {
+watch(() => cardManager.ready, async () => {
   const autoSubmit = UserSettings.CardCreation.AutoAdvanceCard;
   if (cardManager.ready && autoSubmit) {
-    submit();
+    await submit();
   }
 });
 

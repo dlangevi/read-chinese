@@ -119,6 +119,7 @@ func NewBookLibrary(
 	}
 }
 
+// TODO handle downloading image / url / base64
 func copyCover(author string, title string, coverPath string) (string, error) {
 	if coverPath == "" {
 		return "", errors.New("Empty coverpath")
@@ -133,6 +134,22 @@ func copyCover(author string, title string, coverPath string) (string, error) {
 	newCoverLocation := ConfigDir("covers", subpath)
 	err = os.WriteFile(newCoverLocation, bytes, 0666)
 	return subpath, err
+}
+
+func copyBookText(author string, title string, filePath string) (string, error) {
+	if filePath == "" {
+		return "", errors.New("Empty filepath")
+	}
+	bytes, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	ext := path.Ext(filePath)
+	subpath := path.Join(author, fmt.Sprintf("%s%s", title, ext))
+	newCoverLocation := ConfigDir("bookRawText", subpath)
+	err = os.WriteFile(newCoverLocation, bytes, 0666)
+	return newCoverLocation, err
 }
 
 func (b *bookLibrary) emitBooks() error {
@@ -180,6 +197,12 @@ func (b *bookLibrary) AddBook(
 	if err != nil {
 		log.Println("Error copying cover: ", err)
 	}
+
+	filepath, err = copyBookText(author, title, filepath)
+	if err != nil {
+		return 0, err
+	}
+
 	bookId, err := addBookToDb(b.db, author, title, cover, filepath)
 	if err != nil {
 		return 0, err
@@ -191,6 +214,7 @@ func (b *bookLibrary) AddBook(
 	}
 
 	b.emitBooks()
+	b.backend.Generator.GenerateSentenceTableForBook(bookId)
 	return bookId, nil
 }
 

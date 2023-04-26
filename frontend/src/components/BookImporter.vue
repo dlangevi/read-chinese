@@ -4,7 +4,7 @@
       class="btn-primary btn w-full"
       @click="openImporter"
     >
-      Sync Calibre
+      Sync Books From Calibre
     </button>
     <Teleport to="#app-root">
       <div

@@ -102,7 +102,11 @@ func duration(msg string, start time.Time) {
 	log.Printf("%v: %v\n", msg, time.Since(start))
 }
 
-func (g *Generator) GenerateSentenceTableForBook(book Book) int {
+func (g *Generator) GenerateSentenceTableForBook(bookId int) int {
+	book, err := g.backend.BookLibrary.GetBook(bookId)
+	if err != nil {
+		log.Println("Error loading:", bookId)
+	}
 	fullSegmented, err := GetSegmentedText(book)
 	sentences := SentenceCache{}
 	numSentences := 0
@@ -146,7 +150,7 @@ func (g *Generator) GenerateSentenceTable() error {
 		wg.Add(1)
 		go func(book Book) {
 			defer wg.Done()
-			numSentences += g.GenerateSentenceTableForBook(book)
+			numSentences += g.GenerateSentenceTableForBook(book.BookId)
 		}(book)
 	}
 	wg.Wait()

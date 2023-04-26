@@ -4,7 +4,7 @@ import {backend} from '../models';
 
 export function GenerateSentenceTable():Promise<Error>;
 
-export function GenerateSentenceTableForBook(arg1:backend.Book):Promise<number>;
+export function GenerateSentenceTableForBook(arg1:number):Promise<number>;
 
 export function GetSentencesForWord(arg1:string,arg2:Array<number>):Promise<Array<backend.Sentence>>;
 

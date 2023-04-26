@@ -15,6 +15,7 @@
         :initial-value="UserSettings.BookLibrary.DisplayTable"
       />
       <book-importer />
+      <book-adder />
       <button
         class="btn-primary btn"
         @click="exportBooks"
@@ -67,6 +68,7 @@ import BookTable from '@/components/BookTable.vue';
 import SettingsCheckbox
   from '@/components/SettingsWidgets/SettingsCheckbox.vue';
 import BookImporter from '@/components/BookImporter.vue';
+import BookAdder from '@/components/BookAdder.vue';
 import { getUserSettings, ComponentTable } from '@/lib/userSettings';
 import { backend } from '@wailsjs/models';
 import { SaveFile } from '@wailsjs/backend/Backend';
