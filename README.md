@@ -46,7 +46,7 @@ This allows you to study the word in context within Anki
 After also selecting the definitions you want from installed dictionaries, if you have entered a 
 Azure Image ApiKey, you can also select multiple images to go on the flashcard
 
-![Image Selection](images/PickSentence.png)
+![Image Selection](images/PickImage.png)
 
 Upon submiting the card, it will be sent to Anki, here you can see the above card in my Anki deck, 
 along with others I have recently created
