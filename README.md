@@ -1,10 +1,13 @@
 # read-chinese
+
 ## Blocking issues
 Currently the following have to be implemented before I would recommend any
 random person on the internet tries to use this
 
 * I need to make a guide on how to get your own Azure api keys
 * I need to make a guide on how to import known word lists
+
+
 
 ## What is this?
 ### Who is this for
@@ -14,35 +17,55 @@ Intermediate to Advanced learners with
 * experience using Anki
 
 ### How it works
-For a brief overview / demo of the project (v0.0.3) you can watch 
-[this video](https://youtu.be/dAqE2YquGlw "read-chinese demo") the first 5
-minutes contains most of the useful info.
 
-### Technical Overview
-A (technical) summary of the workflow is as follows
+Assuming you have correctly setup Anki, and the required Azure apikeys, the workflow looks like this
+#### Manage BookLibrary
+You can manage your books from the book library. Those marked as 'favorite' are books that you plan on reading next.
 
-* Import txt files containing the text of a book
-* Run Jieba segmentation algorithm on text (filter valid words it can segment
-  to those in user dictionary)
-* Using knowledge of users known words, create a set of all T1 sentences in all books
-* Present the user list of most frequent unknown words in the text
-* For each word, provide 
-    * List of T1 sentences containing this word
-    * Definitions from dictionaries
-    * Images from Microsoft Azure image search
-    * Generated azure TTS of the word / sentence (if desired)
+![BookLibrary View](images/BookLibraryTable.png)
+
+Clicking on a row will open more detailed overview of that book, including character and word counts,
+as well as infomation on how many words you need to learn to hit the next comprehension target.
+
+![BookStats](images/BookInfo.png)
+
+You can start creating flashcards that focus on the vocab of a particular book from the BookStats page, or you can 
+head over to the Create New Flashcards page for more options. Here we see my still unknown words from HSK 6, ordered 
+by the frequency that they appear in my book library
+
+![HSK6 Words](images/HSK6.png)
+
+If you already recognize a word, you don't need to make a flashcard for it and can just mark it as already known. 
+Otherwise we can move onto the card creation workflow. 
+
+You first select from T1 sentences mined from your book library. 
+This allows you to study the word in context within Anki
+
+![Sentence Selection](images/PickSentence.png)
+
+After also selecting the definitions you want from installed dictionaries, if you have entered a 
+Azure Image ApiKey, you can also select multiple images to go on the flashcard
+
+![Image Selection](images/PickImage.png)
+
+Upon submiting the card, it will be sent to Anki, here you can see the above card in my Anki deck, 
+along with others I have recently created
+
+![Anki Deck](images/AnkiResult.png)
+
+Finally here is the progress I have made in the past year and a half of using this program. 
+(Pre 2022 is data backfilled from skritter)
+
+![Stats](images/Stats.png)
 
 ### Getting Started
 
 #### Setup (I hope to automate much of this soon)
-1. Acquire a ebook copies of the books you want to read. (If you legally own a
- physical copy, look on anna's archive for copy you can use)
+1. Acquire a ebook copies of the books you want to read. 
 2. Load these books into calibre and 'convert' them to txt format.
 3. Sync the books from calibre to read-chinese
-4. Import a dictionary (cc-cedict can be imported by just clicking a button)
-5. (Ideally) Import a list of new words
+4. (Ideally) Either import a list of known words, or sync from Anki your known words
 6. Generate your own azure api keys for the free image and tts services
-7. Open anki (with anki-connect plugin installed)
 
 #### Making the flashcards
 
