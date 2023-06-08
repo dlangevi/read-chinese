@@ -120,7 +120,6 @@ func (d *Dictionaries) SetPrimaryDict(name string) {
 	d.backend.UserSettings.SetPrimaryDict(name)
 }
 
-type DictionaryInfoMap map[string]DictionaryInfo
 type DictionaryInfo struct {
 	Name      string `json:"name"`
 	Path      string `json:"path"`
@@ -132,8 +131,8 @@ func (d *Dictionaries) ExportDictionaryInfo() DictionaryInfo {
 	return DictionaryInfo{}
 }
 
-func (d *Dictionaries) GetDictionaryInfo() DictionaryInfoMap {
-	dictInfoMap := DictionaryInfoMap{}
+func (d *Dictionaries) GetDictionaryInfo() map[string]DictionaryInfo {
+	dictInfoMap := map[string]DictionaryInfo{}
 	for name, dict := range d.backend.UserSettings.DictionariesConfig.Dicts {
 		dictInfoMap[name] = DictionaryInfo{
 			Name:      name,

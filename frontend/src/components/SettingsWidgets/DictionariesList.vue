@@ -199,11 +199,7 @@ async function submit() {
   addDictModal.value = false;
 }
 
-type DictionaryInfoMap = {
-  [name:string] : backend.DictionaryInfo
-};
-
-const dicts = ref<DictionaryInfoMap>({});
+const dicts = ref<{[key:string]:backend.DictionaryInfo}>({});
 async function updateDicts() {
   dicts.value = await GetDictionaryInfo();
 }

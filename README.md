@@ -81,10 +81,11 @@ those words will tend to have more T1 sentences to choose from.
 ## Development
 ### Dependancies:
 Let me know if something else is needed that I am not aware of
-
-* [calibre](https://calibre-ebook.com/download)
+* [golang](https://go.dev/doc/install)
 * [wails](https://wails.io/docs/gettingstarted/installation) (make sure to add $HOME/go/bin to path)
+* [nodejs](version XXX)
 * [yarn](https://yarnpkg.com/getting-started/install)
+* [calibre](https://calibre-ebook.com/download)
 * some sort of c++ compiler (to compile the Jieba implementation)
 
 ### to run dev mode:

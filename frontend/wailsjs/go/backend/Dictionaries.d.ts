@@ -14,11 +14,11 @@ export function GetDefinitions(arg1:Array<string>):Promise<backend.WordDefinitio
 
 export function GetDefinitionsForWord(arg1:string,arg2:string):Promise<Array<backend.DictionaryDefinition>>;
 
-export function GetDictionaryInfo():Promise<backend.DictionaryInfoMap>;
+export function GetDictionaryInfo():Promise<{[key: string]: backend.DictionaryInfo}>;
 
 export function GetPossibleWords(arg1:string):Promise<Array<string>>;
 
-export function HealthCheck():Promise<Error>;
+export function HealthCheck():Promise<void>;
 
 export function IsInDictionary(arg1:string):Promise<boolean>;
 

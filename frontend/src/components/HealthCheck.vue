@@ -155,7 +155,7 @@ const ankiConfigure = ref(false);
 type HealthCheckInfo = {
   buttonText: string,
   description: string
-  checkAction: () => Promise<Error>,
+  checkAction: () => Promise<void>,
   buttonAction: () => void,
   passes?: boolean,
   checkResult?: string,

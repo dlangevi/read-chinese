@@ -3,7 +3,7 @@ package backend
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"log"
 	"os/exec"
 	"strings"
@@ -45,7 +45,7 @@ func (c *Calibre) GetCalibreBooks() ([]CalibreBook, error) {
 	calibre.Stderr = &stderr
 	err := calibre.Run()
 	if err != nil {
-		return books, errors.New(stderr.String())
+		return books, fmt.Errorf("%v, %v", err, stderr.String())
 	}
 	err = json.Unmarshal(stdout.Bytes(), &books)
 	if err != nil {

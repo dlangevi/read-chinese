@@ -4,4 +4,4 @@ import {backend} from '../models';
 
 export function GetCalibreBooks():Promise<Array<backend.CalibreBook>>;
 
-export function ImportCalibreBooks(arg1:Array<backend.CalibreBook>):Promise<Error>;
+export function ImportCalibreBooks(arg1:Array<backend.CalibreBook>):Promise<void>;

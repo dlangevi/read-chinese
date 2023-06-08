@@ -3,11 +3,11 @@
 import {backend} from '../models';
 import {time} from '../models';
 
-export function AddWord(arg1:string,arg2:number):Promise<Error>;
+export function AddWord(arg1:string,arg2:number):Promise<void>;
 
-export function AddWords(arg1:Array<backend.WordEntry>):Promise<Error>;
+export function AddWords(arg1:Array<backend.WordEntry>):Promise<void>;
 
-export function DeleteWord(arg1:string):Promise<Error>;
+export function DeleteWord(arg1:string):Promise<void>;
 
 export function GetOccurances(arg1:Array<string>):Promise<{[key: string]: number}>;
 
@@ -21,7 +21,7 @@ export function GetWords():Promise<backend.Words>;
 
 export function GetWordsGrid():Promise<Array<backend.WordGridRow>>;
 
-export function ImportCSVWords(arg1:string):Promise<Error>;
+export function ImportCSVWords(arg1:string):Promise<void>;
 
 export function IsKnown(arg1:string):Promise<boolean>;
 
@@ -29,6 +29,6 @@ export function IsKnownChar(arg1:number):Promise<boolean>;
 
 export function IsWellKnown(arg1:string):Promise<boolean>;
 
-export function SetLearnedDate(arg1:string,arg2:time.Time):Promise<Error>;
+export function SetLearnedDate(arg1:string,arg2:time.Time):Promise<void>;
 
 export function SyncFrequency():Promise<void>;

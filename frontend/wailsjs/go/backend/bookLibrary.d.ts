@@ -6,9 +6,9 @@ export function AddBook(arg1:string,arg2:string,arg3:string,arg4:string):Promise
 
 export function BookExists(arg1:string,arg2:string):Promise<boolean>;
 
-export function DeleteBook(arg1:number):Promise<Error>;
+export function DeleteBook(arg1:number):Promise<void>;
 
-export function ExportDetailedBooks(arg1:string):Promise<Error>;
+export function ExportDetailedBooks(arg1:string):Promise<void>;
 
 export function GetBook(arg1:number):Promise<backend.Book>;
 
@@ -22,7 +22,7 @@ export function GetDetailedBooks():Promise<Array<backend.Book>>;
 
 export function GetFavoriteFrequencies():Promise<{[key: string]: number}>;
 
-export function HealthCheck():Promise<Error>;
+export function HealthCheck():Promise<void>;
 
 export function LearningTarget():Promise<Array<string>>;
 
@@ -30,11 +30,11 @@ export function LearningTargetBook(arg1:number):Promise<Array<string>>;
 
 export function LearningTargetFavorites():Promise<Array<string>>;
 
-export function RecalculateBooks():Promise<Error>;
+export function RecalculateBooks():Promise<void>;
 
-export function SetFavorite(arg1:number,arg2:boolean):Promise<Error>;
+export function SetFavorite(arg1:number,arg2:boolean):Promise<void>;
 
-export function SetRead(arg1:number,arg2:boolean):Promise<Error>;
+export function SetRead(arg1:number,arg2:boolean):Promise<void>;
 
 export function TopUnknownWords(arg1:number,arg2:number):Promise<Array<string>>;
 

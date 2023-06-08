@@ -103,7 +103,6 @@ async function syncCalibre(books : backend.CalibreBook[]) {
 async function getCalibreBooks() {
   books.value = await GetCalibreBooks();
 }
-getCalibreBooks();
 
 async function openImporter() {
   await getCalibreBooks();

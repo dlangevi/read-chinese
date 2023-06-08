@@ -26,7 +26,7 @@ import {
   GetFavoriteFrequencies,
 } from '@wailsjs/backend/bookLibrary';
 import { GetOccurances } from '@wailsjs/backend/knownWords';
-import type { WordDefinitions, UnknownWordRow } from '@/lib/types';
+import type { UnknownWordRow } from '@/lib/types';
 
 import { useCardQueue } from '@/stores/CardQueue';
 
@@ -113,7 +113,7 @@ watch(() => props.words, async () => {
 });
 
 async function updateWords() {
-  const definitions : WordDefinitions = await GetDefinitions(props.words);
+  const definitions = await GetDefinitions(props.words);
   let occurances : {
     [key:string] :number
   } = {};
