@@ -4,7 +4,16 @@
       Pick a sentence
     </div>
     <div v-if="loaded && (allSentences.length + sentences.length) == 0">
-      No sentences found, please skip for now
+      <p>
+        No T1 sentences found. You can either make this card without a sentence,
+        or skip it and create one once you know enough words.
+      </p>
+      <br>
+      <p>
+        Finding sentences depends on knowing enough words. If you see this
+        warning often, I would recommend you mark more words as known (most
+        easily done from 'Create New Flashcards' section)
+      </p>
     </div>
     <div v-for="(sectionSentences, section) in sections" :key="section">
       <div v-if="sectionSentences.value.length > 0">

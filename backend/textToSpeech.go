@@ -67,7 +67,7 @@ func NewTextToSpeach(
 		userSettings: userSettings,
 	}
 	client.httpClient.SetBaseURL(ENDPOINT)
-	client.httpClient.SetTimeout(time.Second * 5)
+	client.httpClient.SetTimeout(time.Second * 10)
 	return client
 }
 func (tts *TextToSpeech) ExportVoice() TTSVoice {

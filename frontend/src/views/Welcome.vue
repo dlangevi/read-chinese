@@ -26,6 +26,18 @@
               features of this application
             </p>
             <p class="mt-4 text-lg">
+              To ask questions, suggest improvements, or get support in setup
+              please join the community
+              <a
+                href="#"
+                class="text-info hover:text-info-content"
+                @click="
+                  BrowserOpenURL('https://discord.gg/RVgCQjTVYq')"
+              >
+                discord
+              </a>
+            </p>
+            <p class="mt-4 text-lg">
               For more information checkout:
             </p>
             <ul class="mt-4 list-inside list-disc text-lg">

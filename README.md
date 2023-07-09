@@ -7,8 +7,6 @@ random person on the internet tries to use this
 * I need to make a guide on how to get your own Azure api keys
 * I need to make a guide on how to import known word lists
 
-
-
 ## What is this?
 ### Who is this for
 Intermediate to Advanced learners with 
@@ -110,6 +108,10 @@ Let me know if something else is needed that I am not aware of
 * [yarn](https://yarnpkg.com/getting-started/install)
 * [calibre](https://calibre-ebook.com/download)
 * some sort of c++ compiler (to compile the Jieba implementation)
+
+### before running the first time, or if something is not working
+`cd frontend/`
+`yarn install`
 
 ### to run dev mode:
 `wails dev`

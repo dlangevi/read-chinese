@@ -430,6 +430,11 @@ func (known *knownWords) GetStatsInfo() ([]TimeQuery, error) {
 	dateCharMap := map[string]int{}
 
 	for word, data := range known.words {
+		// TODO instead of ignoreing interval 0 cards, we could project out
+		// known words in the future
+		if data.Interval == 0 {
+			continue
+		}
 		for _, c := range word {
 			prevTime, ok := charMap[c]
 			if !ok {
