@@ -129,20 +129,21 @@ possible out of problems when they happen on windows
 
 Since I build this on the windows dev test vm, (which expires every 90 days) here are the steps to fully setup my system
 
-`winget install GoLang.Go
-go install github.com/wailsapp/wails/v2/cmd/wails@latest
-winget install Node.js
-winget install Yarn.Yarn
-winget install calibre.calibre
-winget install CoreyButler.NVMforWindows
-nvm install 19
-nvm use 19.9.0
-winget install Git.Git
-winget install Anki.Anki
-winget install Microsoft.VisualStudioCode
-winget install Chocolatey.Chocolatey
-choco install mingw
-choco install nsis
-// Edit the windows PATH to include makensis
-`
+`winget install GoLang.Go`
+`go install github.com/wailsapp/wails/v2/cmd/wails@latest`
+`winget install Node.js`
+`winget install Yarn.Yarn`
+`winget install calibre.calibre`
+`winget install CoreyButler.NVMforWindows`
+`nvm install 19`
+`nvm use 19.9.0`
+`winget install Git.Git`
+`winget install Anki.Anki`
+`winget install Microsoft.VisualStudioCode`
+`winget install Chocolatey.Chocolatey`
+`choco install mingw`
+`choco install nsis`
+
+And then edit the windows PATH to include makensis
+https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/
 
