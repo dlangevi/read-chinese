@@ -123,4 +123,4 @@ Currently I am using the following flags to create the windows installer. This
 is because I primarily develop and test on linux and want to get the most info
 possible out of problems when they happen on windows
 
-`wails build -nsis -windowsconsole -debug`
+`wails build -nsis -windowsconsole -debug -ldflags "-extldflags=-static"`
