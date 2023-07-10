@@ -104,7 +104,7 @@ those words will tend to have more T1 sentences to choose from.
 Let me know if something else is needed that I am not aware of
 * [golang](https://go.dev/doc/install)
 * [wails](https://wails.io/docs/gettingstarted/installation) (make sure to add $HOME/go/bin to path)
-* [nodejs](version XXX)
+* [nodejs](version 19)
 * [yarn](https://yarnpkg.com/getting-started/install)
 * [calibre](https://calibre-ebook.com/download)
 * some sort of c++ compiler (to compile the Jieba implementation)
@@ -124,3 +124,25 @@ is because I primarily develop and test on linux and want to get the most info
 possible out of problems when they happen on windows
 
 `wails build -nsis -windowsconsole -debug -ldflags "-extldflags=-static"`
+
+### Setting up windows env
+
+Since I build this on the windows dev test vm, (which expires every 90 days) here are the steps to fully setup my system
+
+`winget install GoLang.Go
+go install github.com/wailsapp/wails/v2/cmd/wails@latest
+winget install Node.js
+winget install Yarn.Yarn
+winget install calibre.calibre
+winget install CoreyButler.NVMforWindows
+nvm install 19
+nvm use 19.9.0
+winget install Git.Git
+winget install Anki.Anki
+winget install Microsoft.VisualStudioCode
+winget install Chocolatey.Chocolatey
+choco install mingw
+choco install nsis
+// Edit the windows PATH to include makensis
+`
+
