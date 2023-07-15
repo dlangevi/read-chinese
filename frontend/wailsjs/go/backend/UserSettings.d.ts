@@ -6,6 +6,8 @@ export function AddVoice(arg1:backend.Voice):Promise<void>;
 
 export function DeleteDict(arg1:string):Promise<void>;
 
+export function DeleteList(arg1:string):Promise<void>;
+
 export function DeleteMapping(arg1:string):Promise<void>;
 
 export function ExportMapping():Promise<backend.FieldsMapping>;
@@ -20,9 +22,13 @@ export function RemoveVoice(arg1:backend.Voice):Promise<void>;
 
 export function SaveDict(arg1:string,arg2:string,arg3:string):Promise<void>;
 
+export function SaveList(arg1:string,arg2:string):Promise<void>;
+
 export function SetMapping(arg1:string,arg2:backend.FieldsMapping):Promise<void>;
 
 export function SetPrimaryDict(arg1:string):Promise<void>;
+
+export function SetPrimaryList(arg1:string):Promise<void>;
 
 export function SetUserSetting(arg1:string,arg2:string):Promise<void>;
 

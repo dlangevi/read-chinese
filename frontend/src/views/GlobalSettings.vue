@@ -64,6 +64,8 @@ const sections = {
     Object.entries(ComponentTable.AzureConfig),
   Dictionaries:
      Object.entries(ComponentTable.Dictionaries),
+  WordLists:
+     Object.entries(ComponentTable.WordLists),
   SentenceGeneration:
     Object.entries(ComponentTable.SentenceGeneration),
 };

@@ -10,6 +10,10 @@ export function DeleteDict(arg1) {
   return window['go']['backend']['UserSettings']['DeleteDict'](arg1);
 }
 
+export function DeleteList(arg1) {
+  return window['go']['backend']['UserSettings']['DeleteList'](arg1);
+}
+
 export function DeleteMapping(arg1) {
   return window['go']['backend']['UserSettings']['DeleteMapping'](arg1);
 }
@@ -38,12 +42,20 @@ export function SaveDict(arg1, arg2, arg3) {
   return window['go']['backend']['UserSettings']['SaveDict'](arg1, arg2, arg3);
 }
 
+export function SaveList(arg1, arg2) {
+  return window['go']['backend']['UserSettings']['SaveList'](arg1, arg2);
+}
+
 export function SetMapping(arg1, arg2) {
   return window['go']['backend']['UserSettings']['SetMapping'](arg1, arg2);
 }
 
 export function SetPrimaryDict(arg1) {
   return window['go']['backend']['UserSettings']['SetPrimaryDict'](arg1);
+}
+
+export function SetPrimaryList(arg1) {
+  return window['go']['backend']['UserSettings']['SetPrimaryList'](arg1);
 }
 
 export function SetUserSetting(arg1, arg2) {

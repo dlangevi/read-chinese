@@ -29,6 +29,8 @@ type (
 		// Dictionaries
 		DictionariesConfig DictionaryConfig `json:"Dictionaries"`
 
+		WordLists WordListsConfig `json:"WordLists"`
+
 		// Sentence Generation
 		SentenceGenerationConfig SentenceGenerationConfig `json:"SentenceGeneration"`
 
@@ -96,6 +98,11 @@ type (
 		ShowDefinitions bool            `json:"ShowDefinitions"`
 		ShowPinyin      bool            `json:"ShowPinyin"`
 		EnableChinese   bool            `json:"EnableChinese"`
+	}
+
+	WordListsConfig struct {
+		WordLists       map[string]string `json:"WordLists"`
+		PrimaryWordList string            `json:"PrimaryWordList"`
 	}
 
 	SentenceGenerationConfig struct {
@@ -185,6 +192,11 @@ func defaultConfig(path string) *UserSettings {
 			ShowDefinitions: true,
 			ShowPinyin:      true,
 			EnableChinese:   false,
+		},
+
+		WordLists: WordListsConfig{
+			WordLists:       map[string]string{},
+			PrimaryWordList: "",
 		},
 
 		SentenceGenerationConfig: SentenceGenerationConfig{
@@ -336,6 +348,22 @@ func (m *UserSettings) SetPrimaryDict(dictName string) {
 	m.saveMetadata()
 }
 
+func (m *UserSettings) SaveList(name string, listPath string) {
+	m.WordLists.WordLists[name] = listPath
+	m.saveMetadata()
+}
+
+func (m *UserSettings) DeleteList(name string) {
+	delete(m.WordLists.WordLists, name)
+	m.saveMetadata()
+}
+
+func (m *UserSettings) SetPrimaryList(listName string) {
+	// TODO Make sure its a real list
+	m.WordLists.PrimaryWordList = listName
+	m.saveMetadata()
+}
+
 func (m *UserSettings) GetMapping(modelName string) FieldsMapping {
 	mapping, ok := m.AnkiConfig.ModelMappings[modelName]
 	if !ok {
@@ -376,5 +404,4 @@ func (m *UserSettings) RemoveVoice(voice Voice) error {
 
 func (m *UserSettings) ExportMapping() FieldsMapping {
 	return FieldsMapping{}
-
 }

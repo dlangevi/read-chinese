@@ -6,6 +6,10 @@ export function FilePicker(arg1) {
   return window['go']['backend']['Backend']['FilePicker'](arg1);
 }
 
+export function GetFileName(arg1) {
+  return window['go']['backend']['Backend']['GetFileName'](arg1);
+}
+
 export function HealthCheck() {
   return window['go']['backend']['Backend']['HealthCheck']();
 }

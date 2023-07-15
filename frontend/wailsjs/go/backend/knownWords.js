@@ -22,10 +22,6 @@ export function GetStatsInfo() {
   return window['go']['backend']['knownWords']['GetStatsInfo']();
 }
 
-export function GetUnknownHskWords(arg1, arg2) {
-  return window['go']['backend']['knownWords']['GetUnknownHskWords'](arg1, arg2);
-}
-
 export function GetWordStats() {
   return window['go']['backend']['knownWords']['GetWordStats']();
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"path/filepath"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -33,6 +34,7 @@ type Backend struct {
 	Segmentation *Segmentation
 	Generator    *Generator
 	Calibre      *Calibre
+	WordLists    WordLists
 }
 
 func (b *Backend) HealthCheck() error {
@@ -106,6 +108,7 @@ func NewBackend(
 	backend.Segmentation = s
 	backend.Generator = NewGenerator(backend)
 	backend.Calibre = NewCalibre(backend)
+	backend.WordLists = NewWordLists(backend)
 
 	return backend
 }
@@ -127,7 +130,14 @@ func (b *Backend) SaveFile() (string, error) {
 		DefaultFilename: "BookStats.csv",
 	})
 	return selectedFile, err
+
 }
+
+// Javascript can not do this cleanly cross platform lol
+func (b *Backend) GetFileName(path string) string {
+	return filepath.Base(path)
+}
+
 func (b *Backend) FilePicker(extension string) (string, error) {
 	log.Println("requesting file")
 	selectedFile, err := runtime.OpenFileDialog(b.ctx, runtime.OpenDialogOptions{

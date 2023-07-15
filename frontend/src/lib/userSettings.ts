@@ -9,6 +9,8 @@ import SettingsSelector
   from '@/components/SettingsWidgets/SettingsSelector.vue';
 import DictionariesList
   from '@/components/SettingsWidgets/DictionariesList.vue';
+import WordLists
+  from '@/components/SettingsWidgets/WordLists.vue';
 import ModelManager
   from '@/components/SettingsWidgets/ModelManager.vue';
 import VoicePicker
@@ -270,6 +272,13 @@ export const ComponentTable : UserConfigDisplay = {
       'Allow flashcards to use chinese ' +
       'definitions instead of just english ones',
     ),
+  },
+  WordLists: {
+    WordLists: {
+      name: 'WordLists',
+      label: 'Lists',
+      type: WordLists,
+    } as UserSetting<{ [key: string]: string}>,
   },
   SentenceGeneration: {
     KnownInterval: slider(

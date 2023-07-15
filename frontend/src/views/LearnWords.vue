@@ -1,7 +1,7 @@
 <template>
   <with-sidebar>
     <template #sidebar>
-      <div class="flex items-center gap-4">
+      <div class="flex max-w-full items-center gap-4">
         <label for="sourceSelect">Source:</label>
         <select
           id="sourceSelect"
@@ -13,6 +13,27 @@
             v-for="source in sources"
             :key="source"
             :value="source"
+          >
+            {{ source }}
+          </option>
+        </select>
+      </div>
+      <div
+        v-if="gridSource=='word list'"
+        class="flex max-w-full items-center gap-4"
+      >
+        <label for="frequencySelect">Frequency List:</label>
+        <select
+          id="frequencySelect"
+          v-model="frequencyList"
+          class="select-primary select w-1/2 grow"
+          @change="changeSource"
+        >
+          <option
+            v-for="source in frequencyLists"
+            :key="source"
+            :value="source"
+            class="max-w-full"
           >
             {{ source }}
           </option>
@@ -62,6 +83,20 @@
       >
         {{ words.length }} remaining words
       </div>
+      <div class="flex items-center gap-4">
+        <button
+          class="btn-primary btn w-1/3"
+          @click="changeSort(false)"
+        >
+          Sort by occurance
+        </button>
+        <button
+          class="btn-primary btn w-1/3"
+          @click="changeSort(true)"
+        >
+          Sort by frequency
+        </button>
+      </div>
     </template>
     <div class="flex h-full w-full flex-col">
       <div class="shrink-0 text-center">
@@ -75,7 +110,9 @@
         class="m-4 mx-auto h-full w-5/6 grow"
         show-definitions
         :words="words"
+        :sort-by-frequency="sortByFrequency"
         :frequency-source="frequencySource"
+        :occurance-source="occuranceSource"
       />
     </div>
   </with-sidebar>
@@ -90,7 +127,10 @@ import {
 } from '@wailsjs/backend/bookLibrary';
 import {
   GetUnknownHskWords,
-} from '@wailsjs/backend/knownWords';
+  GetUnknownListWords,
+  GetLists,
+  GetPrimaryList,
+} from '@wailsjs/backend/wordLists';
 import UnknownWords from '../components/UnknownWords.vue';
 import { GetPossibleWords } from '@wailsjs/backend/Dictionaries';
 
@@ -103,6 +143,11 @@ const selectedLevel = ref<HskLevel>(1);
 const selectedVersion = ref(false);
 const active = ref(false);
 const unknownWordsRef = ref();
+const sortByFrequency = ref(false);
+function changeSort(freq : boolean) {
+  console.log('changing sort', freq);
+  sortByFrequency.value = freq;
+}
 
 watch(selectedVersion, () => {
   if (selectedVersion.value) {
@@ -122,30 +167,51 @@ const sources = [
   'favorites',
   'hsk',
   'search',
+  'word list',
 ];
 
 const words = ref<string[]>([]);
 const gridSource = ref('all books');
+const frequencyLists = ref<string[]>([]);
+let primaryFrequency = '';
+// The chosen frequencyList to mine
+const frequencyList = ref('');
+// The source of frequency lists
 const frequencySource = ref('');
+const occuranceSource = ref('all');
 const searchBox = ref('');
 async function changeSource() {
+  frequencySource.value = primaryFrequency;
   const newSource = gridSource.value;
   if (newSource === 'all books') {
     words.value = await LearningTarget();
-    frequencySource.value = '';
+    occuranceSource.value = 'all';
   } else if (newSource === 'favorites') {
     words.value = await LearningTargetFavorites();
-    frequencySource.value = 'favorites';
+    occuranceSource.value = 'favorites';
   } else if (newSource === 'hsk') {
     loadHsk();
-    frequencySource.value = '';
+    occuranceSource.value = 'all';
+  } else if (newSource === 'word list') {
+    loadWordList();
+    occuranceSource.value = 'all';
   }
 }
 
 onBeforeMount(async () => {
   words.value = await LearningTarget();
-  frequencySource.value = '';
+  frequencyLists.value = await GetLists();
+  primaryFrequency = await GetPrimaryList();
+  frequencyList.value = primaryFrequency;
+  frequencySource.value = primaryFrequency;
+  occuranceSource.value = 'all';
 });
+
+async function loadWordList() {
+  // Set the frequency source here
+  frequencySource.value = frequencyList.value;
+  words.value = await GetUnknownListWords(frequencyList.value);
+}
 
 async function loadHsk() {
   active.value = true;

@@ -34,6 +34,9 @@ type (
 		BookExists(author string, title string) (bool, error)
 		HealthCheck() error
 
+		GetFavoriteFrequencies() (map[string]int, error)
+		GetBookFrequencies(bookId int) (map[string]int, error)
+
 		// Resegement books
 		RecalculateBooks() error
 
@@ -525,6 +528,7 @@ func (b *bookLibrary) GetBookFrequencies(bookId int) (map[string]int, error) {
 
 	for _, frequency := range frequencies {
 		frequencyMap[frequency.Word] = frequency.Occurance
+
 	}
 	return frequencyMap, nil
 }

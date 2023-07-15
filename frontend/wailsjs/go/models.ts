@@ -635,12 +635,47 @@ export namespace backend {
 	        this.knownCharacters = source["knownCharacters"];
 	    }
 	}
+	export class UnknownWordRow {
+	    word: string;
+	    pinyin: string;
+	    occurance: number;
+	    frequency: number;
+	    definition: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new UnknownWordRow(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.word = source["word"];
+	        this.pinyin = source["pinyin"];
+	        this.occurance = source["occurance"];
+	        this.frequency = source["frequency"];
+	        this.definition = source["definition"];
+	    }
+	}
+	export class WordListsConfig {
+	    WordLists: {[key: string]: string};
+	    PrimaryWordList: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new WordListsConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.WordLists = source["WordLists"];
+	        this.PrimaryWordList = source["PrimaryWordList"];
+	    }
+	}
 	export class UserSettings {
 	    meta: MetaSettings;
 	    CardCreation: CardCreationConfig;
 	    AnkiConfig: AnkiConfig;
 	    AzureConfig: AzureConfig;
 	    Dictionaries: DictionaryConfig;
+	    WordLists: WordListsConfig;
 	    SentenceGeneration: SentenceGenerationConfig;
 	    BookLibrary: LibraryConfig;
 	
@@ -655,6 +690,7 @@ export namespace backend {
 	        this.AnkiConfig = this.convertValues(source["AnkiConfig"], AnkiConfig);
 	        this.AzureConfig = this.convertValues(source["AzureConfig"], AzureConfig);
 	        this.Dictionaries = this.convertValues(source["Dictionaries"], DictionaryConfig);
+	        this.WordLists = this.convertValues(source["WordLists"], WordListsConfig);
 	        this.SentenceGeneration = this.convertValues(source["SentenceGeneration"], SentenceGenerationConfig);
 	        this.BookLibrary = this.convertValues(source["BookLibrary"], LibraryConfig);
 	    }
@@ -697,6 +733,23 @@ export namespace backend {
 	        this.InDict = source["InDict"];
 	    }
 	}
+	export class WordListInfo {
+	    name: string;
+	    path: string;
+	    isPrimary: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new WordListInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.path = source["path"];
+	        this.isPrimary = source["isPrimary"];
+	    }
+	}
+	
 	export class WordStats {
 	    words: number;
 	    characters: number;

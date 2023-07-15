@@ -1,17 +1,14 @@
 package backend
 
 import (
-	"embed"
 	"encoding/csv"
 	"errors"
 	"fmt"
 	"io"
 	"log"
 	"os"
-	"path"
 	"sort"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -26,8 +23,7 @@ type (
 		DeleteWord(word string) error
 		SetLearnedDate(word string, date time.Time) error
 		ImportCSVWords(path string) error
-		GetOccurances(words []string) map[string]int64
-		GetUnknownHskWords(version string, level int) ([]string, error)
+		GetOccurances(words []string) map[string]int
 		GetStatsInfo() ([]TimeQuery, error)
 		GetWords() Words
 		GetWordsGrid() []WordGridRow
@@ -382,46 +378,14 @@ func (known *knownWords) IsKnownChar(char rune) bool {
 	return ok
 }
 
-func (known *knownWords) GetOccurances(words []string) map[string]int64 {
-	occurances := map[string]int64{}
+func (known *knownWords) GetOccurances(words []string) map[string]int {
+	occurances := map[string]int{}
 	for _, word := range words {
 		// Its fine if occurance is just 0
 		occurance, _ := known.frequency[word]
-		occurances[word] = occurance
+		occurances[word] = int(occurance)
 	}
 	return occurances
-}
-
-//go:embed assets/HSK
-var hskWords embed.FS
-
-func (known *knownWords) GetUnknownHskWords(version string, level int) ([]string, error) {
-	// ensure string == 2.0 or 3.0
-	// ensure level == 1 - 6
-	hskPath := path.Join(
-		"assets",
-		"HSK",
-		version,
-		fmt.Sprintf(`L%v.txt`, level),
-	)
-	rows := []string{}
-
-	fileBytes, err := hskWords.ReadFile(hskPath)
-	if err != nil {
-		return rows, err
-	}
-	fileString := string(fileBytes)
-
-	words := strings.Split(fileString, "\n")
-	for _, word := range words {
-		trimmed := strings.TrimSpace(word)
-		trimmed = strings.Trim(trimmed, "\uFEFF")
-		if !known.IsKnown(trimmed) && len(trimmed) > 0 {
-			// Its fine if occurance is just 0
-			rows = append(rows, trimmed)
-		}
-	}
-	return rows, nil
 }
 
 func (known *knownWords) GetStatsInfo() ([]TimeQuery, error) {

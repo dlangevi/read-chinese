@@ -3,6 +3,8 @@
 
 export function FilePicker(arg1:string):Promise<string>;
 
+export function GetFileName(arg1:string):Promise<string>;
+
 export function HealthCheck():Promise<void>;
 
 export function SaveFile():Promise<string>;

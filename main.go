@@ -115,6 +115,7 @@ func main() {
 			backendObj.Generator,
 			backendObj.AnkiInterface,
 			backendObj.Calibre,
+			backendObj.WordLists,
 		},
 		// Windows platform specific options
 		// Windows平台特定选项
