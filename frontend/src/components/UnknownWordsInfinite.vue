@@ -11,7 +11,7 @@
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import {
-  onUnmounted,
+  onBeforeMount, onUnmounted,
 } from 'vue';
 import { AgGridVue } from 'ag-grid-vue3';
 import MarkLearned from '@/components/MarkLearned.vue';
@@ -34,11 +34,14 @@ const columnDefs:ColDef[] = [
   {
     headerName: 'word',
     field: 'word',
+    // width: 80,
+    // minWidth: 80,
     cellClass: 'text-xl',
   },
   {
     headerName: 'pinyin',
     field: 'pinyin',
+    // width: 100,
     cellClass: [
       'border-2',
       'text-base-content',
@@ -54,11 +57,13 @@ const columnDefs:ColDef[] = [
   {
     headerName: 'occurances',
     field: 'occurance',
+    // width: 50,
     minWidth: 50,
   },
   {
     headerName: 'frequency',
     field: 'frequency',
+    // width: 80,
     minWidth: 50,
     valueFormatter: function (params) {
       if (!params.data) {
@@ -100,11 +105,13 @@ const columnDefs:ColDef[] = [
   {
     headerName: '',
     field: 'markButton',
+    // width: 120,
     cellRenderer: MarkLearned,
   },
   {
     headerName: '',
     field: 'Make FlashCard',
+    // width: 120,
     cellRenderer: AddToCardQueue,
   },
 ];
@@ -136,7 +143,6 @@ function onGridReady(params:GridReadyEvent) {
   gridApi = params.api;
   gridApi.setDatasource(dataSource);
   resizeCallback = () => {
-    console.log('resizing');
     setTimeout(() => {
       params.api.sizeColumnsToFit();
     }, 10);
@@ -164,4 +170,9 @@ onUnmounted(() => {
   EventsOff('AddedWord');
   EventsOff('ResetBoard');
 });
+
+onBeforeMount(async () => {
+  // updateWords();
+});
+
 </script>

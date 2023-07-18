@@ -5,17 +5,16 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type (
 	WordLists interface {
-		GetUnknownHskWords(version string, level int) ([]string, error)
-		GetUnknownListWords(list string) ([]string, error)
 		GetFrequencyList(list string) map[string]int
-		GetWordData(words []string,
-			occuranceSource string, frequencySource string) []UnknownWordRow
 		ExportUnknownWordRow() UnknownWordRow
 		AddList(name string, path string) error
 		DeleteList(name string)
@@ -23,10 +22,37 @@ type (
 
 		GetPrimaryList() string
 		GetLists() []string
+
+		// For inifinte scrolling
+		SortWordData()
+		SortByOccurance()
+		SortByFrequency()
+
+		SetWordSourceFromBook(bookId int)
+		SetWordSourceFromSearch(search string)
+		SetWordSourceFromFavorites()
+		SetWordSourceFromAll()
+		SetWordSourceFromList(listname string) error
+		SetWordSourceFromHsk(ver string, lvl int) error
+		SetFrequencySource(listname string)
+		SetOccuranceSource(source string)
+
+		RowCount() int
+		GetRows(startRow int, endRow int) []UnknownWordRow
+		Destroy()
+	}
+
+	tableSession struct {
+		words           []string
+		occuranceMap    map[string]int
+		frequencyMap    map[string]int
+		sortByFrequency bool
+		sortByOccurance bool
 	}
 
 	wordLists struct {
-		backend *Backend
+		backend       *Backend
+		activeSession tableSession
 	}
 )
 
@@ -36,6 +62,7 @@ func NewWordLists(
 	lists := &wordLists{
 		backend: backend,
 	}
+	lists.activeSession.sortByFrequency = true
 	return lists
 }
 
@@ -101,38 +128,6 @@ func (lists *wordLists) GetLists() []string {
 
 }
 
-//go:embed assets/HSK
-var hskWords embed.FS
-
-func (lists *wordLists) GetUnknownHskWords(version string, level int) ([]string, error) {
-	// ensure string == 2.0 or 3.0
-	// ensure level == 1 - 6
-	hskPath := path.Join(
-		"assets",
-		"HSK",
-		version,
-		fmt.Sprintf(`L%v.txt`, level),
-	)
-	rows := []string{}
-
-	fileBytes, err := hskWords.ReadFile(hskPath)
-	if err != nil {
-		return rows, err
-	}
-	fileString := string(fileBytes)
-
-	words := strings.Split(fileString, "\n")
-	for _, word := range words {
-		trimmed := strings.TrimSpace(word)
-		trimmed = strings.Trim(trimmed, "\uFEFF")
-		if !lists.backend.KnownWords.IsKnown(trimmed) && len(trimmed) > 0 {
-			// Its fine if occurance is just 0
-			rows = append(rows, trimmed)
-		}
-	}
-	return rows, nil
-}
-
 func (lists *wordLists) GetFrequencyList(list string) map[string]int {
 	words := map[string]int{}
 	listFile := fmt.Sprintf("%s", list)
@@ -151,29 +146,6 @@ func (lists *wordLists) GetFrequencyList(list string) map[string]int {
 	return words
 }
 
-func (lists *wordLists) GetUnknownListWords(list string) ([]string, error) {
-	rows := []string{}
-	listFile := fmt.Sprintf("%s", list)
-	fileBytes, err := os.ReadFile(ConfigDir("userLists", listFile))
-	if err != nil {
-		return rows, err
-	}
-	fileString := string(fileBytes)
-
-	words := strings.Split(fileString, "\n")
-	for _, word := range words {
-		trimmed := strings.TrimSpace(word)
-		if !lists.backend.KnownWords.IsKnown(trimmed) && len(trimmed) > 0 {
-			// Its fine if occurance is just 0
-			rows = append(rows, trimmed)
-			if len(rows) > 2000 {
-				break
-			}
-		}
-	}
-	return rows, nil
-}
-
 type UnknownWordRow struct {
 	Word       string `json:"word"`
 	Pinyin     string `json:"pinyin"`
@@ -186,20 +158,150 @@ func (lists *wordLists) ExportUnknownWordRow() UnknownWordRow {
 	return UnknownWordRow{}
 }
 
-func (lists *wordLists) GetWordData(
-	words []string,
-	// occuranceSource can be:
-	// "all" : take from all books
-	// "favorites" : take from favorite books
-	// "{number}" : take from a specific book id
-	occuranceSource string,
-	// which frequency list do you want to use
-	// Value is either a specific list, or "combined"
-	frequencySource string,
-) []UnknownWordRow {
-	rows := []UnknownWordRow{}
+// TODO is this the way?
+func (lists *wordLists) SortByFrequency() {
+	lists.activeSession.sortByOccurance = false
+	lists.activeSession.sortByFrequency = true
+	lists.SortWordData()
+}
 
+func (lists *wordLists) SortByOccurance() {
+	lists.activeSession.sortByFrequency = false
+	lists.activeSession.sortByOccurance = true
+	lists.SortWordData()
+}
+
+func (lists *wordLists) SortWordData() {
+	fmt.Println("Resorting Data",
+		lists.activeSession.sortByFrequency,
+		lists.activeSession.sortByOccurance)
+	words := &lists.activeSession.words
+
+	if lists.activeSession.sortByFrequency {
+		sort.Slice(*words, func(i, j int) bool {
+			wordI := (*words)[i]
+			wordJ := (*words)[j]
+			wordIPriority, ok := lists.activeSession.frequencyMap[wordI]
+			if !ok {
+				wordIPriority = len(lists.activeSession.frequencyMap)
+			}
+			wordJPriority, ok := lists.activeSession.frequencyMap[wordJ]
+			if !ok {
+				wordJPriority = len(lists.activeSession.frequencyMap)
+			}
+			return wordIPriority < wordJPriority
+		})
+	} else if lists.activeSession.sortByOccurance {
+		sort.Slice(*words, func(i, j int) bool {
+			wordI := (*words)[i]
+			wordJ := (*words)[j]
+			wordIPriority := lists.activeSession.occuranceMap[wordI]
+			wordJPriority := lists.activeSession.occuranceMap[wordJ]
+			return wordIPriority > wordJPriority
+		})
+	}
+
+	// Emit Event // Wipe Board
+	if lists.backend.ctx != nil {
+		runtime.EventsEmit(lists.backend.ctx, "ResetBoard")
+	}
+}
+
+func (lists *wordLists) SetWordSourceFromBook(bookId int) {
+	words := lists.backend.BookLibrary.LearningTargetBook(bookId)
+	lists.activeSession.words = words
+	lists.SetOccuranceSource(fmt.Sprint(bookId))
+	lists.SortWordData()
+}
+func (lists *wordLists) SetWordSourceFromSearch(search string) {
+	words := lists.backend.Dictionaries.GetPossibleWords(search)
+	lists.activeSession.words = words
+	lists.SortWordData()
+}
+
+func (lists *wordLists) SetWordSourceFromFavorites() {
+	words := lists.backend.BookLibrary.LearningTargetFavorites()
+	lists.activeSession.words = words
+	lists.SetOccuranceSource("favorites")
+	lists.SortWordData()
+}
+
+func (lists *wordLists) SetWordSourceFromAll() {
+	words := lists.backend.BookLibrary.LearningTarget()
+	lists.activeSession.words = words
+	lists.SetOccuranceSource("all")
+	lists.SortWordData()
+}
+
+func (lists *wordLists) SetWordSourceFromList(listname string) error {
+	listFile := fmt.Sprintf("%s", listname)
+	fileBytes, err := os.ReadFile(ConfigDir("userLists", listFile))
+	if err != nil {
+		return err
+	}
+	fileString := string(fileBytes)
+
+	words := []string{}
+	rawWords := strings.Split(fileString, "\n")
+	for _, word := range rawWords {
+		trimmed := strings.TrimSpace(word)
+		if len(trimmed) == 0 {
+			continue
+		}
+		inDictionary := lists.backend.Dictionaries.IsInDictionary(trimmed)
+		isKnown := lists.backend.KnownWords.IsKnown(trimmed)
+		if !isKnown && inDictionary {
+			// Its fine if occurance is just 0
+			words = append(words, trimmed)
+		}
+	}
+	lists.activeSession.words = words
+	lists.SortWordData()
+	return nil
+}
+
+//go:embed assets/HSK
+var hskWords embed.FS
+
+func (lists *wordLists) SetWordSourceFromHsk(version string, level int) error {
+	// ensure string == 2.0 or 3.0
+	// ensure level == 1 - 6
+	hskPath := path.Join(
+		"assets",
+		"HSK",
+		version,
+		fmt.Sprintf(`L%v.txt`, level),
+	)
+
+	fileBytes, err := hskWords.ReadFile(hskPath)
+	if err != nil {
+		return err
+	}
+	fileString := string(fileBytes)
+
+	words := []string{}
+	rawWords := strings.Split(fileString, "\n")
+	for _, word := range rawWords {
+		trimmed := strings.TrimSpace(word)
+		trimmed = strings.Trim(trimmed, "\uFEFF")
+		if !lists.backend.KnownWords.IsKnown(trimmed) && len(trimmed) > 0 {
+			// Its fine if occurance is just 0
+			words = append(words, trimmed)
+		}
+	}
+	lists.activeSession.words = words
+	lists.SortWordData()
+	return nil
+}
+
+func (lists *wordLists) SetFrequencySource(listname string) {
+	lists.activeSession.frequencyMap = lists.GetFrequencyList(listname)
+}
+
+// This is wack
+func (lists *wordLists) SetOccuranceSource(occuranceSource string) {
 	var occuranceMap map[string]int
+	words := lists.activeSession.words
 	if occuranceSource == "all" {
 		occuranceMap = lists.backend.KnownWords.GetOccurances(words)
 	} else if occuranceSource == "favorites" {
@@ -219,17 +321,32 @@ func (lists *wordLists) GetWordData(
 			fmt.Println("error loading book", err)
 		}
 	}
+	lists.activeSession.occuranceMap = occuranceMap
+}
 
-	var frequencyMap map[string]int
-	frequencyMap = lists.GetFrequencyList(frequencySource)
+func (lists *wordLists) RowCount() int {
+	return len(lists.activeSession.words)
+}
 
-	for _, word := range words {
+func (lists *wordLists) GetRows(startRow int, endRow int) []UnknownWordRow {
+	rows := []UnknownWordRow{}
+	words := lists.activeSession.words
+	if startRow > len(words) {
+		startRow = len(words)
+	}
+	if endRow > len(words) {
+		endRow = len(words)
+	}
+	for _, word := range words[startRow:endRow] {
+		if lists.backend.KnownWords.IsKnown(word) {
+			continue
+		}
 		pinyin := lists.backend.Dictionaries.getPinyin(word)
 		definition := lists.backend.Dictionaries.getDefaultDefinition(word)
-		occurance := occuranceMap[word]
-		frequency, found := frequencyMap[word]
+		occurance := lists.activeSession.occuranceMap[word]
+		frequency, found := lists.activeSession.frequencyMap[word]
 		if !found {
-			frequency = len(frequencyMap) + 1
+			frequency = len(lists.activeSession.frequencyMap) + 1
 		}
 		rows = append(rows,
 			UnknownWordRow{
@@ -239,7 +356,11 @@ func (lists *wordLists) GetWordData(
 				Frequency:  frequency,
 				Definition: definition,
 			})
-	}
 
+	}
 	return rows
+}
+
+func (lists *wordLists) Destroy() {
+	lists.activeSession.words = []string{}
 }

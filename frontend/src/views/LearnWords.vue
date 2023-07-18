@@ -77,22 +77,19 @@
       <button class="btn-primary btn" @click="makeCards">
         Make Cards
       </button>
-      <div
-        v-if="gridSource=='hsk'"
-        class="border-2 p-2 text-center"
-      >
-        {{ words.length }} remaining words
+      <div v-if="unknownWordsRef" class="border-2 p-2 text-center">
+        {{ unknownWordsRef.getRowCount() }} remaining words
       </div>
       <div class="flex items-center gap-4">
         <button
           class="btn-primary btn w-1/3"
-          @click="changeSort(false)"
+          @click="SortByOccurance"
         >
           Sort by occurance
         </button>
         <button
           class="btn-primary btn w-1/3"
-          @click="changeSort(true)"
+          @click="SortByFrequency"
         >
           Sort by frequency
         </button>
@@ -108,11 +105,6 @@
       <unknown-words
         ref="unknownWordsRef"
         class="m-4 mx-auto h-full w-5/6 grow"
-        show-definitions
-        :words="words"
-        :sort-by-frequency="sortByFrequency"
-        :frequency-source="frequencySource"
-        :occurance-source="occuranceSource"
       />
     </div>
   </with-sidebar>
@@ -122,17 +114,19 @@
 import WithSidebar from '@/layouts/WithSidebar.vue';
 import { watch, ref, onBeforeMount } from 'vue';
 import {
-  LearningTarget,
-  LearningTargetFavorites,
-} from '@wailsjs/backend/bookLibrary';
-import {
-  GetUnknownHskWords,
-  GetUnknownListWords,
   GetLists,
   GetPrimaryList,
+  SetFrequencySource,
+  SetOccuranceSource,
+  SetWordSourceFromAll,
+  SetWordSourceFromFavorites,
+  SetWordSourceFromHsk,
+  SetWordSourceFromSearch,
+  SetWordSourceFromList,
+  SortByFrequency,
+  SortByOccurance,
 } from '@wailsjs/backend/wordLists';
 import UnknownWords from '../components/UnknownWords.vue';
-import { GetPossibleWords } from '@wailsjs/backend/Dictionaries';
 
 type HskVersion = '2.0' | '3.0';
 type HskLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -143,11 +137,6 @@ const selectedLevel = ref<HskLevel>(1);
 const selectedVersion = ref(false);
 const active = ref(false);
 const unknownWordsRef = ref();
-const sortByFrequency = ref(false);
-function changeSort(freq : boolean) {
-  console.log('changing sort', freq);
-  sortByFrequency.value = freq;
-}
 
 watch(selectedVersion, () => {
   if (selectedVersion.value) {
@@ -170,7 +159,6 @@ const sources = [
   'word list',
 ];
 
-const words = ref<string[]>([]);
 const gridSource = ref('all books');
 const frequencyLists = ref<string[]>([]);
 let primaryFrequency = '';
@@ -184,44 +172,37 @@ async function changeSource() {
   frequencySource.value = primaryFrequency;
   const newSource = gridSource.value;
   if (newSource === 'all books') {
-    words.value = await LearningTarget();
-    occuranceSource.value = 'all';
+    SetWordSourceFromAll();
   } else if (newSource === 'favorites') {
-    words.value = await LearningTargetFavorites();
-    occuranceSource.value = 'favorites';
+    SetWordSourceFromFavorites();
   } else if (newSource === 'hsk') {
     loadHsk();
-    occuranceSource.value = 'all';
   } else if (newSource === 'word list') {
-    loadWordList();
-    occuranceSource.value = 'all';
+    frequencySource.value = frequencyList.value;
+    SetFrequencySource(frequencyList.value);
+    SetWordSourceFromList(frequencyList.value);
   }
 }
 
 onBeforeMount(async () => {
-  words.value = await LearningTarget();
   frequencyLists.value = await GetLists();
   primaryFrequency = await GetPrimaryList();
   frequencyList.value = primaryFrequency;
   frequencySource.value = primaryFrequency;
   occuranceSource.value = 'all';
+  await SetOccuranceSource('all');
+  await SetFrequencySource(primaryFrequency);
+  changeSource();
 });
-
-async function loadWordList() {
-  // Set the frequency source here
-  frequencySource.value = frequencyList.value;
-  words.value = await GetUnknownListWords(frequencyList.value);
-}
 
 async function loadHsk() {
   active.value = true;
-
   const ver = version.value;
   let lvl = selectedLevel.value;
   if (ver === '2.0' && lvl === 7) {
     lvl = 6;
   }
-  words.value = await GetUnknownHskWords(ver, lvl);
+  SetWordSourceFromHsk(ver, lvl);
 }
 
 function makeCards() {
@@ -230,7 +211,7 @@ function makeCards() {
 
 async function onUpdateSearchBox() {
   if (searchBox.value.length !== 0) {
-    words.value = await GetPossibleWords(searchBox.value);
+    SetWordSourceFromSearch(searchBox.value);
   }
 }
 

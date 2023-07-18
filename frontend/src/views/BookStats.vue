@@ -105,9 +105,8 @@
             tab-title="View Unknown Words"
           >
             <unknown-words
+              ref="unknownWordsRef"
               class="h-4/5"
-              :words="words"
-              :book-filter="bookId"
             />
           </tabbed-pane-tab>
         </tabbed-pane>
@@ -119,8 +118,7 @@
 <script lang="ts" setup>
 import TabbedPane from '@/layouts/TabbedPane.vue';
 import TabbedPaneTab from '@/components/TabbedPaneTab.vue';
-import UnknownWords from '@/components/UnknownWords.vue';
-import { useCardQueue } from '@/stores/CardQueue';
+import UnknownWords from '../components/UnknownWords.vue';
 import { backend } from '@wailsjs/models';
 import { EventsOn, EventsOff } from '../../wailsjs/runtime/runtime';
 import {
@@ -141,11 +139,15 @@ import type { ChartData } from 'chart.js';
 import { Line } from 'vue-chartjs';
 
 import {
-  TopUnknownWords,
-  LearningTargetBook,
   GetBookGraph,
   GetBook,
 } from '@wailsjs/backend/bookLibrary';
+import {
+  SetFrequencySource,
+  SetWordSourceFromBook,
+  GetPrimaryList,
+  SortByOccurance,
+} from '@wailsjs/backend/wordLists';
 
 // TODO this is jank and global
 ChartJS.register(
@@ -170,7 +172,6 @@ const props = defineProps({
   },
 });
 
-const words = ref<string[]>([]);
 const book = ref<backend.Book>(backend.Book.createFrom());
 const known = ref(0);
 const likelyKnown = ref(0);
@@ -184,6 +185,7 @@ const data = ref<ChartData<'line'>>({
 });
 const loaded = ref(false);
 const styleRef = ref<HTMLElement | null>(null);
+const unknownWordsRef = ref();
 
 async function loadBook() {
   book.value = await GetBook(props.bookId);
@@ -213,8 +215,13 @@ onMounted(async () => {
     console.error('styleref not there');
     return;
   }
+
   await loadBook();
-  words.value = await LearningTargetBook(book.value.bookId);
+  const primaryFrequency = await GetPrimaryList();
+  SetFrequencySource(primaryFrequency);
+  SortByOccurance();
+  SetWordSourceFromBook(book.value.bookId);
+
   const rawdata = await GetBookGraph(book.value.bookId);
   const style = getComputedStyle(styleRef.value);
   const primary = `hsl(${style.getPropertyValue('--p')}`;
@@ -240,11 +247,7 @@ onUnmounted(() => {
   EventsOff('AddedWord');
 });
 
-const store = useCardQueue();
 async function makeFlashCards() {
-  const topWords: string[] = await TopUnknownWords(props.bookId, 50);
-  topWords.forEach((word) => {
-    store.addWord({ word }, () => {}, props.bookId);
-  });
+  unknownWordsRef.value.enqueueTopRows(50);
 }
 </script>

@@ -6,6 +6,8 @@ export function AddList(arg1:string,arg2:string):Promise<void>;
 
 export function DeleteList(arg1:string):Promise<void>;
 
+export function Destroy():Promise<void>;
+
 export function ExportUnknownWordRow():Promise<backend.UnknownWordRow>;
 
 export function ExportWordListInfo():Promise<backend.WordListInfo>;
@@ -16,12 +18,32 @@ export function GetLists():Promise<Array<string>>;
 
 export function GetPrimaryList():Promise<string>;
 
-export function GetUnknownHskWords(arg1:string,arg2:number):Promise<Array<string>>;
-
-export function GetUnknownListWords(arg1:string):Promise<Array<string>>;
-
-export function GetWordData(arg1:Array<string>,arg2:string,arg3:string):Promise<Array<backend.UnknownWordRow>>;
+export function GetRows(arg1:number,arg2:number):Promise<Array<backend.UnknownWordRow>>;
 
 export function GetWordListsInfo():Promise<{[key: string]: backend.WordListInfo}>;
 
+export function RowCount():Promise<number>;
+
+export function SetFrequencySource(arg1:string):Promise<void>;
+
+export function SetOccuranceSource(arg1:string):Promise<void>;
+
 export function SetPrimaryList(arg1:string):Promise<void>;
+
+export function SetWordSourceFromAll():Promise<void>;
+
+export function SetWordSourceFromBook(arg1:number):Promise<void>;
+
+export function SetWordSourceFromFavorites():Promise<void>;
+
+export function SetWordSourceFromHsk(arg1:string,arg2:number):Promise<void>;
+
+export function SetWordSourceFromList(arg1:string):Promise<void>;
+
+export function SetWordSourceFromSearch(arg1:string):Promise<void>;
+
+export function SortByFrequency():Promise<void>;
+
+export function SortByOccurance():Promise<void>;
+
+export function SortWordData():Promise<void>;

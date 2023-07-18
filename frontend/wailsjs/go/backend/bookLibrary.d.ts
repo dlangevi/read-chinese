@@ -36,8 +36,6 @@ export function SetFavorite(arg1:number,arg2:boolean):Promise<void>;
 
 export function SetRead(arg1:number,arg2:boolean):Promise<void>;
 
-export function TopUnknownWords(arg1:number,arg2:number):Promise<Array<string>>;
-
 export function TotalRead():Promise<number>;
 
 export function TotalReadChars():Promise<number>;

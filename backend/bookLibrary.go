@@ -46,7 +46,6 @@ type (
 		LearningTargetFavorites() []string
 		// Get the words in a specific book that occure the most often
 		LearningTargetBook(bookId int) []string
-		TopUnknownWords(bookId int, numWords int) []string
 		TotalRead() (int, error)
 
 		// Mark book as a favorite
@@ -544,7 +543,6 @@ func (b *bookLibrary) LearningTarget() []string {
     ) 
     GROUP BY word
     ORDER BY sum(count) DESC
-    LIMIT 200
     `)
 	if err != nil {
 		log.Println(err)
@@ -570,7 +568,6 @@ func (b *bookLibrary) LearningTargetFavorites() []string {
     )
     GROUP BY word
     ORDER BY sum(count) DESC
-    LIMIT 200
     `)
 	if err != nil {
 		log.Println(err)
@@ -592,7 +589,6 @@ func (b *bookLibrary) LearningTargetBook(bookId int) []string {
     AND book = $1
     GROUP BY word
     ORDER BY count DESC
-    LIMIT 200
     `, bookId)
 	if err != nil {
 		log.Println(err)
@@ -600,29 +596,6 @@ func (b *bookLibrary) LearningTargetBook(bookId int) []string {
 	}
 
 	return words
-}
-
-func (b *bookLibrary) TopUnknownWords(bookId int, numWords int) []string {
-	words := []string{}
-	err := b.db.Select(&words, `
-    SELECT word
-    FROM frequency
-    WHERE NOT EXISTS (
-        SELECT word
-        FROM words
-        WHERE words.word==frequency.word
-    ) 
-    AND book = $1
-    ORDER BY count DESC
-    LIMIT $2
-  `, bookId, numWords)
-	if err != nil {
-		log.Println(err)
-		return words
-	}
-
-	return words
-
 }
 
 func getKnownWords(db *sqlx.DB, bookId int) (int, error) {
