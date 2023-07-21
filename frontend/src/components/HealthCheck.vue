@@ -200,6 +200,8 @@ const checks = reactive<{
   },
 });
 
+type checkKeys = keyof typeof checks
+
 watch(
   () => [
     checks.Dictionary.passes,
@@ -222,6 +224,15 @@ watch(
     }
   });
 
+watch(
+  () =>
+    checks.AnkiAvaliable.passes,
+  () => {
+    if (checks.AnkiAvaliable.passes) {
+      recheck(['AnkiConfigured']);
+    }
+  });
+
 const allComplete = computed(() => {
   return Object.values(checks).every(
     check => check.passes);
@@ -237,8 +248,13 @@ const stillChecking = computed(() => {
     check => check.passes === undefined);
 });
 
-function recheck() {
-  return Promise.all(Object.values(checks).map(async (check) => {
+function recheck(listOfChecks : checkKeys[] = [
+  'Dictionary',
+  'BookLibrary',
+  'AnkiAvaliable',
+  'AnkiConfigured']) {
+  return Promise.all((listOfChecks).map(async (checkKey) => {
+    const check = checks[checkKey];
     return check.checkAction()
       .then(() => { check.passes = true; })
       .catch(errMsg => {
@@ -250,7 +266,6 @@ function recheck() {
 
 const finishedIntital = ref(false);
 recheck().finally(async () => {
-  await recheck();
   finishedIntital.value = true;
 });
 

@@ -206,7 +206,7 @@ async function loadHsk() {
 }
 
 function makeCards() {
-  unknownWordsRef.value.enqueueTopRows(50);
+  unknownWordsRef.value.enqueueTopRows(500);
 }
 
 async function onUpdateSearchBox() {

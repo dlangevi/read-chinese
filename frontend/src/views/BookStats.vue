@@ -248,6 +248,6 @@ onUnmounted(() => {
 });
 
 async function makeFlashCards() {
-  unknownWordsRef.value.enqueueTopRows(50);
+  unknownWordsRef.value.enqueueTopRows(500);
 }
 </script>
