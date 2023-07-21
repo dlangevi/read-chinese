@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="finishedIntital"
     :class="[
       'rounded-lg',
       {'bg-base-100': !allComplete },
@@ -237,17 +238,22 @@ const stillChecking = computed(() => {
 });
 
 function recheck() {
-  Object.values(checks).forEach(async (check) => {
-    check.checkAction()
+  return Promise.all(Object.values(checks).map(async (check) => {
+    return check.checkAction()
       .then(() => { check.passes = true; })
       .catch(errMsg => {
         check.passes = false;
         check.checkResult = errMsg;
       });
-  });
+  }));
 }
 
-recheck();
+const finishedIntital = ref(false);
+recheck().finally(async () => {
+  await recheck();
+  finishedIntital.value = true;
+});
+
 const checkInterval = setInterval(recheck, 1000);
 
 onBeforeUnmount(() => {
