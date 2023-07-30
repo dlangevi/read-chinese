@@ -172,10 +172,13 @@ async function changeSource() {
   frequencySource.value = primaryFrequency;
   const newSource = gridSource.value;
   if (newSource === 'all books') {
+    SetFrequencySource(primaryFrequency);
     SetWordSourceFromAll();
   } else if (newSource === 'favorites') {
+    SetFrequencySource(primaryFrequency);
     SetWordSourceFromFavorites();
   } else if (newSource === 'hsk') {
+    SetFrequencySource(primaryFrequency);
     loadHsk();
   } else if (newSource === 'word list') {
     frequencySource.value = frequencyList.value;
@@ -192,6 +195,7 @@ onBeforeMount(async () => {
   occuranceSource.value = 'all';
   await SetOccuranceSource('all');
   await SetFrequencySource(primaryFrequency);
+  await SortByOccurance();
   changeSource();
 });
 

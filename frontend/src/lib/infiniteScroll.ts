@@ -12,15 +12,15 @@ export class InfiniteScroll {
   }
 
   getRows(params : IGetRowsParams) {
-    GetRows(params.startRow, params.endRow)
-      .then(async (data) => {
-        const rowCount = await RowCount();
+    Promise.all([
+      GetRows(params.startRow, params.endRow),
+      RowCount(),
+    ])
+      .then(async ([rows, rowCount]) => {
         this.rowCountVal.value = rowCount;
-        console.log('Fetched Data',
-          data, rowCount);
-        params.successCallback(data, rowCount);
+        params.successCallback(rows, rowCount);
       }).catch((err) => {
-        console.log('Error fetching data', err);
+        console.error('Error fetching data', err);
         params.failCallback();
       });
   }

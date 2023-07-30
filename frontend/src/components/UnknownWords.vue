@@ -34,6 +34,7 @@ const columnDefs:ColDef[] = [
   {
     headerName: 'word',
     field: 'word',
+    minWidth: 120,
     cellClass: 'text-xl',
   },
   {

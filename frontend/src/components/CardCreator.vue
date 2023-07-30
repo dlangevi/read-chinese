@@ -4,7 +4,6 @@
     @click.stop
   >
     <div
-      v-if="showModal"
       class="modal-box m-4 flex h-[80vh] w-4/5 max-w-full flex-col"
       @click.stop
     >

@@ -325,7 +325,16 @@ func (lists *wordLists) SetOccuranceSource(occuranceSource string) {
 }
 
 func (lists *wordLists) RowCount() int {
-	return len(lists.activeSession.words)
+	unknownWords := 0
+	// TODO with proper managment I can do active - learned in this session
+	for _, word := range lists.activeSession.words {
+		if lists.backend.KnownWords.IsKnown(word) {
+			continue
+		}
+		unknownWords += 1
+	}
+
+	return unknownWords
 }
 
 func (lists *wordLists) GetRows(startRow int, endRow int) []UnknownWordRow {
