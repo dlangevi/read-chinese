@@ -1,7 +1,22 @@
 <template>
   <div>
-    <div class="m-4 text-3xl">
-      Pick an image
+    <div class="flex items-center gap-4">
+      <div class="m-4 text-3xl">
+        Pick an image
+      </div>
+      <input
+        v-model="customSearch"
+        type="text"
+        class="input-bordered input w-1/2"
+        placeholder="Enter alternative search text here"
+        :maxlength="32"
+      >
+      <button
+        class="btn-primary btn-sm btn"
+        @click="doCustomSearch"
+      >
+        Search
+      </button>
     </div>
     <div class="flex">
       <!-- rows -->
@@ -58,6 +73,7 @@ const cardManager = useCardManager();
 
 const images = ref<backend.ImageInfo[]>([]);
 const selectedImages = ref<backend.ImageInfo[]>([]);
+const customSearch = ref('');
 const cols1 = ref<backend.ImageInfo[]>([]);
 const cols2 = ref<backend.ImageInfo[]>([]);
 const cols3 = ref<backend.ImageInfo[]>([]);
@@ -74,78 +90,86 @@ watch(selectedImages, async () => {
   }
 });
 
+async function loadImages(searchText : string) {
+  images.value = [];
+  images.value.push(...selectedImages.value);
+  images.value.push(...await SearchImages(searchText));
+
+  // Sort items in descending order based on height with
+  // original selected images in first
+  images.value.sort((a, b) => {
+    if (selectedImages.value.includes(a)) {
+      return -1;
+    }
+    if (selectedImages.value.includes(b)) {
+      return 1;
+    }
+    return b.imageHeight - a.imageHeight;
+  });
+
+  // Create three empty sublists
+  const A: backend.ImageInfo[] = [];
+  const B: backend.ImageInfo[] = [];
+  const C: backend.ImageInfo[] = [];
+
+  // Initialize total heights for each sublist
+  const totalHeights = [0, 0, 0];
+
+  // Iterate over each item in the sorted list
+  for (const item of images.value) {
+    // Find the sublist with the smallest total height so far
+    const minIndex = totalHeights.indexOf(Math.min(...totalHeights));
+
+    // Add the item to the selected sublist
+    if (minIndex === 0) {
+      A.push(item);
+    } else if (minIndex === 1) {
+      B.push(item);
+    } else {
+      C.push(item);
+    }
+
+    // Update the total height of the selected sublist
+    totalHeights[minIndex] += item.imageHeight;
+  }
+
+  // Randomize the individual lists, with already selected images
+  // up first (because having all long images first looks weird)
+  const sorter = (a : backend.ImageInfo, b : backend.ImageInfo) => {
+    if (selectedImages.value.includes(a)) {
+      return -1;
+    }
+    if (selectedImages.value.includes(b)) {
+      return 1;
+    }
+    return Math.random() - 0.5;
+  };
+  A.sort(sorter);
+  B.sort(sorter);
+  C.sort(sorter);
+  // Set the three sublists
+  cols1.value = A;
+  cols2.value = B;
+  cols3.value = C;
+}
+
 watch(() => cardManager.currentStep, async () => {
   if (cardManager.currentStep === StepsEnum.IMAGE && !loaded) {
     loaded = true;
-    images.value.push(...await SearchImages(cardManager.word));
-
-    // Sort items in descending order based on height with
-    // original selected images in first
-    images.value.sort((a, b) => {
-      if (selectedImages.value.includes(a)) {
-        return -1;
-      }
-      if (selectedImages.value.includes(b)) {
-        return 1;
-      }
-      return b.imageHeight - a.imageHeight;
-    });
-
-    // Create three empty sublists
-    const A: backend.ImageInfo[] = [];
-    const B: backend.ImageInfo[] = [];
-    const C: backend.ImageInfo[] = [];
-
-    // Initialize total heights for each sublist
-    const totalHeights = [0, 0, 0];
-
-    // Iterate over each item in the sorted list
-    for (const item of images.value) {
-      // Find the sublist with the smallest total height so far
-      const minIndex = totalHeights.indexOf(Math.min(...totalHeights));
-
-      // Add the item to the selected sublist
-      if (minIndex === 0) {
-        A.push(item);
-      } else if (minIndex === 1) {
-        B.push(item);
-      } else {
-        C.push(item);
-      }
-
-      // Update the total height of the selected sublist
-      totalHeights[minIndex] += item.imageHeight;
-    }
-
-    // Randomize the individual lists, with already selected images
-    // up first (because having all long images first looks weird)
-    const sorter = (a : backend.ImageInfo, b : backend.ImageInfo) => {
-      if (selectedImages.value.includes(a)) {
-        return -1;
-      }
-      if (selectedImages.value.includes(b)) {
-        return 1;
-      }
-      return Math.random() - 0.5;
-    };
-    A.sort(sorter);
-    B.sort(sorter);
-    C.sort(sorter);
-    // Return the three sublists
-    cols1.value = A;
-    cols2.value = B;
-    cols3.value = C;
+    loadImages(cardManager.word);
   }
-
   allowUpdate = true;
 }, {
   immediate: true,
 });
 
+function doCustomSearch() {
+  loadImages(customSearch.value);
+}
+
 onBeforeMount(async () => {
   const originalImages = cardManager.originalValues?.images;
   if (originalImages) {
-    images.value.push(...originalImages);
     selectedImages.value.push(...originalImages);
   }
 });
