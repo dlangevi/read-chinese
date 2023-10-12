@@ -111,6 +111,7 @@ func main() {
 			backendObj.UserSettings,
 			backendObj.ImageClient,
 			backendObj.TextToSpeech,
+			backendObj.AiGenerator,
 			backendObj.Dictionaries,
 			backendObj.Generator,
 			backendObj.AnkiInterface,

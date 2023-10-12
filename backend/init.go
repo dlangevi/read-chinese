@@ -23,6 +23,7 @@ type Backend struct {
 	// Independent Libraries
 	ImageClient  *ImageClient
 	TextToSpeech *TextToSpeech
+	AiGenerator  AiGenerator
 
 	// Libraries required by other Libraries
 	BookLibrary   BookLibrary
@@ -92,6 +93,7 @@ func NewBackend(
 	backend.KnownWords = NewKnownWords(db, backend)
 	backend.ImageClient = NewImageClient(userSettings)
 	backend.TextToSpeech = NewTextToSpeach(userSettings)
+	backend.AiGenerator = NewAiGenerator(userSettings)
 	backend.Dictionaries = NewDictionaries(backend)
 	backend.AnkiInterface = NewAnkiInterface(backend)
 
