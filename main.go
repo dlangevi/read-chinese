@@ -170,6 +170,7 @@ func main() {
 			},
 		},
 		Linux: &linux.Options{
+			WebviewGpuPolicy: linux.WebviewGpuPolicyNever,
 			// Icon: icon,
 		},
 	})
