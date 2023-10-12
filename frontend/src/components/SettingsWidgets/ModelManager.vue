@@ -64,6 +64,7 @@ const UserSettings = getUserSettings();
 async function generateModel() {
   // call go backend
   await LoadTemplate();
+  await fetchModels();
 }
 
 type FieldsMapKey = keyof backend.FieldsMapping
