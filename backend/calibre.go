@@ -75,6 +75,7 @@ func (c *Calibre) ImportCalibreBooks(books []CalibreBook) error {
 		}
 		if !exists {
 			log.Println("Potential new book", book.Author, book.Title)
+			foundTxt := false
 			for _, format := range book.Formats {
 				if strings.HasSuffix(format, ".txt") {
 					_, err := c.backend.BookLibrary.AddBook(book.Author, book.Title, book.Cover, format)
@@ -82,9 +83,16 @@ func (c *Calibre) ImportCalibreBooks(books []CalibreBook) error {
 						log.Println("error ", err)
 						return err
 					}
+					foundTxt = true
 					break
 				}
 			}
+			if !foundTxt {
+				return fmt.Errorf(
+					"Failed to find txt format for %s-%s, please use calibre to convert to txt",
+					book.Author, book.Title)
+			}
+
 		} else {
 			log.Println("It exists")
 		}
