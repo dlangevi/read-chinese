@@ -131,9 +131,18 @@ Since I build this on the windows dev test vm, (which expires every 90 days) her
 `install scoop`
 
 `scoop install git go nodejs yarn nvm mingw`
+
 `scoop bucket add extras`
-`scoop install calibre anki nsis`
+
+`scoop install nsis`
+
 `go install github.com/wailsapp/wails/v2/cmd/wails@latest`
+
 `nvm install 19`
+
 `nvm use 19.9.0`
 
+If you need anki/calibre
+
+`winget install Calibre.Calibre`
+`winget install Anki.Anki`
