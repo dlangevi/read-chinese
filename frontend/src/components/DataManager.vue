@@ -29,7 +29,8 @@
               this code.
 
               To be extra safe you can make a copy of the folder
-              {{ configDir }}
+              <span class="bg-primary font-mono"> {{ configDir }} </span> before
+              proceeding
             </div>
             <div
               v-if="badBooks.length > 0"
@@ -49,10 +50,13 @@
             </button>
           </div>
           <div v-else class="flex gap-4">
-            Your data should be good to go. You should be able to copy
-            {{ configDir }} to the equivalent location on your new pc
+            <p>
+              Your data should be good to go. You should be able to copy the
+              folder <span class="bg-primary font-mono"> {{ configDir }} </span>
+              to the equivalent location on your new pc
 
-            If you need any help, please reach out in the discord
+              If you need any help, please reach out in the discord
+            </p>
           </div>
         </div>
       </div>
@@ -93,7 +97,9 @@ async function fixPaths() {
   await FixBookPaths().then(
     (theBadBooks: backend.Book[]) => {
       badBooks.value = theBadBooks;
+      load();
     });
   await FixSettingsPaths();
+  load();
 }
 </script>
