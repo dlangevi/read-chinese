@@ -21,6 +21,7 @@
       <button class="btn-primary btn" @click="importAnkiReviews">
         Sync dates from Anki
       </button>
+      <data-manager />
       <import-csv v-if="UserSettings.meta.EnableExperimental" />
     </div>
     <ag-grid-vue
@@ -46,6 +47,7 @@ import type {
 import { GetWordsGrid } from '@wailsjs/backend/knownWords';
 import { backend } from '@wailsjs/models';
 import DeleteLearned from '@/components/DeleteLearned.vue';
+import DataManager from '@/components/DataManager.vue';
 import ImportCsv from '@/components/ImportCsv.vue';
 import {
   ImportAnkiKeywords,

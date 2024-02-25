@@ -5,7 +5,8 @@
         <th>Title</th>
         <th>Author</th>
         <th>Percent Known</th>
-        <th>Favorite</th>
+        <th>Length</th>
+        <th @click="emit('sortBy')">Favorite</th>
         <th>Read</th>
         <th />
       </tr>
@@ -24,6 +25,7 @@
             (book.stats.totalKnownWords / book.totalWords * 100).toFixed(2)
           }}%
         </td>
+        <td>{{ book.totalCharacters }}</td>
         <td @click.stop>
           <input
             v-model="book.favorite"
@@ -72,6 +74,7 @@ function markRead(bookId:number, setTo:boolean) {
 function deleteBook(bookId:number) {
   DeleteBook(bookId);
 }
+const emit = defineEmits(['sortBy']);
 
 const props = defineProps<{
   books: backend.Book[]

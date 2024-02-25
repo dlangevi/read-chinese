@@ -10,12 +10,20 @@ export function BookExists(arg1, arg2) {
   return window['go']['backend']['bookLibrary']['BookExists'](arg1, arg2);
 }
 
+export function BookPathsPortable() {
+  return window['go']['backend']['bookLibrary']['BookPathsPortable']();
+}
+
 export function DeleteBook(arg1) {
   return window['go']['backend']['bookLibrary']['DeleteBook'](arg1);
 }
 
 export function ExportDetailedBooks(arg1) {
   return window['go']['backend']['bookLibrary']['ExportDetailedBooks'](arg1);
+}
+
+export function FixBookPaths() {
+  return window['go']['backend']['bookLibrary']['FixBookPaths']();
 }
 
 export function GetBook(arg1) {

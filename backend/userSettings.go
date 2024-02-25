@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"reflect"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -404,4 +405,48 @@ func (m *UserSettings) RemoveVoice(voice Voice) error {
 
 func (m *UserSettings) ExportMapping() FieldsMapping {
 	return FieldsMapping{}
+}
+
+func (m *UserSettings) SettingsPathsPortable() bool {
+
+	for _, listPath := range m.WordLists.WordLists {
+		if filepath.IsAbs(listPath) {
+			return false
+		}
+	}
+
+	for _, dict := range m.DictionariesConfig.Dicts {
+		if filepath.IsAbs(dict.Path) {
+			return false
+		}
+	}
+	return true
+}
+
+func (m *UserSettings) FixSettingsPaths() error {
+	// This should be much more safe
+
+	// For path in dicts fix path
+	for name, listPath := range m.WordLists.WordLists {
+		if filepath.IsAbs(listPath) {
+			relPath, err := filepath.Rel(ConfigDir(), listPath)
+			if err != nil {
+				return err
+			}
+			m.SaveList(name, relPath)
+		}
+	}
+
+	for name, dict := range m.DictionariesConfig.Dicts {
+		if filepath.IsAbs(dict.Path) {
+			relPath, err := filepath.Rel(ConfigDir(), dict.Path)
+			if err != nil {
+				return err
+			}
+			m.SaveDict(name, relPath, dict.Language)
+		}
+	}
+
+	// For path in userDicts fix path
+	return nil
 }

@@ -22,6 +22,10 @@ export function ExportMapping() {
   return window['go']['backend']['UserSettings']['ExportMapping']();
 }
 
+export function FixSettingsPaths() {
+  return window['go']['backend']['UserSettings']['FixSettingsPaths']();
+}
+
 export function GetMapping(arg1) {
   return window['go']['backend']['UserSettings']['GetMapping'](arg1);
 }
@@ -68,6 +72,10 @@ export function SetUserSettingBool(arg1, arg2) {
 
 export function SetUserSettingInt(arg1, arg2) {
   return window['go']['backend']['UserSettings']['SetUserSettingInt'](arg1, arg2);
+}
+
+export function SettingsPathsPortable() {
+  return window['go']['backend']['UserSettings']['SettingsPathsPortable']();
 }
 
 export function UpdateTimesRan() {

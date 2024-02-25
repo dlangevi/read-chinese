@@ -3,6 +3,7 @@ package backend
 import (
 	"errors"
 	"log"
+	"path"
 	"strings"
 )
 
@@ -48,7 +49,11 @@ func (d *Dictionaries) PassSegmentation(s *Segmentation) {
 func (d *Dictionaries) loadDictionaries() error {
 	d.Dictionaries = map[string]UserDictionary{}
 	for name, dict := range d.backend.UserSettings.DictionariesConfig.Dicts {
-		newDict, err := FromSavedDictionary(dict.Path)
+		dictPath := dict.Path
+		if !path.IsAbs(dict.Path) {
+			dictPath = ConfigDir(dictPath)
+		}
+		newDict, err := FromSavedDictionary(dictPath)
 		if err != nil {
 			return err
 		}
@@ -87,18 +92,20 @@ func (d *Dictionaries) AddCedict() {
 	if err != nil {
 		log.Println(err)
 	}
-	savedPath := ConfigDir("userDicts", "cc-cedict")
+	relPath := path.Join("userDicts", "cc-cedict")
+	savedPath := ConfigDir(relPath)
 	SaveDictionary(dictionary, savedPath)
-	d.backend.UserSettings.SaveDict("cc-cedict", savedPath, "english")
+	d.backend.UserSettings.SaveDict("cc-cedict", relPath, "english")
 	d.loadDictionaries()
 }
 
-func (d *Dictionaries) AddMigakuDictionary(name string, path string, language string) {
+func (d *Dictionaries) AddMigakuDictionary(name string, dictpath string, language string) {
 	// TODO error handle
-	dictionary, _ := FromMigakuJsonFormat(path)
-	savedPath := ConfigDir("userDicts", name)
+	dictionary, _ := FromMigakuJsonFormat(dictpath)
+	relPath := path.Join("userDicts", name)
+	savedPath := ConfigDir(relPath)
 	SaveDictionary(dictionary, savedPath)
-	d.backend.UserSettings.SaveDict(name, savedPath, language)
+	d.backend.UserSettings.SaveDict(name, relPath, language)
 	d.loadDictionaries()
 }
 

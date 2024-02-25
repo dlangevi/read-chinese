@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -84,6 +85,12 @@ type FrequencyTable map[string]int
 
 // doFullSegmentation
 func (s *Segmentation) SegmentFullText(path string) ([]TokenizedSentence, FrequencyTable, error) {
+
+	// TODO while we have both types of paths
+	if !filepath.IsAbs(path) {
+		path = ConfigDir(path)
+	}
+
 	bytes, err := os.ReadFile(path)
 	if err != nil {
 		return nil, nil, err

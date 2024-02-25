@@ -67,9 +67,10 @@ func NewWordLists(
 }
 
 // For now expect file with new word on each line
-func (lists *wordLists) AddList(name string, path string) error {
+func (lists *wordLists) AddList(name string, listpath string) error {
+	relativePath := path.Join("userLists", name)
 	savedPath := ConfigDir("userLists", name)
-	contents, err := os.ReadFile(path)
+	contents, err := os.ReadFile(listpath)
 	if err != nil {
 		return err
 	}
@@ -77,7 +78,7 @@ func (lists *wordLists) AddList(name string, path string) error {
 	if err != nil {
 		return err
 	}
-	lists.backend.UserSettings.SaveList(name, savedPath)
+	lists.backend.UserSettings.SaveList(name, relativePath)
 	return nil
 }
 

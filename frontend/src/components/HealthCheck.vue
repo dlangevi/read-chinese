@@ -130,8 +130,10 @@ import { onBeforeUnmount, watch, reactive, computed, ref } from 'vue';
 import { BrowserOpenURL } from '@runtime/runtime';
 import { ComponentTable, getUserSettings } from '@/lib/userSettings';
 
-import { HealthCheck as bookHealth } from '@wailsjs/backend/bookLibrary';
 import { HealthCheck as dictHealth } from '@wailsjs/backend/Dictionaries';
+import {
+  HealthCheck as bookHealth,
+} from '@wailsjs/backend/bookLibrary';
 import {
   HealthCheck as ankiHealth,
   ConfigurationCheck as ankiConfigured,

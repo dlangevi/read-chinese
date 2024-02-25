@@ -117,6 +117,7 @@ func main() {
 			backendObj.AnkiInterface,
 			backendObj.Calibre,
 			backendObj.WordLists,
+			&backend.ConfigExposer{},
 		},
 		// Windows platform specific options
 		// Windows平台特定选项

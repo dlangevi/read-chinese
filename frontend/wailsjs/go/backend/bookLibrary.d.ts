@@ -6,9 +6,13 @@ export function AddBook(arg1:string,arg2:string,arg3:string,arg4:string):Promise
 
 export function BookExists(arg1:string,arg2:string):Promise<boolean>;
 
+export function BookPathsPortable():Promise<boolean>;
+
 export function DeleteBook(arg1:number):Promise<void>;
 
 export function ExportDetailedBooks(arg1:string):Promise<void>;
+
+export function FixBookPaths():Promise<Array<backend.Book>>;
 
 export function GetBook(arg1:number):Promise<backend.Book>;
 

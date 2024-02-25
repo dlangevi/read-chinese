@@ -39,6 +39,7 @@
       <book-table
         v-if="UserSettings.BookLibrary.DisplayTable"
         :books="favoriteFilter"
+        @sort-by="sortBy = true"
       />
 
       <div
@@ -93,6 +94,7 @@ async function recalculateBooks() {
 const UserSettings = getUserSettings();
 
 const books: Ref<backend.Book[]> = ref([]);
+const sortBy = ref(false);
 
 const favoriteFilter = computed(
   () => {
@@ -106,9 +108,13 @@ const favoriteFilter = computed(
         if (!onlyFavorites) return true;
         return book.favorite;
       }).sort((bookA, bookB) => {
-        const aKnown = (bookA.stats.totalKnownWords / bookA.totalWords);
-        const bKnown = (bookB.stats.totalKnownWords / bookB.totalWords);
-        return bKnown - aKnown;
+        if (sortBy.value) {
+          return bookB.totalCharacters - bookA.totalCharacters;
+        } else {
+          const aKnown = (bookA.stats.totalKnownWords / bookA.totalWords);
+          const bKnown = (bookB.stats.totalKnownWords / bookB.totalWords);
+          return bKnown - aKnown;
+        }
       });
   });
 

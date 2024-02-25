@@ -9,8 +9,10 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/jmoiron/sqlx"
@@ -33,6 +35,8 @@ type (
 		// Check if book already exists in collection
 		BookExists(author string, title string) (bool, error)
 		HealthCheck() error
+		BookPathsPortable() (bool, error)
+		FixBookPaths() ([]Book, error)
 
 		GetFavoriteFrequencies() (map[string]int, error)
 		GetBookFrequencies(bookId int) (map[string]int, error)
@@ -149,9 +153,11 @@ func copyBookText(author string, title string, filePath string) (string, error) 
 
 	ext := path.Ext(filePath)
 	subpath := path.Join(author, fmt.Sprintf("%s%s", title, ext))
-	newCoverLocation := ConfigDir("bookRawText", subpath)
-	err = os.WriteFile(newCoverLocation, bytes, 0666)
-	return newCoverLocation, err
+	// Relative path
+	relativePath := path.Join("bookRawText", subpath)
+	newBookLocation := ConfigDir(relativePath)
+	err = os.WriteFile(newBookLocation, bytes, 0666)
+	return relativePath, err
 }
 
 func (b *bookLibrary) emitBooks() error {
@@ -484,6 +490,86 @@ func (b *bookLibrary) HealthCheck() error {
 		return errors.New("User has 0 books")
 	}
 	return nil
+}
+
+func (b *bookLibrary) BookPathsPortable() (bool, error) {
+	books, err := b.GetBooks()
+	if err != nil {
+		return false, err
+	}
+	for _, book := range books {
+		if filepath.IsAbs(book.Filepath) {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
+// Older versions of read-chinese saved paths as absolute.
+// This ruins data portability, and so we have this to
+// correct this
+func (b *bookLibrary) FixBookPaths() ([]Book, error) {
+	// load an entry from the dictionary
+	// check if its an absolute path
+	books, err := b.GetBooks()
+	missingBooks := []Book{}
+
+	if err != nil {
+		return missingBooks, err
+	}
+
+	tx, err := b.db.Beginx()
+
+	for _, book := range books {
+		oldPath := book.Filepath
+		if filepath.IsAbs(oldPath) {
+			// Two options. Either the file path is pointing to whereever
+			// the file was imported from, or during import it was copied
+			// to $CONFIG_DIR/bookRawText/Author/Title.txt
+
+			// This can fail if for some reason they have also
+			// put their books in a folder titled 'bookRawText'
+			relativePath := ""
+			segPath, _ := book.SegmentedFile.Value()
+			relativeSeg, err := filepath.Rel(ConfigDir(), segPath.(string))
+			if err != nil {
+				log.Printf("Problem with %s to %s", book.Title, err)
+				missingBooks = append(missingBooks, book)
+				continue
+			}
+
+			if strings.Contains(oldPath, "bookRawText") {
+				// The book has already been copied, we just need to
+				// edit its path in the database
+				relativePath, err = filepath.Rel(ConfigDir(), oldPath)
+			} else {
+				// The book needs to be copied from its original location and
+				// moved to the bookRawText folder
+				relativePath, err = copyBookText(book.Author, book.Title, oldPath)
+			}
+			if err != nil {
+				log.Printf("Problem with %s to %s", book.Title, err)
+				missingBooks = append(missingBooks, book)
+			}
+
+			_, execErr := tx.Exec(`UPDATE books 
+               SET filepath=$1,
+                   segmented_file=$2
+               WHERE bookId=$3`,
+				relativePath, relativeSeg, book.BookId)
+			if execErr != nil {
+				tx.Rollback()
+				return missingBooks, execErr
+			}
+		}
+	}
+	if len(missingBooks) != 0 {
+		tx.Rollback()
+	} else {
+		err = tx.Commit()
+	}
+	return missingBooks, err
 }
 
 func (b *bookLibrary) GetFavoriteFrequencies() (map[string]int, error) {
@@ -907,6 +993,13 @@ func saveBookCalculated(db *sqlx.DB, bookId int, frequencyTable FrequencyTable) 
 	}
 
 	return nil
+}
+
+func convertDatabasePaths() bool {
+	// run a scary update sql command? or load them one by one and replace them.
+	// Important! this has to handle cross platform paths
+
+	return false
 }
 
 // TODO might want to run the segementation preloadWords on
