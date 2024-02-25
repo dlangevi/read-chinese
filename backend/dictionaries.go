@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -50,7 +51,7 @@ func (d *Dictionaries) loadDictionaries() error {
 	d.Dictionaries = map[string]UserDictionary{}
 	for name, dict := range d.backend.UserSettings.DictionariesConfig.Dicts {
 		dictPath := dict.Path
-		if !path.IsAbs(dict.Path) {
+		if !filepath.IsAbs(dict.Path) {
 			dictPath = ConfigDir(dictPath)
 		}
 		newDict, err := FromSavedDictionary(dictPath)
